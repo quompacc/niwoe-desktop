@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Xwayland Video Bridge
+Hidden=true
+# NIWOE-only XDG overlay. The ScreenCast portal required by this bridge is not
+# implemented yet; its helper window otherwise appears as a transparent card.
+# Remove this override when ScreenCast and helper-window handling are supported.

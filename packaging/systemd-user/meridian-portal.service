@@ -1,6 +1,6 @@
 [Unit]
 Description=Meridian desktop portal backend
-PartOf=graphical-session.target
+PartOf=graphical-session.target meridian-session.target
 After=dbus.service
 
 [Service]

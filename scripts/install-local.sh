@@ -3,6 +3,7 @@ set -euo pipefail
 
 PREFIX="/usr/local"
 BUILD=0
+PROFILE="release"
 ENABLE_BOOT=0
 WITH_BOOT_SPLASH=""
 DESKTOP_USER="${SUDO_USER:-${USER}}"
@@ -13,10 +14,12 @@ Usage: scripts/install-local.sh [options]
 
 Installs the Meridian binaries, PAM files, themes, portal metadata, and autostart
 metadata from this checkout. It does not install OS packages; run
-scripts/install-deps.sh first on Arch/pacman or apt-based systems.
+scripts/install-deps.sh first on pacman, dnf or apt-based systems.
+Adds an NIWOE development session to the existing display manager.
 
 Options:
   --build                 Run cargo build --release --workspace before install
+  --debug                 Use development binaries from target/debug
   --prefix PATH           Install prefix for binaries/data (default: /usr/local)
   --desktop-user USER     User that owns /var/lib/meridian (default: sudo user)
   --enable-boot           Enable meridian-login.service and disable getty@tty1
@@ -33,6 +36,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --build)
       BUILD=1
+      shift
+      ;;
+    --debug)
+      PROFILE="dev"
       shift
       ;;
     --prefix)
@@ -73,13 +80,15 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
 if [[ "${BUILD}" -eq 1 ]]; then
-  cargo build --release --workspace
+  cargo build --profile "${PROFILE}" --workspace --locked
 fi
+build_dir="target/release"
+[[ "${PROFILE}" != dev ]] || build_dir="target/debug"
 
 require_file() {
   if [[ ! -e "$1" ]]; then
     echo "install-local: missing required file: $1" >&2
-    echo "install-local: run with --build or build the release workspace first" >&2
+    echo "install-local: run with --build for the selected profile first" >&2
     exit 1
   fi
 }
@@ -98,16 +107,16 @@ binaries=(
 )
 
 for bin in "${binaries[@]}"; do
-  require_file "target/release/${bin}"
-  "${SUDO[@]}" install -Dm755 "target/release/${bin}" "${bindir}/${bin}"
+  require_file "${build_dir}/${bin}"
+  "${SUDO[@]}" install -Dm755 "${build_dir}/${bin}" "${bindir}/${bin}"
 done
 
 if [[ "$(uname -s)" == "OpenBSD" ]]; then
   drm_bridge="libmeridian_xwayland_drm_bridge.so"
-  require_file "target/release/${drm_bridge}"
+  require_file "${build_dir}/${drm_bridge}"
   # The compositor resolves the bridge beside its own executable. Keep this
   # OpenBSD-only artifact out of global loader configuration.
-  "${SUDO[@]}" install -Dm755 "target/release/${drm_bridge}" "${bindir}/${drm_bridge}"
+  "${SUDO[@]}" install -Dm755 "${build_dir}/${drm_bridge}" "${bindir}/${drm_bridge}"
 fi
 "${SUDO[@]}" install -Dm755 scripts/meridian-file-picker "${bindir}/meridian-file-picker"
 
@@ -130,10 +139,15 @@ install_template() {
   local tmp
   tmp="$(mktemp)"
   sed "s#@PREFIX@#${PREFIX}#g" "${src}" > "${tmp}"
-  "${SUDO[@]}" install -Dm644 "${tmp}" "${dest}"
+  "${SUDO[@]}" install -Dm"${3:-644}" "${tmp}" "${dest}"
   rm -f "${tmp}"
 }
 
+install_template packaging/meridian-session "${bindir}/meridian-session" 755
+"${SUDO[@]}" install -Dm644 packaging/session-config/autostart/org.kde.xwaylandvideobridge.desktop "${datadir}/meridian/session-config/autostart/org.kde.xwaylandvideobridge.desktop"
+# Display managers normally discover sessions in /usr/share, independently of
+# the prefix used for development binaries under /usr/local.
+install_template packaging/wayland-sessions/meridian.desktop /usr/share/wayland-sessions/meridian.desktop
 install_template packaging/xdg-autostart/meridian-polkit-agent.desktop /etc/xdg/autostart/meridian-polkit-agent.desktop
 install_template packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service "${datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service"
 install_template packaging/systemd-user/meridian-portal.service "${libdir}/systemd/user/meridian-portal.service"

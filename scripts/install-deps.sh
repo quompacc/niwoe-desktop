@@ -8,10 +8,10 @@ usage() {
   cat <<EOF_USAGE
 Usage: scripts/install-deps.sh [options] [all|build|runtime|hardware-test]
 
-Installs Meridian dependencies on Arch/pacman and apt-based systems.
+Installs NIWOE's current technical dependencies on pacman, dnf and apt-based systems.
 
 Options:
-  --manager auto|pacman|apt  Package manager to use (default: auto)
+  --manager auto|pacman|dnf|apt  Package manager to use (default: auto)
   -h, --help                 Show this help
 
 Modes:
@@ -59,7 +59,7 @@ case "${MODE}" in
 esac
 
 case "${MANAGER}" in
-  auto|pacman|apt) ;;
+  auto|pacman|dnf|apt) ;;
   *)
     echo "install-deps: invalid package manager: ${MANAGER}" >&2
     usage >&2
@@ -70,10 +70,12 @@ esac
 if [[ "${MANAGER}" == "auto" ]]; then
   if command -v pacman >/dev/null 2>&1; then
     MANAGER="pacman"
+  elif command -v dnf >/dev/null 2>&1; then
+    MANAGER="dnf"
   elif command -v apt-get >/dev/null 2>&1; then
     MANAGER="apt"
   else
-    echo "install-deps: could not detect pacman or apt-get; pass --manager explicitly or install packages manually" >&2
+    echo "install-deps: could not detect pacman, dnf or apt-get; pass --manager explicitly or install packages manually" >&2
     exit 2
   fi
 fi
@@ -140,6 +142,31 @@ case "${MANAGER}" in
       mesa-utils
       libnotify
       jq
+    )
+    ;;
+  dnf)
+    if ! command -v dnf >/dev/null 2>&1; then
+      echo "install-deps: dnf not found" >&2
+      exit 2
+    fi
+
+    # Verified against Fedora 44's official package index on 2026-09-21.
+    build_packages=(
+      gcc gcc-c++ make pkgconf-pkg-config rust cargo rustfmt clippy clang
+      clang-devel llvm-devel # libclang.so and llvm-config for bindgen/clang-sys
+      pam-devel libseat-devel systemd-devel fontconfig-devel freetype-devel
+      pixman-devel wayland-devel libxkbcommon-devel libinput-devel
+      mesa-libEGL-devel mesa-libGLES-devel mesa-libgbm-devel libdrm-devel
+    )
+    runtime_packages=(
+      dbus-daemon NetworkManager breeze-cursor-theme papirus-icon-theme
+      xkeyboard-config dejavu-sans-fonts google-noto-sans-fonts xdg-utils
+      python3-gobject gtk3 xdg-desktop-portal polkit pam-u2f cups-client
+      pipewire pipewire-pulseaudio pipewire-alsa wireplumber
+      xorg-x11-server-Xwayland
+    )
+    hardware_packages=(
+      libinput-utils drm_info pciutils usbutils mesa-demos libnotify jq
     )
     ;;
   apt)
@@ -229,6 +256,9 @@ echo "install-deps: installing ${#unique[@]} package(s) via ${MANAGER}"
 case "${MANAGER}" in
   pacman)
     "${SUDO[@]}" pacman -Syu --needed --noconfirm "${unique[@]}"
+    ;;
+  dnf)
+    "${SUDO[@]}" dnf install --refresh --setopt=install_weak_deps=False -y "${unique[@]}"
     ;;
   apt)
     "${SUDO[@]}" env DEBIAN_FRONTEND=noninteractive apt-get update

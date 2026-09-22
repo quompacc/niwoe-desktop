@@ -8,3 +8,5 @@ Description=Meridian graphical session
 # target). Tears down with the session.
 Requires=graphical-session.target
 After=graphical-session.target
+PartOf=graphical-session.target
+Wants=meridian-portal.service

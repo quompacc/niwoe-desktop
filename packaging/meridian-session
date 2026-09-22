@@ -1,0 +1,39 @@
+#!/bin/sh
+# The display manager supplies the authenticated user's runtime directory/bus.
+# Do not inherit a parent display: the compositor must select DRM, not Winit.
+set -eu
+unset DISPLAY WAYLAND_DISPLAY
+export XDG_SESSION_TYPE=wayland
+export XDG_CURRENT_DESKTOP=Meridian
+export XDG_SESSION_DESKTOP=meridian
+export DESKTOP_SESSION=meridian
+# Session-local system defaults; user autostart overrides keep their priority.
+# This directory is not added to KDE's environment or global XDG defaults.
+export XDG_CONFIG_DIRS="@PREFIX@/share/meridian/session-config:${XDG_CONFIG_DIRS:-/etc/xdg}"
+cleanup() {
+    # The shared portal frontend caches the desktop/backend chosen at startup.
+    # If our activation environment still owns it, stop it with our target so
+    # the next desktop can select its own backend. Never stop another desktop's
+    # frontend or the shared graphical-session.target.
+    if systemctl --user show-environment 2>/dev/null |
+        grep -qx 'XDG_CURRENT_DESKTOP=Meridian'; then
+        systemctl --user stop xdg-desktop-portal.service meridian-session.target >/dev/null 2>&1 || true
+        return
+    fi
+    systemctl --user stop meridian-session.target >/dev/null 2>&1 || true
+}
+stop_session() {
+    trap - HUP INT TERM
+    kill -TERM "$compositor_pid" 2>/dev/null || true
+    wait "$compositor_pid" 2>/dev/null || true
+    exit "$1"
+}
+trap cleanup EXIT
+"@PREFIX@/bin/meridian" &
+compositor_pid=$!
+trap 'stop_session 129' HUP
+trap 'stop_session 130' INT
+trap 'stop_session 143' TERM
+result=0
+wait "$compositor_pid" || result=$?
+exit "$result"
