@@ -64,7 +64,6 @@ fn draw_header(
 
 fn draw_bento_strip(
     pm: &mut PixmapMut<'_>,
-    _width: u32,
     apps: &[DesktopApp],
     hidden_execs: &HashSet<String>,
     pinned_apps: &[PinnedApp],

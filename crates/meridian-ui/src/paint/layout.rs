@@ -97,15 +97,15 @@ mod tests {
     fn computes_row_layout_for_two_fixed_children() {
         let child_a = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(50.0),
-                height: length(50.0),
+                width: length(50.0_f32),
+                height: length(50.0_f32),
             },
             ..Default::default()
         }));
         let child_b = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(50.0),
-                height: length(50.0),
+                width: length(50.0_f32),
+                height: length(50.0_f32),
             },
             ..Default::default()
         }));
@@ -113,8 +113,8 @@ mod tests {
             Style {
                 flex_direction: FlexDirection::Row,
                 size: Size {
-                    width: length(200.0),
-                    height: length(100.0),
+                    width: length(200.0_f32),
+                    height: length(100.0_f32),
                 },
                 ..Default::default()
             },
@@ -144,8 +144,8 @@ mod tests {
     fn root_matches_requested_size() {
         let root = Container::leaf(Style {
             size: Size {
-                width: length(200.0),
-                height: length(100.0),
+                width: length(200.0_f32),
+                height: length(100.0_f32),
             },
             ..Default::default()
         });

@@ -26,10 +26,11 @@ pub fn launch_autostart_apps() {
 
     let wayland_display = std::env::var("WAYLAND_DISPLAY").unwrap_or_default();
     let xdg_runtime = std::env::var("XDG_RUNTIME_DIR").unwrap_or_default();
+    let desktop = std::env::var("XDG_CURRENT_DESKTOP").unwrap_or_default();
 
     for (name, path) in entries {
-        match parse_desktop_file(&path) {
-            Some(spec) if !spec.hidden => {
+        match parse_desktop_file(&path, &desktop) {
+            Some(spec) if !spec.disabled => {
                 tracing::info!("autostart: launching {} ({})", name, spec.exec_argv[0]);
                 let result = std::process::Command::new(&spec.exec_argv[0])
                     .args(&spec.exec_argv[1..])
@@ -41,7 +42,7 @@ pub fn launch_autostart_apps() {
                 }
             }
             Some(_) => {
-                tracing::debug!("autostart: skipping {} (Hidden=true)", name);
+                tracing::debug!("autostart: skipping {} (hidden or desktop excluded)", name);
             }
             None => {
                 tracing::debug!("autostart: skipping {} (no Exec or not Application)", name);
@@ -52,15 +53,21 @@ pub fn launch_autostart_apps() {
 
 struct DesktopSpec {
     exec_argv: Vec<String>,
-    hidden: bool,
+    disabled: bool,
 }
 
-fn parse_desktop_file(path: &std::path::Path) -> Option<DesktopSpec> {
+fn parse_desktop_file(path: &std::path::Path, desktop: &str) -> Option<DesktopSpec> {
     let content = std::fs::read_to_string(path).ok()?;
+    parse_desktop_entry(&content, desktop)
+}
+
+fn parse_desktop_entry(content: &str, desktop: &str) -> Option<DesktopSpec> {
     let mut in_entry = false;
     let mut exec: Option<String> = None;
     let mut hidden = false;
     let mut entry_type: Option<String> = None;
+    let mut only_show_in = None;
+    let mut not_show_in = None;
 
     for line in content.lines() {
         let line = line.trim();
@@ -77,10 +84,10 @@ fn parse_desktop_file(path: &std::path::Path) -> Option<DesktopSpec> {
             exec = Some(val.to_string());
         } else if let Some(val) = line.strip_prefix("Hidden=") {
             hidden = val.trim().eq_ignore_ascii_case("true");
-        } else if let Some(val) = line.strip_prefix("NoDisplay=") {
-            if val.trim().eq_ignore_ascii_case("true") {
-                hidden = true;
-            }
+        } else if let Some(val) = line.strip_prefix("OnlyShowIn=") {
+            only_show_in = Some(val);
+        } else if let Some(val) = line.strip_prefix("NotShowIn=") {
+            not_show_in = Some(val);
         }
     }
 
@@ -96,8 +103,20 @@ fn parse_desktop_file(path: &std::path::Path) -> Option<DesktopSpec> {
 
     Some(DesktopSpec {
         exec_argv: argv,
-        hidden,
+        disabled: hidden || !desktop_allowed(desktop, only_show_in, not_show_in),
     })
+}
+
+// XDG_CURRENT_DESKTOP is colon-separated; desktop entry lists use semicolons.
+// NoDisplay only controls menu visibility and must not disable autostart.
+fn desktop_allowed(desktop: &str, only: Option<&str>, not: Option<&str>) -> bool {
+    let matches = |list: &str| {
+        desktop
+            .split(':')
+            .filter(|name| !name.is_empty())
+            .any(|name| list.split(';').any(|entry| entry == name))
+    };
+    only.is_none_or(matches) && !not.is_some_and(matches)
 }
 
 /// Parse a desktop file Exec= value into argv, stripping field codes.
@@ -157,4 +176,50 @@ fn autostart_dirs() -> Vec<PathBuf> {
         }
     }
     dirs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse_desktop_entry;
+
+    fn enabled(keys: &str, desktop: &str) -> bool {
+        let content = format!("[Desktop Entry]\nType=Application\nExec=example --flag\n{keys}");
+        let spec = parse_desktop_entry(&content, desktop).expect("application entry");
+        assert_eq!(spec.exec_argv, ["example", "--flag"]);
+        !spec.disabled
+    }
+
+    #[test]
+    fn excludes_foreign_desktop_autostarts() {
+        assert!(!enabled("OnlyShowIn=KDE;GNOME;", "Meridian"));
+        assert!(enabled("OnlyShowIn=KDE;Meridian;", "Meridian"));
+        assert!(!enabled("NotShowIn=Meridian;", "Meridian"));
+        assert!(enabled("NotShowIn=KDE;", "Meridian"));
+    }
+
+    #[test]
+    fn matches_exact_names_in_desktop_lists() {
+        assert!(enabled("OnlyShowIn=Meridian;", "Other:Meridian"));
+        assert!(!enabled("NotShowIn=Meridian;", "Other:Meridian"));
+        assert!(!enabled("OnlyShowIn=Meridian;", "MeridianExtra"));
+        assert!(!enabled("OnlyShowIn=Meridian;", "meridian"));
+        assert!(!enabled("OnlyShowIn=;", ":"));
+        assert!(!enabled("OnlyShowIn=Meridian;", ""));
+        assert!(enabled("", ""));
+    }
+
+    #[test]
+    fn hidden_disables_but_no_display_does_not() {
+        assert!(enabled("NoDisplay=true\n", "Meridian"));
+        assert!(!enabled("Hidden=true\nNoDisplay=false\n", "Meridian"));
+        assert!(!enabled("NoDisplay=true\nHidden=true\n", "Meridian"));
+    }
+
+    #[test]
+    fn ignores_keys_in_other_groups() {
+        assert!(enabled(
+            "[Desktop Action other]\nOnlyShowIn=KDE;\nHidden=true",
+            "Meridian"
+        ));
+    }
 }

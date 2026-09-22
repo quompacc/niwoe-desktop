@@ -151,6 +151,7 @@ pub(crate) fn system_xkb_settings() -> (String, String, String, String) {
     (String::new(), String::new(), String::new(), String::new())
 }
 
+#[cfg(any(target_os = "openbsd", test))]
 fn openbsd_kbdtype_value(contents: &str) -> Option<(String, String)> {
     let value = contents
         .lines()

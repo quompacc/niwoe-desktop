@@ -40,8 +40,8 @@ mod smoke {
         let child = tree
             .new_leaf(Style {
                 size: Size {
-                    width: length(50.0),
-                    height: length(50.0),
+                    width: length(50.0_f32),
+                    height: length(50.0_f32),
                 },
                 ..Default::default()
             })
@@ -50,8 +50,8 @@ mod smoke {
             .new_with_children(
                 Style {
                     size: Size {
-                        width: length(200.0),
-                        height: length(100.0),
+                        width: length(200.0_f32),
+                        height: length(100.0_f32),
                     },
                     ..Default::default()
                 },

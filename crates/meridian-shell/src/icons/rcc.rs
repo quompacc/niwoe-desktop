@@ -213,7 +213,7 @@ impl RccArchive {
         let bytes = self.raw.get(data_start..data_end)?;
 
         let mut units = Vec::with_capacity(units_len);
-        for chunk in bytes.chunks_exact(2) {
+        for chunk in bytes.as_chunks::<2>().0.iter() {
             units.push(u16::from_be_bytes([chunk[0], chunk[1]]));
         }
 

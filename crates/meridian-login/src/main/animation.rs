@@ -252,7 +252,7 @@ fn run_animation(
         }
 
         // tiny-skia is RGBA; DRM XRGB8888 on LE wants BGRX. Swap in cached RAM…
-        for px in frame_buf.chunks_exact_mut(4) {
+        for px in frame_buf.as_chunks_mut::<4>().0.iter_mut() {
             px.swap(0, 2);
         }
         // …then a single write-only copy into the scanout buffer.

@@ -64,7 +64,7 @@ fn blit_rgba_to_argb(src: &[u8], dst: &mut [u8]) {
     if src.len() != dst.len() || !src.len().is_multiple_of(4) {
         return;
     }
-    for (rgba, argb) in src.chunks_exact(4).zip(dst.chunks_exact_mut(4)) {
+    for (rgba, argb) in src.as_chunks::<4>().0.iter().zip(dst.as_chunks_mut::<4>().0.iter_mut()) {
         argb[0] = rgba[2];
         argb[1] = rgba[1];
         argb[2] = rgba[0];

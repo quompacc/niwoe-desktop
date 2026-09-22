@@ -53,7 +53,7 @@ fn windows_for_pinned_app(app: &PinnedApp, windows: &[PanelWindowEntry]) -> (usi
 /// Recolour a premultiplied-RGBA pixmap to `color`, keeping its alpha (shape).
 /// Used to tint the symbolic battery icon to the active power-profile colour.
 fn tint_pixmap_premul(pm: &mut Pixmap, color: Color) {
-    for px in pm.data_mut().chunks_exact_mut(4) {
+    for px in pm.data_mut().as_chunks_mut::<4>().0.iter_mut() {
         let a = px[3] as u16;
         px[0] = ((color.r as u16 * a) / 255) as u8;
         px[1] = ((color.g as u16 * a) / 255) as u8;
@@ -151,7 +151,7 @@ pub(crate) fn build_panel_widget_tree(
             align_items: Some(AlignItems::Center),
             gap: UiSize {
                 width: ui_length(GAP as f32),
-                height: ui_length(0.0),
+                height: ui_length(0.0_f32),
             },
             ..Default::default()
         },
@@ -167,7 +167,7 @@ pub(crate) fn build_panel_widget_tree(
             align_items: Some(AlignItems::Center),
             gap: UiSize {
                 width: ui_length(GAP as f32),
-                height: ui_length(0.0),
+                height: ui_length(0.0_f32),
             },
             overflow: TaffyPoint {
                 x: Overflow::Hidden,
@@ -254,7 +254,7 @@ pub(crate) fn build_panel_widget_tree(
             align_items: Some(AlignItems::Center),
             gap: UiSize {
                 width: ui_length(GAP as f32),
-                height: ui_length(0.0),
+                height: ui_length(0.0_f32),
             },
             ..Default::default()
         },
@@ -275,8 +275,8 @@ pub(crate) fn build_panel_widget_tree(
             padding: TaffyRect {
                 left: ui_length(LEFT_PADDING as f32),
                 right: ui_length(RIGHT_PADDING as f32),
-                top: ui_length(0.0),
-                bottom: ui_length(0.0),
+                top: ui_length(0.0_f32),
+                bottom: ui_length(0.0_f32),
             },
             ..Default::default()
         },

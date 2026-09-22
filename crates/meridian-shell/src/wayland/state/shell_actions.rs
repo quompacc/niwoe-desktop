@@ -259,11 +259,8 @@ impl MeridianShell {
         );
         self.launcher_icons_warmed = false;
         meridian_config::MeridianConfig::save_theme(&name);
-        // THEME-1: KDE/Qt (Breeze/KColorScheme) and GTK apps read legacy config
-        // files (kdeglobals / gtk settings.ini / gsettings), not the appearance
-        // portal. Re-export them so a live theme switch reaches those apps too.
-        // (Already-running KColorScheme apps only re-read kdeglobals at startup,
-        // so this mainly affects apps launched after the switch.)
+        // Refresh private toolkit artifacts without changing shared desktop
+        // preferences. The portal handles the public appearance setting.
         crate::theme_export::export_theme(&self.theme);
         self.ipc.send(&ShellCommand::ReloadConfig);
         tracing::info!("Theme applied: {}", name);

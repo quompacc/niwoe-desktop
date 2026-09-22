@@ -20,7 +20,7 @@ impl Widget for SettingsHeaderBar {
             align_items: Some(AlignItems::Center),
             gap: UiSize {
                 width: ui_length(SETTINGS_CHROME.header_gap as f32),
-                height: ui_length(0.0),
+                height: ui_length(0.0_f32),
             },
             size: UiSize {
                 width: ui_length(self.width as f32),
@@ -29,8 +29,8 @@ impl Widget for SettingsHeaderBar {
             padding: TaffyRect {
                 left: ui_length(SETTINGS_CHROME.header_pad as f32),
                 right: ui_length(SETTINGS_CHROME.header_pad as f32),
-                top: ui_length(0.0),
-                bottom: ui_length(0.0),
+                top: ui_length(0.0_f32),
+                bottom: ui_length(0.0_f32),
             },
             ..Default::default()
         }
@@ -236,10 +236,10 @@ impl Widget for SidebarPanel {
                 height: ui_length(self.height as f32),
             },
             padding: TaffyRect {
-                left: ui_length(0.0),
-                right: ui_length(0.0),
+                left: ui_length(0.0_f32),
+                right: ui_length(0.0_f32),
                 top: ui_length(SETTINGS_CHROME.sidebar_top_pad as f32),
-                bottom: ui_length(0.0),
+                bottom: ui_length(0.0_f32),
             },
             ..Default::default()
         }
@@ -390,7 +390,7 @@ impl Widget for VerticalDivider {
     fn style(&self) -> WidgetStyle {
         WidgetStyle {
             size: UiSize {
-                width: ui_length(1.0),
+                width: ui_length(1.0_f32),
                 height: ui_length(self.height as f32),
             },
             ..Default::default()

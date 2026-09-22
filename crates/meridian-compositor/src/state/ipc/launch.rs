@@ -169,9 +169,7 @@ mod tests {
         time::{SystemTime, UNIX_EPOCH},
     };
 
-    #[cfg(target_os = "openbsd")]
-    use super::apply_launch_environment;
-    use super::prepare_launch;
+    use super::{apply_launch_environment, prepare_launch};
 
     fn env_lock() -> &'static Mutex<()> {
         static LOCK: OnceLock<Mutex<()>> = OnceLock::new();

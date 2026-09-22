@@ -23,7 +23,7 @@ impl Widget for PanelWindowChip {
         WidgetStyle {
             size: UiSize {
                 width: ui_length(self.width as f32),
-                height: ui_length(20.0),
+                height: ui_length(20.0_f32),
             },
             ..Default::default()
         }

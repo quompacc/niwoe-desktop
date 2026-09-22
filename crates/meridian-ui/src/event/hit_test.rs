@@ -51,8 +51,8 @@ mod tests {
     fn hit_test_returns_none_outside_root() {
         let root = Container::leaf(Style {
             size: Size {
-                width: length(100.0),
-                height: length(100.0),
+                width: length(100.0_f32),
+                height: length(100.0_f32),
             },
             ..Default::default()
         });
@@ -75,8 +75,8 @@ mod tests {
     fn hit_test_returns_empty_path_for_root_only_hit() {
         let root = Container::leaf(Style {
             size: Size {
-                width: length(100.0),
-                height: length(100.0),
+                width: length(100.0_f32),
+                height: length(100.0_f32),
             },
             ..Default::default()
         });
@@ -99,23 +99,23 @@ mod tests {
     fn hit_test_picks_correct_sibling() {
         let left = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(50.0),
-                height: length(50.0),
+                width: length(50.0_f32),
+                height: length(50.0_f32),
             },
             ..Default::default()
         }));
         let right = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(50.0),
-                height: length(50.0),
+                width: length(50.0_f32),
+                height: length(50.0_f32),
             },
             ..Default::default()
         }));
         let root = Container::new(
             Style {
                 size: Size {
-                    width: length(200.0),
-                    height: length(100.0),
+                    width: length(200.0_f32),
+                    height: length(100.0_f32),
                 },
                 ..Default::default()
             },
@@ -143,16 +143,16 @@ mod tests {
     fn hit_test_picks_deepest_child() {
         let deep = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(50.0),
-                height: length(50.0),
+                width: length(50.0_f32),
+                height: length(50.0_f32),
             },
             ..Default::default()
         }));
         let inner = Box::new(Container::new(
             Style {
                 size: Size {
-                    width: length(100.0),
-                    height: length(100.0),
+                    width: length(100.0_f32),
+                    height: length(100.0_f32),
                 },
                 ..Default::default()
             },
@@ -161,8 +161,8 @@ mod tests {
         let root = Container::new(
             Style {
                 size: Size {
-                    width: length(200.0),
-                    height: length(200.0),
+                    width: length(200.0_f32),
+                    height: length(200.0_f32),
                 },
                 ..Default::default()
             },
@@ -195,16 +195,16 @@ mod tests {
         // Absolute coords: root(0,0), inner(10,10) to (90,90), deep(10,10) to (50,50)
         let deep = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(40.0),
-                height: length(40.0),
+                width: length(40.0_f32),
+                height: length(40.0_f32),
             },
             ..Default::default()
         }));
         let inner = Box::new(Container::new(
             Style {
                 size: Size {
-                    width: length(80.0),
-                    height: length(80.0),
+                    width: length(80.0_f32),
+                    height: length(80.0_f32),
                 },
                 ..Default::default()
             },
@@ -213,14 +213,14 @@ mod tests {
         let root = Container::new(
             Style {
                 size: Size {
-                    width: length(200.0),
-                    height: length(200.0),
+                    width: length(200.0_f32),
+                    height: length(200.0_f32),
                 },
                 padding: taffy::prelude::Rect {
-                    left: length(10.0),
-                    top: length(10.0),
-                    right: length(0.0),
-                    bottom: length(0.0),
+                    left: length(10.0_f32),
+                    top: length(10.0_f32),
+                    right: length(0.0_f32),
+                    bottom: length(0.0_f32),
                 },
                 ..Default::default()
             },

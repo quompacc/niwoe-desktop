@@ -90,7 +90,7 @@ impl FileChooserImpl {
                 }
                 let uri = path_to_uri(&path);
                 info!("SaveFile: selected {uri:?}");
-                (0, str_asv("uri", uri))
+                (0, uris_asv(vec![uri]))
             }
             Ok(_) => (1, Asv::new()),
             Err(e) => {
@@ -106,8 +106,11 @@ impl FileChooserImpl {
         _app_id: &str,
         _parent_window: &str,
         title: &str,
-        _options: Asv,
+        options: Asv,
     ) -> (u32, Asv) {
+        let Some(names) = save_names(&options) else {
+            return (2, Asv::new());
+        };
         debug!("SaveFiles title={title:?} (directory picker)");
         let mut cmd = Command::new(file_picker_path());
         cmd.arg("--directory").arg("--title").arg(title);
@@ -119,7 +122,18 @@ impl FileChooserImpl {
                 if path.is_empty() {
                     (1, Asv::new())
                 } else {
-                    (0, str_asv("destination", path))
+                    let base = path_to_uri(&path);
+                    let uris = names
+                        .iter()
+                        .map(|name| {
+                            format!(
+                                "{}/{}",
+                                base.trim_end_matches('/'),
+                                percent_encode_path(name)
+                            )
+                        })
+                        .collect();
+                    (0, uris_asv(uris))
                 }
             }
             Ok(_) => (1, Asv::new()),
@@ -131,13 +145,22 @@ impl FileChooserImpl {
     }
 }
 
-// Build a{sv} with a single string value.
-fn str_asv(key: &str, value: String) -> Asv {
-    let mut m = Asv::new();
-    if let Ok(owned) = Value::from(value).try_to_owned() {
-        m.insert(key.into(), owned);
+// Reject malformed names rather than allowing a client to escape the selected folder.
+fn save_names(options: &Asv) -> Option<Vec<String>> {
+    let files: Vec<Vec<u8>> = options.get("files")?.try_clone().ok()?.try_into().ok()?;
+    if files.is_empty() {
+        return None;
     }
-    m
+    files
+        .into_iter()
+        .map(|bytes| {
+            let name = std::str::from_utf8(bytes.strip_suffix(&[0])?).ok()?;
+            if name.is_empty() || name == "." || name == ".." || name.contains(['/', '\0']) {
+                return None;
+            }
+            Some(name.to_owned())
+        })
+        .collect()
 }
 
 // Build a{sv} with a "uris" key holding an array of strings.
@@ -201,7 +224,46 @@ fn forward_env(cmd: &mut Command) {
 
 #[cfg(test)]
 mod tests {
-    use super::path_to_uri;
+    use super::*;
+
+    #[test]
+    fn save_result_has_portal_uri_array() {
+        let result = uris_asv(vec![path_to_uri("/tmp/My file.txt")]);
+        let uris: Vec<String> = result["uris"].try_clone().unwrap().try_into().unwrap();
+        assert_eq!(uris, ["file:///tmp/My%20file.txt"]);
+        assert_eq!(result.len(), 1);
+    }
+
+    fn files_options(names: &[&[u8]]) -> Asv {
+        let files: Vec<Vec<u8>> = names.iter().map(|name| name.to_vec()).collect();
+        HashMap::from([("files".into(), Value::from(files).try_to_owned().unwrap())])
+    }
+
+    #[test]
+    fn save_names_preserve_order_and_spaces() {
+        assert_eq!(
+            save_names(&files_options(&[b"a b.txt\0", b"two.txt\0"])),
+            Some(vec!["a b.txt".into(), "two.txt".into()])
+        );
+    }
+
+    #[test]
+    fn save_names_reject_invalid_paths_and_encoding() {
+        for invalid in [
+            b"../escape\0".as_slice(),
+            b"/absolute\0",
+            b"..\0",
+            b".\0",
+            b"\0",
+            b"missing terminator",
+            b"embedded\0nul\0",
+            b"\xff\0",
+        ] {
+            assert!(save_names(&files_options(&[invalid])).is_none());
+        }
+        assert!(save_names(&files_options(&[])).is_none());
+        assert!(save_names(&Asv::new()).is_none());
+    }
 
     #[test]
     fn path_to_uri_preserves_existing_file_uri() {

@@ -23,7 +23,7 @@ fn decode_to_rgba8(
             if src.len() != pixels * 3 {
                 return None;
             }
-            for (index, chunk) in src.chunks_exact(3).enumerate() {
+            for (index, chunk) in src.as_chunks::<3>().0.iter().enumerate() {
                 let out = index * 4;
                 rgba[out] = chunk[0];
                 rgba[out + 1] = chunk[1];
@@ -47,7 +47,7 @@ fn decode_to_rgba8(
             if src.len() != pixels * 2 {
                 return None;
             }
-            for (index, chunk) in src.chunks_exact(2).enumerate() {
+            for (index, chunk) in src.as_chunks::<2>().0.iter().enumerate() {
                 let out = index * 4;
                 rgba[out] = chunk[0];
                 rgba[out + 1] = chunk[0];
@@ -65,7 +65,7 @@ fn decode_to_rgba8(
 
 fn rgba_to_bgra(rgba: &[u8]) -> Vec<u8> {
     let mut bgra = Vec::with_capacity(rgba.len());
-    for chunk in rgba.chunks_exact(4) {
+    for chunk in rgba.as_chunks::<4>().0.iter() {
         bgra.push(chunk[2]);
         bgra.push(chunk[1]);
         bgra.push(chunk[0]);

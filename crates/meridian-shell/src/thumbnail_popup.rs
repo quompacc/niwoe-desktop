@@ -173,7 +173,7 @@ mod tests {
 
         // 4x4 XRGB8888 thumb, all red
         let mut thumb = vec![0u8; 4 * 4 * 4];
-        for px in thumb.chunks_exact_mut(4) {
+        for px in thumb.as_chunks_mut::<4>().0.iter_mut() {
             px[0] = 0;
             px[1] = 0;
             px[2] = 255;

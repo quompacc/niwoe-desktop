@@ -211,10 +211,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut event_loop = EventLoop::try_new()?;
     let (mut shell, qh) = wayland::initialize(&mut event_loop)?;
     activate_user_session();
-    // THEME-1: write the legacy theme files (kdeglobals / gtk settings.ini /
-    // gsettings) that KDE/GTK apps read at startup, BEFORE any app launches.
-    // The appearance portal alone does not make Breeze/KColorScheme apps (e.g.
-    // Gwenview) follow the dark theme; they need kdeglobals at their own start.
+    // Stage private toolkit files. Never overwrite another desktop's shared
+    // KDE/GTK preferences; the appearance portal publishes our colour scheme.
     theme_export::export_theme(&shell.theme);
     autostart::launch_autostart_apps();
 

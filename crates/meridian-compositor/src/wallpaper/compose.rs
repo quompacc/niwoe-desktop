@@ -91,8 +91,8 @@ mod tests {
         let out = compose_for_size(None, WallpaperMode::Fill, 3, 2);
 
         assert_eq!(out.len(), 3 * 2 * 4);
-        for chunk in out.chunks_exact(4) {
-            assert_eq!(chunk, [0x1a, 0x1b, 0x26, 0xff]);
+        for chunk in out.as_chunks::<4>().0.iter() {
+            assert_eq!(*chunk, [0x1a, 0x1b, 0x26, 0xff]);
         }
     }
 
@@ -142,8 +142,8 @@ mod tests {
         assert_eq!(fill.len(), 5 * 3 * 4);
         assert_eq!(fit.len(), 5 * 3 * 4);
 
-        for chunk in fill.chunks_exact(4) {
-            assert_eq!(chunk, [33, 44, 55, 255]);
+        for chunk in fill.as_chunks::<4>().0.iter() {
+            assert_eq!(*chunk, [33, 44, 55, 255]);
         }
 
         // Fit keeps aspect ratio, so a 2:2 source in a 5x3 target is centered

@@ -1,5 +1,64 @@
 use super::*;
 
+/// Manual CPU baseline: run in both dev and release profiles on the same host.
+/// Measures warm palette painting (200 synthetic apps, no icon I/O), not GPU,
+/// Wayland presentation or end-to-end input latency. No timing assertion in CI.
+#[test]
+#[ignore = "manual launcher paint baseline; compare dev and release"]
+fn launcher_paint_baseline() {
+    use std::{hint::black_box, time::Instant};
+
+    let theme = meridian_config::ThemeConfig::default();
+    let icons = IconCache::new();
+    let hidden = HashSet::new();
+    let apps: Vec<_> = (0..200)
+        .map(|i| {
+            DesktopApp::new(
+                format!("Application {i:03}"),
+                vec![format!("app-{i}")],
+                false,
+            )
+        })
+        .collect();
+    let mut canvas = vec![0; (crate::LAUNCHER_WIDTH * crate::LAUNCHER_HEIGHT * 4) as usize];
+    for query in ["", "Application 1"] {
+        let mut timings = Vec::new();
+        for iteration in 0..23 {
+            let started = Instant::now();
+            draw_command_palette(
+                &mut canvas,
+                crate::LAUNCHER_WIDTH,
+                crate::LAUNCHER_HEIGHT,
+                &[],
+                &apps,
+                LauncherCategory::All,
+                query,
+                0,
+                Some(iteration % 8),
+                None,
+                &icons,
+                &hidden,
+                Some(iteration % 8),
+                None,
+                false,
+                None,
+                &theme,
+            );
+            black_box(&canvas);
+            if iteration >= 3 {
+                timings.push(started.elapsed().as_secs_f64() * 1000.0);
+            }
+        }
+        timings.sort_by(f64::total_cmp);
+        println!(
+            "launcher paint: debug={} query={query:?} apps={} size={}x{} samples={} median_ms={:.3} p95_ms={:.3}",
+            cfg!(debug_assertions), apps.len(), crate::LAUNCHER_WIDTH,
+            crate::LAUNCHER_HEIGHT, timings.len(), timings[10], timings[18]
+        );
+        assert!(canvas.as_chunks::<4>().0.iter().any(|pixel| pixel[3] != 0));
+    }
+}
+
 #[test]
 fn blit_rgba_to_argb_swaps_red_and_blue() {
     let src = [0x12u8, 0x34, 0x56, 0x78];

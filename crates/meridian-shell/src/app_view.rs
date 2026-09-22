@@ -241,8 +241,7 @@ pub(crate) fn scroll_grid_selection_into_view(
 ) -> i32 {
     let content_y = CP_APPS_TOP + LAUNCHER_LAYOUT.content_pad + LAUNCHER_LAYOUT.app_heading_height;
     let view_h =
-        (LAUNCHER_LAYOUT.height as i32 - content_y - CP_FOOTER_H - LAUNCHER_LAYOUT.content_pad)
-            .max(0);
+        (LAUNCHER_LAYOUT.height - content_y - CP_FOOTER_H - LAUNCHER_LAYOUT.content_pad).max(0);
     let card_top = (selected_idx / CP_APP_COLS) as i32 * CP_APP_ROW_H;
     let card_bottom = card_top + LAUNCHER_LAYOUT.app_card_height;
     let wanted = if card_top < current_scroll {
@@ -373,7 +372,6 @@ pub(crate) fn draw_command_palette(
 
         draw_bento_strip(
             &mut pm,
-            width,
             all_apps,
             hidden_execs,
             pinned_apps,

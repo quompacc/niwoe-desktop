@@ -1,8 +1,6 @@
-use std::{
-    os::fd::{AsFd, AsRawFd},
-    os::unix::io::OwnedFd,
-    process::Stdio,
-};
+#[cfg(target_os = "openbsd")]
+use std::os::fd::{AsFd, AsRawFd};
+use std::{os::unix::io::OwnedFd, process::Stdio};
 
 use smithay::{
     desktop::Window,

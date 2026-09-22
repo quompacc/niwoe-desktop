@@ -16,7 +16,7 @@ use smithay::{
     desktop::{layer_map_for_output, space::render_output, space::SpaceRenderElements, Window},
     output::{Mode, Output, PhysicalProperties, Subpixel},
     reexports::calloop::EventLoop,
-    utils::{Rectangle, Scale, Transform},
+    utils::{Scale, Transform},
 };
 
 use crate::{
@@ -169,7 +169,6 @@ pub fn init_winit(
                 if !matches!(state.output_power_manager.mode_for(&output.name()), OutputPowerMode::Off)
                 {
                     let size = backend.window_size();
-                    let damage = Rectangle::from_size(size);
                     let age = backend.buffer_age().unwrap_or(0);
                     collect_layer_data(
                         &output,
@@ -177,8 +176,15 @@ pub fn init_winit(
                         &mut render_scratch.upper_layer_data,
                     );
 
-                    {
-                        let (renderer, mut framebuffer) = backend.bind().unwrap();
+                    let rendered = {
+                        let (renderer, mut framebuffer) = match backend.bind() {
+                            Ok(bound) => bound,
+                            Err(error) => {
+                                tracing::error!(?error, "failed to bind nested output");
+                                state.loop_signal.stop();
+                                return;
+                            }
+                        };
                         let scale = Scale::from(1.0f64);
                         render_layer_elements(
                             renderer,
@@ -214,10 +220,26 @@ pub fn init_winit(
                             &mut damage_tracker,
                             bg,
                         )
-                        .unwrap();
-                    }
+                    };
 
-                    backend.submit(Some(&[damage])).unwrap();
+                    let rendered = match rendered {
+                        Ok(rendered) => rendered,
+                        Err(error) => {
+                            tracing::error!(?error, "failed to render nested output");
+                            state.loop_signal.stop();
+                            return;
+                        }
+                    };
+                    // No damage means the renderer skipped drawing and may still
+                    // have a surfaceless context current after importing buffers.
+                    // Swapping then is invalid; only present a rendered frame.
+                    if let Some(damage) = rendered.damage {
+                        if let Err(error) = backend.submit(Some(damage)) {
+                            tracing::error!(?error, "failed to present nested output");
+                            state.loop_signal.stop();
+                            return;
+                        }
+                    }
 
                     let time = state.start_time.elapsed();
                     state

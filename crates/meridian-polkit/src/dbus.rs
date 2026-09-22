@@ -23,10 +23,11 @@ use zbus::{
     zvariant::{OwnedObjectPath, OwnedValue, Value},
 };
 
+mod registration;
+
 pub const AGENT_OBJECT_PATH: &str = "/org/freedesktop/PolicyKit1/AuthenticationAgent";
 
 const POLKIT_BUS_NAME: &str = "org.freedesktop.PolicyKit1";
-const POLKIT_OBJECT_PATH: &str = "/org/freedesktop/PolicyKit1/Authority";
 
 /// One polkit identity (we only support unix-user; unix-group is rare
 /// for end-user auth flows).
@@ -176,6 +177,16 @@ trait Authority {
     ) -> zbus::Result<()>;
 }
 
+impl AgentService {
+    fn cancel_pending(&self) {
+        let pending = std::mem::take(&mut *self.pending.lock().unwrap());
+        for (cookie, cancel) in pending {
+            let _ = cancel.send(());
+            let _ = self.tx.send(DbusEvent::Cancel { cookie });
+        }
+    }
+}
+
 #[proxy(
     interface = "org.freedesktop.ConsoleKit.Manager",
     default_service = "org.freedesktop.ConsoleKit",
@@ -280,31 +291,14 @@ async fn run(
     // bus too — polkit calls us back via the unique bus name it sees
     // during RegisterAuthenticationAgent.
     let conn = zbus::connection::Builder::system()?
-        .serve_at(AGENT_OBJECT_PATH, service)?
+        .serve_at(AGENT_OBJECT_PATH, service.clone())?
         .build()
         .await?;
 
     let session_id = resolve_session_id(&conn, session_id, session_cookie).await?;
-    let proxy = AuthorityProxy::new(&conn).await?;
-    let subject = unix_session_subject(&session_id);
-    proxy
-        .register_authentication_agent(&subject, &locale, AGENT_OBJECT_PATH)
-        .await?;
-    info!(
-        bus_name = %conn.unique_name().map(|n| n.to_string()).unwrap_or_default(),
-        session_id = %session_id,
-        locale = %locale,
-        path = AGENT_OBJECT_PATH,
-        POLKIT_BUS_NAME,
-        POLKIT_OBJECT_PATH,
-        "polkit: agent registered"
-    );
-    let _ = ready_tx.send(Ok(()));
-
-    // Park forever. Unregistration on shutdown would be nicer; for now
-    // polkitd reaps stale agents when the bus name disappears.
-    std::future::pending::<()>().await;
-    Ok(())
+    let result = registration::maintain(&conn, &service, &session_id, &locale, ready_tx).await;
+    service.cancel_pending();
+    result
 }
 
 async fn resolve_session_id(

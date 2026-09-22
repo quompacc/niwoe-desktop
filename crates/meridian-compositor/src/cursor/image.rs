@@ -170,7 +170,7 @@ impl CursorImage {
         }
         let mut has_visible = false;
         let mut has_non_black_visible = false;
-        for px in self.pixels_rgba.chunks_exact(4) {
+        for px in self.pixels_rgba.as_chunks::<4>().0.iter() {
             let [r, g, b, a] = [px[0], px[1], px[2], px[3]];
             if a != 0 {
                 has_visible = true;

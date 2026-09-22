@@ -19,7 +19,9 @@ fn run_login_cycle(
     greeter_assets: &mut Option<GreeterAssets>,
 ) -> Result<bool, Box<dyn std::error::Error>> {
     let reacquire_started_at = Instant::now();
-    let (drm_card, mut card) = open_display_card()?;
+    let (drm_card, card) = open_display_card()?;
+    #[cfg(target_os = "openbsd")]
+    let mut card = card;
     info!(path = %drm_card, "preparing login DRM card (auto-selected display GPU)");
 
     let res = card.resource_handles()?;
@@ -49,7 +51,9 @@ fn run_login_cycle(
     .ok_or("no CRTC available")?;
 
     let mut db = card.create_dumb_buffer((w, h), DrmFourcc::Xrgb8888, 32)?;
-    let mut fb = card.add_framebuffer(&db, 24, 32)?;
+    let fb = card.add_framebuffer(&db, 24, 32)?;
+    #[cfg(target_os = "openbsd")]
+    let mut fb = fb;
 
     let assets_reused = greeter_assets
         .as_ref()
@@ -70,7 +74,7 @@ fn run_login_cycle(
         let mut mapping = card.map_dumb_buffer(&mut db)?;
         let buf = mapping.as_mut();
         assets.backdrop.copy_rgba_to(buf)?;
-        for px in buf.chunks_exact_mut(4) {
+        for px in buf.as_chunks_mut::<4>().0.iter_mut() {
             px.swap(0, 2);
         }
     }
@@ -106,7 +110,7 @@ fn run_login_cycle(
                 let mut mapping = card.map_dumb_buffer(&mut db)?;
                 let buf = mapping.as_mut();
                 assets.backdrop.copy_rgba_to(buf)?;
-                for px in buf.chunks_exact_mut(4) {
+                for px in buf.as_chunks_mut::<4>().0.iter_mut() {
                     px.swap(0, 2);
                 }
             }

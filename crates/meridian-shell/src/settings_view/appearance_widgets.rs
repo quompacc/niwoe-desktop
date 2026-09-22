@@ -226,7 +226,7 @@ impl Widget for SettingsPlaceholder {
         WidgetStyle {
             size: UiSize {
                 width: ui_length(self.width as f32),
-                height: ui_length(60.0),
+                height: ui_length(60.0_f32),
             },
             ..Default::default()
         }

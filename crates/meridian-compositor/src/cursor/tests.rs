@@ -93,7 +93,9 @@ fn embedded_cursor_pixel_spot_check() {
     );
 
     let has_opaque_fill = px
-        .chunks_exact(4)
+        .as_chunks::<4>()
+        .0
+        .iter()
         .any(|rgba| rgba[3] == 255 && rgba[0] == 255 && rgba[1] == 255 && rgba[2] == 255);
     assert!(
         has_opaque_fill,
@@ -111,7 +113,12 @@ fn embedded_cursor_pixel_spot_check() {
 #[test]
 fn embedded_cursor_is_not_all_transparent() {
     let px = &CursorImage::embedded().pixels_rgba;
-    let visible = px.chunks_exact(4).filter(|rgba| rgba[3] > 0).count();
+    let visible = px
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .filter(|rgba| rgba[3] > 0)
+        .count();
     let total = CURSOR_WIDTH as usize * CURSOR_HEIGHT as usize;
     assert!(
         visible * 5 >= total,
@@ -128,7 +135,7 @@ fn embedded_cursor_tip_is_opaque() {
 #[test]
 fn embedded_cursor_uses_premultiplied_alpha() {
     let px = &CursorImage::embedded().pixels_rgba;
-    for rgba in px.chunks_exact(4) {
+    for rgba in px.as_chunks::<4>().0.iter() {
         let [r, g, b, a] = [rgba[0], rgba[1], rgba[2], rgba[3]];
         assert!(
             r <= a && g <= a && b <= a,

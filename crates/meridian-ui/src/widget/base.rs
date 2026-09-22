@@ -115,10 +115,10 @@ impl Container {
                     left: length(pad_x.max(0) as f32),
                     right: length(pad_x.max(0) as f32),
                     top: length(pad_top.max(0) as f32),
-                    bottom: length(0.0),
+                    bottom: length(0.0_f32),
                 },
                 gap: Size {
-                    width: length(0.0),
+                    width: length(0.0_f32),
                     height: length(gap.max(0) as f32),
                 },
                 ..Default::default()
@@ -160,7 +160,7 @@ impl Container {
             Style {
                 flex_direction: FlexDirection::Column,
                 gap: Size {
-                    width: length(0.0),
+                    width: length(0.0_f32),
                     height: length(gap),
                 },
                 ..Default::default()
@@ -176,7 +176,7 @@ impl Container {
                 flex_direction: FlexDirection::Row,
                 gap: Size {
                     width: length(gap),
-                    height: length(0.0),
+                    height: length(0.0_f32),
                 },
                 ..Default::default()
             },
@@ -241,8 +241,8 @@ impl Container {
                 padding: taffy::prelude::Rect {
                     left: length(padding),
                     right: length(padding),
-                    top: length(0.0),
-                    bottom: length(0.0),
+                    top: length(0.0_f32),
+                    bottom: length(0.0_f32),
                 },
                 ..Default::default()
             },
@@ -261,7 +261,7 @@ impl Container {
                 align_items: Some(AlignItems::Center),
                 gap: Size {
                     width: length(gap),
-                    height: length(0.0),
+                    height: length(0.0_f32),
                 },
                 ..Default::default()
             },
@@ -302,14 +302,14 @@ mod tests {
     fn container_style_roundtrips() {
         let widget = Container::leaf(Style {
             size: Size {
-                width: length(42.0),
-                height: length(24.0),
+                width: length(42.0_f32),
+                height: length(24.0_f32),
             },
             ..Default::default()
         });
         let style = widget.style();
-        assert_eq!(style.size.width, length(42.0));
-        assert_eq!(style.size.height, length(24.0));
+        assert_eq!(style.size.width, length(42.0_f32));
+        assert_eq!(style.size.height, length(24.0_f32));
     }
 
     #[test]
@@ -321,8 +321,8 @@ mod tests {
             Some(taffy::prelude::JustifyContent::Center)
         );
         assert_eq!(style.align_items, Some(taffy::prelude::AlignItems::Center));
-        assert_eq!(style.size.width, length(880.0));
-        assert_eq!(style.size.height, length(620.0));
+        assert_eq!(style.size.width, length(880.0_f32));
+        assert_eq!(style.size.height, length(620.0_f32));
     }
 
     #[test]
@@ -330,22 +330,22 @@ mod tests {
         let children: Vec<Box<dyn Widget>> = vec![
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(200.0),
-                    height: length(80.0),
+                    width: length(200.0_f32),
+                    height: length(80.0_f32),
                 },
                 ..Default::default()
             })),
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(140.0),
-                    height: length(90.0),
+                    width: length(140.0_f32),
+                    height: length(90.0_f32),
                 },
                 ..Default::default()
             })),
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(120.0),
-                    height: length(70.0),
+                    width: length(120.0_f32),
+                    height: length(70.0_f32),
                 },
                 ..Default::default()
             })),
@@ -455,15 +455,15 @@ mod tests {
         let children: Vec<Box<dyn Widget>> = vec![
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(100.0),
-                    height: length(80.0),
+                    width: length(100.0_f32),
+                    height: length(80.0_f32),
                 },
                 ..Default::default()
             })),
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(100.0),
-                    height: length(40.0),
+                    width: length(100.0_f32),
+                    height: length(40.0_f32),
                 },
                 ..Default::default()
             })),
@@ -488,15 +488,15 @@ mod tests {
         let children: Vec<Box<dyn Widget>> = vec![
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(100.0),
-                    height: length(50.0),
+                    width: length(100.0_f32),
+                    height: length(50.0_f32),
                 },
                 ..Default::default()
             })),
             Box::new(Container::leaf(Style {
                 size: Size {
-                    width: length(80.0),
-                    height: length(50.0),
+                    width: length(80.0_f32),
+                    height: length(50.0_f32),
                 },
                 ..Default::default()
             })),

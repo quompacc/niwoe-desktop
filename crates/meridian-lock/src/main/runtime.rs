@@ -51,7 +51,7 @@ fn main() -> std::process::ExitCode {
     state.lock = Some(lock);
 
     // Create a lock surface for each output discovered so far
-    let outputs: Vec<wl_output::WlOutput> = state.pending_outputs.drain(..).collect();
+    let outputs = std::mem::take(&mut state.pending_outputs);
     let n = outputs.len();
     for output in &outputs {
         create_lock_surface(&mut state, output, &qh);

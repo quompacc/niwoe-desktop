@@ -83,7 +83,7 @@ fn veil_alpha_255_yields_black_frame() {
             ..Default::default()
         },
     );
-    for chunk in pm.data().chunks_exact(4) {
+    for chunk in pm.data().as_chunks::<4>().0.iter() {
         assert_eq!(
             (chunk[0], chunk[1], chunk[2]),
             (0, 0, 0),
@@ -133,7 +133,7 @@ fn render_glow_at_alone_lights_up_pixels() {
         painter.glow_base_radius(w as f32, h as f32),
     );
     // some pixel must have a nonzero blue channel (cyan glow has high B)
-    let any_blue = pm.data().chunks_exact(4).any(|p| p[2] > 0);
+    let any_blue = pm.data().as_chunks::<4>().0.iter().any(|p| p[2] > 0);
     assert!(any_blue, "glow contributed no blue pixels");
 }
 

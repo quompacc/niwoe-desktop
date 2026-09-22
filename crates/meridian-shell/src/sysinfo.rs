@@ -115,6 +115,7 @@ fn gather_openbsd() -> Option<SystemInfo> {
         .and_then(|text| parse_openbsd_sysctl(&text))
 }
 
+#[cfg(any(target_os = "openbsd", test))]
 fn parse_openbsd_sysctl(output: &str) -> Option<SystemInfo> {
     let mut lines = output.lines().map(str::trim);
     let ostype = lines.next()?.to_string();

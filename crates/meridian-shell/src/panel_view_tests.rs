@@ -7,7 +7,7 @@ use crate::{audio::AudioSnapshot, icons::IconCache, network::NetworkState};
 fn panel_chip_style_returns_correct_size() {
     let chip = PanelChip::new("test", "Test".into(), None, 58, false);
     let style = chip.style();
-    assert_eq!(style.size.width, ui_length(58.0));
+    assert_eq!(style.size.width, ui_length(58.0_f32));
     assert_eq!(style.size.height, ui_length(CHIP_H as f32));
 }
 
@@ -91,7 +91,7 @@ fn status_notifier_label_prefers_title_then_icon_then_service() {
 
 #[test]
 fn status_icons_are_smaller_than_application_icons() {
-    assert!(STATUS_ICON_SIZE < APP_ICON_SIZE);
+    const { assert!(STATUS_ICON_SIZE < APP_ICON_SIZE) };
 }
 
 #[test]

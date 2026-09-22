@@ -109,7 +109,7 @@ fn fill_dim(canvas: &mut [u8], w: u32, h: u32) {
         return;
     }
     // BGRA, premultiplied: dim_alpha * (B=G=R=0) = 0, alpha = DIM_ALPHA.
-    for px in canvas[..total].chunks_exact_mut(4) {
+    for px in canvas[..total].as_chunks_mut::<4>().0.iter_mut() {
         px[0] = 0;
         px[1] = 0;
         px[2] = 0;
@@ -135,7 +135,7 @@ fn clear_rect_interior(canvas: &mut [u8], cw: u32, ch: u32, rect: RegionRect) {
         }
         // Fully transparent — the desktop pixels behind the overlay show
         // through unaltered; this is the "see-through" hole.
-        for px in canvas[start..end].chunks_exact_mut(4) {
+        for px in canvas[start..end].as_chunks_mut::<4>().0.iter_mut() {
             px[0] = 0;
             px[1] = 0;
             px[2] = 0;

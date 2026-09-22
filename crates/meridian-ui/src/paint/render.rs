@@ -92,16 +92,16 @@ mod tests {
     fn render_smoke_does_not_crash() {
         let child = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(50.0),
-                height: length(50.0),
+                width: length(50.0_f32),
+                height: length(50.0_f32),
             },
             ..Default::default()
         }));
         let root = Container::new(
             Style {
                 size: Size {
-                    width: length(100.0),
-                    height: length(100.0),
+                    width: length(100.0_f32),
+                    height: length(100.0_f32),
                 },
                 ..Default::default()
             },
@@ -126,8 +126,8 @@ mod tests {
     fn render_accumulates_offset_across_nested_containers() {
         let spacer = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(100.0),
-                height: length(40.0),
+                width: length(100.0_f32),
+                height: length(40.0_f32),
             },
             ..Default::default()
         }));
@@ -311,8 +311,8 @@ mod tests {
         let called = Cell::new(false);
         let child = Box::new(Container::leaf(Style {
             size: Size {
-                width: length(10.0),
-                height: length(10.0),
+                width: length(10.0_f32),
+                height: length(10.0_f32),
             },
             ..Default::default()
         }));
@@ -399,8 +399,8 @@ mod tests {
             Style {
                 flex_direction: FlexDirection::Row,
                 size: Size {
-                    width: length(300.0),
-                    height: length(200.0),
+                    width: length(300.0_f32),
+                    height: length(200.0_f32),
                 },
                 ..Default::default()
             },

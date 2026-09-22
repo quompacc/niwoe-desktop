@@ -419,7 +419,9 @@ pub(crate) fn load_wallpaper_thumbnail(
     let (w, h) = (rgba.width(), rgba.height());
     let premul: Vec<u8> = rgba
         .into_raw()
-        .chunks_exact(4)
+        .as_chunks::<4>()
+        .0
+        .iter()
         .flat_map(|c| {
             let a = c[3] as u16;
             [

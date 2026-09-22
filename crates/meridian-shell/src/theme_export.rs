@@ -1,24 +1,25 @@
-//! Export the active Meridian theme to the *legacy* desktop-config that GTK and
-//! KDE/Qt applications read — derived entirely from the central design source
+//! Stage the active Meridian theme in private legacy desktop-config for GTK and
+//! KDE/Qt applications — derived entirely from the central design source
 //! ([`meridian_config::ThemeConfig`] / `meridian-tokens`), with **no third-party
 //! theme dependency**.
 //!
 //! Meridian serves `org.freedesktop.appearance color-scheme` over the Settings
 //! portal, but most toolkits do not reconstruct a palette from it:
 //!   - **KDE/Qt** (Breeze / `KColorScheme`, e.g. former defaults) read
-//!     `~/.config/kdeglobals` — so we generate its `[Colors:*]` from the tokens.
+//!     `kdeglobals` — generated here under `meridian/toolkit`, never over KDE's file.
 //!   - **GTK** apps read a *theme*. Rather than depend on a shipped theme like
 //!     Adwaita-dark, Meridian **generates its own GTK theme** from the tokens
 //!     into `~/.local/share/themes/Meridian/` (gtk-3.0 + gtk-4.0 `gtk.css` from
-//!     the templates in `assets/gtk/*.css.in`) and points `gtk-theme-name` at it.
-//!     This keeps every app colour sourced from the single design pipeline.
+//!     the templates in `assets/gtk/*.css.in`). Shared GTK settings are untouched.
+//!     Generated colours remain sourced from the single design pipeline.
 //!
-//! `KColorScheme`/GTK read these at application **startup**, so we export at
-//! session start (before apps launch) and again on every live theme switch.
+//! Files are staged at startup and theme switches. Applying them to external
+//! applications requires a future scoped toolkit integration. The appearance
+//! portal already publishes the theme; never change another desktop's files or
+//! persistent GSettings keys to force application colours.
 
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 use meridian_config::{Color, ThemeConfig};
 
@@ -27,31 +28,13 @@ const GTK_THEME_NAME: &str = "Meridian";
 const GTK3_TEMPLATE: &str = include_str!("../assets/gtk/gtk3.css.in");
 const GTK4_TEMPLATE: &str = include_str!("../assets/gtk/gtk4.css.in");
 
-/// Write every legacy theme artifact derived from `theme` and best-effort sync
-/// the gsettings keys. Never fails the caller; problems are logged.
+/// Write private theme artifacts derived from `theme`. Never overwrites shared
+/// toolkit settings or persistent GSettings. Problems are logged.
 pub(crate) fn export_theme(theme: &ThemeConfig) {
     if let Some(cfg) = config_home() {
-        write_file(&cfg.join("kdeglobals"), &kdeglobals_contents(theme));
-        let gtk_ini = gtk_settings_ini(theme);
-        write_file(&cfg.join("gtk-3.0").join("settings.ini"), &gtk_ini);
-        write_file(&cfg.join("gtk-4.0").join("settings.ini"), &gtk_ini);
-        // libadwaita ignores a custom GTK *theme* but loads the per-user
-        // `~/.config/gtk-{3,4}.0/gtk.css` as an override on top of its own
-        // styling, and there it honours the `@define-color` named colours. The
-        // generated theme dir alone therefore leaves libadwaita apps on their
-        // default dark — writing the SAME substituted template here is what
-        // pulls their whole palette onto the Meridian tokens. (Widget CSS in
-        // this file is still ignored by libadwaita; only the colours land.)
-        write_file(
-            &cfg.join("gtk-3.0").join("gtk.css"),
-            &substitute_tokens(GTK3_TEMPLATE, theme),
-        );
-        write_file(
-            &cfg.join("gtk-4.0").join("gtk.css"),
-            &substitute_tokens(GTK4_TEMPLATE, theme),
-        );
+        write_toolkit_config(&cfg, theme);
     } else {
-        tracing::warn!("theme_export: no config dir; skipping kdeglobals/gtk settings");
+        tracing::warn!("theme_export: no config dir; skipping private toolkit files");
     }
 
     if let Some(data) = data_home() {
@@ -69,10 +52,27 @@ pub(crate) fn export_theme(theme: &ThemeConfig) {
         tracing::warn!("theme_export: no data dir; skipping generated GTK theme");
     }
 
-    apply_gsettings(theme);
     tracing::info!(
-        "theme_export: Meridian theme exported (dark={})",
+        "theme_export: private Meridian theme staged (dark={})",
         !theme.appearance_is_light()
+    );
+}
+
+fn write_toolkit_config(config_home: &Path, theme: &ThemeConfig) {
+    let cfg = config_home.join("meridian").join("toolkit");
+    write_file(&cfg.join("kdeglobals"), &kdeglobals_contents(theme));
+    let gtk_ini = gtk_settings_ini(theme);
+    write_file(&cfg.join("gtk-3.0").join("settings.ini"), &gtk_ini);
+    write_file(&cfg.join("gtk-4.0").join("settings.ini"), &gtk_ini);
+    // Keep CSS beside the private toolkit settings. Never install it as the
+    // user's global GTK override: that would also restyle KDE/GNOME sessions.
+    write_file(
+        &cfg.join("gtk-3.0").join("gtk.css"),
+        &substitute_tokens(GTK3_TEMPLATE, theme),
+    );
+    write_file(
+        &cfg.join("gtk-4.0").join("gtk.css"),
+        &substitute_tokens(GTK4_TEMPLATE, theme),
     );
 }
 
@@ -264,34 +264,6 @@ fn push_color_group(out: &mut String, group: &str, bg: Color, theme: &ThemeConfi
     out.push('\n');
 }
 
-// ─── gsettings ────────────────────────────────────────────────────────────────
-
-/// Best-effort sync of the interface gsettings so apps that read them at runtime
-/// (libadwaita, Cinnamon/X-Apps) pick up the Meridian theme + dark preference.
-fn apply_gsettings(theme: &ThemeConfig) {
-    let dark = !theme.appearance_is_light();
-    let scheme = if dark { "prefer-dark" } else { "default" };
-    let icons = app_icon_theme(theme);
-    for schema in [
-        "org.gnome.desktop.interface",
-        "org.cinnamon.desktop.interface",
-    ] {
-        set_gsetting(schema, "gtk-theme", GTK_THEME_NAME);
-        set_gsetting(schema, "icon-theme", &icons);
-        // color-scheme only exists on the GNOME schema; harmless if absent.
-        set_gsetting(schema, "color-scheme", scheme);
-    }
-}
-
-fn set_gsetting(schema: &str, key: &str, value: &str) {
-    if let Err(e) = Command::new("gsettings")
-        .args(["set", schema, key, value])
-        .status()
-    {
-        tracing::debug!("theme_export: gsettings {schema} {key}: {e}");
-    }
-}
-
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
 /// The icon theme exported to OTHER apps (GTK / Qt / gsettings). Meridian's own
@@ -440,6 +412,42 @@ mod tests {
         let mut custom = ThemeConfig::default();
         custom.icons.theme = "Adwaita".to_string();
         assert_eq!(app_icon_theme(&custom), "Adwaita");
+    }
+
+    #[test]
+    fn toolkit_export_preserves_other_desktop_settings() {
+        let dir = std::env::temp_dir().join(format!(
+            "meridian-toolkit-isolation-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let files = [
+            "kdeglobals",
+            "gtk-3.0/settings.ini",
+            "gtk-4.0/settings.ini",
+            "gtk-3.0/gtk.css",
+            "gtk-4.0/gtk.css",
+        ];
+        for file in files {
+            let path = dir.join(file);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, "existing desktop settings\n").unwrap();
+        }
+        for theme in [ThemeConfig::default(), light_theme()] {
+            write_toolkit_config(&dir, &theme);
+            for file in files {
+                assert_eq!(
+                    fs::read_to_string(dir.join(file)).unwrap(),
+                    "existing desktop settings\n"
+                );
+                assert!(dir.join("meridian/toolkit").join(file).is_file());
+                assert!(!dir.join(format!("{file}.bak")).exists());
+            }
+        }
+        fs::remove_dir_all(dir).unwrap();
     }
 
     #[test]

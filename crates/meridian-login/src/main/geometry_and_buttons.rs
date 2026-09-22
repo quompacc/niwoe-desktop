@@ -261,6 +261,12 @@ fn draw_login_button(
     );
 }
 
+struct PowerButtonState {
+    pending: Option<PowerAction>,
+    focused: Option<PowerAction>,
+    hovered: Option<PowerAction>,
+}
+
 fn draw_power_buttons(
     pm: &mut PixmapMut,
     w: f32,
@@ -268,10 +274,9 @@ fn draw_power_buttons(
     painter: &CompassPainter,
     alpha: f32,
     shake_dx: f32,
-    pending: Option<PowerAction>,
-    focused: Option<PowerAction>,
-    hovered: Option<PowerAction>,
+    state: PowerButtonState,
 ) {
+    let PowerButtonState { pending, focused, hovered } = state;
     let (restart, poweroff) = power_button_rects(w, h, shake_dx);
     draw_login_button(
         pm,

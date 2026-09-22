@@ -101,7 +101,7 @@ fn render_card_frame(
 
     // Convert RGBA → BGRA (wl_shm ARGB8888 is BGRA in memory)
     let mut pixels = pm.take();
-    for chunk in pixels.chunks_exact_mut(4) {
+    for chunk in pixels.as_chunks_mut::<4>().0.iter_mut() {
         chunk.swap(0, 2);
     }
     pixels
@@ -189,7 +189,7 @@ fn render_surface(state: &mut AppState, idx: usize, qh: &QueueHandle<AppState>) 
             premultiply((state.style.bg >> 16) & 0xff),
             a as u8,
         ];
-        for pixel in dst.chunks_exact_mut(4) {
+        for pixel in dst.as_chunks_mut::<4>().0.iter_mut() {
             pixel.copy_from_slice(&bg_pixel);
         }
         ls.background_initialized = true;

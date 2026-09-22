@@ -49,7 +49,7 @@ pub fn decode_svg_with_symbolic_color(
     let mut bgra = premultiplied_rgba_to_bgra_nonpremul(pixmap.data());
     if symbolic {
         if let Some([r, g, b]) = parse_hex_rgb(symbolic_color) {
-            for px in bgra.chunks_exact_mut(4) {
+            for px in bgra.as_chunks_mut::<4>().0.iter_mut() {
                 px[0] = b;
                 px[1] = g;
                 px[2] = r;
@@ -124,7 +124,7 @@ fn memchr_contains(haystack: &[u8], needle: &[u8]) -> bool {
 
 fn premultiplied_rgba_to_bgra_nonpremul(data: &[u8]) -> Vec<u8> {
     let mut out = Vec::with_capacity(data.len());
-    for chunk in data.chunks_exact(4) {
+    for chunk in data.as_chunks::<4>().0.iter() {
         let alpha = chunk[3];
         let r = unpremultiply_channel(chunk[0], alpha);
         let g = unpremultiply_channel(chunk[1], alpha);

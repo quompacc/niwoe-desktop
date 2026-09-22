@@ -255,8 +255,10 @@ fn draw_login_ui(
         painter,
         alpha,
         shake_dx,
-        ui.pending_power_action(),
-        ui.power_focus,
-        hovered_power,
+        PowerButtonState {
+            pending: ui.pending_power_action(),
+            focused: ui.power_focus,
+            hovered: hovered_power,
+        },
     );
 }

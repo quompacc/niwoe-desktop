@@ -26,7 +26,7 @@ impl<'a> Painter<'a> {
 
     pub fn clear(&mut self, color: Color) {
         let pixel = argb(color).to_le_bytes();
-        for chunk in self.data.chunks_exact_mut(4) {
+        for chunk in self.data.as_chunks_mut::<4>().0.iter_mut() {
             chunk.copy_from_slice(&pixel);
         }
     }

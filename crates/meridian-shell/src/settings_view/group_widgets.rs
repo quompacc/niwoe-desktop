@@ -56,7 +56,7 @@ impl Widget for SettingsGroupPanel {
         let mut style = WidgetStyle {
             flex_direction: FlexDirection::Column,
             gap: UiSize {
-                width: ui_length(0.0),
+                width: ui_length(0.0_f32),
                 height: ui_length(SETTINGS_CHROME.group_gap as f32),
             },
             padding: TaffyRect {

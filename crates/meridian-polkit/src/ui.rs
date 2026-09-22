@@ -183,7 +183,7 @@ pub fn render(pixels: &mut [u8], width: u32, height: u32, theme: &ThemeConfig, v
     let src = pm.data();
     let n = (width * height * 4) as usize;
     pixels[..n].copy_from_slice(&src[..n]);
-    for chunk in pixels.chunks_exact_mut(4) {
+    for chunk in pixels.as_chunks_mut::<4>().0.iter_mut() {
         chunk.swap(0, 2);
     }
 }

@@ -391,7 +391,9 @@ pub(crate) fn encode_screenshot_png(
     encoder.set_depth(png::BitDepth::Eight);
     let mut writer = encoder.write_header()?;
     let rgb: Vec<u8> = xrgb
-        .chunks_exact(4)
+        .as_chunks::<4>()
+        .0
+        .iter()
         .flat_map(|c| [c[2], c[1], c[0]])
         .collect();
     writer.write_image_data(&rgb)?;
@@ -401,7 +403,9 @@ pub(crate) fn encode_screenshot_png(
 
 #[cfg(test)]
 mod tests {
-    use super::{create_screenshot_shm, encode_screenshot_png, screenshot_buffer_layout};
+    #[cfg(target_os = "openbsd")]
+    use super::create_screenshot_shm;
+    use super::{encode_screenshot_png, screenshot_buffer_layout};
     #[cfg(target_os = "openbsd")]
     use std::os::fd::AsRawFd;
 
