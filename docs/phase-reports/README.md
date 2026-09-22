@@ -3,10 +3,10 @@
 | Phase | Status | Bericht |
 |---|---|---|
 | P00 | accepted | [P00.md](P00.md) |
-| P01 | in-progress | [P01.md](P01.md) |
+| P01 | accepted | [P01.md](P01.md) |
 | P02–P13 | not-started | — |
 
-P01, Prüfcheckpoint 22.09.2026: Namensmigration und nicht überschreibende
+P01, Abschluss 22.09.2026: Namensmigration und nicht überschreibende
 XDG-/Installationsmigration implementiert und lokal committet. Fedora-Gates
 grün: 1.085 Tests bestanden, 2 bewusst ignoriert, Release und Guards bestanden.
 Nested, Staging-Installation, Live-IPC, Portal-Backendneustart, fehlender Picker
@@ -14,10 +14,13 @@ und Polkit-Neuregistrierung einschließlich Passwort-/Abbruchfällen geprüft.
 Beim Shellneustart gefundene doppelte Polkit-Instanz korrigiert und nachgeprüft.
 Sperrfokusfehler nach Portalstart korrigiert: alter Release fällt im isolierten
 Protokolltest durch, korrigierter Release besteht einschließlich Popup-Grab,
-Unlock und fail-closed bei Clientverlust. Korrektur installiert; Nutzer wieder
-in KDE, gemeinsame Einstellungen unverändert. Echte Lock-Abnahme bleibt offen.
-Für die Abnahme fehlen außerdem Dateiportal-Hardwarefälle und der abschließende
-KDE-Rundlauf. Details und Nachweise: [P01.md](P01.md). P02 nicht begonnen.
+Unlock und fail-closed bei Clientverlust. Korrektur installiert. Echte Lock-
+Passwortfälle, Dateiportal SaveFile/SaveFiles/Abbruch und normaler KDE-Rundlauf
+bestanden; gemeinsame Einstellungen unverändert, NIWOE-Dienste beendet und
+KDE-Portale aktiv. Code-Endstand `364edcd`; Diff, Restfunde und Belege geprüft.
+**P01 accepted. P02 nicht begonnen.** Details: [P01.md](P01.md).
+
+## Historische P00-Checkpoints
 
 P00: Fedora 44 KDE eingerichtet; zusätzliche Entwicklungssitzung installiert.
 Format, Workspace-Check, Clippy mit `-D warnings`, alle 1.076 Workspace-Tests
