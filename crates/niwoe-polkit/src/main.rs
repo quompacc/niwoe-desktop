@@ -7,6 +7,7 @@ mod auth;
 mod dbus;
 #[cfg(target_os = "openbsd")]
 mod openbsd_sandbox;
+mod singleton;
 mod ui;
 mod wayland;
 
@@ -71,6 +72,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
     tracing_subscriber::fmt().with_env_filter(env_filter).init();
     install_panic_logger();
+    let Some(_agent_lock) = singleton::acquire()? else {
+        info!("NIWOE Polkit agent is already running; leaving it registered");
+        return Ok(());
+    };
 
     let session_id = std::env::var("XDG_SESSION_ID")
         .ok()
