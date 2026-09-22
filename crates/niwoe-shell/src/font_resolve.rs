@@ -105,7 +105,15 @@ pub(crate) fn read_theme_font_bytes(pattern: &str) -> Option<Vec<u8>> {
     if family.is_empty() {
         return None;
     }
-    resolve_family(family).and_then(|path| std::fs::read(path).ok())
+    let bytes = resolve_family(family).and_then(|path| std::fs::read(path).ok())?;
+    if !niwoe_ui::font_supports_text(&bytes, niwoe_tokens::font::REQUIRED_UI_GLYPHS) {
+        warn!(
+            "UI font {:?} lacks required glyphs; using embedded Sans",
+            family
+        );
+        return None;
+    }
+    Some(bytes)
 }
 
 pub(crate) fn apply_theme_ui_font(theme: &ThemeConfig) {
@@ -114,34 +122,12 @@ pub(crate) fn apply_theme_ui_font(theme: &ThemeConfig) {
         niwoe_ui::clear_ui_font();
         return;
     }
-    match resolve_family(family) {
-        Some(path) => match std::fs::read(&path) {
-            Ok(bytes) if niwoe_ui::set_ui_font(&bytes) => {
-                info!("UI font set from family {:?} ({})", family, path.display());
-            }
-            Ok(_) => {
-                warn!(
-                    "UI font {:?} ({}) did not parse; keeping embedded",
-                    family,
-                    path.display()
-                );
-                niwoe_ui::clear_ui_font();
-            }
-            Err(err) => {
-                warn!(
-                    "UI font {:?} ({}) read failed: {}; keeping embedded",
-                    family,
-                    path.display(),
-                    err
-                );
-                niwoe_ui::clear_ui_font();
-            }
-        },
-        None => {
-            warn!(
-                "UI font family {:?} not found via fontconfig; keeping embedded",
-                family
-            );
+    match read_theme_font_bytes(family) {
+        Some(bytes) if niwoe_ui::set_ui_font(&bytes) => {
+            info!("UI font set from family {:?}", family);
+        }
+        _ => {
+            info!("UI font {:?}: using embedded Sans fallback", family);
             niwoe_ui::clear_ui_font();
         }
     }

@@ -19,10 +19,8 @@ pub struct TextRenderer {
 }
 
 impl TextRenderer {
-    /// `_pattern` (the theme font family) is intentionally ignored for now;
-    /// only `pixels` (the render size) is used. Returns `Some` unconditionally
-    /// so the bitmap fallback in `Painter::text_clipped` only triggers when no
-    /// renderer is present at all.
+    /// Resolve the theme family with the shared required-glyph check, falling
+    /// back to embedded Sans. `pixels` controls the actual raster size.
     pub fn new(_pattern: &str, pixels: u32) -> Option<Self> {
         let font = font_resolve::read_theme_font_bytes(_pattern)
             .and_then(|bytes| FreeTypeFont::from_static_bytes(Box::leak(bytes.into_boxed_slice())))

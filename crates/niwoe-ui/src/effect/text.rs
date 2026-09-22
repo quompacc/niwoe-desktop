@@ -140,6 +140,16 @@ fn embedded_ui_font() -> &'static Font {
     })
 }
 
+/// Validate coverage while loading a font, never from the paint loop.
+/// Missing characters are not treated as the font's visible `.notdef` glyph.
+pub fn font_supports_text(bytes: &[u8], text: &str) -> bool {
+    Font::from_bytes(bytes, FontSettings::default()).is_ok_and(|font| {
+        text.chars()
+            .filter(|ch| !ch.is_whitespace())
+            .all(|ch| font.lookup_glyph_index(ch) != 0)
+    })
+}
+
 /// The active UI font: the theme-resolved override if one is set, else the
 /// embedded Adwaita Sans. Returns `&'static` so callers can hold it across a
 /// draw without locking.

@@ -19,6 +19,6 @@ pub use fill::paint_fill;
 pub use metro_surface::paint_metro_surface;
 pub use radius::rounded_rect_path;
 pub use text::{
-    blend_text_sample, clear_ui_font, measure_text, paint_text, set_ui_font, truncate_to_fit,
-    ui_font, ui_line_metrics, TextInk,
+    blend_text_sample, clear_ui_font, font_supports_text, measure_text, paint_text, set_ui_font,
+    truncate_to_fit, ui_font, ui_line_metrics, TextInk,
 };

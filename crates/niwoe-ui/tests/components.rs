@@ -85,3 +85,11 @@ fn embedded_sans_covers_interface_glyphs_and_identifies_missing_glyphs() {
     }
     assert_eq!(font.lookup_glyph_index('\u{10ffff}'), 0);
 }
+
+#[test]
+fn font_loading_rejects_missing_glyphs_and_invalid_bytes() {
+    let bytes = niwoe_tokens::font::ADWAITA_SANS_REGULAR;
+    assert!(niwoe_ui::font_supports_text(bytes, "ÄÖÜ äöü ß € – … ← → ✓"));
+    assert!(!niwoe_ui::font_supports_text(bytes, "\u{10ffff}"));
+    assert!(!niwoe_ui::font_supports_text(b"not a font", "Text"));
+}
