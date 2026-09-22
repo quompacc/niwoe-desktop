@@ -1,5 +1,5 @@
 pub(super) fn enabled(name: &str) -> bool {
-    std::env::var(name)
+    niwoe_config::environment::var(name)
         .map(|value| {
             matches!(
                 value.trim().to_ascii_lowercase().as_str(),

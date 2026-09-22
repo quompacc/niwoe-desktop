@@ -183,7 +183,7 @@ fn card_drives_a_display(card: &Card) -> bool {
 /// login screen never appears. The compositor's `select_gpu` already works this
 /// way; this gives the greeter the same robustness.
 fn open_display_card() -> Result<(String, Card), Box<dyn std::error::Error>> {
-    if let Ok(path) = std::env::var(LOGIN_DRM_CARD_ENV) {
+    if let Ok(path) = niwoe_config::environment::var(LOGIN_DRM_CARD_ENV) {
         let card = Card(OpenOptions::new().read(true).write(true).open(&path)?);
         return Ok((path, card));
     }

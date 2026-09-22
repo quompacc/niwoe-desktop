@@ -1,5 +1,7 @@
 pub mod config;
+pub mod environment;
 pub mod keybind;
+pub mod migration;
 pub mod output;
 pub mod theme;
 

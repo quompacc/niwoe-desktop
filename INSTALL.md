@@ -1,11 +1,16 @@
 # NIWOE - Installation
 
-This guide documents the **currently implemented Linux installation path**. It
-does not decide NIWOE's long-term operating system. OpenBSD is the next
-real-hardware evaluation target; FreeBSD remains the existing BSD install path.
+This guide documents the **native Rust Linux desktop installation path**.
+The validated development host is Fedora KDE; see
+[the Linux baseline](docs/NIWOE_LINUX_BASELINE.md). BSD scripts are retained
+platform references, not active release gates. The existing KDE login manager
+is preserved: use `bash scripts/install-local.sh --build` without `--enable-boot`.
 
-The WebKit UI runtime described in the active plan is not installed by these
-steps yet. They deploy the current native Rust shell.
+For upgrades from the former desktop names, log out normally and select KDE
+before installing. The installer refuses live legacy processes, backs up retired
+activation files under `/var/lib/niwoe/legacy-install-backup`, and installs one
+NIWOE session. User configuration migration and environment precedence are
+documented in [the migration guide](docs/NIWOE_MIGRATION.md).
 
 > **FreeBSD?** FreeBSD has no systemd/logind and uses its own turnkey installer —
 > see [docs/FREEBSD.md](docs/FREEBSD.md). The steps below do not apply there.

@@ -7,3 +7,6 @@ pub mod protocols;
 pub mod state;
 pub mod wallpaper;
 pub mod workspace;
+
+// Root launcher shares the same user-override compatibility policy.
+pub use niwoe_config::environment;

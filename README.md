@@ -28,8 +28,8 @@ rendert oder ersetzt ihre Toolkit-Oberflächen nicht.
 
 Die verbindliche Reihenfolge und Phasenabnahme steht in
 [NIWOE_IMPLEMENTATION_PLAN.md](NIWOE_IMPLEMENTATION_PLAN.md). Der
-[NIWOE Design-Brief](docs/NIWOE_DESIGN_BRIEF.md) präzisiert das bis P01 noch
-so benannte [Designmanifest](docs/niwoe_design_manifest.md). Zwei Themes,
+[NIWOE Design-Brief](docs/NIWOE_DESIGN_BRIEF.md) präzisiert das
+[Designmanifest](docs/niwoe_design_manifest.md). Zwei Themes,
 zentrale Tokens und effiziente, eventgetriebene Oberflächen bleiben verbindlich.
 
 Die empfohlene Linux-Werkbank ist Fedora KDE. Der konkrete,

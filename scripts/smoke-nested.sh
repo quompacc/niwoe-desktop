@@ -7,7 +7,7 @@ if [[ "${1:-}" == --inside ]]; then
   repo="$2"
   evidence="$3"
   cd "$repo"
-  RUST_LOG=info target/debug/niwoe > "$evidence/compositor.log" 2>&1 &
+  RUST_LOG=info "target/${NIWOE_SMOKE_PROFILE:-release}/niwoe" > "$evidence/compositor.log" 2>&1 &
   compositor_pid=$!
   cleanup_inner() {
     kill "$compositor_pid" 2>/dev/null || true
@@ -30,7 +30,7 @@ if [[ "${1:-}" == --inside ]]; then
   timeout 10s wayland-info > "$evidence/wayland-info.log" 2>&1
   set +e
   GDK_BACKEND=wayland GTK_USE_PORTAL=0 GIO_USE_VFS=local WAYLAND_DEBUG=client \
-    timeout 8s zenity --info --title='NIWOE P00 smoke' --text='NIWOE nested test client' \
+    timeout 8s zenity --info --title='NIWOE P01 smoke' --text='NIWOE nested test client' \
     > "$evidence/client.log" 2>&1
   client_exit=$?
   set -e
@@ -47,20 +47,22 @@ repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 for command in dbus-run-session wayland-info zenity timeout setsid; do
   command -v "$command" >/dev/null || { echo "Missing: $command"; exit 2; }
 done
-[[ -x "$repo/target/debug/niwoe" && -x "$repo/target/debug/niwoe-shell" ]]
+profile_name="${NIWOE_SMOKE_PROFILE:-release}"
+[[ "$profile_name" == release || "$profile_name" == debug ]]
+[[ -x "$repo/target/$profile_name/niwoe" && -x "$repo/target/$profile_name/niwoe-shell" ]]
 parent_socket="${1:-${WAYLAND_DISPLAY:-}}"
 [[ -n "$parent_socket" ]] || { echo 'Pass the parent Wayland socket'; exit 2; }
 [[ "$parent_socket" == /* ]] || parent_socket="${XDG_RUNTIME_DIR:?}/$parent_socket"
 [[ -S "$parent_socket" ]] || { echo 'Parent Wayland socket is not available'; exit 2; }
-mkdir -p "$repo/target/p00-evidence"
-evidence="$(mktemp -d "$repo/target/p00-evidence/nested.XXXXXX")"
-profile="$(mktemp -d /tmp/niwoe-p00.XXXXXX)"
+mkdir -p "$repo/target/p01-evidence"
+evidence="$(mktemp -d "$repo/target/p01-evidence/nested.XXXXXX")"
+profile="$(mktemp -d /tmp/niwoe-p01.XXXXXX)"
 mkdir -m 700 -p "$profile/home/.config" "$profile/home/.local/share" \
   "$profile/runtime" "$profile/system-config" "$profile/cache"
 printf '%s\n' "$profile" > "$evidence/profile-path.txt"
 record_parent() {
   systemctl --user show-environment | grep -E '^(WAYLAND_DISPLAY|XDG_CURRENT_DESKTOP|XDG_SESSION_TYPE)=' | sort
-  for config in "$HOME/.config/kdeglobals" "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini"; do
+  for config in "$HOME/.config/kdeglobals" "$HOME/.config/gtk-3.0/settings.ini" "$HOME/.config/gtk-4.0/settings.ini" "$HOME/.config/gtk-3.0/gtk.css" "$HOME/.config/gtk-4.0/gtk.css"; do
     if [[ -f "$config" ]]; then sha256sum "$config"; else printf 'absent: %s\n' "$config"; fi
   done
 }

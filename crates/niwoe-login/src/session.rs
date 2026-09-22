@@ -77,8 +77,8 @@ pub fn launch_compositor_for(
 
     let runtime_dir = ensure_runtime_dir(uid, gid)?;
 
-    let compositor_path =
-        std::env::var(COMPOSITOR_ENV).unwrap_or_else(|_| DEFAULT_COMPOSITOR.to_string());
+    let compositor_path = niwoe_config::environment::var(COMPOSITOR_ENV)
+        .unwrap_or_else(|_| DEFAULT_COMPOSITOR.to_string());
 
     info!(
         path = %compositor_path,
@@ -152,23 +152,24 @@ pub fn launch_compositor_for(
     // sane cross-platform default.
     cmd.env(
         "XDG_DATA_DIRS",
-        std::env::var("XDG_DATA_DIRS")
+        niwoe_config::environment::var("XDG_DATA_DIRS")
             .unwrap_or_else(|_| "/usr/local/share:/usr/share".to_string()),
     );
     // Forward inherited RUST_LOG if set (so dev/debug filter from the
     // unit drop-in propagates into the compositor + shell chain), else
     // fall back to info.
-    let rust_log = std::env::var("RUST_LOG").unwrap_or_else(|_| "info".to_string());
+    let rust_log =
+        niwoe_config::environment::var("RUST_LOG").unwrap_or_else(|_| "info".to_string());
     cmd.env("RUST_LOG", rust_log);
     // Forward the XKB rules and Xcursor search path from the login environment.
     // On FreeBSD the keymap needs XKB_DEFAULT_RULES=evdev (else libinput's
     // keycodes — including the volume keys — map to nothing), and the cursor
     // theme lives under a non-default XCURSOR_PATH. env_clear() above dropped
     // them, so re-forward whatever the login session was started with.
-    if let Ok(rules) = std::env::var("XKB_DEFAULT_RULES") {
+    if let Ok(rules) = niwoe_config::environment::var("XKB_DEFAULT_RULES") {
         cmd.env("XKB_DEFAULT_RULES", rules);
     }
-    if let Ok(cursor_path) = std::env::var("XCURSOR_PATH") {
+    if let Ok(cursor_path) = niwoe_config::environment::var("XCURSOR_PATH") {
         cmd.env("XCURSOR_PATH", cursor_path);
     }
     // Forward NIWOE_* env vars (dev/debug knobs like
@@ -176,7 +177,7 @@ pub fn launch_compositor_for(
     // are intentionally additive — the explicit envs above already won
     // for any name collisions because cmd.env overwrites.
     for (k, v) in std::env::vars() {
-        if k.starts_with("NIWOE_") {
+        if k.starts_with("NIWOE_") || k.starts_with("MERIDIAN_") {
             cmd.env(k, v);
         }
     }

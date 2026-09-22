@@ -1,5 +1,9 @@
 # Meridian / BSD – aktueller Stand und nächste Schritte
 
+> Historisches Archiv, abgelöst durch `NIWOE_IMPLEMENTATION_PLAN.md`.
+> Die nachfolgenden Produktnamen, Links und WebKit-/BSD-Ziele beschreiben den
+> damaligen Stand und sind keine aktiven Arbeitsaufträge.
+
 Ich entwickle **Meridian Desktop**, einen eigenen Desktop/Wayland-Compositor in Rust. Das Projekt läuft grundsätzlich unter Linux und soll explizit auch BSD unterstützen.
 
 Repository:

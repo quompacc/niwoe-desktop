@@ -404,8 +404,10 @@ include!("state/shell_actions.rs");
 include!("state/panel_actions.rs");
 
 fn hidden_apps_path() -> String {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
-    format!("{home}/.config/niwoe/hidden_apps.txt")
+    niwoe_config::config_directory()
+        .join("hidden_apps.txt")
+        .to_string_lossy()
+        .into_owned()
 }
 
 pub(crate) fn load_wallpaper_thumbnail(

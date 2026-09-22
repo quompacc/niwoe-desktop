@@ -1,7 +1,6 @@
 # NIWOE Designmanifest
 
-> Dieses Manifest trägt bis P01 aus technischen Gründen noch den Dateinamen
-> `niwoe_design_manifest.md`. Es ist die verbindliche Spezifikation. Der
+> Dieses Manifest ist die verbindliche Design-Spezifikation. Der
 > [NIWOE Design-Brief](NIWOE_DESIGN_BRIEF.md) ist seine Mockup-Präzisierung;
 > dessen Rollen und Einschränkungen sind verbindlich, seine P02-Startwerte sind
 > noch keine Renderer-Hardcodes.
@@ -9,8 +8,8 @@
 ## Produkt und Quelle
 
 NIWOE ist eine native Rust-Desktopoberfläche. Es gibt genau eine Designquelle:
-bis P01 `niwoe-tokens` (`Palette`, `Interaction`, `Elevation`, `Radius`) und
-`niwoe-config` (`Decorations`), danach deren NIWOE-Nachfolger. Jede Farbe,
+`niwoe-tokens` (`Palette`, `Interaction`, `Elevation`, `Radius`) und
+`niwoe-config` (`Decorations`). Jede Farbe,
 Alpha, Geometrie, Radius- und Effektentscheidung kommt ausschließlich daraus.
 Lokale Render-Hardcodes sind verboten, außer bei Assets/Tests mit begründeter
 `guard:allow`-Ausnahme.

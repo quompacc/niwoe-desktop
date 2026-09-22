@@ -22,7 +22,7 @@ pub(super) fn select_gpu(
     session: &mut LibSeatSession,
     seat_name: &str,
 ) -> Result<PathBuf, Box<dyn std::error::Error>> {
-    if let Ok(path) = std::env::var("NIWOE_DRM_DEVICE") {
+    if let Ok(path) = niwoe_config::environment::var("NIWOE_DRM_DEVICE") {
         info!("Using GPU from NIWOE_DRM_DEVICE: {}", path);
         return Ok(PathBuf::from(path));
     }

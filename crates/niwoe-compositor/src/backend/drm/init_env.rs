@@ -1,9 +1,9 @@
-use std::{collections::HashSet, env, time::Duration};
+use std::{collections::HashSet, time::Duration};
 
 use smithay::backend::allocator::{Format, Fourcc, Modifier};
 
 pub(super) fn env_flag_enabled(name: &str) -> bool {
-    env::var(name)
+    niwoe_config::environment::var(name)
         .map(|value| {
             matches!(
                 value.trim().to_ascii_lowercase().as_str(),
@@ -22,7 +22,7 @@ pub(crate) fn disable_drm_modifiers_requested() -> bool {
 }
 
 pub(super) fn forced_scanout_format_from_env() -> Option<Fourcc> {
-    let value = env::var("NIWOE_DRM_FORCE_FORMAT").ok()?;
+    let value = niwoe_config::environment::var("NIWOE_DRM_FORCE_FORMAT").ok()?;
     let normalized = value.trim().to_ascii_uppercase();
     match normalized.as_str() {
         "XRGB8888" => Some(Fourcc::Xrgb8888),
@@ -74,7 +74,7 @@ pub(super) fn select_repaint_interval(
     default: Duration,
     default_source: String,
 ) -> (Duration, String) {
-    if let Ok(value) = env::var("NIWOE_DRM_FRAME_INTERVAL_MS") {
+    if let Ok(value) = niwoe_config::environment::var("NIWOE_DRM_FRAME_INTERVAL_MS") {
         match value.trim().parse::<u64>() {
             Ok(ms) if ms > 0 => {
                 return (
@@ -95,7 +95,7 @@ pub(super) fn select_repaint_interval(
         }
     }
 
-    if let Ok(value) = env::var("NIWOE_DRM_FORCE_REFRESH_HZ") {
+    if let Ok(value) = niwoe_config::environment::var("NIWOE_DRM_FORCE_REFRESH_HZ") {
         match value.trim().parse::<u32>() {
             Ok(hz) if hz > 0 => {
                 if let Some(interval) = duration_from_hz(hz) {
@@ -122,5 +122,5 @@ pub(super) fn select_repaint_interval(
 }
 
 pub(super) fn env_value_or_unset(name: &str) -> String {
-    env::var(name).unwrap_or_else(|_| "<unset>".to_string())
+    niwoe_config::environment::var(name).unwrap_or_else(|_| "<unset>".to_string())
 }

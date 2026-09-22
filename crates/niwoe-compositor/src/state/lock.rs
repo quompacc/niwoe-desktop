@@ -97,7 +97,7 @@ impl LockManager {
             return None;
         }
         #[cfg(debug_assertions)]
-        if std::env::var_os("NIWOE_FAULT_INJECT_HOLD_LOCK_PENDING").is_some() {
+        if niwoe_config::environment::var_os("NIWOE_FAULT_INJECT_HOLD_LOCK_PENDING").is_some() {
             // Debug-only hardware fault injection: keep the compositor in the
             // fail-closed Pending phase so client-loss recovery can be tested
             // deterministically. Release builds never contain this branch.

@@ -178,21 +178,28 @@ fn expand_tilde(s: &str) -> PathBuf {
 }
 
 fn user_theme_directory() -> PathBuf {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
-    PathBuf::from(home)
-        .join(".config")
-        .join("niwoe")
-        .join("themes")
+    crate::config_directory().join("themes")
 }
 
 fn theme_directories() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
     push_unique_path(&mut dirs, user_theme_directory());
 
-    if let Ok(value) = env::var("NIWOE_THEME_DIR") {
+    // Treat the two path overrides as one group: any new override suppresses
+    // legacy paths, including a legacy singular path before a new plural path.
+    let has_new_override =
+        env::var_os("NIWOE_THEME_DIR").is_some() || env::var_os("NIWOE_THEME_DIRS").is_some();
+    let read_override = |name| {
+        if has_new_override {
+            env::var(name)
+        } else {
+            crate::environment::var(name)
+        }
+    };
+    if let Ok(value) = read_override("NIWOE_THEME_DIR") {
         push_unique_path(&mut dirs, PathBuf::from(value));
     }
-    if let Ok(value) = env::var("NIWOE_THEME_DIRS") {
+    if let Ok(value) = read_override("NIWOE_THEME_DIRS") {
         for path in env::split_paths(&value) {
             push_unique_path(&mut dirs, path);
         }

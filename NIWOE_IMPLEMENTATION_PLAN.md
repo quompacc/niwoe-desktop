@@ -41,7 +41,10 @@ Die wichtigsten Einschränkungen für die erste Version:
 - Bestehender BSD-Code wird nicht pauschal gelöscht; daraus folgt keine aktive
   BSD-Supportzusage und kein verpflichtendes BSD-Releasegate. Linux ist Produktziel.
 
-## 2. Was im Repository tatsächlich vorhanden ist
+## 2. Historische Ausgangssichtung vor P00/P01
+
+Die folgenden technischen Altnamen dokumentieren den Planungsstand. Aktuelle
+Pfade und Migrationsnachweise stehen in `docs/phase-reports/P01.md`.
 
 | Bereich | Gesehener Stand | Konsequenz |
 |---|---|---|
@@ -230,7 +233,7 @@ Commit für eine komplette mehrteilige Phase.
 1. P00-01: Arbeitsbaum und Basis-Commit erfassen. Nutzer-Assets/-Löschungen in
    Phasebericht festhalten; weder reset noch ungefragtes Stash noch pauschales `git add .`.
 2. P00-02: `AGENTS.md`, `CLAUDE.md`, `README.md`, `ROADMAP.md`, `PLAN.md`,
-   `MERIDIAN_OS_PLAN.md`, `docs/NATIVE_UI_PLAN.md`, `docs/UI_PLATFORM.md` prüfen.
+   `NIWOE_OS_PLAN.md`, `docs/NATIVE_UI_PLAN.md`, `docs/UI_PLATFORM.md` prüfen.
    Linux als Produktziel, natives Rust als UI-Pfad, dieses Phasenmodell als aktive
    Reihenfolge eintragen. Alle alten Meridian-Roadmaps als abgelöste Historie
    markieren; keine unerledigten Altphasen als NIWOE-Pflicht übernehmen.

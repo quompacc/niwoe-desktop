@@ -167,7 +167,7 @@ fn next_restart_delay(current: Duration) -> Duration {
 }
 
 fn env_flag_enabled(name: &str) -> bool {
-    std::env::var(name)
+    niwoe_compositor::environment::var(name)
         .map(|value| {
             matches!(
                 value.trim().to_ascii_lowercase().as_str(),

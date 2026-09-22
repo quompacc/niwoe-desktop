@@ -50,22 +50,22 @@ pub fn install() -> io::Result<()> {
 
 fn existing_theme_roots() -> Vec<PathBuf> {
     let mut roots = Vec::new();
-    let home = env::var_os("HOME");
+    let home = niwoe_config::environment::var_os("HOME");
     if let Some(home) = home.as_ref() {
         let home = Path::new(home);
         push_existing(&mut roots, home.join(".config/niwoe/themes"));
     }
 
-    if let Some(path) = env::var_os("NIWOE_THEME_DIR") {
+    if let Some(path) = niwoe_config::environment::var_os("NIWOE_THEME_DIR") {
         push_existing(&mut roots, PathBuf::from(path));
     }
-    if let Some(paths) = env::var_os("NIWOE_THEME_DIRS") {
+    if let Some(paths) = niwoe_config::environment::var_os("NIWOE_THEME_DIRS") {
         for path in env::split_paths(&paths) {
             push_existing(&mut roots, path);
         }
     }
 
-    if let Some(path) = env::var_os("XDG_DATA_HOME") {
+    if let Some(path) = niwoe_config::environment::var_os("XDG_DATA_HOME") {
         push_existing(&mut roots, PathBuf::from(path).join("niwoe/themes"));
     } else if let Some(home) = home {
         push_existing(
@@ -74,7 +74,7 @@ fn existing_theme_roots() -> Vec<PathBuf> {
         );
     }
 
-    let data_dirs = env::var_os("XDG_DATA_DIRS")
+    let data_dirs = niwoe_config::environment::var_os("XDG_DATA_DIRS")
         .filter(|value| !value.is_empty())
         .unwrap_or_else(|| "/usr/local/share:/usr/share".into());
     for path in env::split_paths(&data_dirs) {

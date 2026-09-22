@@ -1,5 +1,3 @@
-use std::env;
-
 use niwoe_config::OutputModeConfig;
 
 use crate::state::OutputModeInfo;
@@ -393,16 +391,16 @@ fn parse_mode_size(value: &str) -> Option<(u16, u16)> {
 }
 
 pub(super) fn forced_mode_size_from_env() -> Option<(u16, u16)> {
-    if let Ok(value) = env::var("NIWOE_DRM_MODE") {
+    if let Ok(value) = niwoe_config::environment::var("NIWOE_DRM_MODE") {
         return parse_mode_size(&value);
     }
-    env::var("NIWOE_DRM_FORCE_MODE")
+    niwoe_config::environment::var("NIWOE_DRM_FORCE_MODE")
         .ok()
         .and_then(|value| parse_mode_size(&value))
 }
 
 pub(super) fn forced_mode_index_from_env() -> Option<usize> {
-    env::var("NIWOE_DRM_MODE_INDEX")
+    niwoe_config::environment::var("NIWOE_DRM_MODE_INDEX")
         .ok()
         .and_then(|value| value.trim().parse::<usize>().ok())
 }

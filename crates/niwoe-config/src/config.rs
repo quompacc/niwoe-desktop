@@ -119,10 +119,14 @@ impl NiwoeConfig {
         Ok(())
     }
 
-    fn load_from(path: &Path) -> Result<Self, String> {
+    pub(crate) fn load_from(path: &Path) -> Result<Self, String> {
         let raw = fs::read_to_string(path).map_err(|e| e.to_string())?;
+        Self::parse(&raw)
+    }
+
+    pub(crate) fn parse(raw: &str) -> Result<Self, String> {
         let toml: NiwoeToml =
-            toml::from_str(&raw).map_err(|e| format!("TOML parse error: {}", e))?;
+            toml::from_str(raw).map_err(|e| format!("TOML parse error: {}", e))?;
 
         let keybinds = if toml.keybinds.is_empty() {
             KeybindConfig::default()
@@ -194,12 +198,30 @@ impl NiwoeConfig {
     }
 }
 
-/// `~/.config/niwoe` — the directory holding `config.toml`. Exposed so
+/// `$XDG_CONFIG_HOME/niwoe` (default `~/.config/niwoe`) holds `config.toml`.
+/// Exposed so
 /// other crates (e.g. the settings portal watcher) can reason about the
 /// config file without re-deriving the path convention.
 pub fn config_directory() -> PathBuf {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
-    PathBuf::from(home).join(".config").join("niwoe")
+    let base = std::env::var_os("XDG_CONFIG_HOME")
+        .map(PathBuf::from)
+        .filter(|path| path.is_absolute())
+        .unwrap_or_else(|| PathBuf::from(&home).join(".config"));
+    static MIGRATED: std::sync::OnceLock<()> = std::sync::OnceLock::new();
+    MIGRATED.get_or_init(|| {
+        if let Err(error) = crate::migration::migrate_legacy_at(&base) {
+            warn!(%error, "Legacy configuration migration failed; originals retained");
+        }
+        let data = std::env::var_os("XDG_DATA_HOME")
+            .map(PathBuf::from)
+            .filter(|path| path.is_absolute())
+            .unwrap_or_else(|| PathBuf::from(&home).join(".local/share"));
+        if let Err(error) = crate::migration::migrate_legacy_themes_at(&data) {
+            warn!(%error, "Legacy user theme migration failed; originals retained");
+        }
+    });
+    base.join("niwoe")
 }
 
 #[derive(Debug, Clone, Deserialize)]

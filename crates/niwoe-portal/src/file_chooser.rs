@@ -196,7 +196,8 @@ fn path_to_uri(path: &str) -> String {
 }
 
 fn file_picker_path() -> String {
-    std::env::var(FILE_PICKER_ENV).unwrap_or_else(|_| DEFAULT_FILE_PICKER.to_string())
+    niwoe_config::environment::var(FILE_PICKER_ENV)
+        .unwrap_or_else(|_| DEFAULT_FILE_PICKER.to_string())
 }
 
 fn percent_encode_path(path: &str) -> String {
@@ -214,7 +215,7 @@ fn percent_encode_path(path: &str) -> String {
 
 fn forward_env(cmd: &mut Command) {
     for var in ["WAYLAND_DISPLAY", "DISPLAY", "XDG_RUNTIME_DIR"] {
-        if let Ok(val) = std::env::var(var) {
+        if let Ok(val) = niwoe_config::environment::var(var) {
             cmd.env(var, val);
         }
     }

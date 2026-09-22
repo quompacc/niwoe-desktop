@@ -4,14 +4,14 @@
 NIWOE ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess. Produktziel
 ist zuerst ein kohärenter nativer Linux-Desktop auf einer bestehenden Linux-
 Distribution; ein eigenes Linux-basiertes OS folgt erst nach der Desktop-Alpha.
-NIWOE-eigene UI bleibt vollständig nativ in Rust und baut bis P01 auf
+NIWOE-eigene UI bleibt vollständig nativ in Rust und baut auf
 `niwoe-ui`, `niwoe-tokens` und `niwoe-config` auf. Der archivierte
 WebKit-Prototyp ist nur visuelle Referenz und kein Produktpfad. Die aktive
 Reihenfolge ist ausschließlich `NIWOE_IMPLEMENTATION_PLAN.md`; frühere
 NIWOE-/BSD-Roadmaps sind historische Evidenz und keine offenen Pflichten.
 
 ## Design – VERBINDLICHE Vorgabe (gilt für jede UI-/Render-Änderung)
-Die Datei **`docs/niwoe_design_manifest.md` ist bis zur P01-Umbenennung die
+Die Datei **`docs/niwoe_design_manifest.md` ist die
 maßgebliche Design-Spezifikation.** Sie präzisiert `docs/NIWOE_DESIGN_BRIEF.md`.
 Jede Änderung an Aussehen, Farben, Geometrie oder Effekten MUSS ihr entsprechen.
 Bei Konflikt schlägt das Manifest jede andere Quelle (Audits, Altcode).

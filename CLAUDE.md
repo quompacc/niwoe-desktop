@@ -14,9 +14,8 @@ Fedora KDE nach `docs/NIWOE_DEVELOPMENT_DISTRO.md` und
 
 ## Aktive Produktstrategie (2026-09-21)
 
-- NIWOE bleibt ein eigener nativer Rust-Wayland-Compositor. Die P01-
-  Namensmigration ist noch nicht durchgeführt; bestehende `niwoe-*`-Namen
-  sind bis dahin technische Bestandsnamen.
+- NIWOE bleibt ein eigener nativer Rust-Wayland-Compositor. Eigene Crates,
+  Programme und Integrationskennungen verwenden `niwoe-*` (P01).
 - Linux ist Produktziel. Zuerst entsteht ein nutzbarer NIWOE-Desktop auf einer
   bestehenden Distribution, danach wird ein eigenes Linux-basiertes OS geplant.
 - Der archivierte WebKit-Prototyp ist ausschließlich eine visuelle Referenz.
@@ -32,7 +31,7 @@ Mesa-Builds und ungeprüfte Paketquellen sind nicht zulässig.
 
 ## Design – verbindlich
 
-- `docs/niwoe_design_manifest.md` ist bis P01 das verbindliche Manifest und
+- `docs/niwoe_design_manifest.md` ist das verbindliche Manifest und
   präzisiert `docs/NIWOE_DESIGN_BRIEF.md`.
 - Eine zentrale Designquelle: `niwoe-tokens` + `niwoe-config`; keine
   lokalen Farb-, Alpha-, Radius- oder Mix-Hardcodes im Renderer.

@@ -4,7 +4,7 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-RESULT_DIR=${NIWOE_PERF_RESULT_DIR:-/tmp/niwoe-perf-${STAMP}}
+RESULT_DIR=${NIWOE_PERF_RESULT_DIR-${MERIDIAN_PERF_RESULT_DIR-/tmp/niwoe-perf-${STAMP}}}
 RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/niwoe-runtime-$(id -u)}
 BENCH_BIN=${RESULT_DIR}/x11-motion-bench
 

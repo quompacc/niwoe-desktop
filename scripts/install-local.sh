@@ -6,6 +6,7 @@ BUILD=0
 PROFILE="release"
 ENABLE_BOOT=0
 WITH_BOOT_SPLASH=""
+DESTDIR=""
 DESKTOP_USER="${SUDO_USER:-${USER}}"
 
 usage() {
@@ -21,6 +22,7 @@ Options:
   --build                 Run cargo build --release --workspace before install
   --debug                 Use development binaries from target/debug
   --prefix PATH           Install prefix for binaries/data (default: /usr/local)
+  --destdir PATH          Stage a fresh/migrated installation without activating services
   --desktop-user USER     User that owns /var/lib/niwoe (default: sudo user)
   --enable-boot           Enable niwoe-login.service and disable getty@tty1
   --bootsplash PATH       Also install sibling bootsplash checkout from PATH
@@ -50,6 +52,11 @@ while [[ $# -gt 0 ]]; do
       DESKTOP_USER="${2:?missing value for --desktop-user}"
       shift 2
       ;;
+    --destdir)
+      DESTDIR="${2:?missing value for --destdir}"
+      [[ "$DESTDIR" == /* && "$DESTDIR" != / ]] || { echo 'destdir must be an absolute staging directory'; exit 2; }
+      shift 2
+      ;;
     --enable-boot)
       ENABLE_BOOT=1
       shift
@@ -71,13 +78,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 SUDO=()
-if [[ "${EUID}" -ne 0 ]]; then
+if [[ "${EUID}" -ne 0 && -z "$DESTDIR" ]]; then
   SUDO=(sudo)
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
+source "$SCRIPT_DIR/migrate-legacy-install.sh"
+legacy_preflight
 
 if [[ "${BUILD}" -eq 1 ]]; then
   cargo build --profile "${PROFILE}" --workspace --locked
@@ -93,9 +102,9 @@ require_file() {
   fi
 }
 
-bindir="${PREFIX}/bin"
-datadir="${PREFIX}/share"
-libdir="${PREFIX}/lib"
+bindir="${DESTDIR}${PREFIX}/bin"
+datadir="${DESTDIR}${PREFIX}/share"
+libdir="${DESTDIR}${PREFIX}/lib"
 
 binaries=(
   niwoe
@@ -108,6 +117,8 @@ binaries=(
 
 for bin in "${binaries[@]}"; do
   require_file "${build_dir}/${bin}"
+done
+for bin in "${binaries[@]}"; do
   "${SUDO[@]}" install -Dm755 "${build_dir}/${bin}" "${bindir}/${bin}"
 done
 
@@ -128,10 +139,14 @@ for theme in themes/*; do
   "${SUDO[@]}" cp -a "${theme}/." "${datadir}/niwoe/themes/${name}/"
 done
 
-"${SUDO[@]}" install -d -o "${DESKTOP_USER}" -g "${DESKTOP_USER}" -m 0755 /var/lib/niwoe
-"${SUDO[@]}" install -Dm644 crates/niwoe-login/config/niwoe-login.service /etc/systemd/system/niwoe-login.service
-"${SUDO[@]}" install -Dm644 crates/niwoe-login/config/niwoe-login.pam /etc/pam.d/niwoe-login
-"${SUDO[@]}" install -Dm644 packaging/pam/niwoe-login-password /etc/pam.d/niwoe-login-password
+"${SUDO[@]}" install -d -m 0755 "$DESTDIR/var/lib/niwoe"
+if [[ -z "$DESTDIR" ]]; then
+  "${SUDO[@]}" chown "${DESKTOP_USER}:${DESKTOP_USER}" /var/lib/niwoe
+fi
+"${SUDO[@]}" install -Dm644 crates/niwoe-login/config/niwoe-login.service "$DESTDIR/etc/systemd/system/niwoe-login.service"
+"${SUDO[@]}" install -Dm644 crates/niwoe-login/config/niwoe-login.pam "$DESTDIR/etc/pam.d/niwoe-login"
+"${SUDO[@]}" install -Dm644 packaging/pam/niwoe-login-password "$DESTDIR/etc/pam.d/niwoe-login-password"
+"${SUDO[@]}" install -Dm644 packaging/pam/niwoe-lock "$DESTDIR/etc/pam.d/niwoe-lock"
 
 install_template() {
   local src="$1"
@@ -147,8 +162,8 @@ install_template packaging/niwoe-session "${bindir}/niwoe-session" 755
 "${SUDO[@]}" install -Dm644 packaging/session-config/autostart/org.kde.xwaylandvideobridge.desktop "${datadir}/niwoe/session-config/autostart/org.kde.xwaylandvideobridge.desktop"
 # Display managers normally discover sessions in /usr/share, independently of
 # the prefix used for development binaries under /usr/local.
-install_template packaging/wayland-sessions/niwoe.desktop /usr/share/wayland-sessions/niwoe.desktop
-install_template packaging/xdg-autostart/niwoe-polkit-agent.desktop /etc/xdg/autostart/niwoe-polkit-agent.desktop
+install_template packaging/wayland-sessions/niwoe.desktop "$DESTDIR/usr/share/wayland-sessions/niwoe.desktop"
+install_template packaging/xdg-autostart/niwoe-polkit-agent.desktop "$DESTDIR/etc/xdg/autostart/niwoe-polkit-agent.desktop"
 install_template packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service "${datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service"
 install_template packaging/systemd-user/niwoe-portal.service "${libdir}/systemd/user/niwoe-portal.service"
 # niwoe-session.target pulls graphical-session.target up at login (started by
@@ -166,9 +181,14 @@ if [[ -n "${WITH_BOOT_SPLASH}" ]]; then
   require_file "${boot_root}/target/release/bootsplash"
   require_file "${boot_root}/systemd/bootsplash.service"
   "${SUDO[@]}" install -Dm755 "${boot_root}/target/release/bootsplash" "${bindir}/bootsplash"
-  "${SUDO[@]}" install -Dm644 "${boot_root}/systemd/bootsplash.service" /etc/systemd/system/bootsplash.service
+  "${SUDO[@]}" install -Dm644 "${boot_root}/systemd/bootsplash.service" "$DESTDIR/etc/systemd/system/bootsplash.service"
 fi
 
+legacy_retire
+if [[ -n "$DESTDIR" ]]; then
+  echo "install-local: staged installation in $DESTDIR; no services activated"
+  exit 0
+fi
 "${SUDO[@]}" systemctl daemon-reload
 if command -v systemctl >/dev/null 2>&1; then
   systemctl --user daemon-reload >/dev/null 2>&1 || true

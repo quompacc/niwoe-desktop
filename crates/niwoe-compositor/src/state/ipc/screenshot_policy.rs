@@ -122,7 +122,7 @@ impl ScreenshotPolicy {
 /// `evaluate`). Off unless `NIWOE_SCREENSHOT_DEV=1` is in the compositor's
 /// environment; never enabled in a normal session.
 fn internal_capture_dev_enabled() -> bool {
-    std::env::var("NIWOE_SCREENSHOT_DEV")
+    niwoe_config::environment::var("NIWOE_SCREENSHOT_DEV")
         .map(|v| v == "1")
         .unwrap_or(false)
 }

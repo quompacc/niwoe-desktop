@@ -313,7 +313,7 @@ pub(super) fn register_wscons_event_sources(
 }
 
 fn device_path(variable: &str, fallback: &str) -> PathBuf {
-    std::env::var_os(variable)
+    niwoe_config::environment::var_os(variable)
         .filter(|value| !value.is_empty())
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(fallback))

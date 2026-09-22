@@ -65,8 +65,8 @@ auf Fremdanwendungen benötigt eine spätere, ausdrücklich sitzungsspezifische
 Integration. Die öffentliche Hell-/Dunkel-Einstellung kommt weiterhin aus dem
 Portal. Globale Dateiumschreibung ist kein zulässiger Ersatz dafür.
 
-Bis P01 heißen die ausführbaren Dateien technisch NIWOE. Der Installer fügt
-bereits jetzt `/usr/share/wayland-sessions/niwoe.desktop` mit dem Anzeigenamen
+Seit P01 verwenden auch die ausführbaren Dateien NIWOE-Namen. Der Installer fügt
+`/usr/share/wayland-sessions/niwoe.desktop` mit dem Anzeigenamen
 `NIWOE (development)` sowie `/usr/local/bin/niwoe-session` hinzu:
 
 ```bash
@@ -114,8 +114,8 @@ systemctl --user status niwoe-portal
 busctl --user list | grep -E 'portal|polkit'
 ```
 
-Ab P01 werden die technischen NIWOE-Namen in diesen Befehlen in ihre
-NIWOE-Nachfolger migriert. Portal und Polkit dürfen nur einmal pro Sitzung
+Die Befehle verwenden die technischen Namen ab P01; P00-Nachweise bewahren
+ihre damaligen Namen im Phasenbericht. Portal und Polkit dürfen nur einmal pro Sitzung
 aktiv sein; keine konkurrierende KDE- und NIWOE-Agenteninstanz.
 
 ## Gates und Smoke

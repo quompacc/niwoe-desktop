@@ -21,9 +21,9 @@ if [[ "$(uname -s)" == "OpenBSD" ]] && command -v ck-launch-session >/dev/null 2
   RUNNER=(ck-launch-session "${RUNNER[@]}")
 fi
 
-LOG_FILE="${NIWOE_SMOKE_LOG:-/tmp/niwoe-smoke-drm.log}"
-TIMEOUT_SECONDS="${NIWOE_SMOKE_TIMEOUT:-20}"
-MODE="${NIWOE_SMOKE_MODE:-smoke}"
+LOG_FILE="${NIWOE_SMOKE_LOG-${MERIDIAN_SMOKE_LOG-/tmp/niwoe-smoke-drm.log}}"
+TIMEOUT_SECONDS="${NIWOE_SMOKE_TIMEOUT-${MERIDIAN_SMOKE_TIMEOUT-20}}"
+MODE="${NIWOE_SMOKE_MODE-${MERIDIAN_SMOKE_MODE-smoke}}"
 
 usage() {
   cat <<'EOF'
@@ -70,17 +70,8 @@ fi
 echo "[smoke-drm] building release..."
 cargo build --release --workspace
 
-echo "[smoke-drm] stopping old NIWOE session processes (if any)..."
-pkill -x niwoe-shell 2>/dev/null || true
-pkill -x niwoe 2>/dev/null || true
-for _ in {1..50}; do
-  if ! pgrep -x niwoe-shell >/dev/null 2>&1 && ! pgrep -x niwoe >/dev/null 2>&1; then
-    break
-  fi
-  sleep 0.1
-done
 if pgrep -x niwoe-shell >/dev/null 2>&1 || pgrep -x niwoe >/dev/null 2>&1; then
-  echo "[smoke-drm] old session did not stop cleanly" >&2
+  echo "[smoke-drm] a NIWOE session is running; coordinate a normal logout before this test" >&2
   exit 1
 fi
 # seatd/libdrm can outlive the process table transition briefly while the old
