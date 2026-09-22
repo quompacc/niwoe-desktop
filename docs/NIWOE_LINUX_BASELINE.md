@@ -93,15 +93,16 @@ die Desktopkennung und erhält Runtime-Verzeichnis und Sessionbus aus dem
 Displaymanager. Der Compositor startet die Shell aus demselben Binärverzeichnis;
 die Shell aktiviert den vorhandenen Session-/Portalpfad. Rückkehr: NIWOE abmelden
 bzw. beenden und im Displaymanager wieder KDE auswählen. Start, Panel und
-Launcher sind seit dem Hardwaretest am 22.09. bestätigt; das Sitzungsende
-ist noch nicht abgenommen.
+Launcher sowie das Sitzungsende sind in P00 bestätigt; P01 wiederholt den
+Rundlauf mit den neuen technischen Namen, siehe aktuellen Phasenbericht.
 
 KDE und NIWOE bis zur Lifecycle-Prüfung nicht gleichzeitig unter demselben
 Benutzer betreiben: systemd-Usermanager und dessen Aktivierungsumgebung sind
 benutzerweit. Für erste Versuche ein separates Testprofil verwenden. Der
 Autostartparser berücksichtigt jetzt `OnlyShowIn`/`NotShowIn` und unterscheidet
 `Hidden` von reiner Menüunsichtbarkeit (`NoDisplay`). Die tatsächliche
-Agenten-/Portalaktivierung und das Sessionende bleiben auf Hardware zu prüfen.
+Agenten-/Portalaktivierung und Sessionende wurden in P00 auf Hardware geprüft
+und gehören nach der Namensmigration erneut zu den P01-Pflichtfällen.
 
 SELinux bleibt `Enforcing`. Bei einem AVC werden Kontext und Ursache mit
 `ausearch -m AVC -ts recent` festgehalten und die Installation/Labels oder eine

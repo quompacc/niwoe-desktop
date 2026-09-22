@@ -829,3 +829,21 @@ CONTENT	themes/dark/theme.toml	3	Meridian, meridian_tokens, meridian-config
 CONTENT	themes/light/theme.toml	3	Meridian, meridian_tokens, meridian-config
 CONTENT	third_party/smithay/Cargo.toml	1	Meridian
 CONTENT	third_party/smithay/OPENBSD_PORT.md	7	Meridian, meridian-compositor, meridian-wm
+DIRECTORY	crates/meridian-app-catalog		meridian-app-catalog
+DIRECTORY	crates/meridian-boot-common		meridian-boot-common
+DIRECTORY	crates/meridian-compass-render		meridian-compass-render
+DIRECTORY	crates/meridian-compositor		meridian-compositor
+DIRECTORY	crates/meridian-config		meridian-config
+DIRECTORY	crates/meridian-freetype		meridian-freetype
+DIRECTORY	crates/meridian-ipc		meridian-ipc
+DIRECTORY	crates/meridian-lock		meridian-lock
+DIRECTORY	crates/meridian-login		meridian-login
+DIRECTORY	crates/meridian-polkit		meridian-polkit
+DIRECTORY	crates/meridian-portal		meridian-portal
+DIRECTORY	crates/meridian-shell		meridian-shell
+DIRECTORY	crates/meridian-tokens		meridian-tokens
+DIRECTORY	crates/meridian-ui		meridian-ui
+DIRECTORY	crates/meridian-wm		meridian-wm
+DIRECTORY	crates/meridian-xwayland-drm-bridge		meridian-xwayland-drm-bridge
+REMOTE	github	1	git@github.com:quompacc/meridian-desktop.git -> git@github.com:quompacc/niwoe-desktop.git
+REMOTE	origin	1	ssh://git@codeberg.org/QuompaCC/meridian-desktop.git (unchanged external mirror)

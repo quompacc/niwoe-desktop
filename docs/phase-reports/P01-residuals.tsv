@@ -25,8 +25,10 @@ docs/OPENBSD_SETTINGS_AUDIT_2026-08-27.md	7	Explicit historical/superseded plan,
 docs/OPENBSD_SUSPEND_INPUT_2026-08-26.md	21	Explicit historical/superseded plan, audit or dated platform evidence
 docs/phase-reports/P00_REVIEW.md	1	Immutable historical P00 command and test evidence
 docs/phase-reports/P00.md	38	Immutable historical P00 command and test evidence
-docs/phase-reports/P01-inventory.tsv	2296	Phase inventory/evidence and unchanged external Codeberg remote
-docs/phase-reports/P01.md	2	Phase inventory/evidence and unchanged external Codeberg remote
+docs/phase-reports/P01-changes.tsv	471	Per-file migration evidence with original paths
+docs/phase-reports/P01-inventory.tsv	2330	Phase inventory/evidence and unchanged external Codeberg remote
+docs/phase-reports/P01-residuals.tsv	1	This per-path exception ledger repeats historical path names
+docs/phase-reports/P01.md	3	Phase inventory/evidence and unchanged external Codeberg remote
 docs/PROJECT_STATUS.md	63	Explicit historical/superseded plan, audit or dated platform evidence
 docs/SSD_FRAME_PLAN.md	32	Explicit historical/superseded plan, audit or dated platform evidence
 Meridian - BSD – Übergabe für ChatGPT Desktop.md	29	Explicit historical/superseded plan, audit or dated platform evidence
@@ -34,5 +36,7 @@ NIWOE_IMPLEMENTATION_PLAN.md	19	Historical baseline table and explicit P01 old-t
 NIWOE_Konzeptzusammenfassung.md	2	Original user concept; historical naming provenance
 PLAN.md	2	Explicit historical/superseded plan, audit or dated platform evidence
 ROADMAP.md	3	Explicit historical/superseded plan, audit or dated platform evidence
+scripts/measure-openbsd-drm.ksh	1	Legacy performance output directory override; NIWOE value wins
 scripts/migrate-legacy-install.sh	30	Detect and retire old installed names; staged migration fixtures
+scripts/smoke-drm.sh	3	Legacy smoke overrides; present NIWOE values win; no old executable is launched
 scripts/test-install-migration.sh	8	Detect and retire old installed names; staged migration fixtures

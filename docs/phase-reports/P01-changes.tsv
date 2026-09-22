@@ -1,0 +1,537 @@
+Status	Before	After	Change
+M	.gitattributes	.gitattributes	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	.githooks/pre-push	.githooks/pre-push	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	.github/workflows/release.yml	.github/workflows/release.yml	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	AGENTS.md	AGENTS.md	Active names/links, migration documentation or evidence
+M	CLAUDE.md	CLAUDE.md	Active names/links, migration documentation or evidence
+M	Cargo.lock	Cargo.lock	Own package and path names; external dependency versions unchanged
+M	Cargo.toml	Cargo.toml	Own package and path names; external dependency versions unchanged
+M	INSTALL.md	INSTALL.md	Active names/links, migration documentation or evidence
+M	Meridian - BSD – Übergabe für ChatGPT Desktop.md	Meridian - BSD – Übergabe für ChatGPT Desktop.md	Active names/links, migration documentation or evidence
+M	NIWOE_IMPLEMENTATION_PLAN.md	NIWOE_IMPLEMENTATION_PLAN.md	Active names/links, migration documentation or evidence
+R090	MERIDIAN_OS_PLAN.md	NIWOE_OS_PLAN.md	Active names/links, migration documentation or evidence
+M	README.md	README.md	Active names/links, migration documentation or evidence
+M	cliff.toml	cliff.toml	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+D	crates/meridian-config/src/theme/types/color.rs	crates/meridian-config/src/theme/types/color.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R076	crates/meridian-app-catalog/Cargo.toml	crates/niwoe-app-catalog/Cargo.toml	Own package and path names; external dependency versions unchanged
+R096	crates/meridian-app-catalog/src/lib.rs	crates/niwoe-app-catalog/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R084	crates/meridian-app-catalog/src/tests.rs	crates/niwoe-app-catalog/src/tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R050	crates/meridian-boot-common/Cargo.toml	crates/niwoe-boot-common/Cargo.toml	Own package and path names; external dependency versions unchanged
+R091	crates/meridian-boot-common/src/lib.rs	crates/niwoe-boot-common/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R077	crates/meridian-compass-render/Cargo.toml	crates/niwoe-compass-render/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-compass-render/assets/DejaVuSans-Bold.ttf	crates/niwoe-compass-render/assets/DejaVuSans-Bold.ttf	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compass-render/assets/Italianno-Regular.ttf	crates/niwoe-compass-render/assets/Italianno-Regular.ttf	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-compass-render/examples/wallpaper.rs	crates/niwoe-compass-render/examples/wallpaper.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R082	crates/meridian-compass-render/src/assets.rs	crates/niwoe-compass-render/src/assets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compass-render/src/lib.rs	crates/niwoe-compass-render/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compass-render/src/lib/background_and_scale.rs	crates/niwoe-compass-render/src/lib/background_and_scale.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compass-render/src/lib/rose_and_needle.rs	crates/niwoe-compass-render/src/lib/rose_and_needle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compass-render/src/lib/text.rs	crates/niwoe-compass-render/src/lib/text.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compass-render/src/lib_tests.rs	crates/niwoe-compass-render/src/lib_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R073	crates/meridian-compositor/Cargo.toml	crates/niwoe-compositor/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-compositor/build.rs	crates/niwoe-compositor/build.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-compositor/src/backend/clipped_surface.frag	crates/niwoe-compositor/src/backend/clipped_surface.frag	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/clipped_surface.rs	crates/niwoe-compositor/src/backend/clipped_surface.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/blur.frag	crates/niwoe-compositor/src/backend/drm/blur.frag	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/glass.frag	crates/niwoe-compositor/src/backend/drm/glass.frag	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/glass.rs	crates/niwoe-compositor/src/backend/drm/glass.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/glass_cache.rs	crates/niwoe-compositor/src/backend/drm/glass_cache.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/backend/drm/gpu.rs	crates/niwoe-compositor/src/backend/drm/gpu.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/backend/drm/init.rs	crates/niwoe-compositor/src/backend/drm/init.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/init/build.rs	crates/niwoe-compositor/src/backend/drm/init/build.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/backend/drm/init/event_sources.rs	crates/niwoe-compositor/src/backend/drm/init/event_sources.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/backend/drm/init/hotplug.rs	crates/niwoe-compositor/src/backend/drm/init/hotplug.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-compositor/src/backend/drm/init/layout.rs	crates/niwoe-compositor/src/backend/drm/init/layout.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/init_diagnostics.rs	crates/niwoe-compositor/src/backend/drm/init_diagnostics.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R075	crates/meridian-compositor/src/backend/drm/init_env.rs	crates/niwoe-compositor/src/backend/drm/init_env.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R083	crates/meridian-compositor/src/backend/drm/login_ipc.rs	crates/niwoe-compositor/src/backend/drm/login_ipc.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/backend/drm/mod.rs	crates/niwoe-compositor/src/backend/drm/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/backend/drm/mode_selection.rs	crates/niwoe-compositor/src/backend/drm/mode_selection.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/backend/drm/openbsd_privsep.rs	crates/niwoe-compositor/src/backend/drm/openbsd_privsep.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-compositor/src/backend/drm/render.rs	crates/niwoe-compositor/src/backend/drm/render.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/backend/drm/render/capture.rs	crates/niwoe-compositor/src/backend/drm/render/capture.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R086	crates/meridian-compositor/src/backend/drm/render/layers.rs	crates/niwoe-compositor/src/backend/drm/render/layers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-compositor/src/backend/drm/render/scene_composition.rs	crates/niwoe-compositor/src/backend/drm/render/scene_composition.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/backend/drm/render/scene_helpers.rs	crates/niwoe-compositor/src/backend/drm/render/scene_helpers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/render/stack.rs	crates/niwoe-compositor/src/backend/drm/render/stack.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R082	crates/meridian-compositor/src/backend/drm/sleep_lifecycle.rs	crates/niwoe-compositor/src/backend/drm/sleep_lifecycle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/drm/stats.rs	crates/niwoe-compositor/src/backend/drm/stats.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/backend/drm/wscons.rs	crates/niwoe-compositor/src/backend/drm/wscons.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/backend/mod.rs	crates/niwoe-compositor/src/backend/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R081	crates/meridian-compositor/src/backend/winit/layers.rs	crates/niwoe-compositor/src/backend/winit/layers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/backend/winit/mod.rs	crates/niwoe-compositor/src/backend/winit/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/backend/winit/scene.rs	crates/niwoe-compositor/src/backend/winit/scene.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/cursor/embedded.rs	crates/niwoe-compositor/src/cursor/embedded.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/cursor/image.rs	crates/niwoe-compositor/src/cursor/image.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/cursor/mod.rs	crates/niwoe-compositor/src/cursor/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-compositor/src/cursor/tests.rs	crates/niwoe-compositor/src/cursor/tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/cursor/xcursor.rs	crates/niwoe-compositor/src/cursor/xcursor.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/decoration/icons.rs	crates/niwoe-compositor/src/decoration/icons.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/decoration/mod.rs	crates/niwoe-compositor/src/decoration/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/decoration/model.rs	crates/niwoe-compositor/src/decoration/model.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/decoration/render/buffers.rs	crates/niwoe-compositor/src/decoration/render/buffers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/decoration/render/elements.rs	crates/niwoe-compositor/src/decoration/render/elements.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/decoration/render/elements/frame.rs	crates/niwoe-compositor/src/decoration/render/elements/frame.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/decoration/render/elements/shaders.rs	crates/niwoe-compositor/src/decoration/render/elements/shaders.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/decoration/render/geometry.rs	crates/niwoe-compositor/src/decoration/render/geometry.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/decoration/render/hit.rs	crates/niwoe-compositor/src/decoration/render/hit.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R091	crates/meridian-compositor/src/decoration/render/icon_cache.rs	crates/niwoe-compositor/src/decoration/render/icon_cache.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/decoration/render/mod.rs	crates/niwoe-compositor/src/decoration/render/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/grabs/mod.rs	crates/niwoe-compositor/src/grabs/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R084	crates/meridian-compositor/src/grabs/move_grab.rs	crates/niwoe-compositor/src/grabs/move_grab.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/grabs/move_grab/release.rs	crates/niwoe-compositor/src/grabs/move_grab/release.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/grabs/move_grab/restore.rs	crates/niwoe-compositor/src/grabs/move_grab/restore.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/grabs/move_grab_tests.rs	crates/niwoe-compositor/src/grabs/move_grab_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R087	crates/meridian-compositor/src/grabs/resize_grab/grab.rs	crates/niwoe-compositor/src/grabs/resize_grab/grab.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/grabs/resize_grab/mod.rs	crates/niwoe-compositor/src/grabs/resize_grab/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/grabs/resize_grab/pacing.rs	crates/niwoe-compositor/src/grabs/resize_grab/pacing.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/grabs/resize_grab/state.rs	crates/niwoe-compositor/src/grabs/resize_grab/state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-compositor/src/input/keyboard.rs	crates/niwoe-compositor/src/input/keyboard.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/input/mod.rs	crates/niwoe-compositor/src/input/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/input/pointer/button.rs	crates/niwoe-compositor/src/input/pointer/button.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-compositor/src/input/pointer/button/helpers.rs	crates/niwoe-compositor/src/input/pointer/button/helpers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/input/pointer/button_tests.rs	crates/niwoe-compositor/src/input/pointer/button_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/input/pointer/mod.rs	crates/niwoe-compositor/src/input/pointer/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/input/pointer/mod_tests.rs	crates/niwoe-compositor/src/input/pointer/mod_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R059	crates/meridian-compositor/src/lib.rs	crates/niwoe-compositor/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/mod.rs	crates/niwoe-compositor/src/protocols/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/xdg_shell.rs	crates/niwoe-compositor/src/protocols/xdg_shell.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/protocols/xwayland.rs	crates/niwoe-compositor/src/protocols/xwayland.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/xwayland/configure.rs	crates/niwoe-compositor/src/protocols/xwayland/configure.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-compositor/src/protocols/xwayland/helpers.rs	crates/niwoe-compositor/src/protocols/xwayland/helpers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/xwayland/input_selection.rs	crates/niwoe-compositor/src/protocols/xwayland/input_selection.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/xwayland/state_requests.rs	crates/niwoe-compositor/src/protocols/xwayland/state_requests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/xwayland/window_lifecycle.rs	crates/niwoe-compositor/src/protocols/xwayland/window_lifecycle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/protocols/xwayland_tests.rs	crates/niwoe-compositor/src/protocols/xwayland_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/client.rs	crates/niwoe-compositor/src/state/client.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/handlers/core/compositor.rs	crates/niwoe-compositor/src/state/handlers/core/compositor.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R081	crates/meridian-compositor/src/state/handlers/core/grab.rs	crates/niwoe-compositor/src/state/handlers/core/grab.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/state/handlers/core/layer_shell.rs	crates/niwoe-compositor/src/state/handlers/core/layer_shell.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/handlers/core/mod.rs	crates/niwoe-compositor/src/state/handlers/core/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R062	crates/meridian-compositor/src/state/handlers/core/shm.rs	crates/niwoe-compositor/src/state/handlers/core/shm.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R087	crates/meridian-compositor/src/state/handlers/dmabuf.rs	crates/niwoe-compositor/src/state/handlers/dmabuf.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R087	crates/meridian-compositor/src/state/handlers/idle.rs	crates/niwoe-compositor/src/state/handlers/idle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-compositor/src/state/handlers/misc.rs	crates/niwoe-compositor/src/state/handlers/misc.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/handlers/mod.rs	crates/niwoe-compositor/src/state/handlers/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-compositor/src/state/handlers/output_power.rs	crates/niwoe-compositor/src/state/handlers/output_power.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/state/handlers/screencopy.rs	crates/niwoe-compositor/src/state/handlers/screencopy.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/handlers/session_lock.rs	crates/niwoe-compositor/src/state/handlers/session_lock.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R071	crates/meridian-compositor/src/state/handlers/syncobj.rs	crates/niwoe-compositor/src/state/handlers/syncobj.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-compositor/src/state/handlers/wayland_extra.rs	crates/niwoe-compositor/src/state/handlers/wayland_extra.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R091	crates/meridian-compositor/src/state/handlers/xdg/lifecycle.rs	crates/niwoe-compositor/src/state/handlers/xdg/lifecycle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/state/handlers/xdg/mod.rs	crates/niwoe-compositor/src/state/handlers/xdg/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/handlers/xdg/requests/grab.rs	crates/niwoe-compositor/src/state/handlers/xdg/requests/grab.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/handlers/xdg/requests/mod.rs	crates/niwoe-compositor/src/state/handlers/xdg/requests/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-compositor/src/state/handlers/xdg/requests/state.rs	crates/niwoe-compositor/src/state/handlers/xdg/requests/state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R069	crates/meridian-compositor/src/state/handlers/xdg/requests/window.rs	crates/niwoe-compositor/src/state/handlers/xdg/requests/window.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/idle.rs	crates/niwoe-compositor/src/state/idle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R080	crates/meridian-compositor/src/state/ipc/appearance.rs	crates/niwoe-compositor/src/state/ipc/appearance.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/ipc/broadcast.rs	crates/niwoe-compositor/src/state/ipc/broadcast.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/ipc/commands.rs	crates/niwoe-compositor/src/state/ipc/commands.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/ipc/conversions.rs	crates/niwoe-compositor/src/state/ipc/conversions.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/ipc/launch.rs	crates/niwoe-compositor/src/state/ipc/launch.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R072	crates/meridian-compositor/src/state/ipc/lock_screen.rs	crates/niwoe-compositor/src/state/ipc/lock_screen.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/ipc/mod.rs	crates/niwoe-compositor/src/state/ipc/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R071	crates/meridian-compositor/src/state/ipc/network.rs	crates/niwoe-compositor/src/state/ipc/network.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/state/ipc/screenshot.rs	crates/niwoe-compositor/src/state/ipc/screenshot.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-compositor/src/state/ipc/screenshot_policy.rs	crates/niwoe-compositor/src/state/ipc/screenshot_policy.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/ipc/server.rs	crates/niwoe-compositor/src/state/ipc/server.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-compositor/src/state/ipc/server_tests.rs	crates/niwoe-compositor/src/state/ipc/server_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-compositor/src/state/layout/focus.rs	crates/niwoe-compositor/src/state/layout/focus.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/layout/mod.rs	crates/niwoe-compositor/src/state/layout/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/layout/surface.rs	crates/niwoe-compositor/src/state/layout/surface.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/state/layout/tiling.rs	crates/niwoe-compositor/src/state/layout/tiling.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/state/layout/workspace.rs	crates/niwoe-compositor/src/state/layout/workspace.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/state/lock.rs	crates/niwoe-compositor/src/state/lock.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/state/mod.rs	crates/niwoe-compositor/src/state/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/mod_tests.rs	crates/niwoe-compositor/src/state/mod_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/state/output_hotplug_tests.rs	crates/niwoe-compositor/src/state/output_hotplug_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_hotplug_tests/basic.rs	crates/niwoe-compositor/src/state/output_hotplug_tests/basic.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_hotplug_tests/reload.rs	crates/niwoe-compositor/src/state/output_hotplug_tests/reload.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_hotplug_tests/windows.rs	crates/niwoe-compositor/src/state/output_hotplug_tests/windows.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/state/output_layout.rs	crates/niwoe-compositor/src/state/output_layout.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R073	crates/meridian-compositor/src/state/output_layout_tests.rs	crates/niwoe-compositor/src/state/output_layout_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-compositor/src/state/output_layout_tests/config_and_diff.rs	crates/niwoe-compositor/src/state/output_layout_tests/config_and_diff.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_layout_tests/fixtures.rs	crates/niwoe-compositor/src/state/output_layout_tests/fixtures.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_layout_tests/resolution.rs	crates/niwoe-compositor/src/state/output_layout_tests/resolution.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_power.rs	crates/niwoe-compositor/src/state/output_power.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_registry.rs	crates/niwoe-compositor/src/state/output_registry.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/output_registry_tests.rs	crates/niwoe-compositor/src/state/output_registry_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/state/placement.rs	crates/niwoe-compositor/src/state/placement.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/session_lock_tests.rs	crates/niwoe-compositor/src/state/session_lock_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R090	crates/meridian-compositor/src/state/setup.rs	crates/niwoe-compositor/src/state/setup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-compositor/src/state/setup/dirty_and_construction.rs	crates/niwoe-compositor/src/state/setup/dirty_and_construction.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/state/setup/layout.rs	crates/niwoe-compositor/src/state/setup/layout.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-compositor/src/state/setup/output_lifecycle.rs	crates/niwoe-compositor/src/state/setup/output_lifecycle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-compositor/src/state/setup_tests.rs	crates/niwoe-compositor/src/state/setup_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/utils.rs	crates/niwoe-compositor/src/state/utils.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/state/workspace_output_state.rs	crates/niwoe-compositor/src/state/workspace_output_state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-compositor/src/wallpaper/compose.rs	crates/niwoe-compositor/src/wallpaper/compose.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/wallpaper/gpu.rs	crates/niwoe-compositor/src/wallpaper/gpu.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-compositor/src/wallpaper/manager.rs	crates/niwoe-compositor/src/wallpaper/manager.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/wallpaper/mod.rs	crates/niwoe-compositor/src/wallpaper/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-compositor/src/workspace.rs	crates/niwoe-compositor/src/workspace.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R088	crates/meridian-compositor/tests/layer_shell.rs	crates/niwoe-compositor/tests/layer_shell.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R074	crates/meridian-config/Cargo.toml	crates/niwoe-config/Cargo.toml	Own package and path names; external dependency versions unchanged
+R083	crates/meridian-config/src/config.rs	crates/niwoe-config/src/config.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-config/src/config/mutation.rs	crates/niwoe-config/src/config/mutation.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/config/output_toml.rs	crates/niwoe-config/src/config/output_toml.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/config/wallpapers.rs	crates/niwoe-config/src/config/wallpapers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-config/src/config_tests.rs	crates/niwoe-config/src/config_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R083	crates/meridian-config/src/config_tests/output_updates.rs	crates/niwoe-config/src/config_tests/output_updates.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R087	crates/meridian-config/src/config_tests/parsing.rs	crates/niwoe-config/src/config_tests/parsing.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R091	crates/meridian-config/src/config_tests/wallpaper_and_idle.rs	crates/niwoe-config/src/config_tests/wallpaper_and_idle.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+A	crates/niwoe-config/src/environment.rs	crates/niwoe-config/src/environment.rs	Migration/precedence/single-instance logic and regression coverage
+R100	crates/meridian-config/src/keybind/defaults.rs	crates/niwoe-config/src/keybind/defaults.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/keybind/mod.rs	crates/niwoe-config/src/keybind/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/keybind/parse.rs	crates/niwoe-config/src/keybind/parse.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R077	crates/meridian-config/src/lib.rs	crates/niwoe-config/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+A	crates/niwoe-config/src/migration.rs	crates/niwoe-config/src/migration.rs	Migration/precedence/single-instance logic and regression coverage
+A	crates/niwoe-config/src/migration_tests.rs	crates/niwoe-config/src/migration_tests.rs	Migration/precedence/single-instance logic and regression coverage
+R100	crates/meridian-config/src/output.rs	crates/niwoe-config/src/output.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-config/src/theme/manager.rs	crates/niwoe-config/src/theme/manager.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/theme/mod.rs	crates/niwoe-config/src/theme/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+A	crates/niwoe-config/src/theme/types/color.rs	crates/niwoe-config/src/theme/types/color.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-config/src/theme/types/config.rs	crates/niwoe-config/src/theme/types/config.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/theme/types/error.rs	crates/niwoe-config/src/theme/types/error.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-config/src/theme/types/mod.rs	crates/niwoe-config/src/theme/types/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R053	crates/meridian-freetype/Cargo.toml	crates/niwoe-freetype/Cargo.toml	Own package and path names; external dependency versions unchanged
+R099	crates/meridian-freetype/src/lib.rs	crates/niwoe-freetype/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R086	crates/meridian-ipc/Cargo.toml	crates/niwoe-ipc/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-ipc/src/appearance.rs	crates/niwoe-ipc/src/appearance.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-ipc/src/lib.rs	crates/niwoe-ipc/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-ipc/src/lib_tests.rs	crates/niwoe-ipc/src/lib_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ipc/src/settings.rs	crates/niwoe-ipc/src/settings.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R062	crates/meridian-lock/Cargo.toml	crates/niwoe-lock/Cargo.toml	Own package and path names; external dependency versions unchanged
+R097	crates/meridian-lock/src/auth.rs	crates/niwoe-lock/src/auth.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-lock/src/auth_protocol.rs	crates/niwoe-lock/src/auth_protocol.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-lock/src/bin/meridian-openbsd-auth.rs	crates/niwoe-lock/src/bin/niwoe-openbsd-auth.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-lock/src/lib.rs	crates/niwoe-lock/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-lock/src/main.rs	crates/niwoe-lock/src/main.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-lock/src/main/render.rs	crates/niwoe-lock/src/main/render.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-lock/src/main/render_helpers.rs	crates/niwoe-lock/src/main/render_helpers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-lock/src/main/runtime.rs	crates/niwoe-lock/src/main/runtime.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-lock/src/main_tests.rs	crates/niwoe-lock/src/main_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-lock/src/openbsd_sandbox.rs	crates/niwoe-lock/src/openbsd_sandbox.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R060	crates/meridian-login/Cargo.toml	crates/niwoe-login/Cargo.toml	Own package and path names; external dependency versions unchanged
+R078	crates/meridian-login/config/meridian-login.pam	crates/niwoe-login/config/niwoe-login.pam	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R088	crates/meridian-login/config/meridian-login.service	crates/niwoe-login/config/niwoe-login.service	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-login/src/auth.rs	crates/niwoe-login/src/auth.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/auth/openbsd_backend.rs	crates/niwoe-login/src/auth/openbsd_backend.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-login/src/input.rs	crates/niwoe-login/src/input.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-login/src/input/openbsd.rs	crates/niwoe-login/src/input/openbsd.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-login/src/main.rs	crates/niwoe-login/src/main.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/main/animation.rs	crates/niwoe-login/src/main/animation.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/main/controls.rs	crates/niwoe-login/src/main/controls.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-login/src/main/geometry_and_buttons.rs	crates/niwoe-login/src/main/geometry_and_buttons.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/main/handover_ipc.rs	crates/niwoe-login/src/main/handover_ipc.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/main/power_actions.rs	crates/niwoe-login/src/main/power_actions.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-login/src/main/runtime.rs	crates/niwoe-login/src/main/runtime.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/main/state.rs	crates/niwoe-login/src/main/state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/main/ui.rs	crates/niwoe-login/src/main/ui.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-login/src/main_tests.rs	crates/niwoe-login/src/main_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R090	crates/meridian-login/src/session.rs	crates/niwoe-login/src/session.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-login/src/visual.rs	crates/niwoe-login/src/visual.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R076	crates/meridian-polkit/Cargo.toml	crates/niwoe-polkit/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-polkit/src/auth.rs	crates/niwoe-polkit/src/auth.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-polkit/src/dbus.rs	crates/niwoe-polkit/src/dbus.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-polkit/src/dbus/registration.rs	crates/niwoe-polkit/src/dbus/registration.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R083	crates/meridian-polkit/src/main.rs	crates/niwoe-polkit/src/main.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-polkit/src/openbsd_sandbox.rs	crates/niwoe-polkit/src/openbsd_sandbox.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+A	crates/niwoe-polkit/src/singleton.rs	crates/niwoe-polkit/src/singleton.rs	Migration/precedence/single-instance logic and regression coverage
+R096	crates/meridian-polkit/src/ui.rs	crates/niwoe-polkit/src/ui.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R090	crates/meridian-polkit/src/wayland.rs	crates/niwoe-polkit/src/wayland.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-polkit/src/wayland/dispatch.rs	crates/niwoe-polkit/src/wayland/dispatch.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-polkit/src/wayland/state.rs	crates/niwoe-polkit/src/wayland/state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R069	crates/meridian-portal/Cargo.toml	crates/niwoe-portal/Cargo.toml	Own package and path names; external dependency versions unchanged
+R090	crates/meridian-portal/src/access.rs	crates/niwoe-portal/src/access.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-portal/src/file_chooser.rs	crates/niwoe-portal/src/file_chooser.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-portal/src/lib.rs	crates/niwoe-portal/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R061	crates/meridian-portal/src/main.rs	crates/niwoe-portal/src/main.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R085	crates/meridian-portal/src/openbsd_sandbox.rs	crates/niwoe-portal/src/openbsd_sandbox.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-portal/src/screenshot.rs	crates/niwoe-portal/src/screenshot.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-portal/src/settings.rs	crates/niwoe-portal/src/settings.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R073	crates/meridian-shell/Cargo.toml	crates/niwoe-shell/Cargo.toml	Own package and path names; external dependency versions unchanged
+R094	crates/meridian-shell/assets/gtk/gtk3.css.in	crates/niwoe-shell/assets/gtk/gtk3.css.in	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/assets/gtk/gtk4.css.in	crates/niwoe-shell/assets/gtk/gtk4.css.in	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R091	crates/meridian-shell/src/app_view.rs	crates/niwoe-shell/src/app_view.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R088	crates/meridian-shell/src/app_view/header_and_grid.rs	crates/niwoe-shell/src/app_view/header_and_grid.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-shell/src/app_view/rows_and_helpers.rs	crates/niwoe-shell/src/app_view/rows_and_helpers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/app_view_tests.rs	crates/niwoe-shell/src/app_view_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/audio/mixer.rs	crates/niwoe-shell/src/audio/mixer.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/audio/mixerctl.rs	crates/niwoe-shell/src/audio/mixerctl.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/audio/mod.rs	crates/niwoe-shell/src/audio/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/audio/wpctl.rs	crates/niwoe-shell/src/audio/wpctl.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/audio_popup.rs	crates/niwoe-shell/src/audio_popup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-shell/src/autostart.rs	crates/niwoe-shell/src/autostart.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/battery.rs	crates/niwoe-shell/src/battery.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/bluetooth.rs	crates/niwoe-shell/src/bluetooth.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/buffer.rs	crates/niwoe-shell/src/buffer.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-shell/src/context_menu.rs	crates/niwoe-shell/src/context_menu.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/context_menu/icons.rs	crates/niwoe-shell/src/context_menu/icons.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/context_menu/overlays.rs	crates/niwoe-shell/src/context_menu/overlays.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/context_menu_tests.rs	crates/niwoe-shell/src/context_menu_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/cursor.rs	crates/niwoe-shell/src/cursor.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/default_apps.rs	crates/niwoe-shell/src/default_apps.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/draw/bitmap.rs	crates/niwoe-shell/src/draw/bitmap.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/draw/mod.rs	crates/niwoe-shell/src/draw/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/draw/painter.rs	crates/niwoe-shell/src/draw/painter.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/draw/painter_tests.rs	crates/niwoe-shell/src/draw/painter_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-shell/src/draw/text.rs	crates/niwoe-shell/src/draw/text.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-shell/src/font_resolve.rs	crates/niwoe-shell/src/font_resolve.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/icons/cache.rs	crates/niwoe-shell/src/icons/cache.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/loader.rs	crates/niwoe-shell/src/icons/loader.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/loader/decode.rs	crates/niwoe-shell/src/icons/loader/decode.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/loader/filesystem.rs	crates/niwoe-shell/src/icons/loader/filesystem.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/icons/loader_tests.rs	crates/niwoe-shell/src/icons/loader_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/mod.rs	crates/niwoe-shell/src/icons/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/rcc.rs	crates/niwoe-shell/src/icons/rcc.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/icons/rcc_tests.rs	crates/niwoe-shell/src/icons/rcc_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/svg.rs	crates/niwoe-shell/src/icons/svg.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/icons/theme_index.rs	crates/niwoe-shell/src/icons/theme_index.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/launcher.rs	crates/niwoe-shell/src/launcher.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/launcher_tests.rs	crates/niwoe-shell/src/launcher_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R088	crates/meridian-shell/src/main.rs	crates/niwoe-shell/src/main.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/network/freebsd.rs	crates/niwoe-shell/src/network/freebsd.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/network/mod.rs	crates/niwoe-shell/src/network/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/network/nmcli.rs	crates/niwoe-shell/src/network/nmcli.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/network/nmcli_tests.rs	crates/niwoe-shell/src/network/nmcli_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/network_popup.rs	crates/niwoe-shell/src/network_popup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-shell/src/notification_popup.rs	crates/niwoe-shell/src/notification_popup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/notifications/dbus.rs	crates/niwoe-shell/src/notifications/dbus.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/notifications/mod.rs	crates/niwoe-shell/src/notifications/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/notifications/state.rs	crates/niwoe-shell/src/notifications/state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/panel.rs	crates/niwoe-shell/src/panel.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/src/panel_view.rs	crates/niwoe-shell/src/panel_view.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/panel_view/chips.rs	crates/niwoe-shell/src/panel_view/chips.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/panel_view/layout.rs	crates/niwoe-shell/src/panel_view/layout.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/panel_view/pinned.rs	crates/niwoe-shell/src/panel_view/pinned.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/panel_view/render.rs	crates/niwoe-shell/src/panel_view/render.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/panel_view/windows.rs	crates/niwoe-shell/src/panel_view/windows.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/panel_view_tests.rs	crates/niwoe-shell/src/panel_view_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/popup_card.rs	crates/niwoe-shell/src/popup_card.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/power_profile.rs	crates/niwoe-shell/src/power_profile.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/printers.rs	crates/niwoe-shell/src/printers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/process.rs	crates/niwoe-shell/src/process.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/quick_settings_popup.rs	crates/niwoe-shell/src/quick_settings_popup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/region_picker.rs	crates/niwoe-shell/src/region_picker.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/screenshot_consent.rs	crates/niwoe-shell/src/screenshot_consent.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/settings_refresh.rs	crates/niwoe-shell/src/settings_refresh.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/settings_view.rs	crates/niwoe-shell/src/settings_view.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/appearance_widgets.rs	crates/niwoe-shell/src/settings_view/appearance_widgets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/audio_system_widgets.rs	crates/niwoe-shell/src/settings_view/audio_system_widgets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/settings_view/basic_widgets.rs	crates/niwoe-shell/src/settings_view/basic_widgets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/bluetooth.rs	crates/niwoe-shell/src/settings_view/content/bluetooth.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/cursor.rs	crates/niwoe-shell/src/settings_view/content/cursor.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/default_apps.rs	crates/niwoe-shell/src/settings_view/content/default_apps.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/display.rs	crates/niwoe-shell/src/settings_view/content/display.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/network.rs	crates/niwoe-shell/src/settings_view/content/network.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/pinned_apps.rs	crates/niwoe-shell/src/settings_view/content/pinned_apps.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/power.rs	crates/niwoe-shell/src/settings_view/content/power.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/printers.rs	crates/niwoe-shell/src/settings_view/content/printers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/sound.rs	crates/niwoe-shell/src/settings_view/content/sound.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R091	crates/meridian-shell/src/settings_view/content/system_overview.rs	crates/niwoe-shell/src/settings_view/content/system_overview.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/theme.rs	crates/niwoe-shell/src/settings_view/content/theme.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/updates.rs	crates/niwoe-shell/src/settings_view/content/updates.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-shell/src/settings_view/content/users.rs	crates/niwoe-shell/src/settings_view/content/users.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/content/wallpaper.rs	crates/niwoe-shell/src/settings_view/content/wallpaper.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/settings_view/content_builders.rs	crates/niwoe-shell/src/settings_view/content_builders.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/display_controls.rs	crates/niwoe-shell/src/settings_view/display_controls.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/display_widgets.rs	crates/niwoe-shell/src/settings_view/display_widgets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/src/settings_view/draw.rs	crates/niwoe-shell/src/settings_view/draw.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/settings_view/group_widgets.rs	crates/niwoe-shell/src/settings_view/group_widgets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/ids.rs	crates/niwoe-shell/src/settings_view/ids.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/settings_view/network_device_widgets.rs	crates/niwoe-shell/src/settings_view/network_device_widgets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/soft_shadow.rs	crates/niwoe-shell/src/soft_shadow.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/status_notifier.rs	crates/niwoe-shell/src/status_notifier.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/status_notifier/activation_and_menu.rs	crates/niwoe-shell/src/status_notifier/activation_and_menu.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/status_notifier_popup.rs	crates/niwoe-shell/src/status_notifier_popup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/status_notifier_tests.rs	crates/niwoe-shell/src/status_notifier_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/sysinfo.rs	crates/niwoe-shell/src/sysinfo.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-shell/src/system_power.rs	crates/niwoe-shell/src/system_power.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R087	crates/meridian-shell/src/theme_export.rs	crates/niwoe-shell/src/theme_export.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/src/thumbnail_popup.rs	crates/niwoe-shell/src/thumbnail_popup.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/ui/mod.rs	crates/niwoe-shell/src/ui/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-shell/src/ui/primitives.rs	crates/niwoe-shell/src/ui/primitives.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/src/ui/tokens.rs	crates/niwoe-shell/src/ui/tokens.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/updates.rs	crates/niwoe-shell/src/updates.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/users.rs	crates/niwoe-shell/src/users.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/wayland/calendar.rs	crates/niwoe-shell/src/wayland/calendar.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/wayland/handlers/compositor.rs	crates/niwoe-shell/src/wayland/handlers/compositor.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/wayland/handlers/keyboard.rs	crates/niwoe-shell/src/wayland/handlers/keyboard.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/wayland/handlers/layer.rs	crates/niwoe-shell/src/wayland/handlers/layer.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R063	crates/meridian-shell/src/wayland/handlers/mod.rs	crates/niwoe-shell/src/wayland/handlers/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R090	crates/meridian-shell/src/wayland/handlers/output.rs	crates/niwoe-shell/src/wayland/handlers/output.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/wayland/handlers/pointer.rs	crates/niwoe-shell/src/wayland/handlers/pointer.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/wayland/handlers/pointer/launcher.rs	crates/niwoe-shell/src/wayland/handlers/pointer/launcher.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/wayland/handlers/pointer/overlays_and_desktop.rs	crates/niwoe-shell/src/wayland/handlers/pointer/overlays_and_desktop.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wayland/handlers/pointer/panel_and_popups.rs	crates/niwoe-shell/src/wayland/handlers/pointer/panel_and_popups.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wayland/handlers/pointer_state.rs	crates/niwoe-shell/src/wayland/handlers/pointer_state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R082	crates/meridian-shell/src/wayland/handlers/pointer_translate.rs	crates/niwoe-shell/src/wayland/handlers/pointer_translate.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/src/wayland/handlers/seat.rs	crates/niwoe-shell/src/wayland/handlers/seat.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R063	crates/meridian-shell/src/wayland/handlers/shm.rs	crates/niwoe-shell/src/wayland/handlers/shm.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wayland/handlers/widget_dispatch.rs	crates/niwoe-shell/src/wayland/handlers/widget_dispatch.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R093	crates/meridian-shell/src/wayland/handlers/widget_dispatch/dispatch.rs	crates/niwoe-shell/src/wayland/handlers/widget_dispatch/dispatch.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R091	crates/meridian-shell/src/wayland/handlers/widget_dispatch/settings_and_context.rs	crates/niwoe-shell/src/wayland/handlers/widget_dispatch/settings_and_context.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R088	crates/meridian-shell/src/wayland/init.rs	crates/niwoe-shell/src/wayland/init.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R092	crates/meridian-shell/src/wayland/init/assets.rs	crates/niwoe-shell/src/wayland/init/assets.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R090	crates/meridian-shell/src/wayland/init/commit.rs	crates/niwoe-shell/src/wayland/init/commit.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R076	crates/meridian-shell/src/wayland/init/flags.rs	crates/niwoe-shell/src/wayland/init/flags.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R089	crates/meridian-shell/src/wayland/ipc.rs	crates/niwoe-shell/src/wayland/ipc.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R074	crates/meridian-shell/src/wayland/mod.rs	crates/niwoe-shell/src/wayland/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/wayland/render.rs	crates/niwoe-shell/src/wayland/render.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/wayland/render/calendar_workspace.rs	crates/niwoe-shell/src/wayland/render/calendar_workspace.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wayland/render/core.rs	crates/niwoe-shell/src/wayland/render/core.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wayland/render/desktop_overlays.rs	crates/niwoe-shell/src/wayland/render/desktop_overlays.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/wayland/render/launcher.rs	crates/niwoe-shell/src/wayland/render/launcher.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/wayland/render/network_audio.rs	crates/niwoe-shell/src/wayland/render/network_audio.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/wayland/render/notifications.rs	crates/niwoe-shell/src/wayland/render/notifications.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/wayland/screencopy.rs	crates/niwoe-shell/src/wayland/screencopy.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/wayland/shell.rs	crates/niwoe-shell/src/wayland/shell.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/src/wayland/state.rs	crates/niwoe-shell/src/wayland/state.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/wayland/state/audio_and_network_popups.rs	crates/niwoe-shell/src/wayland/state/audio_and_network_popups.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/wayland/state/ipc_events.rs	crates/niwoe-shell/src/wayland/state/ipc_events.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/wayland/state/panel_actions.rs	crates/niwoe-shell/src/wayland/state/panel_actions.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-shell/src/wayland/state/popups.rs	crates/niwoe-shell/src/wayland/state/popups.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/wayland/state/shell_actions.rs	crates/niwoe-shell/src/wayland/state/shell_actions.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wayland/state/timers.rs	crates/niwoe-shell/src/wayland/state/timers.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R082	crates/meridian-shell/src/wayland/state_tests.rs	crates/niwoe-shell/src/wayland/state_tests.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/wayland/state_tests/output_events.rs	crates/niwoe-shell/src/wayland/state_tests/output_events.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R094	crates/meridian-shell/src/wayland/state_tests/workspaces.rs	crates/niwoe-shell/src/wayland/state_tests/workspaces.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/wayland/time.rs	crates/niwoe-shell/src/wayland/time.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-shell/src/wayland/types.rs	crates/niwoe-shell/src/wayland/types.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/widget_action.rs	crates/niwoe-shell/src/widget_action.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-shell/src/widget_traversal.rs	crates/niwoe-shell/src/widget_traversal.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-shell/src/wifi_password_modal.rs	crates/niwoe-shell/src/wifi_password_modal.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-shell/src/workspaces.rs	crates/niwoe-shell/src/workspaces.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-shell/tests/centralization_guard.rs	crates/niwoe-shell/tests/centralization_guard.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R082	crates/meridian-tokens/Cargo.toml	crates/niwoe-tokens/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-tokens/assets/fonts/AdwaitaSans-Regular.ttf	crates/niwoe-tokens/assets/fonts/AdwaitaSans-Regular.ttf	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-tokens/assets/fonts/LICENSE	crates/niwoe-tokens/assets/fonts/LICENSE	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-tokens/src/chrome.rs	crates/niwoe-tokens/src/chrome.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-tokens/src/color.rs	crates/niwoe-tokens/src/color.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-tokens/src/elevation.rs	crates/niwoe-tokens/src/elevation.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R074	crates/meridian-tokens/src/font.rs	crates/niwoe-tokens/src/font.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-tokens/src/interaction.rs	crates/niwoe-tokens/src/interaction.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R079	crates/meridian-tokens/src/lib.rs	crates/niwoe-tokens/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R096	crates/meridian-tokens/src/radius.rs	crates/niwoe-tokens/src/radius.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-tokens/src/typography.rs	crates/niwoe-tokens/src/typography.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-tokens/tests/design_guard.rs	crates/niwoe-tokens/tests/design_guard.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R095	crates/meridian-tokens/tests/source_size_guard.rs	crates/niwoe-tokens/tests/source_size_guard.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R053	crates/meridian-ui/Cargo.toml	crates/niwoe-ui/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-ui/assets/fonts/LICENSE	crates/niwoe-ui/assets/fonts/LICENSE	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/effect/border.rs	crates/niwoe-ui/src/effect/border.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/effect/dominant_color.rs	crates/niwoe-ui/src/effect/dominant_color.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/effect/fill.rs	crates/niwoe-ui/src/effect/fill.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/effect/metro_surface.rs	crates/niwoe-ui/src/effect/metro_surface.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/effect/mod.rs	crates/niwoe-ui/src/effect/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/effect/radius.rs	crates/niwoe-ui/src/effect/radius.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R098	crates/meridian-ui/src/effect/text.rs	crates/niwoe-ui/src/effect/text.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/event/hit_test.rs	crates/niwoe-ui/src/event/hit_test.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/event/mod.rs	crates/niwoe-ui/src/event/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R097	crates/meridian-ui/src/lib.rs	crates/niwoe-ui/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/paint/layout.rs	crates/niwoe-ui/src/paint/layout.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/paint/mod.rs	crates/niwoe-ui/src/paint/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/paint/render.rs	crates/niwoe-ui/src/paint/render.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R066	crates/meridian-ui/src/style/color.rs	crates/niwoe-ui/src/style/color.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/style/mod.rs	crates/niwoe-ui/src/style/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R067	crates/meridian-ui/src/style/radius.rs	crates/niwoe-ui/src/style/radius.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/style/spacing.rs	crates/niwoe-ui/src/style/spacing.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-ui/src/widget/base.rs	crates/niwoe-ui/src/widget/base.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-ui/src/widget/button.rs	crates/niwoe-ui/src/widget/button.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R090	crates/meridian-ui/src/widget/mod.rs	crates/niwoe-ui/src/widget/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R099	crates/meridian-ui/src/widget/tile.rs	crates/niwoe-ui/src/widget/tile.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R086	crates/meridian-wm/Cargo.toml	crates/niwoe-wm/Cargo.toml	Own package and path names; external dependency versions unchanged
+R100	crates/meridian-wm/src/floating.rs	crates/niwoe-wm/src/floating.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/lib.rs	crates/niwoe-wm/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/tiling/layout.rs	crates/niwoe-wm/src/tiling/layout.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/tiling/mod.rs	crates/niwoe-wm/src/tiling/mod.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/tiling/tree.rs	crates/niwoe-wm/src/tiling/tree.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/tiling/types.rs	crates/niwoe-wm/src/tiling/types.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/window.rs	crates/niwoe-wm/src/window.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R100	crates/meridian-wm/src/workspace.rs	crates/niwoe-wm/src/workspace.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+R075	crates/meridian-xwayland-drm-bridge/Cargo.toml	crates/niwoe-xwayland-drm-bridge/Cargo.toml	Own package and path names; external dependency versions unchanged
+R096	crates/meridian-xwayland-drm-bridge/src/lib.rs	crates/niwoe-xwayland-drm-bridge/src/lib.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	docs/APP_STACK.md	docs/APP_STACK.md	Active names/links, migration documentation or evidence
+M	docs/ARCHITECTURE.md	docs/ARCHITECTURE.md	Active names/links, migration documentation or evidence
+M	docs/CODE_INDEX.md	docs/CODE_INDEX.md	Active names/links, migration documentation or evidence
+M	docs/CONFIGURATION.md	docs/CONFIGURATION.md	Active names/links, migration documentation or evidence
+M	docs/DEBUGGING.md	docs/DEBUGGING.md	Active names/links, migration documentation or evidence
+M	docs/DESKTOP_SETTINGS_CONTRACT.md	docs/DESKTOP_SETTINGS_CONTRACT.md	Active names/links, migration documentation or evidence
+M	docs/FRAME_STRATEGY.md	docs/FRAME_STRATEGY.md	Active names/links, migration documentation or evidence
+M	docs/FREEBSD.md	docs/FREEBSD.md	Active names/links, migration documentation or evidence
+M	docs/GUI_CENTRALIZATION_PLAN.md	docs/GUI_CENTRALIZATION_PLAN.md	Active names/links, migration documentation or evidence
+M	docs/HARDWARE_SMOKE.md	docs/HARDWARE_SMOKE.md	Active names/links, migration documentation or evidence
+M	docs/MULTI_MONITOR.md	docs/MULTI_MONITOR.md	Active names/links, migration documentation or evidence
+M	docs/NIWOE_DESIGN_BRIEF.md	docs/NIWOE_DESIGN_BRIEF.md	Active names/links, migration documentation or evidence
+M	docs/NIWOE_DEVELOPMENT_DISTRO.md	docs/NIWOE_DEVELOPMENT_DISTRO.md	Active names/links, migration documentation or evidence
+M	docs/NIWOE_LINUX_BASELINE.md	docs/NIWOE_LINUX_BASELINE.md	Active names/links, migration documentation or evidence
+R074	docs/MERIDIAN_LOGIN.md	docs/NIWOE_LOGIN.md	Active names/links, migration documentation or evidence
+A	docs/NIWOE_MIGRATION.md	docs/NIWOE_MIGRATION.md	Migration/precedence/single-instance logic and regression coverage
+M	docs/NVIDIA_PASSTHROUGH.md	docs/NVIDIA_PASSTHROUGH.md	Active names/links, migration documentation or evidence
+M	docs/OPENBSD.md	docs/OPENBSD.md	Active names/links, migration documentation or evidence
+M	docs/OPENBSD_QUIET_BOOT.md	docs/OPENBSD_QUIET_BOOT.md	Active names/links, migration documentation or evidence
+M	docs/OPENBSD_SANDBOX_PLAN.md	docs/OPENBSD_SANDBOX_PLAN.md	Active names/links, migration documentation or evidence
+M	docs/README.md	docs/README.md	Active names/links, migration documentation or evidence
+M	docs/REFACTORING_PLAN.md	docs/REFACTORING_PLAN.md	Active names/links, migration documentation or evidence
+M	docs/TESTING.md	docs/TESTING.md	Active names/links, migration documentation or evidence
+M	docs/WORKSPACES.md	docs/WORKSPACES.md	Active names/links, migration documentation or evidence
+M	docs/XDG_PORTALS.md	docs/XDG_PORTALS.md	Active names/links, migration documentation or evidence
+R088	docs/meridian_design_manifest.md	docs/niwoe_design_manifest.md	Active names/links, migration documentation or evidence
+A	docs/phase-reports/P01-inventory.tsv	docs/phase-reports/P01-inventory.tsv	Active names/links, migration documentation or evidence
+A	docs/phase-reports/P01-residuals.tsv	docs/phase-reports/P01-residuals.tsv	Active names/links, migration documentation or evidence
+A	docs/phase-reports/P01.md	docs/phase-reports/P01.md	Active names/links, migration documentation or evidence
+M	docs/phase-reports/README.md	docs/phase-reports/README.md	Active names/links, migration documentation or evidence
+M	docs/technical-design-guidelines.md	docs/technical-design-guidelines.md	Active names/links, migration documentation or evidence
+D	packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service	packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service	New deployment/runtime identifiers and smoke contracts
+A	packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service	packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service	New deployment/runtime identifiers and smoke contracts
+R070	packaging/meridian-session	packaging/niwoe-session	New deployment/runtime identifiers and smoke contracts
+R067	packaging/openbsd/rc.d/meridian_bootsplash	packaging/openbsd/rc.d/niwoe_bootsplash	New deployment/runtime identifiers and smoke contracts
+R067	packaging/openbsd/rc.d/meridian_login	packaging/openbsd/rc.d/niwoe_login	New deployment/runtime identifiers and smoke contracts
+R076	packaging/pam/freebsd/meridian-login	packaging/pam/freebsd/niwoe-login	New deployment/runtime identifiers and smoke contracts
+R072	packaging/pam/freebsd/meridian-login-password	packaging/pam/freebsd/niwoe-login-password	New deployment/runtime identifiers and smoke contracts
+A	packaging/pam/niwoe-lock	packaging/pam/niwoe-lock	New deployment/runtime identifiers and smoke contracts
+R067	packaging/pam/meridian-login-password	packaging/pam/niwoe-login-password	New deployment/runtime identifiers and smoke contracts
+D	packaging/rc.d/meridian	packaging/rc.d/meridian	New deployment/runtime identifiers and smoke contracts
+A	packaging/rc.d/niwoe	packaging/rc.d/niwoe	New deployment/runtime identifiers and smoke contracts
+R051	packaging/rc.d/meridian-login	packaging/rc.d/niwoe-login	New deployment/runtime identifiers and smoke contracts
+R062	packaging/rc.d/meridian_quiet	packaging/rc.d/niwoe_quiet	New deployment/runtime identifiers and smoke contracts
+D	packaging/systemd-user/meridian-portal.service	packaging/systemd-user/meridian-portal.service	New deployment/runtime identifiers and smoke contracts
+A	packaging/systemd-user/niwoe-portal.service	packaging/systemd-user/niwoe-portal.service	New deployment/runtime identifiers and smoke contracts
+R063	packaging/systemd-user/meridian-session.target	packaging/systemd-user/niwoe-session.target	New deployment/runtime identifiers and smoke contracts
+D	packaging/wayland-sessions/meridian.desktop	packaging/wayland-sessions/meridian.desktop	New deployment/runtime identifiers and smoke contracts
+A	packaging/wayland-sessions/niwoe.desktop	packaging/wayland-sessions/niwoe.desktop	New deployment/runtime identifiers and smoke contracts
+D	packaging/xdg-autostart/meridian-polkit-agent.desktop	packaging/xdg-autostart/meridian-polkit-agent.desktop	New deployment/runtime identifiers and smoke contracts
+A	packaging/xdg-autostart/niwoe-polkit-agent.desktop	packaging/xdg-autostart/niwoe-polkit-agent.desktop	New deployment/runtime identifiers and smoke contracts
+D	packaging/xdg-desktop-portal/meridian-openbsd-portals.conf	packaging/xdg-desktop-portal/meridian-openbsd-portals.conf	New deployment/runtime identifiers and smoke contracts
+D	packaging/xdg-desktop-portal/meridian-portals.conf	packaging/xdg-desktop-portal/meridian-portals.conf	New deployment/runtime identifiers and smoke contracts
+A	packaging/xdg-desktop-portal/niwoe-openbsd-portals.conf	packaging/xdg-desktop-portal/niwoe-openbsd-portals.conf	New deployment/runtime identifiers and smoke contracts
+A	packaging/xdg-desktop-portal/niwoe-portals.conf	packaging/xdg-desktop-portal/niwoe-portals.conf	New deployment/runtime identifiers and smoke contracts
+R065	packaging/xdg-desktop-portal/portals/meridian-openbsd.portal	packaging/xdg-desktop-portal/portals/niwoe-openbsd.portal	New deployment/runtime identifiers and smoke contracts
+R071	packaging/xdg-desktop-portal/portals/meridian.portal	packaging/xdg-desktop-portal/portals/niwoe.portal	New deployment/runtime identifiers and smoke contracts
+R086	scripts/gen-meridian-theme.py	scripts/gen-niwoe-theme.py	New deployment/runtime identifiers and smoke contracts
+M	scripts/gen_code_index.sh	scripts/gen_code_index.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-deps-freebsd.sh	scripts/install-deps-freebsd.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-deps.sh	scripts/install-deps.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-freebsd.sh	scripts/install-freebsd.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-local.sh	scripts/install-local.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-openbsd-boot.ksh	scripts/install-openbsd-boot.ksh	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-openbsd-lock	scripts/install-openbsd-lock	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-openbsd-polkit	scripts/install-openbsd-polkit	New deployment/runtime identifiers and smoke contracts
+M	scripts/install-openbsd-portal	scripts/install-openbsd-portal	New deployment/runtime identifiers and smoke contracts
+M	scripts/measure-openbsd-drm.ksh	scripts/measure-openbsd-drm.ksh	New deployment/runtime identifiers and smoke contracts
+A	scripts/migrate-legacy-install.sh	scripts/migrate-legacy-install.sh	Migration/precedence/single-instance logic and regression coverage
+R095	scripts/meridian-file-picker	scripts/niwoe-file-picker	New deployment/runtime identifiers and smoke contracts
+M	scripts/restart-openbsd-shell.ksh	scripts/restart-openbsd-shell.ksh	New deployment/runtime identifiers and smoke contracts
+M	scripts/smoke-drm.sh	scripts/smoke-drm.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/smoke-nested.sh	scripts/smoke-nested.sh	New deployment/runtime identifiers and smoke contracts
+A	scripts/test-install-migration.sh	scripts/test-install-migration.sh	Migration/precedence/single-instance logic and regression coverage
+M	scripts/test-login-uinput.py	scripts/test-login-uinput.py	New deployment/runtime identifiers and smoke contracts
+A	scripts/test-portal-missing-helper.py	scripts/test-portal-missing-helper.py	New deployment/runtime identifiers and smoke contracts
+M	scripts/test-session-launcher.sh	scripts/test-session-launcher.sh	New deployment/runtime identifiers and smoke contracts
+M	scripts/x11-motion-bench.c	scripts/x11-motion-bench.c	New deployment/runtime identifiers and smoke contracts
+M	src/main.rs	src/main.rs	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	themes/dark/theme.toml	themes/dark/theme.toml	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	themes/light/theme.toml	themes/light/theme.toml	Own identifiers, type prefixes, imports and referenced paths renamed consistently
+M	third_party/smithay/Cargo.toml	third_party/smithay/Cargo.toml	Own package and path names; external dependency versions unchanged
+M	third_party/smithay/OPENBSD_PORT.md	third_party/smithay/OPENBSD_PORT.md	Active names/links, migration documentation or evidence

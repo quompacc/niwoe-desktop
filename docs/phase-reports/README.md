@@ -6,6 +6,15 @@
 | P01 | in-progress | [P01.md](P01.md) |
 | P02–P13 | not-started | — |
 
+P01, Prüfcheckpoint 22.09.2026: Namensmigration und nicht überschreibende
+XDG-/Installationsmigration implementiert und lokal committet. Fedora-Gates
+grün: 1.085 Tests bestanden, 2 bewusst ignoriert, Release und Guards bestanden.
+Nested, Staging-Installation, Live-IPC, Portal-Backendneustart, fehlender Picker
+und Polkit-Neuregistrierung einschließlich Passwort-/Abbruchfällen geprüft.
+Beim Shellneustart gefundene doppelte Polkit-Instanz korrigiert und nachgeprüft.
+Für die Abnahme fehlen Lock, Dateiportal-Hardwarefälle und der abschließende
+KDE-Rundlauf. Details und Nachweise: [P01.md](P01.md). P02 nicht begonnen.
+
 P00: Fedora 44 KDE eingerichtet; zusätzliche Entwicklungssitzung installiert.
 Format, Workspace-Check, Clippy mit `-D warnings`, alle 1.076 Workspace-Tests
 und Build bestehen ohne zusätzlichen Paket-Ausschluss. Der isolierte Nested-
