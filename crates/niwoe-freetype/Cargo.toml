@@ -1,0 +1,9 @@
+[package]
+name = "niwoe-freetype"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+
+[dev-dependencies]
+niwoe-tokens = { path = "../niwoe-tokens" }

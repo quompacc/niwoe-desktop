@@ -4,15 +4,15 @@
 
 ## 1. Goal
 
-Every Meridian-owned UI uses one design source and one reusable native component
+Every NIWOE-owned UI uses one design source and one reusable native component
 model. Changing theme color, interaction state, elevation, radius or configured
 decoration geometry must not require editing multiple renderers or applications.
 
 ## 2. Authoritative sources
 
-- `meridian-tokens`: `Palette`, `Interaction`, `Elevation`, `Radius`
-- `meridian-config`: `Decorations` and user-selected configuration
-- `meridian_design_manifest.md`: visual and product rules
+- `niwoe-tokens`: `Palette`, `Interaction`, `Elevation`, `Radius`
+- `niwoe-config`: `Decorations` and user-selected configuration
+- `niwoe_design_manifest.md`: visual and product rules
 
 Native Rust code consumes these types directly. Preview artifacts and the
 archived WebKit prototype are never a second editable source of truth.
@@ -23,10 +23,10 @@ archived WebKit prototype are never a second editable source of truth.
 manifest
    │
    ▼
-meridian-tokens + meridian-config
+niwoe-tokens + niwoe-config
    │
    ▼
-shared meridian-ui primitives
+shared niwoe-ui primitives
    ├─ panel
    ├─ launcher
    ├─ Quick Settings
@@ -41,7 +41,7 @@ shared meridian-ui primitives
 - explicit guard rationale for unavoidable brand assets or test fixtures
 - no compass/brand theater in everyday UI
 - shared primitives own focus, hover, pressed, disabled and accessibility states
-- external applications are not forced to adopt Meridian geometry
+- external applications are not forced to adopt NIWOE geometry
 - no parallel renderer or independently evolving design system
 
 ## 5. Native quality sequence

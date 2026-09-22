@@ -5,20 +5,20 @@ NIWOE ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess. Produktziel
 ist zuerst ein kohärenter nativer Linux-Desktop auf einer bestehenden Linux-
 Distribution; ein eigenes Linux-basiertes OS folgt erst nach der Desktop-Alpha.
 NIWOE-eigene UI bleibt vollständig nativ in Rust und baut bis P01 auf
-`meridian-ui`, `meridian-tokens` und `meridian-config` auf. Der archivierte
+`niwoe-ui`, `niwoe-tokens` und `niwoe-config` auf. Der archivierte
 WebKit-Prototyp ist nur visuelle Referenz und kein Produktpfad. Die aktive
 Reihenfolge ist ausschließlich `NIWOE_IMPLEMENTATION_PLAN.md`; frühere
-Meridian-/BSD-Roadmaps sind historische Evidenz und keine offenen Pflichten.
+NIWOE-/BSD-Roadmaps sind historische Evidenz und keine offenen Pflichten.
 
 ## Design – VERBINDLICHE Vorgabe (gilt für jede UI-/Render-Änderung)
-Die Datei **`docs/meridian_design_manifest.md` ist bis zur P01-Umbenennung die
+Die Datei **`docs/niwoe_design_manifest.md` ist bis zur P01-Umbenennung die
 maßgebliche Design-Spezifikation.** Sie präzisiert `docs/NIWOE_DESIGN_BRIEF.md`.
 Jede Änderung an Aussehen, Farben, Geometrie oder Effekten MUSS ihr entsprechen.
 Bei Konflikt schlägt das Manifest jede andere Quelle (Audits, Altcode).
 
 Daraus abgeleitete, nicht verhandelbare Invarianten:
-- **Eine** zentrale Design-Quelle: `meridian-tokens` (`Palette`, `Interaction`,
-  `Elevation`, `Radius`) + `meridian-config` (`Decorations`). Jedes UI-Element
+- **Eine** zentrale Design-Quelle: `niwoe-tokens` (`Palette`, `Interaction`,
+  `Elevation`, `Radius`) + `niwoe-config` (`Decorations`). Jedes UI-Element
   zieht Farbe/Alpha/Geometrie/Radius/Effekt **ausschließlich** daraus.
 - **Kein hartverdrahteter Farb-/Alpha-/Radius-/Mix-Wert im Render-Code** außerhalb
   dieser Quelle. Ausnahmen nur für Marken-Assets/Icons und Tests, und nur explizit
@@ -26,14 +26,14 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
 - Genau **2 Themes (hell/dunkel)**, identisch bis auf Farben (Layout, Geometrie,
   Radien, Glas/Blur/Schatten gleich). Theme-Wechsel = nur Farbtabelle tauschen.
 - **Branding nur als NIWOE-Wortmarke in Welcome, Login und About**; keine
-  Meridian-Kompassgrafik und keine Markenfläche in der Alltags-UI, Taskbar oder
+  NIWOE-Kompassgrafik und keine Markenfläche in der Alltags-UI, Taskbar oder
   dem Launcher-Button.
-- **Guard-Test muss grün bleiben:** `cargo test -p meridian-tokens --test design_guard`
+- **Guard-Test muss grün bleiben:** `cargo test -p niwoe-tokens --test design_guard`
   schlägt bei neuen Hardcodes fehl. Roten Guard nie ignorieren — entweder
   zentralisieren oder bewusst mit `// guard:allow: <grund>` freigeben.
 - Definition of Done für Zentralität: `docs/GUI_CENTRALIZATION_PLAN.md` §9.
 - Archivierte Mockups sind nicht normativ. Native Produkt-UI bezieht alle
-  Designwerte direkt aus `meridian-tokens` + `meridian-config`.
+  Designwerte direkt aus `niwoe-tokens` + `niwoe-config`.
 
 ## Harte Regeln für Codex
 1. Keine Feature-Änderung ohne expliziten Auftrag.

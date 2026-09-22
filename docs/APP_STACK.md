@@ -1,8 +1,8 @@
-# Meridian — External Application Compatibility
+# NIWOE — External Application Compatibility
 
 > Updated 2026-08-19. This replaces the former “GTK-only application stack” as
 > product policy. The previous GTK findings remain relevant to client-side
-> decorations, but Meridian no longer chooses one toolkit as its architecture.
+> decorations, but NIWOE no longer chooses one toolkit as its architecture.
 
 ## Boundary
 
@@ -13,7 +13,7 @@ GTK / Qt / Firefox / Chromium / Electron / wxWidgets
                          │
                       Wayland
                          │
-                      Meridian
+                      NIWOE
 
 legacy or incompatible clients
                          │
@@ -21,10 +21,10 @@ legacy or incompatible clients
                          │
                      XWayland
                          │
-                      Meridian
+                      NIWOE
 ```
 
-Meridian-owned surfaces and tools use the native Rust shell. Meridian does not
+NIWOE-owned surfaces and tools use the native Rust shell. NIWOE does not
 embed, replace or restyle arbitrary external applications.
 
 ## Compatibility policy
@@ -38,7 +38,7 @@ embed, replace or restyle arbitrary external applications.
    analysis and a tightly scoped test.
 
 GTK and libadwaita commonly draw their own header bars and decorations. Qt and
-other clients may negotiate server-side decorations. Meridian must honor each
+other clients may negotiate server-side decorations. NIWOE must honor each
 protocol path rather than double-frame clients.
 
 ## Reference matrix
@@ -48,9 +48,9 @@ reference OS and real-hardware run.
 
 | Family | Reference | OpenBSD | FreeBSD | Linux | Notes |
 |---|---|---|---|---|---|
-| Browser | Firefox | pending | usable, gaps tracked | reference | historically harder than Chromium in some Meridian paths |
+| Browser | Firefox | pending | usable, gaps tracked | reference | historically harder than Chromium in some NIWOE paths |
 | Browser | Chromium | pending | known platform gap | reference | test native Wayland and fallback separately |
-| GTK3 | Thunar | XWayland quirk verified 2026-08-22 | pending | reference | launcher scopes `GDK_BACKEND=x11` + `GTK_CSD=0` to Thunar so Meridian owns SSD |
+| GTK3 | Thunar | XWayland quirk verified 2026-08-22 | pending | reference | launcher scopes `GDK_BACKEND=x11` + `GTK_CSD=0` to Thunar so NIWOE owns SSD |
 | GTK4/libadwaita | representative modern app | pending | pending | reference | client owns header bar |
 | Qt5 | representative app | pending | pending | reference | verify decoration negotiation |
 | Qt6 | representative app | pending | pending | reference | verify decoration negotiation |
@@ -72,10 +72,10 @@ work. Prefer applications that behave correctly as standalone Wayland clients.
 
 ## Relationship to theming
 
-Meridian may export compatible color/theme hints through standard desktop
+NIWOE may export compatible color/theme hints through standard desktop
 mechanisms. Those exports are best-effort integration, not a promise that all
 toolkits share identical geometry. The binding visual system applies to
-Meridian-owned UI; external clients retain their toolkit conventions.
+NIWOE-owned UI; external clients retain their toolkit conventions.
 
 See `FRAME_STRATEGY.md` for the historical decoration findings and
-`NATIVE_UI_PLAN.md` for Meridian-owned UI.
+`NATIVE_UI_PLAN.md` for NIWOE-owned UI.

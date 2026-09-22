@@ -1,19 +1,19 @@
 # OpenBSD Sandbox Plan
 
-> Status: `meridian-lock` and `meridian-polkit` pilots implemented and verified
+> Status: `niwoe-lock` and `niwoe-polkit` pilots implemented and verified
 > on reference hardware on 2026-08-23 and 2026-08-24. This document defines the
-> continuing fail-closed rollout of `pledge(2)` and `unveil(2)` for Meridian
+> continuing fail-closed rollout of `pledge(2)` and `unveil(2)` for NIWOE
 > processes.
 
 ## Current assessment
 
-Meridian separates authentication, policy, portal, native shell and compositor
+NIWOE separates authentication, policy, portal, native shell and compositor
 responsibilities into distinct processes with narrow typed IPC boundaries.
 OpenBSD authentication uses `auth_userokay(3)`. The native shell does not own
 raw DRM or input handles.
 
-The unprivileged `meridian-lock` UI and its narrow setgid authentication helper
-apply separate `pledge(2)` and `unveil(2)` profiles. Other Meridian processes
+The unprivileged `niwoe-lock` UI and its narrow setgid authentication helper
+apply separate `pledge(2)` and `unveil(2)` profiles. Other NIWOE processes
 remain unsandboxed until their own responsibilities and observed requirements
 have been inventoried; the lock pilot is not a generic profile to copy blindly.
 
@@ -30,9 +30,9 @@ have been inventoried; the lock pilot is not a generic profile to copy blindly.
 - OpenBSD profiles remain platform-specific. FreeBSD capability work is
   designed independently rather than hidden behind a false common policy.
 
-## Pilot: `meridian-lock`
+## Pilot: `niwoe-lock`
 
-`meridian-lock` is the first candidate because it is small, security-sensitive
+`niwoe-lock` is the first candidate because it is small, security-sensitive
 and has a bounded purpose. Sandboxing starts only after its unsandboxed
 end-to-end lifecycle has been proven on the OpenBSD reference machine.
 
@@ -52,12 +52,12 @@ replacement lock process. This invariant must be covered before the sandbox is
 enabled.
 
 Local state-machine coverage was added before the sandbox work: the compositor
-reaper delivers `meridian-lock` termination back to the compositor event loop.
+reaper delivers `niwoe-lock` termination back to the compositor event loop.
 An unsuccessful exit while the lock is pending or acquired preserves that
 phase, prunes dead client-owned lock surfaces, clears keyboard focus and
 requests a compositor-owned cleared frame. Only the protocol's explicit
 `unlock_and_destroy` request reaches the unlock transition. Lock refusal and a
-Wayland dispatch failure make `meridian-lock` exit unsuccessfully. Unit tests
+Wayland dispatch failure make `niwoe-lock` exit unsuccessfully. Unit tests
 cover failure before acquisition, while pending and after acquisition. This is
 not a substitute for the real-hardware lifecycle and crash matrix above, which
 remains required before enabling `pledge` or `unveil`.
@@ -65,7 +65,7 @@ remains required before enabling `pledge` or `unveil`.
 OpenBSD reference verification on 2026-08-23: `cargo check --workspace`,
 `cargo build --workspace`, the lock-focused tests and
 `cargo test --workspace --exclude smithay` all passed. The exclusion is the
-documented vendored-Smithay example limitation, not a Meridian test failure.
+documented vendored-Smithay example limitation, not a NIWOE test failure.
 
 The same hardware run established the unsandboxed baseline for one Intel
 output: `Super+L` reaches the compositor-supervised lock client, the lock
@@ -80,13 +80,13 @@ normal user, then install from a privileged, root-owned path:
 
 ```sh
 env LIBRARY_PATH=/usr/local/lib:/usr/X11R6/lib \
-    cargo build --release -p meridian-lock --bins
+    cargo build --release -p niwoe-lock --bins
 doas ./scripts/install-openbsd-lock
 ```
 
-The resulting `/usr/local/libexec/meridian-lock` is the unprivileged Wayland/UI
+The resulting `/usr/local/libexec/niwoe-lock` is the unprivileged Wayland/UI
 process and must be owned by `root:wheel` with mode `0555`. Only the narrow
-`/usr/local/libexec/meridian-openbsd-auth` helper is owned by `root:auth` with
+`/usr/local/libexec/niwoe-openbsd-auth` helper is owned by `root:auth` with
 mode `2555`; it is setgid `auth`, never setuid root. The helper accepts only a
 bounded, length-prefixed password over a pipe and authenticates the real caller
 UID, so the UI cannot select another account. Neither binary is installed from
@@ -103,11 +103,11 @@ desktop usable, while `PendingFailClosed` and `LockedFailClosed` kept the deskto
 in a compositor-owned secured state until explicit SSH recovery. The locked
 case was also repeated while the setgid auth helper was active. Because the real
 Pending window completes in roughly four milliseconds, debug builds expose the
-explicit `MERIDIAN_FAULT_INJECT_HOLD_LOCK_PENDING=1` test gate; release builds
+explicit `NIWOE_FAULT_INJECT_HOLD_LOCK_PENDING=1` test gate; release builds
 compile that gate out.
 
 The desktop context menu and launcher power menu now send the typed
-`LockSession` IPC command instead of spawning `meridian-lock` directly. Both
+`LockSession` IPC command instead of spawning `niwoe-lock` directly. Both
 paths passed on hardware through the compositor supervisor, including unlock in
 dark and light themes. The built-in Intel output is covered; a real multi-output
 lock run remains an expansion of the hardware matrix, not a reason to broaden
@@ -130,7 +130,7 @@ fixed authentication helper. `rpath wpath cpath` remain only because OpenBSD's
 view is:
 
 ```text
-/usr/local/libexec/meridian-openbsd-auth  x
+/usr/local/libexec/niwoe-openbsd-auth  x
 /dev/null                                  w
 /tmp                                       rwc
 /usr/libexec/ld.so                         rx
@@ -170,7 +170,7 @@ auth helper kept the lock screen active and successfully retried after mode
 `root:auth 2555` was restored. The live UI process reported both pledge and
 unveil state (`pU`) in `ps`.
 
-## Pilot: `meridian-polkit`
+## Pilot: `niwoe-polkit`
 
 The second pilot keeps the long-lived Wayland authentication UI unprivileged
 and retains polkit's packaged setuid helper protocol. On OpenBSD the package
@@ -193,14 +193,14 @@ step:
 
 ```sh
 env LIBRARY_PATH=/usr/local/lib:/usr/X11R6/lib \
-    cargo build --release -p meridian-polkit
+    cargo build --release -p niwoe-polkit
 doas ./scripts/install-openbsd-polkit
 ```
 
-The installer places `/usr/local/bin/meridian-polkit-agent` as
-`root:wheel 0555`, installs both Meridian theme tables read-only below
-`/usr/local/share/meridian/themes`, and renders the existing XDG autostart
-entry to `/etc/xdg/autostart/meridian-polkit-agent.desktop` as
+The installer places `/usr/local/bin/niwoe-polkit-agent` as
+`root:wheel 0555`, installs both NIWOE theme tables read-only below
+`/usr/local/share/niwoe/themes`, and renders the existing XDG autostart
+entry to `/etc/xdg/autostart/niwoe-polkit-agent.desktop` as
 `root:wheel 0444`. Starting through the shell's XDG autostart path is part of
 correctness: an SSH-launched process is not a member of the graphical
 ConsoleKit session and polkit rejects its registration.
@@ -212,10 +212,10 @@ the agent locks this unveiled view:
 /usr/local/lib/polkit-1/polkit-agent-helper-1  x
 /dev/null                                      w
 /tmp                                           rwc
-~/.config/meridian                             r   (when present)
-~/.local/share/meridian/themes                 r   (when present)
-$MERIDIAN_THEME_DIR(S)                         r   (existing entries only)
-$XDG_DATA_DIRS/meridian/themes                 r   (existing entries only)
+~/.config/niwoe                             r   (when present)
+~/.local/share/niwoe/themes                 r   (when present)
+$NIWOE_THEME_DIR(S)                         r   (existing entries only)
+$XDG_DATA_DIRS/niwoe/themes                 r   (existing entries only)
 /usr/libexec/ld.so                             rx
 /var/run/ld.so.hints                           r
 /usr/lib                                       r
@@ -235,7 +235,7 @@ stdio rpath wpath cpath getpw proc exec sendfd recvfd
 `getpw` resolves polkit's authorised Unix identities, `proc exec` launches the
 fixed helper, and descriptor passing remains required by Wayland. No
 `execpromises` are set because OpenBSD blocks setuid execution when they are
-present. The packaged setuid helper starts outside Meridian's pledge profile
+present. The packaged setuid helper starts outside NIWOE's pledge profile
 and owns its protected BSD Authentication and system-D-Bus access. Those paths
 cannot be pre-unveiled by the unprivileged UI (`/usr/libexec/auth` is not
 traversable by it); this is an explicit upstream trust boundary and residual
@@ -251,42 +251,42 @@ status 1. Killing the agent while `pkexec` awaited input removed the dialog and
 made `pkexec` report `not authorized`; no root action ran. A clean session
 restart restored the autostarted sandboxed agent.
 
-## Pilot: `meridian-portal`
+## Pilot: `niwoe-portal`
 
-The third pilot separates the narrow Meridian policy backend from the broad
+The third pilot separates the narrow NIWOE policy backend from the broad
 filesystem view required by an interactive file chooser. On OpenBSD,
-`meridian-portal` publishes only Settings, Screenshot and Access. The official
+`niwoe-portal` publishes only Settings, Screenshot and Access. The official
 `xdg-desktop-portal-gtk` package owns FileChooser in a separate process;
-Meridian therefore does not unveil the user's home directory and does not keep
+NIWOE therefore does not unveil the user's home directory and does not keep
 `proc` or `exec` promises merely to launch a picker.
 
 Build and install the backend as the normal user plus the narrow root step:
 
 ```sh
 env LIBRARY_PATH=/usr/local/lib:/usr/X11R6/lib \
-    cargo build --release -p meridian-portal
+    cargo build --release -p niwoe-portal
 doas pkg_add xdg-desktop-portal xdg-desktop-portal-gtk
 doas ./scripts/install-openbsd-portal
 ```
 
-The installer requires both packaged portal daemons, installs the Meridian
+The installer requires both packaged portal daemons, installs the NIWOE
 binary as `root:wheel 0555`, and installs D-Bus activation, the OpenBSD-only
 portal descriptor, routing config and both central theme tables as
-`root:wheel 0444`. Settings and Screenshot route to Meridian; FileChooser
+`root:wheel 0444`. Settings and Screenshot route to NIWOE; FileChooser
 routes only to GTK.
 
-After acquiring its session-bus name, the backend verifies that the Meridian
+After acquiring its session-bus name, the backend verifies that the NIWOE
 IPC path already exists as a real Unix socket, locks this unveiled view and
 fails startup on every setup error:
 
 ```text
-~/.config/meridian                     r   (when present)
-~/.config/meridian/themes              r   (when present)
-~/.local/share/meridian/themes         r   (when present)
-$MERIDIAN_THEME_DIR(S)                 r   (existing entries only)
-$XDG_DATA_HOME/meridian/themes         r   (when configured and present)
-$XDG_DATA_DIRS/meridian/themes         r   (existing entries only)
-$XDG_RUNTIME_DIR/meridian.sock         rw  (required Unix socket)
+~/.config/niwoe                     r   (when present)
+~/.config/niwoe/themes              r   (when present)
+~/.local/share/niwoe/themes         r   (when present)
+$NIWOE_THEME_DIR(S)                 r   (existing entries only)
+$XDG_DATA_HOME/niwoe/themes         r   (when configured and present)
+$XDG_DATA_DIRS/niwoe/themes         r   (existing entries only)
+$XDG_RUNTIME_DIR/niwoe.sock         rw  (required Unix socket)
 ```
 
 It pledges:
@@ -308,9 +308,9 @@ cancels visibly. Startup without the compositor socket and with a regular file
 substituted at its path both exit with status 1. A visible screenshot denial
 returned response code 1 without a result; the allow path returned code 0 and
 a valid local 1920x1080 PNG. The backend remained `pU`, and the temporary image
-was removed after type, ownership and size verification. A clean Meridian
+was removed after type, ownership and size verification. A clean NIWOE
 session restart with the production environment automatically activated the
-Meridian and GTK backends without display/proxy errors; Settings and a new
+NIWOE and GTK backends without display/proxy errors; Settings and a new
 FileChooser request still passed without any manual D-Bus environment update.
 
 ## Implementation method
@@ -333,12 +333,12 @@ permission is added only for a named operation demonstrated by code or trace.
 
 ## Rollout order
 
-1. `meridian-lock` (complete)
-2. `meridian-polkit` (complete)
-3. `meridian-portal` (complete)
-4. `meridian-login`
-5. `meridian-shell`
-6. Meridian compositor
+1. `niwoe-lock` (complete)
+2. `niwoe-polkit` (complete)
+3. `niwoe-portal` (complete)
+4. `niwoe-login`
+5. `niwoe-shell`
+6. NIWOE compositor
 
 Polkit and the portal refine the process and tooling before login, shell and
 compositor, which follow later because they
@@ -347,7 +347,7 @@ process responsibilities. If a useful profile remains too broad, split the
 responsibility into a smaller helper instead of presenting a weak profile as
 complete isolation.
 
-### Historical `meridian-ui-runtime` prototype (retired)
+### Historical `niwoe-ui-runtime` prototype (retired)
 
 > This completed experiment is retained as sandbox evidence only. The runtime
 > was removed from the workspace on 2026-08-25 and is no longer in rollout.
@@ -355,7 +355,7 @@ complete isolation.
 The runtime creates one GTK host, one WebKit web process and one WebKit network
 process for each persistent surface. WebKitGTK's sandbox switch is enabled as
 defence in depth, but the OpenBSD package does not give these processes native
-`pledge(2)` or `unveil(2)` state. Meridian does not count that switch as an OS
+`pledge(2)` or `unveil(2)` state. NIWOE does not count that switch as an OS
 sandbox.
 
 The first stage restricts only the GTK host after its first document has

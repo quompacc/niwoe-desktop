@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Exercise meridian-login with a virtual keyboard.
+"""Exercise niwoe-login with a virtual keyboard.
 
 This script is intentionally system-facing: run it as root on the login host.
-It can prepare a disposable user, restart meridian-login, type credentials via
+It can prepare a disposable user, restart niwoe-login, type credentials via
 /dev/uinput, verify the compositor handover in journald, and clean up again.
 """
 
@@ -188,7 +188,7 @@ class VirtualKeyboard:
         for code in sorted(set(KEYS.values()) | {KEY_TAB, KEY_ENTER, KEY_SPACE, KEY_LEFTMETA}):
             fcntl.ioctl(self._file, UI_SET_KEYBIT, code)
 
-        name = b"meridian-login-smoke-keyboard"
+        name = b"niwoe-login-smoke-keyboard"
         user_dev = struct.pack("80sHHHHi", name, 3, 0x1234, 0x5678, 1, 0)
         self._file.write(user_dev + bytes(1116 - len(user_dev)))
         fcntl.ioctl(self._file, UI_DEV_CREATE)
@@ -253,7 +253,7 @@ class VirtualPointer:
         fcntl.ioctl(self._file, UI_SET_ABSBIT, ABS_X)
         fcntl.ioctl(self._file, UI_SET_ABSBIT, ABS_Y)
 
-        name = b"meridian-login-smoke-pointer"
+        name = b"niwoe-login-smoke-pointer"
         user_dev = struct.pack("80sHHHHi", name, 3, 0x1234, 0x5679, 1, 0)
         absmax = [0] * 64
         absmin = [0] * 64
@@ -304,8 +304,8 @@ def current_journal_time() -> str:
 
 
 def restart_login() -> None:
-    log("restarting meridian-login.service")
-    run_cmd(["systemctl", "restart", "meridian-login.service"])
+    log("restarting niwoe-login.service")
+    run_cmd(["systemctl", "restart", "niwoe-login.service"])
 
 
 def journal_since(since: str) -> str:
@@ -339,7 +339,7 @@ def verify_login(username: str, since: str) -> None:
     log("checking spawned compositor processes")
     process_deadline = time.monotonic() + 6.0
     while True:
-        missing = [name for name in ("meridian", "meridian-shell") if not pgrep_user(username, name)]
+        missing = [name for name in ("niwoe", "niwoe-shell") if not pgrep_user(username, name)]
         if not missing:
             break
         if time.monotonic() >= process_deadline:
@@ -347,7 +347,7 @@ def verify_login(username: str, since: str) -> None:
             raise TestFailure(f"missing processes for {username}: {', '.join(missing)}\n{processes}")
         time.sleep(0.4)
 
-    log("checking meridian-login journal markers")
+    log("checking niwoe-login journal markers")
     required = ("auth ok", "compositor spawned", "ipc handover", "ipc exit")
     journal_deadline = time.monotonic() + 10.0
     while True:
@@ -367,11 +367,11 @@ def verify_login(username: str, since: str) -> None:
 
 def send_logout_ipc(username: str) -> None:
     uid = user_uid(username)
-    path = Path(f"/run/user/{uid}/meridian.sock")
+    path = Path(f"/run/user/{uid}/niwoe.sock")
     deadline = time.monotonic() + 6.0
     while not path.exists():
         if time.monotonic() >= deadline:
-            raise TestFailure(f"meridian IPC socket not found: {path}")
+            raise TestFailure(f"niwoe IPC socket not found: {path}")
         time.sleep(0.2)
 
     log(f"sending compositor quit via {path}")
@@ -390,7 +390,7 @@ def verify_logout(username: str, since: str) -> None:
     log("checking compositor processes stopped")
     deadline = time.monotonic() + 10.0
     while True:
-        running = [name for name in ("meridian", "meridian-shell") if pgrep_user(username, name)]
+        running = [name for name in ("niwoe", "niwoe-shell") if pgrep_user(username, name)]
         if not running:
             break
         if time.monotonic() >= deadline:
@@ -398,17 +398,17 @@ def verify_logout(username: str, since: str) -> None:
             raise TestFailure(f"processes still running after logout: {', '.join(running)}\n{processes}")
         time.sleep(0.4)
 
-    log("checking meridian-login restarted")
+    log("checking niwoe-login restarted")
     active_deadline = time.monotonic() + 10.0
     while True:
-        active = run_cmd(["systemctl", "is-active", "meridian-login.service"], check=False)
+        active = run_cmd(["systemctl", "is-active", "niwoe-login.service"], check=False)
         if active.stdout.strip() == "active":
             break
         if time.monotonic() >= active_deadline:
-            raise TestFailure(f"meridian-login.service is not active: {active.stdout.strip()}")
+            raise TestFailure(f"niwoe-login.service is not active: {active.stdout.strip()}")
         time.sleep(0.4)
 
-    required = ("compositor exited", "meridian-login starting")
+    required = ("compositor exited", "niwoe-login starting")
     journal_deadline = time.monotonic() + 10.0
     while True:
         journal = journal_since(since)
@@ -444,8 +444,8 @@ def run_login_test(args: argparse.Namespace) -> None:
 
 
 def run_logout_ipc_test(args: argparse.Namespace) -> None:
-    if not pgrep_user(args.username, "meridian"):
-        raise TestFailure(f"no running meridian session for {args.username}; use --run with --keep-session first")
+    if not pgrep_user(args.username, "niwoe"):
+        raise TestFailure(f"no running niwoe session for {args.username}; use --run with --keep-session first")
 
     since = current_journal_time()
     send_logout_ipc(args.username)
@@ -464,8 +464,8 @@ def logout_button_center(width: int, height: int) -> tuple[int, int]:
 
 
 def run_logout_ui_test(args: argparse.Namespace) -> None:
-    if not pgrep_user(args.username, "meridian"):
-        raise TestFailure(f"no running meridian session for {args.username}; use --run first")
+    if not pgrep_user(args.username, "niwoe"):
+        raise TestFailure(f"no running niwoe session for {args.username}; use --run first")
 
     since = current_journal_time()
     with VirtualKeyboard() as keyboard, VirtualPointer(args.ui_width, args.ui_height) as pointer:
@@ -485,7 +485,7 @@ def run_logout_ui_test(args: argparse.Namespace) -> None:
 
 
 def panel_click_zones_path(username: str) -> Path:
-    return Path(f"/run/user/{user_uid(username)}/meridian-panel-click-zones.json")
+    return Path(f"/run/user/{user_uid(username)}/niwoe-panel-click-zones.json")
 
 
 def load_panel_click_zone(username: str, zone_id: str, ui_height: int) -> tuple[int, int]:
@@ -514,8 +514,8 @@ def load_panel_click_zone(username: str, zone_id: str, ui_height: int) -> tuple[
 
 
 def run_panel_click_test(args: argparse.Namespace) -> None:
-    if not pgrep_user(args.username, "meridian"):
-        raise TestFailure(f"no running meridian session for {args.username}; use --run with --keep-session first")
+    if not pgrep_user(args.username, "niwoe"):
+        raise TestFailure(f"no running niwoe session for {args.username}; use --run with --keep-session first")
 
     with VirtualPointer(args.ui_width, args.ui_height) as pointer:
         time.sleep(args.ui_device_ready_delay)
@@ -533,8 +533,8 @@ def run_panel_click_test(args: argparse.Namespace) -> None:
             pointer.click(x, y, button)
             time.sleep(args.panel_click_delay)
 
-    if not pgrep_user(args.username, "meridian-shell"):
-        raise TestFailure("meridian-shell exited after panel click smoke")
+    if not pgrep_user(args.username, "niwoe-shell"):
+        raise TestFailure("niwoe-shell exited after panel click smoke")
     log("panel click smoke test passed")
 
 
@@ -546,7 +546,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run", action="store_true", help="run the virtual-keyboard login test")
     parser.add_argument("--logout-ipc", action="store_true", help="send ShellCommand::Quit and verify login returns")
     parser.add_argument("--logout-ui", action="store_true", help="open launcher and double-click power logout")
-    parser.add_argument("--panel-click", help="click a panel zone by widget id or action from meridian-panel-click-zones.json")
+    parser.add_argument("--panel-click", help="click a panel zone by widget id or action from niwoe-panel-click-zones.json")
     parser.add_argument("--panel-click-button", choices=("left", "right", "middle"), default="left")
     parser.add_argument("--panel-click-count", type=int, default=1)
     parser.add_argument("--panel-click-delay", type=float, default=0.25)

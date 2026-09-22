@@ -5,7 +5,7 @@
 
 ## Ziel
 
-Meridian soll globale Desktop-Einstellungen standardnah und toolkit-neutral bereitstellen.
+NIWOE soll globale Desktop-Einstellungen standardnah und toolkit-neutral bereitstellen.
 
 - Keine App-Hacks.
 - Keine Policy im Compositor-Hotpath.
@@ -21,7 +21,7 @@ Meridian soll globale Desktop-Einstellungen standardnah und toolkit-neutral bere
 
 ## V0 Settings (perspektivisch)
 
-Meridian sollte als ersten, kleinen Contract perspektivisch diese Settings global bereitstellen:
+NIWOE sollte als ersten, kleinen Contract perspektivisch diese Settings global bereitstellen:
 
 - Color-Scheme / Dark-Light Preference
 - Cursor Theme
@@ -38,8 +38,8 @@ Optional spaeter:
 
 - Bevorzugt ueber eine separate Settings-/Portal-Schicht.
 - Nicht direkt im Compositor-Hotpath.
-- `meridian-config` bleibt die Quelle fuer interne Defaults.
-- `meridian-portal` oder ein separater Settings-Daemon kann eine standardisierte Read-only-Schnittstelle fuer Apps bereitstellen.
+- `niwoe-config` bleibt die Quelle fuer interne Defaults.
+- `niwoe-portal` oder ein separater Settings-Daemon kann eine standardisierte Read-only-Schnittstelle fuer Apps bereitstellen.
 - XSettings, GSettings und Portal-Settings sind moegliche Integrationsrichtungen, aber in v0 noch nicht implementiert.
 - Die Web-UI-Bridge ist nur Presentation/Intent-Transport. Sie schreibt keine
   Systemdateien direkt und umgeht weder Config-Validierung noch Portal-/Service-
@@ -50,7 +50,7 @@ Optional spaeter:
 - Compositor: Protokolle, Fensterverwaltung, Input, Session-Basis.
 - Shell/Settings: User-facing Einstellungen.
 - WebKit Runtime: unprivilegierte Darstellung und typisierte Nutzerabsichten.
-- Config: persistente Meridian-Einstellungen.
+- Config: persistente NIWOE-Einstellungen.
 - Portal/Settings-Service: app-seitige Desktop-Settings-Signale.
 - Apps/Toolkits: finale CSD/Headerbar/Window-Control-Darstellung.
 

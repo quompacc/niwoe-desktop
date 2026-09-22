@@ -1,9 +1,0 @@
-[package]
-name = "meridian-boot-common"
-version.workspace = true
-edition = "2021"
-license = "GPL-3.0-or-later"
-description = "Shared boot-chain helpers for bootsplash and meridian-login"
-
-[dependencies]
-drm = "0.15"

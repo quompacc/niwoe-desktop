@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=NIWOE Polkit Agent
+Comment=PolicyKit authentication agent for the NIWOE desktop
+Exec=@PREFIX@/bin/niwoe-polkit-agent
+OnlyShowIn=NIWOE;
+X-GNOME-Autostart-Phase=Initialization

@@ -43,7 +43,7 @@ the old BSD evaluation roadmap is superseded by `../NIWOE_IMPLEMENTATION_PLAN.md
 - Favor minimal settings surfaces.
 - New settings must have clear product value and low long-term maintenance cost.
 
-## Meridian-Owned Shell Components
+## NIWOE-Owned Shell Components
 - Keep panel, launcher, and compositor-owned UI behavior coherent and predictable.
 - Avoid unbounded extension points that fragment UX.
 - Build shared native primitives before expanding the shell's feature surface.
@@ -86,6 +86,6 @@ Apply this priority order:
 
 ## Product Filter
 A technical change is acceptable only if it:
-1. aligns with Meridian product direction
+1. aligns with NIWOE product direction
 2. avoids policy drift and app-specific coupling
 3. remains maintainable under small-patch discipline

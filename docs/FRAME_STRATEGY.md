@@ -1,12 +1,12 @@
-# Meridian — Window-Frame-Strategie (der Schlachtplan)
+# NIWOE — Window-Frame-Strategie (der Schlachtplan)
 
 > **Status 2026-08-19:** Die Live-Befunde zu GTK-CSD/SSD bleiben gültiger
 > Kompatibilitätskontext für externe Clients. Dieser Plan ist aber keine aktive
 > Priorität vor dem WebKit-Vertical-Slice und gilt nicht als Strategie für
-> Meridian-eigene UI. Externe Apps bleiben Wayland/XWayland-Clients.
+> NIWOE-eigene UI. Externe Apps bleiben Wayland/XWayland-Clients.
 
 **Status:** Entscheidung getroffen 2026-06-21. Umsetzung in Phasen, später.
-**Kurzfassung:** Eine uniforme, vom Compositor gezeichnete Meridian-Titelleiste
+**Kurzfassung:** Eine uniforme, vom Compositor gezeichnete NIWOE-Titelleiste
 über **alle** Apps ist auf Wayland **nicht erreichbar**. Wir fahren deshalb
 **zweigleisig**: volle Kontrolle für die Kern-Apps (SSD / Eigenbau), und für den
 Rest CSD akzeptieren und nur farblich integrieren — wie elementary OS / macOS.
@@ -41,19 +41,19 @@ Empirisch, nicht neu zu verhandeln:
 - **Gegenbeispiele, die SSD respektieren:** Qt (über `xdg-decoration`),
   Wayland-Terminals (`foot`, `alacritty`, `wezterm`), SDL, viele Spiele.
 - **GTK-Lebenszyklus:** GTK3 ist im Wartungsmodus, GTK4→GTK5 bringt denselben
-  Bruch, libadwaita wird eher strenger. **Meridians Kern-Identität darf nicht
+  Bruch, libadwaita wird eher strenger. **NIWOEs Kern-Identität darf nicht
   vom Schicksal eines fremden Toolkits abhängen.**
 
 ## 3. Die zwei Gleise
 
-### Gleis A — Volle Kontrolle (echte Meridian-SSD-Leiste, wie im Mockup)
+### Gleis A — Volle Kontrolle (echte NIWOE-SSD-Leiste, wie im Mockup)
 Apps, bei denen der **Compositor** die token-getriebene Leiste zeichnet:
 - **Terminal:** `foot` oder `alacritty` (beide SSD, heute bei Alacritty
-  verifiziert — trägt die Meridian-Leiste samt der neuen grauen Buttons).
+  verifiziert — trägt die NIWOE-Leiste samt der neuen grauen Buttons).
 - **Qt-Apps:** respektieren ServerSide; Theming aber ohne Plasma fummelig
   (Grund, warum KDE gedroppt wurde) — nur dosiert einsetzen.
 - **Eigenbau-Apps in Rust** (der wirklich „neutrale" Weg): eigenes Rendering,
-  kein fremdes Toolkit, Designtokens direkt aus `meridian-tokens`. Die Shell
+  kein fremdes Toolkit, Designtokens direkt aus `niwoe-tokens`. Die Shell
   macht das bereits (smithay-Rendering).
 
 ### Gleis B — Lange Leine (CSD akzeptiert, nur farblich integriert)
@@ -68,14 +68,14 @@ Farbe/Form über Tokens:
 ## 4. Phasenplan (später umsetzbar)
 
 **Phase 0 — erledigt (2026-06-21):**
-- Graue Mockup-Buttons auf der Meridian-SSD-Leiste (`decoration/render/elements.rs`).
+- Graue Mockup-Buttons auf der NIWOE-SSD-Leiste (`decoration/render/elements.rs`).
 - libadwaita-Palette nach `~/.config/gtk-{3,4}.0/gtk.css` (`theme_export.rs`).
 - Build/Test/Install nur auf der Arch-Box festgeschrieben (`CLAUDE.md`).
 - Step 2 (force-SSD + `GTK_CSD=0`) verworfen und zurückgenommen.
 
 **Phase 1 — erledigt (2026-08-22, OpenBSD-Referenzhardware):**
 - `foot` ist installiert, wird als bevorzugtes Terminal aufgeloest und traegt
-  den Meridian-SSD-Rahmen. Thunar nutzt ausschliesslich ueber seinen
+  den NIWOE-SSD-Rahmen. Thunar nutzt ausschliesslich ueber seinen
   Launch-Adapter XWayland plus `GTK_CSD=0` und traegt denselben Rahmen.
 - Die live abgestimmte SSD-Leiste nutzt zentrale `WindowChrome`-Tokens: 34 px
   Titelleiste, grosszuegige Klickflaechen, ruhige Glyphen, eingelassene
@@ -85,7 +85,7 @@ Farbe/Form über Tokens:
   Normal- und Maximalzustand interaktiv bestaetigt.
 - XWayland-Splashfenster bleiben anhand ihres standardisierten Fenstertyps
   rahmenlos. Blender und FreeCAD erhalten dagegen am normalen, implizit
-  maximierten Hauptfenster den Meridian-Frame; beide Faelle sind interaktiv
+  maximierten Hauptfenster den NIWOE-Frame; beide Faelle sind interaktiv
   bestaetigt.
 - Der Icon-Cache schluesselt die konkrete Themefarbe mit ein. Die drei
   Fensterbuttons bleiben damit nach beliebig vielen Hell-/Dunkelwechseln
@@ -103,12 +103,12 @@ Farbe/Form über Tokens:
   Empfehlung als Default: Slint (deklarativ, eigenes Rendering, gut themebar) —
   in Phase 3 final entscheiden.
 - Ein schmaler Prototyp (z. B. minimaler Dateimanager oder Bildbetrachter) mit
-  echter Meridian-SSD-Leiste + Tokens, als Tracer-Bullet.
+  echter NIWOE-SSD-Leiste + Tokens, als Tracer-Bullet.
 
-**Phase 4 — Token-Bridge / Meridian-UI-Kit (Gleis A, Fundament):**
-- Ein wiederverwendbares Crate, das `meridian-tokens` für Eigenbau-Apps
+**Phase 4 — Token-Bridge / NIWOE-UI-Kit (Gleis A, Fundament):**
+- Ein wiederverwendbares Crate, das `niwoe-tokens` für Eigenbau-Apps
   bereitstellt (Farben/Spacing/Radius/Fonts), damit jede neue App ohne Copy-Paste
-  Meridian-konform ist. Idealerweise teilen Shell + Apps Widgets.
+  NIWOE-konform ist. Idealerweise teilen Shell + Apps Widgets.
 
 **Phase 5 — schrittweise Substitution:**
 - Default-Apps der Gleis-A-Kategorien nacheinander durch Eigenbau ersetzen,
@@ -132,5 +132,5 @@ Farbe/Form über Tokens:
 - [`APP_STACK.md`](APP_STACK.md) — Gleis-B-Begründung (GTK zeichnet selbst).
 - [`SSD_FRAME_PLAN.md`](SSD_FRAME_PLAN.md) — Step 1 (SSD-Styling, läuft weiter),
   Step 2 (verworfen, siehe oben).
-- [`meridian_design_manifest.md`](meridian_design_manifest.md) — maßgebliche
+- [`niwoe_design_manifest.md`](niwoe_design_manifest.md) — maßgebliche
   Design-Spezifikation (schlägt im Konflikt jede andere Quelle).

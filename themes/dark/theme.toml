@@ -1,11 +1,11 @@
-# Meridian — DARK theme.
+# NIWOE — DARK theme.
 #
 # Per the GUI centralization model this file carries ONLY the colour table
 # (plus the icon set). All geometry, radii, shadows and glass treatment
-# come from the central Rust defaults in `meridian-config` (Decorations::default)
+# come from the central Rust defaults in `niwoe-config` (Decorations::default)
 # so dark and light stay identical in everything but colour.
 #
-# These values mirror `meridian_tokens::Palette::DARK` (the single source).
+# These values mirror `niwoe_tokens::Palette::DARK` (the single source).
 
 [colors]
 background = "#14171b"

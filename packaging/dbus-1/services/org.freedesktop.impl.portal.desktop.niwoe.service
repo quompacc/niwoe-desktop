@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.freedesktop.impl.portal.desktop.niwoe
+Exec=@PREFIX@/bin/niwoe-portal
+SystemdService=niwoe-portal.service

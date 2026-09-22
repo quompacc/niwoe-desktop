@@ -42,7 +42,7 @@ gen() {
     [ -d "$src" ] || continue
     local crate
     if [ "$crate_dir" = "$ROOT" ]; then
-      crate="meridian (root binary)"
+      crate="niwoe (root binary)"
     else
       crate="$(basename "$crate_dir")"
     fi

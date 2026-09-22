@@ -16,7 +16,7 @@ Options:
 
 Modes:
   build          Rust/C build headers needed for cargo build/test
-  runtime        Packages needed by an installed Meridian session
+  runtime        Packages needed by an installed NIWOE session
   hardware-test  Runtime extras useful for real DRM/input/portal validation
   all            build + runtime + hardware-test (default)
 

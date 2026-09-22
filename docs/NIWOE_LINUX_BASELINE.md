@@ -59,28 +59,28 @@ GTK-CSS oder persistente GSettings anderer Desktops nicht überschreiben.
 Der alte Theme-Export verletzte das und setzte auf dem Acer ein nicht
 installiertes Icon-Theme. Die Originaldateien wurden aus vorhandenen Backups
 wiederhergestellt; der Nutzer bestätigt, dass KDE-Symbole wieder sichtbar sind.
-Toolkit-Dateien werden künftig unter `$XDG_CONFIG_HOME/meridian/toolkit`
-(Standard: `~/.config/meridian/toolkit`) erzeugt. Eine Anwendung dieser Dateien
+Toolkit-Dateien werden künftig unter `$XDG_CONFIG_HOME/niwoe/toolkit`
+(Standard: `~/.config/niwoe/toolkit`) erzeugt. Eine Anwendung dieser Dateien
 auf Fremdanwendungen benötigt eine spätere, ausdrücklich sitzungsspezifische
 Integration. Die öffentliche Hell-/Dunkel-Einstellung kommt weiterhin aus dem
 Portal. Globale Dateiumschreibung ist kein zulässiger Ersatz dafür.
 
-Bis P01 heißen die ausführbaren Dateien technisch Meridian. Der Installer fügt
-bereits jetzt `/usr/share/wayland-sessions/meridian.desktop` mit dem Anzeigenamen
-`NIWOE (development)` sowie `/usr/local/bin/meridian-session` hinzu:
+Bis P01 heißen die ausführbaren Dateien technisch NIWOE. Der Installer fügt
+bereits jetzt `/usr/share/wayland-sessions/niwoe.desktop` mit dem Anzeigenamen
+`NIWOE (development)` sowie `/usr/local/bin/niwoe-session` hinzu:
 
 ```bash
 bash scripts/install-local.sh --build
-test -x /usr/local/bin/meridian-session
-test -f /usr/share/wayland-sessions/meridian.desktop
+test -x /usr/local/bin/niwoe-session
+test -f /usr/share/wayland-sessions/niwoe.desktop
 ```
 
 Für den ersten Smoke wurde mit `--debug` aus den geprüften `target/debug`-
 Binaries installiert. Seit der Performance-Diagnose am 22.09. ist der
 vollständig gebaute Release-Stand installiert. Der Standard bleibt Release; `--build`
 baut das mit `--debug` ausgewählte Profil. Der Sessionwrapper stoppt beim
-Beenden `meridian-session.target`, dessen Portal gehört per `PartOf` dazu.
-Solange die systemd-Aktivierungsumgebung noch `XDG_CURRENT_DESKTOP=Meridian`
+Beenden `niwoe-session.target`, dessen Portal gehört per `PartOf` dazu.
+Solange die systemd-Aktivierungsumgebung noch `XDG_CURRENT_DESKTOP=NIWOE`
 enthält, stoppt er gleichzeitig `xdg-desktop-portal.service`, damit die nächste
 Sitzung ihren Backendnamen neu bestimmt. Bei bereits fremder Desktopkennung
 wird ausschließlich das eigene Target beendet; der gemeinsame grafische
@@ -110,11 +110,11 @@ deaktiviert. Innerhalb der gewählten Sitzung prüfen:
 
 ```bash
 systemctl --user status xdg-desktop-portal
-systemctl --user status meridian-portal
+systemctl --user status niwoe-portal
 busctl --user list | grep -E 'portal|polkit'
 ```
 
-Ab P01 werden die technischen Meridian-Namen in diesen Befehlen in ihre
+Ab P01 werden die technischen NIWOE-Namen in diesen Befehlen in ihre
 NIWOE-Nachfolger migriert. Portal und Polkit dürfen nur einmal pro Sitzung
 aktiv sein; keine konkurrierende KDE- und NIWOE-Agenteninstanz.
 
@@ -127,9 +127,9 @@ cargo fmt --all -- --check
 cargo check --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
-cargo test -p meridian-tokens --test design_guard
-cargo test -p meridian-tokens --test source_size_guard
-cargo test -p meridian-shell --test centralization_guard
+cargo test -p niwoe-tokens --test design_guard
+cargo test -p niwoe-tokens --test source_size_guard
+cargo test -p niwoe-shell --test centralization_guard
 git diff --check
 ```
 
@@ -159,13 +159,13 @@ In der grafischen Sitzung des Testbenutzers (Build im selben Checkout):
 ```bash
 cargo build --workspace
 mkdir -p target/p00-evidence
-RUST_LOG=info target/debug/meridian > target/p00-evidence/nested.log 2>&1 &
+RUST_LOG=info target/debug/niwoe > target/p00-evidence/nested.log 2>&1 &
 niwoe_pid=$!
 ```
 
 Die vorhandene Backendwahl erkennt das geerbte `WAYLAND_DISPLAY`/`DISPLAY` und
 startet Winit. Im Log müssen `Detected parent display`, die Zeile
-`Meridian running on socket:` sowie der erfolgreiche Shellstart erscheinen.
+`NIWOE running on socket:` sowie der erfolgreiche Shellstart erscheinen.
 Aus dieser Socketzeile den tatsächlichen Namen übernehmen, nicht `wayland-0`
 raten. In einem zweiten Terminal des gleichen Testbenutzers:
 
@@ -196,8 +196,8 @@ Dieser Zustand ist keine bestandene Performanceabnahme.
 Reproduzierbarer CPU-Vergleich des bestehenden Launcher-Zeichenpfads:
 
 ```bash
-cargo test -p meridian-shell launcher_paint_baseline -- --ignored --nocapture
-cargo test --release -p meridian-shell launcher_paint_baseline -- --ignored --nocapture
+cargo test -p niwoe-shell launcher_paint_baseline -- --ignored --nocapture
+cargo test --release -p niwoe-shell launcher_paint_baseline -- --ignored --nocapture
 ```
 
 Beide Testbinaries vorher kompilieren; während der eigentlichen Messung keine

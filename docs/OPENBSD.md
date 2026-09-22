@@ -1,4 +1,4 @@
-# Meridian on OpenBSD — Evaluation Guide
+# NIWOE on OpenBSD — Evaluation Guide
 
 > **STATUS: BASE SYSTEM PATCHED, DEVELOPMENT STACK PROBED.** Hardware was
 > inventoried and the first native build matrix was run over SSH on 2026-08-19.
@@ -39,12 +39,12 @@ repository document.
 
 ### Boot experience requirement
 
-The release target is a quiet, coherent path from firmware through a Meridian
-bootsplash to `meridian-login` and the desktop. Routine boot-loader, kernel and
+The release target is a quiet, coherent path from firmware through a NIWOE
+bootsplash to `niwoe-login` and the desktop. Routine boot-loader, kernel and
 `rc` output should be suppressed in the normal path wherever OpenBSD supports
 that without a private kernel fork. A native splash is preferred; a restrained
-Meridian logo is the minimum acceptable fallback. Its appearance is governed
-by `docs/meridian_design_manifest.md` §12.
+NIWOE logo is the minimum acceptable fallback. Its appearance is governed
+by `docs/niwoe_design_manifest.md` §12.
 
 Silent boot must not remove observability or recovery. Kernel and service
 diagnostics remain available through the normal OpenBSD logs, and a documented
@@ -116,7 +116,7 @@ Use `pass`, `partial`, `fail`, `not available` or `not tested`, with evidence.
 | webcam | pass (detection) | Realtek device attaches as `uvideo0`/`video0` |
 | external display | not tested | |
 | display hotplug | not tested | |
-| suspend/resume | fail (hardware/OS blocker) | Direct `zzz` with zero Meridian processes reproduces `pms0` disable/enable/reset errors and loss of pointer motion; reboot recovers |
+| suspend/resume | fail (hardware/OS blocker) | Direct `zzz` with zero NIWOE processes reproduces `pms0` disable/enable/reset errors and loss of pointer motion; reboot recovers |
 | lid close/open | not tested | |
 
 ## Phase D — Desktop/toolkit matrix
@@ -159,27 +159,27 @@ Installed development baseline (2026-08-19):
   cannot read the intentionally protected D-Bus launch helper)
 
 The WebKit C smoke compiled, linked and returned version `2.52.5`. The later
-Meridian hardware run also proved display creation, Wayland layer-shell
+NIWOE hardware run also proved display creation, Wayland layer-shell
 integration and interactive panel/launcher rendering. Detailed steady-state
 GPU/memory and launcher-start performance budgets remain open.
 
 ### Historical WebKit diagnostic runtime (removed)
 
-> Evidence only. `meridian-ui-runtime` and `MERIDIAN_WEB_UI_PANEL` were removed
-> from the product on 2026-08-25 when Meridian committed to native Rust UI. The
+> Evidence only. `niwoe-ui-runtime` and `NIWOE_WEB_UI_PANEL` were removed
+> from the product on 2026-08-25 when NIWOE committed to native Rust UI. The
 > commands below describe the retired prototype and no longer work at HEAD.
 
-`meridian-ui-runtime` provided the Rust panel and launcher surface proof. A
-standalone surface was run from an existing Meridian Wayland session so
+`niwoe-ui-runtime` provided the Rust panel and launcher surface proof. A
+standalone surface was run from an existing NIWOE Wayland session so
 `WAYLAND_DISPLAY` and `XDG_RUNTIME_DIR` referred to that session:
 
 ```sh
-cargo run -p meridian-ui-runtime -- --surface=panel --theme=dark
-cargo run -p meridian-ui-runtime -- --surface=launcher --theme=light
+cargo run -p niwoe-ui-runtime -- --surface=panel --theme=dark
+cargo run -p niwoe-ui-runtime -- --surface=launcher --theme=light
 ```
 
 For the former managed integration, the session was started with
-`MERIDIAN_WEB_UI_PANEL=1`; `meridian-shell` then owns the panel runtime and
+`NIWOE_WEB_UI_PANEL=1`; `niwoe-shell` then owns the panel runtime and
 launcher lifecycle. Expected evidence:
 
 - the panel is a 66-logical-pixel bottom layer surface in both themes
@@ -192,7 +192,7 @@ launcher lifecycle. Expected evidence:
 Hardware evidence from 2026-08-20: on the 1920x1080 Acer output, the corrected
 panel layer is `y=1014, h=66` and its first document load completes in about
 320 ms. The 2026-08-21 cold-launch measurement separated 1 ms catalogue work
-from 362-469 ms WebKit document startup. Meridian now prewarms one hidden
+from 362-469 ms WebKit document startup. NIWOE now prewarms one hidden
 launcher and controls visibility through a GLib-observed stdin FD. Repeated
 toggle-to-layer-map time is 0.18-5.1 ms with no process or document reload and
 no hidden-launcher CPU-time increase over a five-second idle sample. Resident
@@ -200,28 +200,28 @@ launcher RSS was about 77 MiB for the GTK host, 92 MiB for WebProcess and
 51 MiB for NetworkProcess; those figures include multiply counted shared pages
 and are an upper-bound signal, not proportional memory.
 
-Native Meridian build matrix on 2026-08-19:
+Native NIWOE build matrix on 2026-08-19:
 
 | Crate/path | Result | Evidence / first blocker |
 |---|---|---|
-| `meridian-tokens` | pass | `cargo check`; design guard test passes |
-| `meridian-ipc` | pass | `cargo check` |
-| `meridian-config` | pass | `cargo check`, including xkbcommon |
-| `meridian-portal` | pass | root-owned installed backend uses checked `pledge`/`unveil`, publishes Settings/Screenshot/Access only, and routes FileChooser to the separately packaged GTK backend; real frontend Settings, FileChooser cancel, fail-closed socket, screenshot deny/allow and clean-session activation paths pass |
-| `meridian-boot-common` | pass | `cargo check` |
-| `meridian-compass-render` | pass | `cargo check` |
-| `meridian-freetype` / `meridian-ui` | pass | built directly and as shell dependencies |
-| `meridian-wm` / `meridian-compositor` | pass | native OpenBSD build succeeds; DRM devices are enumerated from `/dev/dri`, keyboard/pointer input uses wscons directly, and `linux-drm-syncobj-v1` is target-disabled |
-| `meridian-shell` | pass | OpenBSD screencopy uses native `shm_mkstemp(3)` with explicit `FD_CLOEXEC`; 310 unit tests and the centralization guard pass |
-| `meridian-login` / `meridian-lock` | pass | OpenBSD password authentication uses native `auth_userokay(3)` through a minimal setgid `auth` helper; the lock UI stays unprivileged and PAM remains target-scoped to non-OpenBSD systems; login, lock and bounded auth-protocol tests pass |
-| `meridian-polkit` | pass | resolves `ck-launch-session` cookies through ConsoleKit, registers fail-closed, runs as a root-owned XDG-autostart binary with active `pledge`/`unveil`, and retains PolicyKit's packaged setuid helper boundary; 13 tests pass plus real bad/good-password, repeated and crash-denial hardware runs |
+| `niwoe-tokens` | pass | `cargo check`; design guard test passes |
+| `niwoe-ipc` | pass | `cargo check` |
+| `niwoe-config` | pass | `cargo check`, including xkbcommon |
+| `niwoe-portal` | pass | root-owned installed backend uses checked `pledge`/`unveil`, publishes Settings/Screenshot/Access only, and routes FileChooser to the separately packaged GTK backend; real frontend Settings, FileChooser cancel, fail-closed socket, screenshot deny/allow and clean-session activation paths pass |
+| `niwoe-boot-common` | pass | `cargo check` |
+| `niwoe-compass-render` | pass | `cargo check` |
+| `niwoe-freetype` / `niwoe-ui` | pass | built directly and as shell dependencies |
+| `niwoe-wm` / `niwoe-compositor` | pass | native OpenBSD build succeeds; DRM devices are enumerated from `/dev/dri`, keyboard/pointer input uses wscons directly, and `linux-drm-syncobj-v1` is target-disabled |
+| `niwoe-shell` | pass | OpenBSD screencopy uses native `shm_mkstemp(3)` with explicit `FD_CLOEXEC`; 310 unit tests and the centralization guard pass |
+| `niwoe-login` / `niwoe-lock` | pass | OpenBSD password authentication uses native `auth_userokay(3)` through a minimal setgid `auth` helper; the lock UI stays unprivileged and PAM remains target-scoped to non-OpenBSD systems; login, lock and bounded auth-protocol tests pass |
+| `niwoe-polkit` | pass | resolves `ck-launch-session` cookies through ConsoleKit, registers fail-closed, runs as a root-owned XDG-autostart binary with active `pledge`/`unveil`, and retains PolicyKit's packaged setuid helper boundary; 13 tests pass plus real bad/good-password, repeated and crash-denial hardware runs |
 
-`cargo check --workspace` now passes on OpenBSD. The Meridian workspace tests
+`cargo check --workspace` now passes on OpenBSD. The NIWOE workspace tests
 also pass when the excluded vendored Smithay package is omitted explicitly with
 `--exclude smithay`. A plain `cargo test --workspace` still asks Cargo to build
 Smithay's feature-gated example programs and fails there because Vulkan and the
 example-only CLI/image dependencies are intentionally disabled; this is not a
-Meridian test failure.
+NIWOE test failure.
 
 **Link-environment prerequisites (verified 2026-08-20).** OpenBSD packages ship
 only versioned shared objects and no unversioned `.so` symlinks, and the linker
@@ -239,7 +239,7 @@ does not search `/usr/local/lib` by default. Native test linking (`-lxkbcommon`,
    (lld honours it at link time without invalidating the compile cache).
 
 **Shell audio backend (implemented 2026-08-20).** OpenBSD has no PipeWire and
-no FreeBSD `mixer(8)`; `meridian-shell` drives the kernel mixer through base
+no FreeBSD `mixer(8)`; `niwoe-shell` drives the kernel mixer through base
 `mixerctl(8)` (`audio/mixerctl.rs`): it picks the playback volume control
 (`outputs.master`, with fallbacks to `outputs.dac`/`outputs.speaker`/
 `outputs.spkr`/`outputs.volume` or the first numeric `outputs.*` control),
@@ -268,8 +268,8 @@ scripts/smoke-drm.sh run
 ```
 
 Das Skript setzt auf OpenBSD die benötigten Linkpfade, baut den Workspace mit
-`--release` und startet `target/release/meridian`. Der Compositor-Watchdog wählt
-dadurch ausschließlich die danebenliegende `target/release/meridian-shell`.
+`--release` und startet `target/release/niwoe`. Der Compositor-Watchdog wählt
+dadurch ausschließlich die danebenliegende `target/release/niwoe-shell`.
 Ein Lauf aus `target/debug` ist für Performance-Abnahmen ungültig; der native
 Pixelpfad kann dort um mehr als eine Größenordnung langsamer sein.
 
@@ -280,12 +280,12 @@ Release-Sitzung:
 ksh scripts/restart-openbsd-shell.ksh
 ```
 
-Der Helfer baut `meridian-shell` erneut mit `--release` und beendet nur die
+Der Helfer baut `niwoe-shell` erneut mit `--release` und beendet nur die
 alte Shell. Der bestehende Compositor startet den neuen Build über seinen
 Watchdog. Läuft der Compositor nicht selbst aus `target/release`, verweigert
 das Skript den Austausch fail-closed.
 
-## Phase F — Meridian core smoke
+## Phase F — NIWOE core smoke
 
 Target the smallest useful progression:
 
@@ -308,7 +308,7 @@ The fail-closed rollout, lock-process safety invariant, implemented pilot
 profiles and process order are specified in `docs/OPENBSD_SANDBOX_PLAN.md`.
 Both the lock UI and its setgid authentication helper now apply checked
 OpenBSD-only `pledge(2)`/`unveil(2)` restrictions. Sandbox setup failure is
-fatal; Meridian never continues through an automatic unsandboxed runtime
+fatal; NIWOE never continues through an automatic unsandboxed runtime
 fallback.
 
 ## Decision record
@@ -332,22 +332,22 @@ the more workable platform. The decision and blockers belong in this file.
    only network path.
 2. **Bluetooth is also unavailable in the baseline.** Its USB function is only
    exposed through the generic USB driver.
-3. **Suspend fails on the reference hardware below Meridian.** On 2026-08-26,
-   both the Meridian path and a direct `doas /usr/sbin/zzz` control run with
-   zero Meridian processes produced the same `pms0` disable/enable/reset
+3. **Suspend fails on the reference hardware below NIWOE.** On 2026-08-26,
+   both the NIWOE path and a direct `doas /usr/sbin/zzz` control run with
+   zero NIWOE processes produced the same `pms0` disable/enable/reset
    errors. Keyboard and clicks survived, pointer motion did not, and only a
    reboot recovered it. The attempted wscons close/reopen/timing workarounds
    did not help and were removed. Full evidence and the support boundary are
    recorded in `OPENBSD_SUSPEND_INPUT_2026-08-26.md`.
-4. **The Smithay DRM syncobj compile blocker is resolved natively.** Meridian's
+4. **The Smithay DRM syncobj compile blocker is resolved natively.** NIWOE's
    pinned Smithay port layer does not compile or advertise
    `linux-drm-syncobj-v1` on OpenBSD because its kernel contract requires
    Linux `eventfd`. DRM/KMS, GBM, EGL and implicit client synchronization remain
-   available. `meridian-wm` and `meridian-compositor` now pass `cargo check`.
+   available. `niwoe-wm` and `niwoe-compositor` now pass `cargo check`.
    OpenBSD selects DRM card nodes directly and consumes `wskbd`/`wsmouse`
    records through event-driven calloop sources, so the OpenBSD compositor no
    longer links Smithay's udev or libinput backends. OpenBSD libdrm's weak
-   `priv_open_device` hook is exported by the Meridian binary and routed through
+   `priv_open_device` hook is exported by the NIWOE binary and routed through
    the existing seatd session with a `/dev/dri/card*` and `/dev/dri/renderD*`
    allowlist; neither a root compositor nor relaxed device permissions are
    required. All 381 compositor library
@@ -363,7 +363,7 @@ the more workable platform. The decision and blockers belong in this file.
    `shm_mkstemp(3)` facility and sets `FD_CLOEXEC` before exposing the descriptor
    to Wayland. The OpenBSD kernel test proves that the descriptor is resizable
    and close-on-exec. A controlled 20-second full-session run started
-   `meridian-shell`, authenticated its IPC connection, mapped the desktop and
+   `niwoe-shell`, authenticated its IPC connection, mapped the desktop and
    panel surfaces, and configured the 1920x66 panel plus 880x620 launcher. An
    end-to-end screenshot still needs an interactive run. The same smoke also
    exposed the next session-integration gap: no D-Bus session bus was present,
@@ -371,12 +371,12 @@ the more workable platform. The decision and blockers belong in this file.
 6. **The native lock lifecycle is proven; login remains to be proven.** Login
    and lock use OpenBSD `auth_userokay(3)` with the user's configured default
    BSD Authentication style; their PAM implementation and dependency remain
-   intact on non-OpenBSD targets. On 2026-08-23, `meridian-lock` successfully
+   intact on non-OpenBSD targets. On 2026-08-23, `niwoe-lock` successfully
    acquired the session lock, accepted keyboard input, authenticated the real
    account and explicitly unlocked on the Intel reference machine. OpenBSD
-   requires the release lock binary at `/usr/local/libexec/meridian-lock`, owned
+   requires the release lock binary at `/usr/local/libexec/niwoe-lock`, owned
    by `root:wheel` with mode `0555`; the compositor uses that absolute path. The
-   UI passes a bounded password request to `/usr/local/libexec/meridian-openbsd-auth`,
+   UI passes a bounded password request to `/usr/local/libexec/niwoe-openbsd-auth`,
    the only setgid `auth` component (`root:auth`, mode `2555`). The helper derives
    the account from the real caller UID instead of accepting a username. This
    privilege split, real-password unlock and input performance were verified on
@@ -393,7 +393,7 @@ the more workable platform. The decision and blockers belong in this file.
    matrix. An unavailable helper kept the screen locked and accepted a retry
    after restoration; `ps` showed the live UI in pledged and unveiled state.
    Smartcard login still reports an explicit unsupported configuration instead
-   of silently falling back, and the successful `meridian-login` session
+   of silently falling back, and the successful `niwoe-login` session
    lifecycle remains untested. Polkit delegates authorization to the packaged
    `/usr/local/lib/polkit-1/polkit-agent-helper-1`. Its unprivileged UI is the
    second completed `pledge(2)`/`unveil(2)` pilot: XDG autostart keeps it inside
@@ -402,7 +402,7 @@ the more workable platform. The decision and blockers belong in this file.
    authorizations and agent loss during an outstanding request passed on
    2026-08-24; the crash produced `not authorized`, never a root action. The
    launcher uses a private, ownership-checked
-   `/tmp/meridian-runtime-<uid>` directory and includes `/usr/X11R6/bin` in the
+   `/tmp/niwoe-runtime-<uid>` directory and includes `/usr/X11R6/bin` in the
    sanitized OpenBSD session `PATH`, so XWayland remains discoverable.
 7. **Graphics/WebKit runtime proof is complete for the first panel/launcher
    slice.** EGL/GBM and WebKit compile/link successfully; the Intel-accelerated
@@ -416,19 +416,19 @@ the more workable platform. The decision and blockers belong in this file.
    Acer. Persistent hidden popups no longer intercept pointer or keyboard
    input. Normal Wayland/XWayland windows now start centered in the panel-safe
    workarea. Blender and FreeCAD now keep their splash screens undecorated and
-   show the Meridian frame on their maximized main windows. This was
+   show the NIWOE frame on their maximized main windows. This was
    interactively accepted on the Acer on 2026-08-22.
 9. **Qt 6 application launch currently defaults to XCB/XWayland.** A controlled
    2026-08-22 comparison showed FreeCAD's native Wayland path stopping after
    the splash with `QOpenGLWidget`/QRhi context creation failures, while the
    identical desktop command under `QT_QPA_PLATFORM=xcb` created its complete
-   main window without those errors. Meridian applies this default only to
+   main window without those errors. NIWOE applies this default only to
    OpenBSD-launched applications and respects an explicit session override.
    Re-evaluate it when Qt Wayland OpenGL works on the reference stack. A second
    controlled run on 2026-08-22 narrowed the remaining performance risk:
    FreeCAD maps its normal main window and stays responsive as a process, but
    The secure XWayland server path was completed on 2026-08-22 without changing
-   DRM-node permissions. Meridian opens exactly the active primary and render
+   DRM-node permissions. NIWOE opens exactly the active primary and render
    nodes through seatd and passes only those descriptors to the still
    unprivileged XWayland process. The OpenBSD bridge validates the canonical
    device path and `st_rdev`; Xwayland initializes Glamor and exposes DRI3. An
@@ -436,18 +436,18 @@ the more workable platform. The decision and blockers belong in this file.
    Intel HD 620 with `Accelerated: yes`, but was rolled back immediately after
    the hardware test: FreeCAD no longer opened and Blender crashed when leaving
    maximized mode. X11 applications therefore retain the stable software client
-   path for now. The bridge remains required beside `meridian` for Xwayland's
+   path for now. The bridge remains required beside `niwoe` for Xwayland's
    own Glamor initialization, and the local installer handles that artifact.
 10. **Thunar uses a tightly scoped XWayland SSD compatibility path.** Its
    native GTK3 Wayland backend does not negotiate `xdg-decoration`, and
-   `GTK_CSD=0` alone therefore cannot hand the frame to Meridian. The launcher
+   `GTK_CSD=0` alone therefore cannot hand the frame to NIWOE. The launcher
    sets `GDK_BACKEND=x11` and `GTK_CSD=0` only for the Thunar executable. This
    keeps every other GTK application on its normal native Wayland path. The
    resulting frame, maximize workarea, square maximized corners and drag-restore
    behavior were interactively accepted on the Acer on 2026-08-22.
 11. **The compositor-owned SSD frame is visually accepted in both themes.**
-   Geometry and effects come from `meridian-tokens` plus
-   `meridian-config::Decorations`; the light/dark switch changes only colors.
+   Geometry and effects come from `niwoe-tokens` plus
+   `niwoe-config::Decorations`; the light/dark switch changes only colors.
    The decoration icon cache includes the resolved tint in its key, preventing
    stale low-contrast glyphs after a theme switch. Hover assets remain cached
    and no idle work was added.

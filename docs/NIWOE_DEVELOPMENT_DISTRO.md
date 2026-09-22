@@ -3,7 +3,7 @@
 Stand: 21.09.2026. Status: Fedora 44 KDE vom Nutzer installiert und als
 Entwicklungsrechner per SSH freigegeben; siehe `NIWOE_LINUX_BASELINE.md`.
 Beschlossen ist bereits: bestehende Linux-Distribution für niwoe-desktop,
-später eigenes Linux-basiertes NIWOE OS. Der Meridian-Plan ist vollständig abgelöst.
+später eigenes Linux-basiertes NIWOE OS. Der NIWOE-Plan ist vollständig abgelöst.
 
 ## Empfehlung
 

@@ -56,7 +56,7 @@ int main(void) {
     Window window = XCreateSimpleWindow(
         display, root, 100, 100, 720, 480, 0,
         BlackPixel(display, screen), WhitePixel(display, screen));
-    XStoreName(display, window, "Meridian X11 motion benchmark");
+    XStoreName(display, window, "NIWOE X11 motion benchmark");
     XMapWindow(display, window);
     XSync(display, False);
 

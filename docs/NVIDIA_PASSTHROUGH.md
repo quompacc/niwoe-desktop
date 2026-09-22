@@ -5,7 +5,7 @@
 > reference is the Acer using Intel HD 620; the laptop's NVIDIA 940MX is ignored.
 
 ## Ziel
-Meridian auf einer per VFIO durchgereichten NVIDIA RTX 4070 Super in der Entwicklungs-VM mit DRM/GBM validieren.
+NIWOE auf einer per VFIO durchgereichten NVIDIA RTX 4070 Super in der Entwicklungs-VM mit DRM/GBM validieren.
 
 ## Scope
 - Nur manueller Hardware-Testplan.
@@ -55,7 +55,7 @@ Empfohlene Host-Checks:
 6. Nutzerrechte:
    - `eduard` in passenden Gruppen (`video`, ggf. `render`, distroabhängig).
 
-## 4) Meridian-Testablauf
+## 4) NIWOE-Testablauf
 1. Build:
    - `cargo build --release`
 2. Start:
@@ -76,8 +76,8 @@ Empfohlene Host-Checks:
 Aus Repo-Root:
 
 ```bash
-MERIDIAN_SMOKE_TIMEOUT=20 \
-MERIDIAN_SMOKE_LOG=/tmp/meridian-smoke-drm.log \
+NIWOE_SMOKE_TIMEOUT=20 \
+NIWOE_SMOKE_LOG=/tmp/niwoe-smoke-drm.log \
 scripts/smoke-drm.sh
 ```
 
@@ -86,13 +86,13 @@ Manueller Lauf für UX-/Launcher-Tests (ohne Timeout):
 ```bash
 scripts/smoke-drm.sh run
 # oder:
-MERIDIAN_SMOKE_MODE=run scripts/smoke-drm.sh
+NIWOE_SMOKE_MODE=run scripts/smoke-drm.sh
 ```
 
 Der Smoke-Test setzt:
-- `MERIDIAN_DRM_TIMING=1`
-- `MERIDIAN_DIRTY_STATS=1`
-- `MERIDIAN_SHELL_RENDER_STATS=1`
+- `NIWOE_DRM_TIMING=1`
+- `NIWOE_DIRTY_STATS=1`
+- `NIWOE_SHELL_RENDER_STATS=1`
 - `RUST_LOG=info`
 
 und wertet danach u. a. folgende Muster aus:
@@ -188,7 +188,7 @@ Beobachtungen:
    - `card1 = virtio-gpu`
 3. Connector:
    - `card0-HDMI-A-1 connected`
-4. Meridian:
+4. NIWOE:
    - `frame rendered` sichtbar (Debug-Log) auf `3440x1440@60Hz`
    - Panel layer surface `3440x36` sichtbar/gemappt
    - Layer map `surfaces=2`
@@ -206,10 +206,10 @@ Bestätigter Root Cause (vor Fixlauf):
 ## NVIDIA Input Smoke-Test (vor Runtime-Hotplug)
 
 ### Ziel
-Input-Probleme zwischen Meridian/libinput und USB-/KVM-/Hub-Pfad sauber trennen.
+Input-Probleme zwischen NIWOE/libinput und USB-/KVM-/Hub-Pfad sauber trennen.
 
 ### 1) Geräteerkennung nach Monitor-Port-Umschaltung
-Direkt nach Umschaltung auf die Meridian-VM:
+Direkt nach Umschaltung auf die NIWOE-VM:
 - `lsusb`
 - `sudo libinput list-devices`
 - `journalctl -k -f`
@@ -225,10 +225,10 @@ Erwartung:
 
 Interpretation:
 - Keine Tastatur-Events in libinput:
-  - Kein Meridian-Keybinding-Problem.
+  - Kein NIWOE-Keybinding-Problem.
   - USB-/KVM-/Hub-Pfad priorisieren.
-- Tastatur-Events in libinput sichtbar, Meridian reagiert nicht:
-  - Meridian-Inputpfad separat prüfen.
+- Tastatur-Events in libinput sichtbar, NIWOE reagiert nicht:
+  - NIWOE-Inputpfad separat prüfen.
 
 ### 3) Vergleichstest ohne Monitor-Hub/KVM
 - Tastatur direkt per USB an VM/Host-Passthrough testen.
@@ -244,13 +244,13 @@ Interpretation:
 
 ### 5) Aktueller Zwischenstand
 - Maus: `partial pass` (funktioniert, aber hackelig).
-- Tastatur: `pending/fail` im Meridian-Test.
+- Tastatur: `pending/fail` im NIWOE-Test.
 - Monitor-Hub/KVM: `yes` als wahrscheinlicher Risikofaktor.
 - Empfehlung: keine Codeänderung bis libinput-/USB-Vergleichsdaten vorliegen.
 
 ### Befund Relative vs. Absolute Pointer
 - QEMU Tablet (absolute motion / `POINTER_MOTION_ABSOLUTE`): funktioniert.
-- USB-Maus (relative motion / `POINTER_MOTION`): war zuvor nicht im Meridian-Dispatch angebunden.
+- USB-Maus (relative motion / `POINTER_MOTION`): war zuvor nicht im NIWOE-Dispatch angebunden.
 - Status nach Fix: relativer Motion-Pfad ist jetzt angebunden; manueller Re-Test auf NVIDIA-VM weiterhin erforderlich.
 
 ## DRM Stutter-Messung (NVIDIA VM)
@@ -262,22 +262,22 @@ Render-/Event-Loop-Langsamkeit gegen reinen Input-Dispatch trennen.
 1. Baseline:
    - `RUST_LOG=warn cargo run`
 2. Timing-Aggregation:
-   - `RUST_LOG=info MERIDIAN_DRM_TIMING=1 cargo run`
+   - `RUST_LOG=info NIWOE_DRM_TIMING=1 cargo run`
 3. Kurzdiagnose:
-   - `RUST_LOG=debug MERIDIAN_DRM_TIMING=1 cargo run`
+   - `RUST_LOG=debug NIWOE_DRM_TIMING=1 cargo run`
 4. Forcierte Cadence (nur Scheduler-Override, keine Renderlogik):
-   - `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_FORCE_REFRESH_HZ=60 cargo run`
-   - oder: `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_FRAME_INTERVAL_MS=16 cargo run`
-   - Hinweis: `MERIDIAN_DRM_FORCE_REFRESH_HZ` und `MERIDIAN_DRM_FRAME_INTERVAL_MS` beeinflussen nur den Repaint-Scheduler (Timer), nicht die KMS/Display-Mode-Auswahl.
+   - `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_FORCE_REFRESH_HZ=60 cargo run`
+   - oder: `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_FRAME_INTERVAL_MS=16 cargo run`
+   - Hinweis: `NIWOE_DRM_FORCE_REFRESH_HZ` und `NIWOE_DRM_FRAME_INTERVAL_MS` beeinflussen nur den Repaint-Scheduler (Timer), nicht die KMS/Display-Mode-Auswahl.
 5. Optionaler Mode-Override (nur Diagnose):
-   - `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_MODE=1920x1080 cargo run`
-   - `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_MODE=2560x1440 cargo run`
-   - oder: `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_MODE_INDEX=0 cargo run`
-   - Legacy-Alias bleibt: `MERIDIAN_DRM_FORCE_MODE=...`
-   - Die KMS/Display-Mode-Auswahl wird über `MERIDIAN_DRM_MODE`, `MERIDIAN_DRM_FORCE_MODE` oder `MERIDIAN_DRM_MODE_INDEX` beeinflusst.
+   - `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_MODE=1920x1080 cargo run`
+   - `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_MODE=2560x1440 cargo run`
+   - oder: `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_MODE_INDEX=0 cargo run`
+   - Legacy-Alias bleibt: `NIWOE_DRM_FORCE_MODE=...`
+   - Die KMS/Display-Mode-Auswahl wird über `NIWOE_DRM_MODE`, `NIWOE_DRM_FORCE_MODE` oder `NIWOE_DRM_MODE_INDEX` beeinflusst.
 6. Optionaler Shell-Isolationstest:
-   - `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_DISABLE_SHELL=1 cargo run`
-   - Alias: `MERIDIAN_NO_SHELL=1`
+   - `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_DISABLE_SHELL=1 cargo run`
+   - Alias: `NIWOE_NO_SHELL=1`
    - Erwartung im Idle: überwiegend leere Ticks, `commit_ms` nahe 0.
 
 ### Erwartete Timing-Zeile
@@ -326,6 +326,6 @@ Render-/Event-Loop-Langsamkeit gegen reinen Input-Dispatch trennen.
 - In der lokalen Rust-DRM-API (`drm` crate) ist `acquire_master_lock()` als privilegierter ioctl dokumentiert
   (CAP_SYS_ADMIN-Kontext).
 - Praktisch kann das in nicht-root Sessions trotz aktivem `seat0/tty1` als `EPERM` enden.
-- Meridian wertet daher den funktionalen KMS-Gate höher:
+- NIWOE wertet daher den funktionalen KMS-Gate höher:
   - `EPERM` allein ist kein finaler Abbruchgrund;
   - fehlender erster KMS-Commit bleibt fatal.

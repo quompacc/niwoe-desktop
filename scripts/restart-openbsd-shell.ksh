@@ -9,15 +9,15 @@ if [ "$(uname -s)" != "OpenBSD" ]; then
     exit 1
 fi
 
-compositor_pid=$(pgrep -xo meridian 2>/dev/null || true)
+compositor_pid=$(pgrep -xo niwoe 2>/dev/null || true)
 if [ -z "${compositor_pid}" ]; then
-    echo "No running Meridian compositor; start scripts/smoke-drm.sh run first." >&2
+    echo "No running NIWOE compositor; start scripts/smoke-drm.sh run first." >&2
     exit 1
 fi
 
 compositor_command=$(ps -o command= -p "${compositor_pid}")
 case "${compositor_command}" in
-    *target/release/meridian*) ;;
+    *target/release/niwoe*) ;;
     *)
         echo "Refusing shell update: compositor is not running from target/release." >&2
         echo "Stop it and start scripts/smoke-drm.sh run to get a performance-valid session." >&2
@@ -30,9 +30,9 @@ export RUSTFLAGS=${RUSTFLAGS:--L native=/usr/X11R6/lib}
 
 cd "${REPO_ROOT}"
 echo "[openbsd-shell] building optimized shell..."
-cargo build --release -p meridian-shell
+cargo build --release -p niwoe-shell
 
-shell_pid=$(pgrep -xo meridian-shell 2>/dev/null || true)
+shell_pid=$(pgrep -xo niwoe-shell 2>/dev/null || true)
 if [ -n "${shell_pid}" ]; then
     echo "[openbsd-shell] stopping shell pid ${shell_pid}; compositor watchdog will restart it..."
     kill "${shell_pid}"
@@ -40,4 +40,4 @@ else
     echo "[openbsd-shell] shell is not running; compositor watchdog will start it."
 fi
 
-echo "[openbsd-shell] release shell ready: ${REPO_ROOT}/target/release/meridian-shell"
+echo "[openbsd-shell] release shell ready: ${REPO_ROOT}/target/release/niwoe-shell"

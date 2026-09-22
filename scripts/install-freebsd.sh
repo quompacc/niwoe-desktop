@@ -1,5 +1,5 @@
 #!/bin/sh
-# Turnkey FreeBSD installer for Meridian.
+# Turnkey FreeBSD installer for NIWOE.
 #
 # Installs the compositor/shell/login/lock/portal binaries, themes and PAM
 # stacks, registers the rc.d services, and configures the system so the desktop
@@ -16,12 +16,12 @@
 #   * sets the GPU KMS module in kld_list (autodetected, or --gpu)
 #   * with --enable-boot: enables the login manager at boot, switches networking
 #     to background dhclient, and loads the GPU module now
-#   * with --quiet-boot: installs the Meridian loader image and configures the
+#   * with --quiet-boot: installs the NIWOE loader image and configures the
 #     native FreeBSD boot_mute splash instead of the stock FreeBSD logo
 #
 # Recovery: every boot-affecting step is gated behind --enable-boot. Always keep
 # an SSH session open the first time you enable boot; recover with:
-#   service meridian_login stop
+#   service niwoe_login stop
 set -eu
 
 PREFIX="/usr/local"
@@ -37,7 +37,7 @@ Usage: scripts/install-freebsd.sh [options]
 
   --build           cargo build --release --workspace before installing
   --enable-boot     enable the login manager + prerequisites at boot
-  --quiet-boot      native Meridian boot logo + muted console/rc output
+  --quiet-boot      native NIWOE boot logo + muted console/rc output
   --user NAME       desktop user (owns appearance state; default: \$SUDO_USER)
   --gpu DRIVER      KMS module: auto|intel|amd|none (default: auto-detect)
   --prefix PATH     install prefix (default: /usr/local)
@@ -77,7 +77,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 cd "${REPO_ROOT}"
 
-# Resolve the desktop user (owns /var/lib/meridian and becomes meridian_user).
+# Resolve the desktop user (owns /var/lib/niwoe and becomes niwoe_user).
 if [ -z "${DESK_USER}" ]; then
 	DESK_USER="${SUDO_USER:-$(id -un)}"
 fi
@@ -115,7 +115,7 @@ set_loader_conf() {
 	name=$1
 	value=$2
 	file=/boot/loader.conf
-	tmp="/tmp/meridian-loader.conf.$$"
+	tmp="/tmp/niwoe-loader.conf.$$"
 
 	${SUDO} awk -v key="${name}" '
 		index($0, key "=") == 1 { next }
@@ -129,38 +129,38 @@ set_loader_conf() {
 # ---------------------------------------------------------------------------
 # 2. Binaries, themes, appearance state
 # ---------------------------------------------------------------------------
-for bin in meridian meridian-shell meridian-login meridian-lock \
-	meridian-portal meridian-polkit-agent; do
+for bin in niwoe niwoe-shell niwoe-login niwoe-lock \
+	niwoe-portal niwoe-polkit-agent; do
 	require_file "target/release/${bin}"
 	${SUDO} install -m 0755 "target/release/${bin}" "${bindir}/${bin}"
 done
 echo "install-freebsd: installed binaries to ${bindir}"
 
-${SUDO} install -d "${datadir}/meridian/themes"
+${SUDO} install -d "${datadir}/niwoe/themes"
 for theme in themes/*; do
 	[ -d "${theme}" ] || continue
 	name=$(basename "${theme}")
-	${SUDO} install -d "${datadir}/meridian/themes/${name}"
-	${SUDO} cp -a "${theme}/." "${datadir}/meridian/themes/${name}/"
+	${SUDO} install -d "${datadir}/niwoe/themes/${name}"
+	${SUDO} cp -a "${theme}/." "${datadir}/niwoe/themes/${name}/"
 done
-echo "install-freebsd: installed themes to ${datadir}/meridian/themes"
+echo "install-freebsd: installed themes to ${datadir}/niwoe/themes"
 
 # Appearance state dir, owned by the desktop user.
 ${SUDO} install -d -o "${DESK_USER}" -g "$(id -gn "${DESK_USER}")" \
-	-m 0755 /var/lib/meridian
+	-m 0755 /var/lib/niwoe
 
 # ---------------------------------------------------------------------------
 # 3. PAM stacks + rc.d services
 # ---------------------------------------------------------------------------
 # FreeBSD PAM stacks for the login manager (pam_unix; no pam_systemd/pam_u2f).
-${SUDO} install -m 0644 packaging/pam/freebsd/meridian-login /etc/pam.d/meridian-login
-${SUDO} install -m 0644 packaging/pam/freebsd/meridian-login-password \
-	/etc/pam.d/meridian-login-password
+${SUDO} install -m 0644 packaging/pam/freebsd/niwoe-login /etc/pam.d/niwoe-login
+${SUDO} install -m 0644 packaging/pam/freebsd/niwoe-login-password \
+	/etc/pam.d/niwoe-login-password
 echo "install-freebsd: installed PAM stacks to /etc/pam.d"
 
-${SUDO} install -m 0755 packaging/rc.d/meridian "${rcdir}/meridian"
-${SUDO} install -m 0755 packaging/rc.d/meridian-login "${rcdir}/meridian-login"
-${SUDO} install -m 0755 packaging/rc.d/meridian_quiet "${rcdir}/meridian_quiet"
+${SUDO} install -m 0755 packaging/rc.d/niwoe "${rcdir}/niwoe"
+${SUDO} install -m 0755 packaging/rc.d/niwoe-login "${rcdir}/niwoe-login"
+${SUDO} install -m 0755 packaging/rc.d/niwoe_quiet "${rcdir}/niwoe_quiet"
 echo "install-freebsd: installed rc.d services to ${rcdir}"
 
 # ---------------------------------------------------------------------------
@@ -222,8 +222,8 @@ fi
 # ---------------------------------------------------------------------------
 if [ "${ENABLE_BOOT}" -eq 1 ]; then
 	# Login manager replaces the direct-compositor service — enable exactly one.
-	${SUDO} sysrc meridian_login_enable=YES >/dev/null
-	${SUDO} sysrc meridian_enable=NO        >/dev/null
+	${SUDO} sysrc niwoe_login_enable=YES >/dev/null
+	${SUDO} sysrc niwoe_enable=NO        >/dev/null
 	# Background dhclient so networking does not block / spam the boot.
 	${SUDO} sysrc background_dhclient=YES   >/dev/null
 	# Load the GPU module now so a test start works before the next reboot.
@@ -234,13 +234,13 @@ if [ "${ENABLE_BOOT}" -eq 1 ]; then
 		require_file assets/bsd_bootlogo-loader.png
 		${SUDO} install -d -m 0755 /boot/images
 		${SUDO} install -m 0644 assets/bsd_bootlogo-loader.png \
-			/boot/images/meridian-bootlogo.png
+			/boot/images/niwoe-bootlogo.png
 
 		# Use FreeBSD's native boot_mute framebuffer splash. This replaces the
 		# stock /boot/images/freebsd-logo-rev.png without modifying system files,
-		# so freebsd-update cannot overwrite the Meridian image or configuration.
-		if [ ! -e /boot/loader.conf.meridian-backup ]; then
-			${SUDO} cp -p /boot/loader.conf /boot/loader.conf.meridian-backup
+		# so freebsd-update cannot overwrite the NIWOE image or configuration.
+		if [ ! -e /boot/loader.conf.niwoe-backup ]; then
+			${SUDO} cp -p /boot/loader.conf /boot/loader.conf.niwoe-backup
 		fi
 		set_loader_conf autoboot_delay -1
 		set_loader_conf beastie_disable YES
@@ -248,20 +248,20 @@ if [ "${ENABLE_BOOT}" -eq 1 ]; then
 		set_loader_conf loader_brand none
 		set_loader_conf boot_mute YES
 		set_loader_conf kern.consmute 1
-		set_loader_conf splash /boot/images/meridian-bootlogo.png
-		set_loader_conf shutdown_splash /boot/images/meridian-bootlogo.png
+		set_loader_conf splash /boot/images/niwoe-bootlogo.png
+		set_loader_conf shutdown_splash /boot/images/niwoe-bootlogo.png
 
-		${SUDO} sysrc meridian_quiet_enable=YES >/dev/null
+		${SUDO} sysrc niwoe_quiet_enable=YES >/dev/null
 		${SUDO} sysrc rc_startmsgs=NO >/dev/null
 		echo "install-freebsd: installed native loader logo and enabled silent boot"
 	fi
-	echo "install-freebsd: enabled meridian_login at boot (background_dhclient=YES)"
+	echo "install-freebsd: enabled niwoe_login at boot (background_dhclient=YES)"
 	cat <<EOF
 
 install-freebsd: DONE — boot enabled.
   Keep this SSH session open and verify recovery before rebooting:
-    service meridian_login start     # bring the greeter up now
-    service meridian_login stop      # recover
+    service niwoe_login start     # bring the greeter up now
+    service niwoe_login stop      # recover
 
   Then reboot to confirm boot-to-greeter.
 EOF
@@ -270,12 +270,12 @@ else
 
 install-freebsd: DONE — installed but boot NOT enabled.
   Test the greeter ad-hoc (keep an SSH session open to recover):
-    service meridian_login onestart
-    service meridian_login onestop
+    service niwoe_login onestart
+    service niwoe_login onestop
 
   To enable boot-to-greeter, re-run with --enable-boot, or:
-    sysrc meridian_login_enable=YES
-    sysrc meridian_enable=NO
+    sysrc niwoe_login_enable=YES
+    sysrc niwoe_enable=NO
     sysrc background_dhclient=YES
 EOF
 fi

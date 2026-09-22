@@ -1,8 +1,0 @@
-[package]
-name = "meridian-wm"
-version.workspace = true
-edition = "2021"
-
-[dependencies]
-smithay = { workspace = true }
-tracing = { workspace = true }

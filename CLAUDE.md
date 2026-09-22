@@ -15,13 +15,13 @@ Fedora KDE nach `docs/NIWOE_DEVELOPMENT_DISTRO.md` und
 ## Aktive Produktstrategie (2026-09-21)
 
 - NIWOE bleibt ein eigener nativer Rust-Wayland-Compositor. Die P01-
-  Namensmigration ist noch nicht durchgeführt; bestehende `meridian-*`-Namen
+  Namensmigration ist noch nicht durchgeführt; bestehende `niwoe-*`-Namen
   sind bis dahin technische Bestandsnamen.
 - Linux ist Produktziel. Zuerst entsteht ein nutzbarer NIWOE-Desktop auf einer
   bestehenden Distribution, danach wird ein eigenes Linux-basiertes OS geplant.
 - Der archivierte WebKit-Prototyp ist ausschließlich eine visuelle Referenz.
 - Die verbindliche Reihenfolge ist `NIWOE_IMPLEMENTATION_PLAN.md`; alte
-  Meridian-/BSD-Pläne sind historische Evidenz.
+  NIWOE-/BSD-Pläne sind historische Evidenz.
 - Die Shell bleibt unprivilegiert. Privilegierte Aktionen bleiben in kleinen
   Rust-Services/Helpern hinter eng typisierten Grenzen.
 
@@ -32,15 +32,15 @@ Mesa-Builds und ungeprüfte Paketquellen sind nicht zulässig.
 
 ## Design – verbindlich
 
-- `docs/meridian_design_manifest.md` ist bis P01 das verbindliche Manifest und
+- `docs/niwoe_design_manifest.md` ist bis P01 das verbindliche Manifest und
   präzisiert `docs/NIWOE_DESIGN_BRIEF.md`.
-- Eine zentrale Designquelle: `meridian-tokens` + `meridian-config`; keine
+- Eine zentrale Designquelle: `niwoe-tokens` + `niwoe-config`; keine
   lokalen Farb-, Alpha-, Radius- oder Mix-Hardcodes im Renderer.
 - Genau zwei Themes, die sich ausschließlich in den zentralen Farbtabellen
   unterscheiden.
-- NIWOE-Wortmarke nur in Welcome, Login und About; kein Meridian-Kompass und
+- NIWOE-Wortmarke nur in Welcome, Login und About; kein NIWOE-Kompass und
   keine Markenfläche in Alltags-UI oder Launcher-Button.
-- `cargo test -p meridian-tokens --test design_guard` bleibt grün.
+- `cargo test -p niwoe-tokens --test design_guard` bleibt grün.
 
 ## Vor dem Abschluss einer Rust-Änderung
 

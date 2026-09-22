@@ -19,7 +19,7 @@ Die Dateinamen beginnen jeweils mit `ChatGPT Image 21. Sept. 2026, `.
 | `17_13_54 (3).png` | Control Center, Räume verwalten | Informationsdichte, Navigation und Filter |
 | `17_13_54 (4).png` | Raum konfigurieren, Tabs, Formular, Restore, Vorschau | Formularhierarchie und Einstellungen; nur umgesetzte Fähigkeiten aktiv |
 
-Alle gelieferten Ansichten sind dunkel und tragen noch Meridian-Schriftzüge und
+Alle gelieferten Ansichten sind dunkel und tragen noch NIWOE-Schriftzüge und
 Kompassmarken. Sie sind unveränderte Referenzbilder, keine fertigen NIWOE-Assets.
 Es gibt keine helle Ansicht, keine ausgearbeitete Spotlight-Suche und keine
 vollständige Wizard-Sequenz. Animation kann aus statischen Bildern nicht abgeleitet
@@ -54,13 +54,13 @@ Die sichtbaren App-Innenflächen sind illustrative Beispiele; NIWOE zeichnet sie
 nicht nach und injiziert kein erzwungenes GTK-/Qt-/Electron-Theme.
 
 Vorgeschlagene Branding-Regel für P00: einfache NIWOE-Wortmarke in Welcome, Login,
-About und optional als Launcher-Beschriftung. Kein weiterverwendeter Meridian-
+About und optional als Launcher-Beschriftung. Kein weiterverwendeter NIWOE-
 Kompass als Standardicon. Launcher bekommt ein neutrales funktionales Symbol.
 Eine endgültige eigenständige NIWOE-Bildmarke ist ein späteres Asset, kein Blocker.
 
 ## 4. Semantische Designquelle
 
-Vor Umbenennung `meridian-tokens` + `meridian-config`, danach `niwoe-tokens` +
+Vor Umbenennung `niwoe-tokens` + `niwoe-config`, danach `niwoe-tokens` +
 `niwoe-config`. Bestehende `Palette`, `Interaction`, `Elevation`, `Radius`,
 `Decorations` und Geometrietokens erweitern. Keine zweite JSON-/CSS-Palette,
 keine gemessenen PNG-Farben direkt im Renderer.

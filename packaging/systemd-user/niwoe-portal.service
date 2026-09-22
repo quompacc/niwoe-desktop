@@ -1,0 +1,14 @@
+[Unit]
+Description=NIWOE desktop portal backend
+PartOf=graphical-session.target niwoe-session.target
+After=dbus.service
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.impl.portal.desktop.niwoe
+ExecStart=@PREFIX@/bin/niwoe-portal
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

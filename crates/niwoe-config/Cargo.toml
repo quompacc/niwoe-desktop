@@ -1,0 +1,12 @@
+[package]
+name = "niwoe-config"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+niwoe-tokens = { path = "../niwoe-tokens" }
+bitflags = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+toml = "0.8.23"
+tracing = { workspace = true }
+xkbcommon = "0.7"

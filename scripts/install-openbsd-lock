@@ -7,10 +7,10 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-lock_binary=${1:-target/release/meridian-lock}
-auth_binary=${2:-target/release/meridian-openbsd-auth}
-lock_destination=/usr/local/libexec/meridian-lock
-auth_destination=/usr/local/libexec/meridian-openbsd-auth
+lock_binary=${1:-target/release/niwoe-lock}
+auth_binary=${2:-target/release/niwoe-openbsd-auth}
+lock_destination=/usr/local/libexec/niwoe-lock
+auth_destination=/usr/local/libexec/niwoe-openbsd-auth
 
 for source_binary in "$lock_binary" "$auth_binary"; do
     if [ ! -f "$source_binary" ] || [ ! -x "$source_binary" ]; then

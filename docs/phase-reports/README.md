@@ -3,7 +3,8 @@
 | Phase | Status | Bericht |
 |---|---|---|
 | P00 | accepted | [P00.md](P00.md) |
-| P01–P13 | not-started | — |
+| P01 | in-progress | [P01.md](P01.md) |
+| P02–P13 | not-started | — |
 
 P00: Fedora 44 KDE eingerichtet; zusätzliche Entwicklungssitzung installiert.
 Format, Workspace-Check, Clippy mit `-D warnings`, alle 1.076 Workspace-Tests

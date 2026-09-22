@@ -7,14 +7,14 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-portal_binary=${1:-target/release/meridian-portal}
-portal_destination=/usr/local/bin/meridian-portal
-service_source=packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service
-service_destination=/usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service
-descriptor_source=packaging/xdg-desktop-portal/portals/meridian-openbsd.portal
-descriptor_destination=/usr/local/share/xdg-desktop-portal/portals/meridian.portal
-config_source=packaging/xdg-desktop-portal/meridian-openbsd-portals.conf
-config_destination=/etc/xdg/xdg-desktop-portal/meridian-portals.conf
+portal_binary=${1:-target/release/niwoe-portal}
+portal_destination=/usr/local/bin/niwoe-portal
+service_source=packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service
+service_destination=/usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service
+descriptor_source=packaging/xdg-desktop-portal/portals/niwoe-openbsd.portal
+descriptor_destination=/usr/local/share/xdg-desktop-portal/portals/niwoe.portal
+config_source=packaging/xdg-desktop-portal/niwoe-openbsd-portals.conf
+config_destination=/etc/xdg/xdg-desktop-portal/niwoe-portals.conf
 
 if [ ! -f "$portal_binary" ] || [ ! -x "$portal_binary" ]; then
     echo "install-openbsd-portal: missing executable: $portal_binary" >&2
@@ -41,7 +41,7 @@ for dependency in \
     fi
 done
 
-rendered=$(mktemp /tmp/meridian-portal-service.XXXXXXXXXX)
+rendered=$(mktemp /tmp/niwoe-portal-service.XXXXXXXXXX)
 trap 'rm -f "$rendered"' EXIT HUP INT TERM
 sed 's|@PREFIX@|/usr/local|g' "$service_source" >"$rendered"
 
@@ -55,12 +55,12 @@ install -o root -g wheel -m 0444 "$rendered" "$service_destination"
 install -o root -g wheel -m 0444 "$descriptor_source" "$descriptor_destination"
 install -o root -g wheel -m 0444 "$config_source" "$config_destination"
 install -d -o root -g wheel -m 0555 \
-    /usr/local/share/meridian/themes/dark \
-    /usr/local/share/meridian/themes/light
+    /usr/local/share/niwoe/themes/dark \
+    /usr/local/share/niwoe/themes/light
 for theme in dark light; do
     install -o root -g wheel -m 0444 \
         "themes/$theme/theme.toml" \
-        "/usr/local/share/meridian/themes/$theme/theme.toml"
+        "/usr/local/share/niwoe/themes/$theme/theme.toml"
 done
 
 for destination in \
@@ -81,7 +81,7 @@ for destination in \
 done
 
 for theme in dark light; do
-    destination="/usr/local/share/meridian/themes/$theme/theme.toml"
+    destination="/usr/local/share/niwoe/themes/$theme/theme.toml"
     identity=$(stat -f '%Su:%Sg %Sp' "$destination")
     if [ "$identity" != 'root:wheel -r--r--r--' ]; then
         echo "install-openbsd-portal: unexpected identity/mode: $destination: $identity" >&2

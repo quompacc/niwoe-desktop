@@ -8,12 +8,12 @@ cd "${REPO_ROOT}"
 if [[ "$(uname -s)" == "OpenBSD" ]]; then
   export LIBRARY_PATH="${LIBRARY_PATH:-/usr/local/lib:/usr/X11R6/lib}"
   export RUSTFLAGS="${RUSTFLAGS:--L native=/usr/X11R6/lib}"
-  export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/meridian-runtime-$(id -u)}"
+  export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/niwoe-runtime-$(id -u)}"
   mkdir -p "${XDG_RUNTIME_DIR}"
   chmod 700 "${XDG_RUNTIME_DIR}"
 fi
 
-RUNNER=(target/release/meridian)
+RUNNER=(target/release/niwoe)
 if command -v dbus-run-session >/dev/null 2>&1; then
   RUNNER=(dbus-run-session -- "${RUNNER[@]}")
 fi
@@ -21,9 +21,9 @@ if [[ "$(uname -s)" == "OpenBSD" ]] && command -v ck-launch-session >/dev/null 2
   RUNNER=(ck-launch-session "${RUNNER[@]}")
 fi
 
-LOG_FILE="${MERIDIAN_SMOKE_LOG:-/tmp/meridian-smoke-drm.log}"
-TIMEOUT_SECONDS="${MERIDIAN_SMOKE_TIMEOUT:-20}"
-MODE="${MERIDIAN_SMOKE_MODE:-smoke}"
+LOG_FILE="${NIWOE_SMOKE_LOG:-/tmp/niwoe-smoke-drm.log}"
+TIMEOUT_SECONDS="${NIWOE_SMOKE_TIMEOUT:-20}"
+MODE="${NIWOE_SMOKE_MODE:-smoke}"
 
 usage() {
   cat <<'EOF'
@@ -34,9 +34,9 @@ Modes:
   run              Run compositor without timeout for manual tests.
 
 Environment:
-  MERIDIAN_SMOKE_TIMEOUT   Timeout seconds for smoke mode (default: 20)
-  MERIDIAN_SMOKE_LOG       Log file path (default: /tmp/meridian-smoke-drm.log)
-  MERIDIAN_SMOKE_MODE      Default mode if no positional mode is passed
+  NIWOE_SMOKE_TIMEOUT   Timeout seconds for smoke mode (default: 20)
+  NIWOE_SMOKE_LOG       Log file path (default: /tmp/niwoe-smoke-drm.log)
+  NIWOE_SMOKE_MODE      Default mode if no positional mode is passed
 EOF
 }
 
@@ -70,16 +70,16 @@ fi
 echo "[smoke-drm] building release..."
 cargo build --release --workspace
 
-echo "[smoke-drm] stopping old Meridian session processes (if any)..."
-pkill -x meridian-shell 2>/dev/null || true
-pkill -x meridian 2>/dev/null || true
+echo "[smoke-drm] stopping old NIWOE session processes (if any)..."
+pkill -x niwoe-shell 2>/dev/null || true
+pkill -x niwoe 2>/dev/null || true
 for _ in {1..50}; do
-  if ! pgrep -x meridian-shell >/dev/null 2>&1 && ! pgrep -x meridian >/dev/null 2>&1; then
+  if ! pgrep -x niwoe-shell >/dev/null 2>&1 && ! pgrep -x niwoe >/dev/null 2>&1; then
     break
   fi
   sleep 0.1
 done
-if pgrep -x meridian-shell >/dev/null 2>&1 || pgrep -x meridian >/dev/null 2>&1; then
+if pgrep -x niwoe-shell >/dev/null 2>&1 || pgrep -x niwoe >/dev/null 2>&1; then
   echo "[smoke-drm] old session did not stop cleanly" >&2
   exit 1
 fi
@@ -91,15 +91,15 @@ echo "[smoke-drm] running compositor..."
 echo "[smoke-drm] runtime profile: release (compositor and shell)"
 set +e
 if [[ "${MODE}" == "smoke" ]]; then
-  MERIDIAN_DRM_TIMING=1 \
-  MERIDIAN_DIRTY_STATS=1 \
-  MERIDIAN_SHELL_RENDER_STATS=1 \
+  NIWOE_DRM_TIMING=1 \
+  NIWOE_DIRTY_STATS=1 \
+  NIWOE_SHELL_RENDER_STATS=1 \
   RUST_LOG=info \
   timeout "${TIMEOUT_SECONDS}s" "${RUNNER[@]}" 2>&1 | tee "${LOG_FILE}"
 else
-  MERIDIAN_DRM_TIMING=1 \
-  MERIDIAN_DIRTY_STATS=1 \
-  MERIDIAN_SHELL_RENDER_STATS=1 \
+  NIWOE_DRM_TIMING=1 \
+  NIWOE_DIRTY_STATS=1 \
+  NIWOE_SHELL_RENDER_STATS=1 \
   RUST_LOG=info \
   "${RUNNER[@]}" 2>&1 | tee "${LOG_FILE}"
 fi

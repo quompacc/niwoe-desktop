@@ -7,7 +7,7 @@
 When documents disagree, use this order:
 
 1. `../NIWOE_IMPLEMENTATION_PLAN.md` and the current user decisions
-2. `meridian_design_manifest.md` for every visual decision
+2. `niwoe_design_manifest.md` for every visual decision
 3. `phase-reports/README.md` for current phase status and validation
 4. `ARCHITECTURE.md` for current system boundaries
 5. focused technical documents
@@ -24,7 +24,7 @@ When documents disagree, use this order:
 - `phase-reports/README.md` — current implementation status
 - `PROJECT_STATUS.md` — dated pre-NIWOE implementation evidence
 - `GUI_CENTRALIZATION_PLAN.md` — binding native token pipeline and DoD
-- `meridian_design_manifest.md` — binding visual specification
+- `niwoe_design_manifest.md` — binding visual specification
 - `technical-design-guidelines.md` — engineering decision rules
 
 ## Platforms and compatibility
@@ -44,13 +44,13 @@ When documents disagree, use this order:
 - `TESTING.md` — native and platform validation
 - `PERFORMANCE_RULES.md` / `VISUAL_PERFORMANCE.md` — native UI budgets
 - `DESKTOP_SETTINGS_CONTRACT.md` — settings ownership and toolkit export
-- `MERIDIAN_LOGIN.md` — current login architecture
+- `NIWOE_LOGIN.md` — current login architecture
 - `MULTI_MONITOR.md` / `WORKSPACES.md` — compositor output/workspace policy
 - `XDG_PORTALS.md` — portal architecture
 
 ## Historical or deferred documents
 
-- `../MERIDIAN_OS_PLAN.md`, `../ROADMAP.md`, `../PLAN.md`, root BSD handoff
+- `../NIWOE_OS_PLAN.md`, `../ROADMAP.md`, `../PLAN.md`, root BSD handoff
 - `NATIVE_UI_PLAN.md` — superseded phase sequence
 - `AUDIT_2026-05-25.md`
 - `AUDIT_2026-06-20.md`

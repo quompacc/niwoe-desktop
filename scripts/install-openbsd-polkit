@@ -7,10 +7,10 @@ if [ "$(id -u)" -ne 0 ]; then
     exit 1
 fi
 
-agent_binary=${1:-target/release/meridian-polkit-agent}
-agent_destination=/usr/local/bin/meridian-polkit-agent
-autostart_source=packaging/xdg-autostart/meridian-polkit-agent.desktop
-autostart_destination=/etc/xdg/autostart/meridian-polkit-agent.desktop
+agent_binary=${1:-target/release/niwoe-polkit-agent}
+agent_destination=/usr/local/bin/niwoe-polkit-agent
+autostart_source=packaging/xdg-autostart/niwoe-polkit-agent.desktop
+autostart_destination=/etc/xdg/autostart/niwoe-polkit-agent.desktop
 
 if [ ! -f "$agent_binary" ] || [ ! -x "$agent_binary" ]; then
     echo "install-openbsd-polkit: missing executable: $agent_binary" >&2
@@ -27,7 +27,7 @@ for theme in dark light; do
     fi
 done
 
-rendered=$(mktemp /tmp/meridian-polkit-autostart.XXXXXXXXXX)
+rendered=$(mktemp /tmp/niwoe-polkit-autostart.XXXXXXXXXX)
 trap 'rm -f "$rendered"' EXIT HUP INT TERM
 sed 's|@PREFIX@|/usr/local|g' "$autostart_source" >"$rendered"
 
@@ -36,12 +36,12 @@ install -o root -g wheel -m 0555 "$agent_binary" "$agent_destination"
 install -o root -g wheel -m 0444 "$rendered" "$autostart_destination"
 
 install -d -o root -g wheel -m 0555 \
-    /usr/local/share/meridian/themes/dark \
-    /usr/local/share/meridian/themes/light
+    /usr/local/share/niwoe/themes/dark \
+    /usr/local/share/niwoe/themes/light
 for theme in dark light; do
     install -o root -g wheel -m 0444 \
         "themes/$theme/theme.toml" \
-        "/usr/local/share/meridian/themes/$theme/theme.toml"
+        "/usr/local/share/niwoe/themes/$theme/theme.toml"
 done
 
 agent_mode=$(stat -f '%Su:%Sg %Sp' "$agent_destination")

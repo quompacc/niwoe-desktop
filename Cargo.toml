@@ -2,22 +2,22 @@
 # The root package is already a member. Listing "." here would also pull
 # excluded path dependencies below the root back into the workspace.
 members = [
-    "crates/meridian-compositor",
-    "crates/meridian-wm",
-    "crates/meridian-shell",
-    "crates/meridian-ipc",
-    "crates/meridian-config",
-    "crates/meridian-tokens",
-    "crates/meridian-portal",
-    "crates/meridian-ui",
-    "crates/meridian-freetype",
-    "crates/meridian-login",
-    "crates/meridian-lock",
-    "crates/meridian-polkit",
-    "crates/meridian-compass-render",
-    "crates/meridian-boot-common",
-    "crates/meridian-app-catalog",
-    "crates/meridian-xwayland-drm-bridge",
+    "crates/niwoe-compositor",
+    "crates/niwoe-wm",
+    "crates/niwoe-shell",
+    "crates/niwoe-ipc",
+    "crates/niwoe-config",
+    "crates/niwoe-tokens",
+    "crates/niwoe-portal",
+    "crates/niwoe-ui",
+    "crates/niwoe-freetype",
+    "crates/niwoe-login",
+    "crates/niwoe-lock",
+    "crates/niwoe-polkit",
+    "crates/niwoe-compass-render",
+    "crates/niwoe-boot-common",
+    "crates/niwoe-app-catalog",
+    "crates/niwoe-xwayland-drm-bridge",
 ]
 exclude = ["third_party/smithay"]
 
@@ -47,13 +47,13 @@ tiny-skia = "0.11"
 ab_glyph = "0.2"
 
 [package]
-name = "meridian"
+name = "niwoe"
 version.workspace = true
 edition = "2021"
 
 [dependencies]
 libc = "0.2"
-meridian-compositor = { path = "crates/meridian-compositor" }
+niwoe-compositor = { path = "crates/niwoe-compositor" }
 smithay = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }

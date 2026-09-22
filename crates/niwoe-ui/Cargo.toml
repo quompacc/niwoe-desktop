@@ -1,0 +1,11 @@
+[package]
+name = "niwoe-ui"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+niwoe-tokens = { path = "../niwoe-tokens" }
+niwoe-freetype = { path = "../niwoe-freetype" }
+fontdue = "0.9"
+taffy = { workspace = true }
+tiny-skia = { workspace = true }

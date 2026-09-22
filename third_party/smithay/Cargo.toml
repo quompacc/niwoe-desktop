@@ -71,7 +71,7 @@ pkg-config = { version = "0.3.17", optional = true }
 cc = { version = "1.0.79", optional = true }
 
 [features]
-# Meridian selects every required backend explicitly in its workspace
+# NIWOE selects every required backend explicitly in its workspace
 # dependency. Keeping this empty prevents `cargo check --workspace` from also
 # enabling unrelated Vulkan/Pixman/X11 defaults merely because this local port
 # package is visible to the parent workspace.

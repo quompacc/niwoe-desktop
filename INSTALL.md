@@ -1,7 +1,7 @@
-# Meridian - Installation
+# NIWOE - Installation
 
 This guide documents the **currently implemented Linux installation path**. It
-does not decide Meridian's long-term operating system. OpenBSD is the next
+does not decide NIWOE's long-term operating system. OpenBSD is the next
 real-hardware evaluation target; FreeBSD remains the existing BSD install path.
 
 The WebKit UI runtime described in the active plan is not installed by these
@@ -18,19 +18,19 @@ For the full boot experience keep the sibling checkouts next to each other:
 
 ```text
 ~/bootsplash
-~/meridian-desktop
+~/niwoe-desktop
 ```
 
-`bootsplash` owns the early DRM splash and hands over to `meridian-login`.
-`meridian-desktop` owns the login manager, compositor, shell, lock screen,
+`bootsplash` owns the early DRM splash and hands over to `niwoe-login`.
+`niwoe-desktop` owns the login manager, compositor, shell, lock screen,
 portal backend, polkit agent, PAM files, themes, and install metadata.
 
 ## 1. Install dependencies on Arch
 
-From the Meridian checkout:
+From the NIWOE checkout:
 
 ```bash
-cd ~/meridian-desktop
+cd ~/niwoe-desktop
 scripts/install-deps.sh --manager pacman all
 rustup default stable
 ```
@@ -55,7 +55,7 @@ What the dependency sets cover:
 - `build`: `base-devel`, `pkgconf`, Rust via `rustup`, PAM, libseat/logind,
   Wayland, libinput, EGL/GLES/GBM/DRM, font and pixman development libraries.
 - `runtime`: D-Bus, NetworkManager, Breeze cursor theme, fonts/xkb data,
-  Python GTK3 for `meridian-file-picker`, xdg-desktop-portal, polkit, pam_u2f,
+  Python GTK3 for `niwoe-file-picker`, xdg-desktop-portal, polkit, pam_u2f,
   CUPS client tools, PipeWire/WirePlumber, and XWayland.
 - `hardware-test`: libinput diagnostics, DRM/PCI/USB inspection tools,
   `mesa-utils`, `notify-send`, and `jq`.
@@ -66,12 +66,12 @@ On Debian/apt systems use the same script with `--manager apt` or auto-detect:
 scripts/install-deps.sh --manager apt all
 ```
 
-## 2. Build and install Meridian
+## 2. Build and install NIWOE
 
 The normal local install path is:
 
 ```bash
-cd ~/meridian-desktop
+cd ~/niwoe-desktop
 scripts/install-local.sh --build
 ```
 
@@ -83,15 +83,15 @@ scripts/install-local.sh --build --bootsplash ../bootsplash
 
 This installs:
 
-- binaries: `meridian`, `meridian-shell`, `meridian-login`, `meridian-lock`,
-  `meridian-portal`, `meridian-polkit-agent`, `meridian-file-picker`
-- PAM: `meridian-login`, `meridian-login-password`
-- themes: `${prefix}/share/meridian/themes`
+- binaries: `niwoe`, `niwoe-shell`, `niwoe-login`, `niwoe-lock`,
+  `niwoe-portal`, `niwoe-polkit-agent`, `niwoe-file-picker`
+- PAM: `niwoe-login`, `niwoe-login-password`
+- themes: `${prefix}/share/niwoe/themes`
 - portal metadata: D-Bus service, systemd user unit, `.portal`,
-  `meridian-portals.conf`
-- polkit autostart: `/etc/xdg/autostart/meridian-polkit-agent.desktop`
-- login service: `/etc/systemd/system/meridian-login.service`
-- appearance state dir: `/var/lib/meridian`, owned by the desktop user
+  `niwoe-portals.conf`
+- polkit autostart: `/etc/xdg/autostart/niwoe-polkit-agent.desktop`
+- login service: `/etc/systemd/system/niwoe-login.service`
+- appearance state dir: `/var/lib/niwoe`, owned by the desktop user
 
 Default prefix is `/usr/local`. Override only if the corresponding XDG and D-Bus
 search paths on the target system include that prefix:
@@ -116,14 +116,14 @@ ssh <host> true
 Verify installed files:
 
 ```bash
-command -v meridian meridian-shell meridian-login meridian-lock meridian-portal meridian-polkit-agent
-command -v meridian-file-picker
+command -v niwoe niwoe-shell niwoe-login niwoe-lock niwoe-portal niwoe-polkit-agent
+command -v niwoe-file-picker
 if command -v bootsplash >/dev/null; then bootsplash --help >/dev/null || true; fi
-test -f /etc/pam.d/meridian-login
-test -f /etc/pam.d/meridian-login-password
-test -d /usr/local/share/meridian/themes
-test -f /usr/local/share/xdg-desktop-portal/portals/meridian.portal
-test -f /usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service
+test -f /etc/pam.d/niwoe-login
+test -f /etc/pam.d/niwoe-login-password
+test -d /usr/local/share/niwoe/themes
+test -f /usr/local/share/xdg-desktop-portal/portals/niwoe.portal
+test -f /usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service
 ```
 
 ## 4. Enable boot login
@@ -131,7 +131,7 @@ test -f /usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.mer
 Without bootsplash:
 
 ```bash
-cd ~/meridian-desktop
+cd ~/niwoe-desktop
 scripts/install-local.sh --enable-boot
 sudo reboot
 ```
@@ -139,7 +139,7 @@ sudo reboot
 With bootsplash:
 
 ```bash
-cd ~/meridian-desktop
+cd ~/niwoe-desktop
 scripts/install-local.sh --enable-boot --bootsplash ../bootsplash
 sudo reboot
 ```
@@ -148,11 +148,11 @@ The boot chain is:
 
 - `bootsplash.service` starts early, opens the DRM card, and listens on
   `/run/bootsplash.sock`.
-- `meridian-login.service` replaces `getty@tty1`, authenticates through PAM,
-  opens a logind session, and starts `meridian` as the authenticated user.
-- `meridian` starts `meridian-shell`; the shell autostarts the polkit agent and
+- `niwoe-login.service` replaces `getty@tty1`, authenticates through PAM,
+  opens a logind session, and starts `niwoe` as the authenticated user.
+- `niwoe` starts `niwoe-shell`; the shell autostarts the polkit agent and
   apps from XDG autostart directories.
-- `meridian-portal` is activated by xdg-desktop-portal through the installed
+- `niwoe-portal` is activated by xdg-desktop-portal through the installed
   portal metadata.
 
 Recovery if login fails: `Ctrl+Alt+F2` should bring up a regular getty on tty2.
@@ -163,16 +163,16 @@ After the first reboot:
 
 ```bash
 systemctl --failed --no-pager
-systemctl status --no-pager bootsplash.service meridian-login.service
-sudo journalctl -b -u bootsplash.service -u meridian-login.service --no-pager
-pgrep -a meridian
+systemctl status --no-pager bootsplash.service niwoe-login.service
+sudo journalctl -b -u bootsplash.service -u niwoe-login.service --no-pager
+pgrep -a niwoe
 ```
 
-Inside the logged-in Meridian session, or over SSH with the user bus exported:
+Inside the logged-in NIWOE session, or over SSH with the user bus exported:
 
 ```bash
-busctl --user list | grep -E "xdg|portal|meridian" || true
-busctl --user introspect org.freedesktop.impl.portal.desktop.meridian /org/freedesktop/portal/desktop --no-pager
+busctl --user list | grep -E "xdg|portal|niwoe" || true
+busctl --user introspect org.freedesktop.impl.portal.desktop.niwoe /org/freedesktop/portal/desktop --no-pager
 ```
 
 For the first controlled hardware pass, follow `docs/HARDWARE_SMOKE.md`.
@@ -202,11 +202,11 @@ Adjust `enp1s0` to the real interface name.
 
 ## 7. Cursor theme
 
-Meridian defaults to `Breeze_Light` at size `24`. The Arch runtime dependency
+NIWOE defaults to `Breeze_Light` at size `24`. The Arch runtime dependency
 installs Breeze. To make it explicit:
 
 ```toml
-# ~/.config/meridian/config.toml
+# ~/.config/niwoe/config.toml
 [cursor]
 theme = "Breeze_Light"
 size = 24

@@ -1,18 +1,18 @@
-# Meridian OpenBSD Smithay port layer
+# NIWOE OpenBSD Smithay port layer
 
 This directory is based on upstream Smithay commit
-`060e9cd9c8ae2633947bdb72cffa1748ac53922d`, the revision Meridian previously
+`060e9cd9c8ae2633947bdb72cffa1748ac53922d`, the revision NIWOE previously
 referenced directly from GitHub.
 
-Meridian carries this source temporarily because Cargo cannot apply a small
+NIWOE carries this source temporarily because Cargo cannot apply a small
 target patch to a Git dependency. Keep changes minimal and suitable for an
 upstream pull request.
 
 The upstream nested `[workspace]`, development-only dependencies, examples,
 benchmarks and local profile are omitted so this package can be used as a lean
-path dependency inside Meridian's workspace. Smithay's library source and
+path dependency inside NIWOE's workspace. Smithay's library source and
 runtime/build dependency versions otherwise remain at the pinned revision.
-The vendored package's default feature set is empty because Meridian declares
+The vendored package's default feature set is empty because NIWOE declares
 its required Smithay features explicitly; this avoids pulling unrelated
 Vulkan/Pixman defaults into workspace-wide checks.
 
@@ -39,6 +39,6 @@ When updating Smithay:
 1. import the new upstream revision without local history;
 2. reapply only the OpenBSD target boundary;
 3. run Linux workspace checks to ensure behavior is unchanged there;
-4. run `cargo check -p meridian-wm` and `cargo check -p meridian-compositor` on
+4. run `cargo check -p niwoe-wm` and `cargo check -p niwoe-compositor` on
    OpenBSD;
 5. remove this vendored copy once an equivalent upstream boundary is available.

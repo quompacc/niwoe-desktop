@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=NIWOE (development)
-Comment=Native NIWOE Wayland desktop
-Exec=@PREFIX@/bin/meridian-session
-TryExec=@PREFIX@/bin/meridian-session
-Type=Application
-DesktopNames=Meridian;

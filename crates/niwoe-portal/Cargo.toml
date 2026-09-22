@@ -1,0 +1,12 @@
+[package]
+name = "niwoe-portal"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+niwoe-ipc = { path = "../niwoe-ipc" }
+niwoe-config = { path = "../niwoe-config" }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+zbus = { version = "5", features = ["tokio"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "time"] }

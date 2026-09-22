@@ -1,0 +1,70 @@
+#!/bin/sh
+#
+# PROVIDE: niwoe_login
+# REQUIRE: seatd dbus
+# KEYWORD: shutdown
+#
+# NIWOE login manager (greeter) for FreeBSD. Runs at boot, authenticates the
+# user via PAM (see /etc/pam.d/niwoe-login-password), and spawns the
+# compositor as the authenticated user. This is the FreeBSD analogue of the
+# systemd niwoe-login.service. It REPLACES the direct-compositor `niwoe`
+# service — enable exactly one of the two:
+#
+#   sysrc niwoe_login_enable=YES
+#   sysrc niwoe_enable=NO
+#
+# Enable only after verifying SSH recovery; recover with:
+#   service niwoe_login stop
+
+. /etc/rc.subr
+
+name=niwoe_login
+desc="NIWOE login manager"
+rcvar=niwoe_login_enable
+
+load_rc_config $name
+
+: ${niwoe_login_enable:="NO"}
+: ${niwoe_login_prefix:="/usr/local"}
+
+pidfile="/var/run/${name}.pid"
+login_bin="${niwoe_login_prefix}/bin/niwoe-login"
+
+start_cmd="niwoe_login_start"
+stop_cmd="niwoe_login_stop"
+
+niwoe_login_start()
+{
+	if [ ! -x "${login_bin}" ]; then
+		echo "niwoe-login: ${login_bin} not found" >&2
+		return 1
+	fi
+	# /run is absent on FreeBSD; the login IPC socket the compositor connects to
+	# is /run/niwoe-login.sock, so alias /run to /var/run.
+	[ -e /run ] || ln -s /var/run /run
+	install -d -m 0700 /var/run/user/0
+
+	echo "Starting niwoe-login."
+	# XKB_DEFAULT_RULES=evdev and XCURSOR_PATH are forwarded into the compositor
+	# the greeter spawns (session.rs), so its keymap (incl. volume keys) and
+	# cursor theme are correct.
+	/usr/sbin/daemon -p "${pidfile}" -o /var/log/niwoe-login.log -- \
+		/usr/bin/env \
+			XDG_RUNTIME_DIR=/var/run/user/0 \
+			XKB_DEFAULT_RULES=evdev \
+			XCURSOR_PATH=/usr/local/share/icons:/usr/local/lib/X11/icons \
+			"${login_bin}"
+}
+
+niwoe_login_stop()
+{
+	if [ -f "${pidfile}" ] && kill -0 "$(cat "${pidfile}")" 2>/dev/null; then
+		echo "Stopping niwoe-login."
+		kill -TERM "$(cat "${pidfile}")"
+		wait_for_pids "$(cat "${pidfile}")"
+	fi
+	pkill -f "${niwoe_login_prefix}/bin/niwoe" 2>/dev/null || true
+	rm -f "${pidfile}"
+}
+
+run_rc_command "$1"

@@ -7,7 +7,7 @@ if [[ "${1:-}" == --inside ]]; then
   repo="$2"
   evidence="$3"
   cd "$repo"
-  RUST_LOG=info target/debug/meridian > "$evidence/compositor.log" 2>&1 &
+  RUST_LOG=info target/debug/niwoe > "$evidence/compositor.log" 2>&1 &
   compositor_pid=$!
   cleanup_inner() {
     kill "$compositor_pid" 2>/dev/null || true
@@ -47,7 +47,7 @@ repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 for command in dbus-run-session wayland-info zenity timeout setsid; do
   command -v "$command" >/dev/null || { echo "Missing: $command"; exit 2; }
 done
-[[ -x "$repo/target/debug/meridian" && -x "$repo/target/debug/meridian-shell" ]]
+[[ -x "$repo/target/debug/niwoe" && -x "$repo/target/debug/niwoe-shell" ]]
 parent_socket="${1:-${WAYLAND_DISPLAY:-}}"
 [[ -n "$parent_socket" ]] || { echo 'Pass the parent Wayland socket'; exit 2; }
 [[ "$parent_socket" == /* ]] || parent_socket="${XDG_RUNTIME_DIR:?}/$parent_socket"

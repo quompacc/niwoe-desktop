@@ -4,10 +4,10 @@ use std::{
     time::Duration,
 };
 
-use meridian_compositor::{
+use niwoe_compositor::{
     backend::{drm::init_drm, winit::init_winit},
     protocols::xwayland::start_xwayland,
-    state::MeridianState,
+    state::NiwoeState,
 };
 use smithay::reexports::{
     calloop::{
@@ -22,7 +22,7 @@ use tracing::{info, warn};
 const SHELL_RESTART_MIN_DELAY: Duration = Duration::from_secs(2);
 const SHELL_RESTART_MAX_DELAY: Duration = Duration::from_secs(30);
 const SHELL_STABLE_AFTER: Duration = Duration::from_secs(10);
-const IPC_TOKEN_ENV: &str = "MERIDIAN_IPC_TOKEN";
+const IPC_TOKEN_ENV: &str = "NIWOE_IPC_TOKEN";
 
 struct ShellWatchdog {
     child: Option<Child>,
@@ -37,7 +37,7 @@ struct ShellWatchdog {
 impl ShellWatchdog {
     fn new(wayland_display: String, ipc_token: String) -> Self {
         let shell_binary = find_shell_binary();
-        info!("meridian-shell binary: {:?}", shell_binary);
+        info!("niwoe-shell binary: {:?}", shell_binary);
         Self {
             child: None,
             last_start: std::time::Instant::now() - Duration::from_secs(5),
@@ -54,7 +54,7 @@ impl ShellWatchdog {
             return;
         }
         info!(
-            "starting meridian-shell: {:?} (WAYLAND_DISPLAY={})",
+            "starting niwoe-shell: {:?} (WAYLAND_DISPLAY={})",
             self.shell_binary, self.wayland_display
         );
         match Command::new(&self.shell_binary)
@@ -76,19 +76,19 @@ impl ShellWatchdog {
                 }),
             )
             .env("XDG_SESSION_TYPE", "wayland")
-            .env("XDG_CURRENT_DESKTOP", "Meridian")
-            .env("XDG_SESSION_DESKTOP", "meridian")
-            .env("DESKTOP_SESSION", "meridian")
+            .env("XDG_CURRENT_DESKTOP", "NIWOE")
+            .env("XDG_SESSION_DESKTOP", "niwoe")
+            .env("DESKTOP_SESSION", "niwoe")
             .spawn()
         {
             Ok(child) => {
-                info!("meridian-shell started (pid {})", child.id());
+                info!("niwoe-shell started (pid {})", child.id());
                 self.child = Some(child);
                 self.last_start = std::time::Instant::now();
             }
             Err(err) => {
                 warn!(
-                    "failed to start meridian-shell {:?}: {}",
+                    "failed to start niwoe-shell {:?}: {}",
                     self.shell_binary, err
                 );
                 self.bump_restart_delay();
@@ -111,14 +111,14 @@ impl ShellWatchdog {
                         self.bump_restart_delay();
                     }
                     info!(
-                        "meridian-shell exited: {} (uptime {:?}, next restart in {:?})",
+                        "niwoe-shell exited: {} (uptime {:?}, next restart in {:?})",
                         status, uptime, self.restart_delay
                     );
                     self.child = None;
                 }
                 Ok(None) => return,
                 Err(err) => {
-                    warn!("meridian-shell wait error: {}", err);
+                    warn!("niwoe-shell wait error: {}", err);
                     self.child = None;
                 }
             }
@@ -136,7 +136,7 @@ impl ShellWatchdog {
     fn stop(&mut self) {
         self.shutting_down = true;
         if let Some(mut child) = self.child.take() {
-            info!("stopping meridian-shell (pid {})", child.id());
+            info!("stopping niwoe-shell (pid {})", child.id());
             let _ = child.kill();
             let _ = child.wait();
         }
@@ -152,13 +152,13 @@ impl Drop for ShellWatchdog {
 fn find_shell_binary() -> PathBuf {
     if let Ok(exe) = std::env::current_exe() {
         if let Some(dir) = exe.parent() {
-            let candidate = dir.join("meridian-shell");
+            let candidate = dir.join("niwoe-shell");
             if candidate.is_file() {
                 return candidate;
             }
         }
     }
-    PathBuf::from("meridian-shell")
+    PathBuf::from("niwoe-shell")
 }
 
 fn next_restart_delay(current: Duration) -> Duration {
@@ -180,9 +180,9 @@ fn env_flag_enabled(name: &str) -> bool {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
 
-    let mut event_loop: EventLoop<'static, MeridianState> = EventLoop::try_new()?;
-    let display: Display<MeridianState> = Display::new()?;
-    let mut state = MeridianState::new(&mut event_loop, display)?;
+    let mut event_loop: EventLoop<'static, NiwoeState> = EventLoop::try_new()?;
+    let display: Display<NiwoeState> = Display::new()?;
+    let mut state = NiwoeState::new(&mut event_loop, display)?;
 
     let in_session = std::env::var("WAYLAND_DISPLAY").is_ok() || std::env::var("DISPLAY").is_ok();
 
@@ -194,7 +194,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         init_drm(&mut event_loop, &mut state)?;
     }
 
-    info!("Meridian running on socket: {:?}", state.socket_name);
+    info!("NIWOE running on socket: {:?}", state.socket_name);
     let socket_name = state.socket_name.to_string_lossy().to_string();
     // SAFETY: process-global env mutation is intentionally performed during compositor startup.
     unsafe { std::env::set_var("WAYLAND_DISPLAY", &state.socket_name) };
@@ -202,10 +202,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     start_xwayland(&mut state);
 
     let shell_disabled =
-        env_flag_enabled("MERIDIAN_DRM_DISABLE_SHELL") || env_flag_enabled("MERIDIAN_NO_SHELL");
+        env_flag_enabled("NIWOE_DRM_DISABLE_SHELL") || env_flag_enabled("NIWOE_NO_SHELL");
 
     if shell_disabled {
-        info!("shell auto-start disabled by env (MERIDIAN_DRM_DISABLE_SHELL or MERIDIAN_NO_SHELL)");
+        info!("shell auto-start disabled by env (NIWOE_DRM_DISABLE_SHELL or NIWOE_NO_SHELL)");
     }
 
     if let Some(listener) = state.ipc.event_listener_clone() {
@@ -217,7 +217,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             },
         )?;
     } else {
-        warn!("Meridian IPC readiness source unavailable; using timer polling only");
+        warn!("NIWOE IPC readiness source unavailable; using timer polling only");
     }
 
     // Retain a low-frequency fallback for already-connected clients and for
