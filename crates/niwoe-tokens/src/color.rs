@@ -127,42 +127,42 @@ pub struct Palette {
 }
 
 impl Palette {
-    /// The single source of truth for the **dark** desktop theme. Sampled from
-    /// the dark reference mockup (`assets/arch_desktop_mockup.png`); a neutral
-    /// grey-blue. `niwoe_config::ThemeColors::default()` derives from this,
+    /// The single source of truth for the **dark** desktop theme. Derived from
+    /// the NIWOE design brief; a deep
+    /// muted green. `niwoe_config::ThemeColors::default()` derives from this,
     /// and `themes/dark/theme.toml` mirrors these values for human editing.
     /// The light theme (`LIGHT`) differs **only** in these colours — geometry,
     /// radii and glass treatment are shared central defaults.
     pub const DARK: Palette = Palette {
-        background: Color::rgb(0x14, 0x17, 0x1b),
-        surface: Color::rgb(0x20, 0x25, 0x2b),
-        surface_alt: Color::rgb(0x1b, 0x1f, 0x24),
-        accent: Color::rgb(0x4e, 0x99, 0xf3),
-        accent_alt: Color::rgb(0x43, 0x83, 0xce),
-        text: Color::rgb(0xdc, 0xde, 0xe1),
-        text_dim: Color::rgb(0x88, 0x8d, 0x93),
-        border: Color::rgb(0x35, 0x3a, 0x40),
-        error: Color::rgb(0xb5, 0x68, 0x5c),
-        warning: Color::rgb(0xb8, 0x9a, 0x6a),
-        success: Color::rgb(0x6f, 0xa0, 0x8c),
+        background: Color::rgb(0x10, 0x17, 0x10),
+        surface: Color::rgb(0x19, 0x22, 0x1a),
+        surface_alt: Color::rgb(0x20, 0x2b, 0x22),
+        accent: Color::rgb(0xd6, 0xb3, 0x5b),
+        accent_alt: Color::rgb(0xc4, 0xa1, 0x49),
+        text: Color::rgb(0xf1, 0xee, 0xe3),
+        text_dim: Color::rgb(0xba, 0xc3, 0xb7),
+        border: Color::rgb(0x43, 0x50, 0x44),
+        error: Color::rgb(0xff, 0xb7, 0xad),
+        warning: Color::rgb(0xef, 0xb4, 0x7d),
+        success: Color::rgb(0xa0, 0xcf, 0xa9),
     };
 
-    /// The single source of truth for the **light** desktop theme. Sampled from
-    /// the light reference mockup (`assets/arch_desktop_mockup_hell.png`). The
+    /// The single source of truth for the **light** desktop theme. Derived from
+    /// the NIWOE design brief (ivory/green/gold). The
     /// only thing that differs from [`Palette::DARK`] is the colour table —
     /// see `themes/light/theme.toml`.
     pub const LIGHT: Palette = Palette {
-        background: Color::rgb(0xec, 0xe4, 0xd3),
-        surface: Color::rgb(0xf4, 0xef, 0xe3),
-        surface_alt: Color::rgb(0xe3, 0xd9, 0xc4),
-        accent: Color::rgb(0x2f, 0x62, 0x99),
-        accent_alt: Color::rgb(0x24, 0x4f, 0x7d),
-        text: Color::rgb(0x07, 0x11, 0x1c),
-        text_dim: Color::rgb(0x26, 0x37, 0x46),
-        border: Color::rgb(0xc9, 0xbc, 0xa0),
-        error: Color::rgb(0x9a, 0x46, 0x36),
-        warning: Color::rgb(0x8a, 0x6a, 0x30),
-        success: Color::rgb(0x3f, 0x7d, 0x5e),
+        background: Color::rgb(0xf4, 0xf1, 0xe7),
+        surface: Color::rgb(0xff, 0xfc, 0xf3),
+        surface_alt: Color::rgb(0xe9, 0xe9, 0xdc),
+        accent: Color::rgb(0x73, 0x57, 0x15),
+        accent_alt: Color::rgb(0x64, 0x49, 0x10),
+        text: Color::rgb(0x18, 0x27, 0x1d),
+        text_dim: Color::rgb(0x40, 0x4d, 0x41),
+        border: Color::rgb(0xbd, 0xc5, 0xb5),
+        error: Color::rgb(0x87, 0x28, 0x20),
+        warning: Color::rgb(0x6d, 0x37, 0x0d),
+        success: Color::rgb(0x24, 0x56, 0x31),
     };
 
     /// The historical Tokyo-Night-Metro palette. No longer a shipped theme;
@@ -184,9 +184,37 @@ impl Palette {
 
     /// Near-black foreground for placing text/icons on a LIGHT background or
     /// accent. Named once so the contrast pair isn't a magic value per call site.
-    pub const TEXT_ON_LIGHT: Color = Color::rgb(0x05, 0x08, 0x0c);
+    pub const TEXT_ON_LIGHT: Color = Color::rgb(0x15, 0x1b, 0x13);
     /// Near-white foreground for placing text/icons on a DARK background/accent.
-    pub const TEXT_ON_DARK: Color = Color::rgb(0xf6, 0xf9, 0xff);
+    pub const TEXT_ON_DARK: Color = Color::rgb(0xff, 0xff, 0xff);
+
+    /// Semantic aliases retain the existing config/wire field names.
+    pub const fn surface_base(self) -> Color {
+        self.background
+    }
+    pub const fn surface_raised(self) -> Color {
+        self.surface
+    }
+    pub const fn surface_overlay(self) -> Color {
+        self.surface_alt
+    }
+    pub const fn border_subtle(self) -> Color {
+        self.border
+    }
+    /// Essential control outlines need stronger contrast than decoration.
+    pub const fn border_control(self) -> Color {
+        self.text_dim
+    }
+    pub const fn border_focus(self) -> Color {
+        self.accent
+    }
+    pub fn on_accent(self) -> Color {
+        contrast_text(self.accent)
+    }
+    /// Availability is enforced by input handling and also labelled.
+    pub const fn text_disabled(self) -> Color {
+        self.text_dim
+    }
 }
 
 /// Perceived luminance (0..=255) via the Rec.601 weights. The ONE formula for
@@ -309,19 +337,19 @@ mod tests {
     #[test]
     fn dark_palette_anchors_match_mockup() {
         let p = Palette::DARK;
-        assert_eq!(p.background, Color::rgb(0x14, 0x17, 0x1b));
-        assert_eq!(p.surface, Color::rgb(0x20, 0x25, 0x2b));
-        assert_eq!(p.accent, Color::rgb(0x4e, 0x99, 0xf3));
-        assert_eq!(p.text, Color::rgb(0xdc, 0xde, 0xe1));
+        assert_eq!(p.background, Color::rgb(0x10, 0x17, 0x10));
+        assert_eq!(p.surface, Color::rgb(0x19, 0x22, 0x1a));
+        assert_eq!(p.accent, Color::rgb(0xd6, 0xb3, 0x5b));
+        assert_eq!(p.text, Color::rgb(0xf1, 0xee, 0xe3));
     }
 
     #[test]
     fn light_palette_anchors_match_mockup() {
         let p = Palette::LIGHT;
-        assert_eq!(p.background, Color::rgb(0xec, 0xe4, 0xd3));
-        assert_eq!(p.surface, Color::rgb(0xf4, 0xef, 0xe3));
-        assert_eq!(p.accent, Color::rgb(0x2f, 0x62, 0x99));
-        assert_eq!(p.text, Color::rgb(0x07, 0x11, 0x1c));
+        assert_eq!(p.background, Color::rgb(0xf4, 0xf1, 0xe7));
+        assert_eq!(p.surface, Color::rgb(0xff, 0xfc, 0xf3));
+        assert_eq!(p.accent, Color::rgb(0x73, 0x57, 0x15));
+        assert_eq!(p.text, Color::rgb(0x18, 0x27, 0x1d));
     }
 
     #[test]

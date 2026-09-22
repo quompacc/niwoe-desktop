@@ -7,8 +7,10 @@
 
 pub mod base;
 pub mod button;
+pub mod component;
 pub mod tile;
 
 pub use base::{Container, Widget};
 pub use button::Button;
+pub use component::{Component, ComponentKind, ComponentState};
 pub use tile::{Tile, TileSize};

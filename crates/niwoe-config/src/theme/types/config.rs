@@ -112,8 +112,8 @@ impl Default for Decorations {
     fn default() -> Self {
         Self {
             border_width: 1,
-            corner_radius: 10,
-            window_corner_radius: 8,
+            corner_radius: niwoe_tokens::Radius::DEFAULT.md as u32,
+            window_corner_radius: niwoe_tokens::Radius::DEFAULT.md as u32,
             shadow: true,
             shadow_radius: 18,
             shadow_radius_top: 9,
@@ -123,7 +123,7 @@ impl Default for Decorations {
             glass: true,
             // High = opaque frosted surface (the launcher look the user signed
             // off on). Transparency stays a hint; the frost does the work.
-            glass_alpha: 0.92,
+            glass_alpha: niwoe_tokens::chrome::SURFACE_ALPHA as f32 / 255.0,
             glass_specular: 0.6,
             glass_blur: true,
             // Strong frosted blur — the surfaces must read as milk-glass, not
@@ -144,9 +144,15 @@ impl Decorations {
             return 0.0;
         }
         match surface {
-            ThemeSurface::Panel | ThemeSurface::Launcher => base + 2.0,
-            ThemeSurface::Popup | ThemeSurface::Modal => base + 4.0,
-            ThemeSurface::Control => (base * 0.8).round().max(1.0),
+            ThemeSurface::Panel | ThemeSurface::Launcher => {
+                base * niwoe_tokens::Radius::DEFAULT.lg as f32
+                    / niwoe_tokens::Radius::DEFAULT.md as f32
+            }
+            ThemeSurface::Popup | ThemeSurface::Modal => {
+                base * niwoe_tokens::Radius::DEFAULT.lg as f32
+                    / niwoe_tokens::Radius::DEFAULT.md as f32
+            }
+            ThemeSurface::Control => base,
         }
     }
 
@@ -316,17 +322,17 @@ mod tests {
     fn test_theme_colors_default_is_dark_palette() {
         // Defaults derive from the single source `Palette::DARK`.
         let colors = ThemeColors::default();
-        assert_eq!(colors.background, Color::rgb(0x14, 0x17, 0x1b));
-        assert_eq!(colors.surface, Color::rgb(0x20, 0x25, 0x2b));
-        assert_eq!(colors.surface_alt, Color::rgb(0x1b, 0x1f, 0x24));
-        assert_eq!(colors.accent, Color::rgb(0x4e, 0x99, 0xf3));
-        assert_eq!(colors.accent_alt, Color::rgb(0x43, 0x83, 0xce));
-        assert_eq!(colors.text, Color::rgb(0xdc, 0xde, 0xe1));
-        assert_eq!(colors.text_dim, Color::rgb(0x88, 0x8d, 0x93));
-        assert_eq!(colors.border, Color::rgb(0x35, 0x3a, 0x40));
-        assert_eq!(colors.error, Color::rgb(0xb5, 0x68, 0x5c));
-        assert_eq!(colors.warning, Color::rgb(0xb8, 0x9a, 0x6a));
-        assert_eq!(colors.success, Color::rgb(0x6f, 0xa0, 0x8c));
+        assert_eq!(colors.background, Color::rgb(0x10, 0x17, 0x10));
+        assert_eq!(colors.surface, Color::rgb(0x19, 0x22, 0x1a));
+        assert_eq!(colors.surface_alt, Color::rgb(0x20, 0x2b, 0x22));
+        assert_eq!(colors.accent, Color::rgb(0xd6, 0xb3, 0x5b));
+        assert_eq!(colors.accent_alt, Color::rgb(0xc4, 0xa1, 0x49));
+        assert_eq!(colors.text, Color::rgb(0xf1, 0xee, 0xe3));
+        assert_eq!(colors.text_dim, Color::rgb(0xba, 0xc3, 0xb7));
+        assert_eq!(colors.border, Color::rgb(0x43, 0x50, 0x44));
+        assert_eq!(colors.error, Color::rgb(0xff, 0xb7, 0xad));
+        assert_eq!(colors.warning, Color::rgb(0xef, 0xb4, 0x7d));
+        assert_eq!(colors.success, Color::rgb(0xa0, 0xcf, 0xa9));
     }
 
     #[test]
@@ -335,7 +341,7 @@ mod tests {
         // "andeutung" target (mockup): near-opaque fill, faint blur+tint.
         let decorations = Decorations::default();
         assert_eq!(decorations.border_width, 1);
-        assert_eq!(decorations.corner_radius, 10);
+        assert_eq!(decorations.corner_radius, 8);
         assert!(decorations.shadow);
         assert_eq!(decorations.window_corner_radius, 8);
         assert_eq!(decorations.shadow_radius, 18);
@@ -344,7 +350,10 @@ mod tests {
         assert_eq!(decorations.shadow_offset_y, 2);
         assert_eq!(decorations.gap, 8);
         assert!(decorations.glass);
-        assert_eq!(decorations.glass_alpha, 0.92);
+        assert_eq!(
+            decorations.glass_alpha,
+            niwoe_tokens::chrome::SURFACE_ALPHA as f32 / 255.0
+        );
         assert_eq!(decorations.glass_blur_radius, 20.0);
         assert_eq!(decorations.glass_divider_alpha, 0.30);
     }
@@ -379,18 +388,18 @@ mod tests {
         .expect("partial theme config should deserialize");
 
         assert_eq!(config.colors.background, Color::rgb(0x00, 0x00, 0x00));
-        assert_eq!(config.colors.surface, Color::rgb(0x20, 0x25, 0x2b));
-        assert_eq!(config.colors.surface_alt, Color::rgb(0x1b, 0x1f, 0x24));
-        assert_eq!(config.colors.accent, Color::rgb(0x4e, 0x99, 0xf3));
-        assert_eq!(config.colors.accent_alt, Color::rgb(0x43, 0x83, 0xce));
-        assert_eq!(config.colors.text, Color::rgb(0xdc, 0xde, 0xe1));
-        assert_eq!(config.colors.text_dim, Color::rgb(0x88, 0x8d, 0x93));
-        assert_eq!(config.colors.border, Color::rgb(0x35, 0x3a, 0x40));
-        assert_eq!(config.colors.error, Color::rgb(0xb5, 0x68, 0x5c));
-        assert_eq!(config.colors.warning, Color::rgb(0xb8, 0x9a, 0x6a));
-        assert_eq!(config.colors.success, Color::rgb(0x6f, 0xa0, 0x8c));
+        assert_eq!(config.colors.surface, Color::rgb(0x19, 0x22, 0x1a));
+        assert_eq!(config.colors.surface_alt, Color::rgb(0x20, 0x2b, 0x22));
+        assert_eq!(config.colors.accent, Color::rgb(0xd6, 0xb3, 0x5b));
+        assert_eq!(config.colors.accent_alt, Color::rgb(0xc4, 0xa1, 0x49));
+        assert_eq!(config.colors.text, Color::rgb(0xf1, 0xee, 0xe3));
+        assert_eq!(config.colors.text_dim, Color::rgb(0xba, 0xc3, 0xb7));
+        assert_eq!(config.colors.border, Color::rgb(0x43, 0x50, 0x44));
+        assert_eq!(config.colors.error, Color::rgb(0xff, 0xb7, 0xad));
+        assert_eq!(config.colors.warning, Color::rgb(0xef, 0xb4, 0x7d));
+        assert_eq!(config.colors.success, Color::rgb(0xa0, 0xcf, 0xa9));
         assert_eq!(config.decorations.border_width, 1);
-        assert_eq!(config.decorations.corner_radius, 10);
+        assert_eq!(config.decorations.corner_radius, 8);
         assert_eq!(config.decorations.window_corner_radius, 8);
         assert!(config.decorations.shadow);
         assert_eq!(config.decorations.shadow_radius, 18);
@@ -403,7 +412,7 @@ mod tests {
     #[test]
     fn surface_treatment_uses_theme_radius_and_glass_alpha() {
         let decorations = Decorations {
-            corner_radius: 10,
+            corner_radius: niwoe_tokens::Radius::DEFAULT.md as u32,
             glass: true,
             glass_alpha: 0.5,
             glass_frame_alpha: 0.25,
@@ -412,7 +421,7 @@ mod tests {
         };
 
         let modal = decorations.surface_treatment(ThemeSurface::Modal);
-        assert_eq!(modal.radius, 14.0);
+        assert_eq!(modal.radius, 12.0);
         assert_eq!(modal.fill_alpha, 128);
         assert_eq!(modal.frame_alpha, 64);
         // Tint solidity is driven by glass_alpha (the one knob), not a tint field.
@@ -429,7 +438,7 @@ mod tests {
         assert_eq!(panel.blur_radius, 12.0);
 
         let popup = decorations.surface_treatment(ThemeSurface::Popup);
-        assert_eq!(popup.radius, 14.0);
+        assert_eq!(popup.radius, 12.0);
         assert_eq!(popup.tint_amount, 0.5);
         assert_eq!(popup.blur_radius, 12.0);
     }

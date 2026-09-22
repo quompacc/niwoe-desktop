@@ -12,7 +12,7 @@ pub fn draw_active_indicator(
     edge: ActiveIndicatorEdge,
     theme: &ThemeConfig,
 ) {
-    const THICKNESS: i32 = 2;
+    const THICKNESS: i32 = niwoe_tokens::Controls::FOCUS_WIDTH;
     let bar = match edge {
         ActiveIndicatorEdge::Top => Rect {
             x: rect.x,

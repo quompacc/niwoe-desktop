@@ -6,6 +6,10 @@
 //! colour always comes from `Palette`; only the *opacity* is named here), so
 //! they stay theme-agnostic and identical between the light and dark themes.
 
+/// Default composited surface opacity, shared by config and native previews.
+// guard:allow: canonical surface opacity definition in niwoe-tokens, not a renderer override.
+pub const SURFACE_ALPHA: u8 = 235;
+
 /// Scrollbar track/thumb opacity (drawn over glass).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Scrollbar {
@@ -55,7 +59,7 @@ pub struct Panel {
 
 impl Panel {
     pub const DEFAULT: Panel = Panel {
-        height: 42,
+        height: 48,
         bottom_gap: 8,
         side_margin: 12,
         top_shadow: 16,
@@ -351,7 +355,7 @@ impl Settings {
         header_gap: 8,
         back_width: 40,
         search_width: 336,
-        search_height: 40,
+        search_height: crate::Controls::FORM_HEIGHT,
         sidebar_width: 224,
         sidebar_top_pad: 8,
         sidebar_content_pad: 16,
@@ -370,9 +374,9 @@ impl Settings {
         display_mode_height: 64,
         display_control_height: 64,
         display_control_gap: 8,
-        sidebar_row_height: 30,
+        sidebar_row_height: crate::Controls::MIN_HEIGHT,
         sidebar_section_height: 18,
-        sidebar_group_gap: 6,
+        sidebar_group_gap: crate::Spacing::DEFAULT.xs,
         sidebar_row_inset: 8,
         selection_inset: 6,
         selection_bar_width: 3,
@@ -426,8 +430,8 @@ impl QuickSettings {
         status_height: 70,
         footer_height: 46,
         control_radius: 10,
-        slider_height: 5,
-        slider_thumb_size: 14,
+        slider_height: crate::Controls::TRACK_HEIGHT,
+        slider_thumb_size: crate::Controls::THUMB_SIZE,
         icon_size: 20,
     };
 }
@@ -471,8 +475,8 @@ mod tests {
         assert_eq!(Launcher::DEFAULT.app_icon_size, 32);
         assert_eq!(Launcher::DEFAULT.sidebar_width, 224);
         assert_eq!(Launcher::DEFAULT.grid_columns, 2);
-        assert_eq!(Panel::DEFAULT.surface_height(), 66);
-        assert_eq!(Panel::DEFAULT.window_reservation(), 50);
+        assert_eq!(Panel::DEFAULT.surface_height(), 72);
+        assert_eq!(Panel::DEFAULT.window_reservation(), 56);
         assert_eq!(Panel::DEFAULT.control_height, 32);
         assert_eq!(Panel::DEFAULT.app_icon_size, 22);
         assert_eq!(Panel::DEFAULT.status_icon_size, 18);
@@ -521,7 +525,7 @@ mod tests {
         assert_eq!(Mask::DEFAULT.dim_alpha, 160);
         assert_eq!(QuickSettings::DEFAULT.width, 384);
         assert_eq!(QuickSettings::DEFAULT.height, 468);
-        assert_eq!(QuickSettings::DEFAULT.slider_thumb_size, 14);
+        assert_eq!(QuickSettings::DEFAULT.slider_thumb_size, 16);
     }
 
     #[test]

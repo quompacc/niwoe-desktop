@@ -19,18 +19,18 @@ impl Radius {
     /// The live rounding scale. The shell's element radii derive from these
     /// steps, so changing a corner radius is a one-line edit here.
     ///
-    /// Step assignments (Phase 2, mapped 1:1 from the former scattered
-    /// constants so the rendered image is unchanged):
-    /// - `sm` (6):  small tiles / generic roundish rects, workspace tiles
+    /// Step assignments (P02, based on the NIWOE design brief;
+    /// both themes use this same scale):
+    /// - `sm` (4):  small tiles / generic roundish rects, workspace tiles
     /// - `md` (8):  panel chip highlight, launcher tiles
     /// - `lg` (12): panel island
-    /// - `xl` (14): popup cards
+    /// - `xl` (12): popup cards
     pub const DEFAULT: Radius = Radius {
         none: 0,
-        sm: 6,
+        sm: 4,
         md: 8,
         lg: 12,
-        xl: 14,
+        xl: 12,
     };
 
     /// All-square scale (Metro). Retained for the UI `Theme` default bundle.
@@ -69,10 +69,10 @@ mod tests {
         // these intentionally is fine — but it WILL move the rendered radii,
         // so update with eyes open.
         let r = Radius::DEFAULT;
-        assert_eq!(r.sm, 6);
+        assert_eq!(r.sm, 4);
         assert_eq!(r.md, 8);
         assert_eq!(r.lg, 12);
-        assert_eq!(r.xl, 14);
+        assert_eq!(r.xl, 12);
     }
 
     #[test]

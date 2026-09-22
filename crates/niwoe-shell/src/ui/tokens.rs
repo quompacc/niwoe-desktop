@@ -39,7 +39,7 @@ fn radius_scale_from_config(config: &ThemeConfig) -> UiRadius {
     let control = surface_radius_from_config(config, ThemeSurface::Control);
     UiRadius {
         none: 0,
-        sm: (control * 3 / 4).max(0),
+        sm: (control * niwoe_tokens::Radius::DEFAULT.sm / niwoe_tokens::Radius::DEFAULT.md).max(0),
         md: control.max(0),
         lg: surface_radius_from_config(config, ThemeSurface::Panel).max(0),
         xl: card.max(0),

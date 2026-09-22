@@ -146,7 +146,7 @@ fn output_sized_rect_is_treated_as_fullscreen_and_left_unchanged() {
     assert_eq!(adjusted, requested);
     assert_eq!(
         output.height - NORMAL_WINDOW_BOTTOM_RESERVED_PX,
-        850,
+        output.height - niwoe_tokens::Panel::DEFAULT.window_reservation() as i32,
         "sanity check: panel-safe height differs from fullscreen height"
     );
 }

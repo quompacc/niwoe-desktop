@@ -19,7 +19,7 @@ impl Typography {
         caption_size: 12,
         body_size: 14,
         title_size: 18,
-        display_size: 24,
+        display_size: 28,
         regular_weight: 400,
         medium_weight: 500,
         strong_weight: 600,

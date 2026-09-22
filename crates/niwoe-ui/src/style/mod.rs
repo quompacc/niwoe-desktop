@@ -20,6 +20,15 @@ pub struct Theme {
 }
 
 impl Theme {
+    pub const DARK: Theme = Theme {
+        palette: Palette::DARK,
+        spacing: Spacing::DEFAULT,
+        radius: Radius::DEFAULT,
+    };
+    pub const LIGHT: Theme = Theme {
+        palette: Palette::LIGHT,
+        ..Self::DARK
+    };
     /// Tokyo-Night-Metro defaults - fully embedded, no I/O.
     pub const TOKYO_NIGHT_METRO: Theme = Theme {
         palette: Palette::TOKYO_NIGHT_METRO,
@@ -36,7 +45,7 @@ mod tests {
     fn default_theme_bundles_metro_tokens() {
         let t = Theme::TOKYO_NIGHT_METRO;
         assert_eq!(t.palette.accent, Color::rgb(0x7a, 0xa2, 0xf7));
-        assert_eq!(t.spacing.md, 8);
+        assert_eq!(t.spacing.md, niwoe_tokens::Spacing::DEFAULT.md);
         assert_eq!(t.radius.lg, 0);
     }
 

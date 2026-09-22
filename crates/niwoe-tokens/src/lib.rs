@@ -15,6 +15,7 @@ pub mod elevation;
 pub mod font;
 pub mod interaction;
 pub mod radius;
+pub mod spacing;
 pub mod typography;
 
 pub use chrome::{
@@ -25,4 +26,5 @@ pub use color::{contrast_text, relative_luminance, Color, Palette};
 pub use elevation::Elevation;
 pub use interaction::Interaction;
 pub use radius::Radius;
+pub use spacing::{Controls, Spacing};
 pub use typography::Typography;

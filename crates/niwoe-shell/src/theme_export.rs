@@ -338,7 +338,7 @@ mod tests {
         assert!(s.contains("[Colors:Window]"));
         assert!(s.contains("ColorScheme=NiwoeDark"));
         assert!(s.contains("widgetStyle=Breeze"));
-        assert!(s.contains("BackgroundNormal=32,37,43")); // surface 0x20252b
+        assert!(s.contains("BackgroundNormal=25,34,26")); // surface 0x20252b
     }
 
     #[test]
@@ -372,11 +372,11 @@ mod tests {
         assert!(!css3.contains("@@"), "unsubstituted token in gtk3 css");
         assert!(!css4.contains("@@"), "unsubstituted token in gtk4 css");
         // Tokens resolved to the dark palette hexes.
-        assert!(css3.contains("#14171b")); // background
-        assert!(css3.contains("#4e99f3")); // accent
+        assert!(css3.contains("#101710")); // background
+        assert!(css3.contains("#d6b35b")); // accent
                                            // libadwaita named colour wired from tokens.
-        assert!(css4.contains("@define-color window_bg_color #14171b"));
-        assert!(css4.contains("@define-color accent_bg_color #4e99f3"));
+        assert!(css4.contains("@define-color window_bg_color #101710"));
+        assert!(css4.contains("@define-color accent_bg_color #d6b35b"));
     }
 
     #[test]
@@ -385,9 +385,9 @@ mod tests {
         // the libadwaita named colours from the tokens (the recolour surface),
         // otherwise libadwaita apps stay on their built-in dark.
         let css4 = substitute_tokens(GTK4_TEMPLATE, &ThemeConfig::default());
-        assert!(css4.contains("@define-color window_bg_color #14171b"));
+        assert!(css4.contains("@define-color window_bg_color #101710"));
         assert!(css4.contains("@define-color headerbar_bg_color"));
-        assert!(css4.contains("@define-color accent_bg_color #4e99f3"));
+        assert!(css4.contains("@define-color accent_bg_color #d6b35b"));
     }
 
     #[test]

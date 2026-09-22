@@ -1,7 +1,3 @@
-fn with_alpha(color: Color, alpha: u8) -> Color {
-    Color::rgba(color.r, color.g, color.b, alpha)
-}
-
 fn settings_theme_from_config(config: &ThemeConfig) -> Theme {
     theme_from_config(config)
 }
@@ -109,7 +105,7 @@ impl Widget for SettingsSidebarBrand {
         let eyebrow_y = area.y + Typography::DEFAULT.caption_size as i32;
         paint_text(
             canvas,
-            "NIWOE",
+            "SYSTEM",
             x,
             eyebrow_y,
             Typography::DEFAULT.caption_size as f32,
@@ -183,36 +179,11 @@ impl Widget for SettingsSearchField {
         }
     }
 
-    fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, _state: WidgetState) {
-        let pal = theme.palette;
-        if let Some(path) = rounded_rect_path(area, theme.radius.md) {
-            paint_fill(
-                canvas,
-                &path,
-                with_alpha(pal.surface_alt, SETTINGS_CHROME.search_alpha),
-            );
-        }
-        let baseline = area.y + (area.height + Typography::DEFAULT.body_size as i32) / 2;
-        let text_x = area.x + 14;
-        if self.query.is_empty() {
-            paint_text(
-                canvas,
-                "Einstellungen durchsuchen…",
-                text_x,
-                baseline,
-                Typography::DEFAULT.body_size as f32,
-                pal.text_dim,
-            );
-        } else {
-            paint_text(
-                canvas,
-                &self.query,
-                text_x,
-                baseline,
-                Typography::DEFAULT.body_size as f32,
-                pal.text,
-            );
-        }
+    fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
+        let label = if self.query.is_empty() { "Einstellungen durchsuchen…" } else { &self.query };
+        niwoe_ui::widget::Component::new(
+            niwoe_ui::widget::ComponentKind::Input, label, self.width,
+        ).paint(area, canvas, theme, state);
     }
 }
 
