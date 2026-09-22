@@ -138,6 +138,9 @@ impl NiwoeShell {
             ShellEvent::ToggleLauncher => {
                 self.toggle_launcher();
             }
+            ShellEvent::LaunchTerminal => self.launch_default_app(None),
+            ShellEvent::LaunchBrowser => self.launch_default_app(Some(crate::default_apps::DefaultAppCategory::WebBrowser)),
+            ShellEvent::LaunchFiles => self.launch_default_app(Some(crate::default_apps::DefaultAppCategory::FileManager)),
             ShellEvent::ToggleQuickSettings => {
                 // The combined native Quick Settings card shares the network
                 // popup surface; redraw_after_ipc commits it after this state

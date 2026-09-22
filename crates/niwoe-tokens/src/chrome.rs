@@ -36,6 +36,8 @@ impl Default for Scrollbar {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Panel {
     pub height: u32,
+    /// Edge-attached top bar; shared by shell paint and compositor backdrop.
+    pub edge_radius: i32,
     pub bottom_gap: u32,
     pub side_margin: u32,
     pub top_shadow: u32,
@@ -49,6 +51,8 @@ pub struct Panel {
     pub control_width: u32,
     /// Wider status control used by the clock.
     pub clock_width: u32,
+    pub room_width: u32,
+    pub room_overflow_width: u32,
     /// Neutral hover overlay over `Palette::surface_alt`.
     pub hover_alpha: u8,
     /// Focus/running indicator overlay over `Palette::accent`.
@@ -60,14 +64,17 @@ pub struct Panel {
 impl Panel {
     pub const DEFAULT: Panel = Panel {
         height: 48,
-        bottom_gap: 8,
-        side_margin: 12,
-        top_shadow: 16,
+        edge_radius: 0,
+        bottom_gap: 0,
+        side_margin: 0,
+        top_shadow: 0,
         control_height: 32,
         app_icon_size: 22,
-        status_icon_size: 18,
+        status_icon_size: 22,
         control_width: 40,
-        clock_width: 88,
+        clock_width: 200,
+        room_width: 88,
+        room_overflow_width: 80,
         hover_alpha: 30,
         active_alpha: 38,
         divider_alpha: 46,
@@ -77,9 +84,7 @@ impl Panel {
         self.top_shadow + self.height + self.bottom_gap
     }
 
-    /// Screen edge occupied by the visible panel island and its bottom gap.
-    /// Maximized windows may extend into the transparent top-shadow canvas,
-    /// but must stop at the island itself.
+    /// Logical space reserved at the top edge for normal windows.
     pub const fn window_reservation(self) -> u32 {
         self.height + self.bottom_gap
     }
@@ -168,7 +173,7 @@ pub struct WindowChrome {
 
 impl WindowChrome {
     pub const DEFAULT: WindowChrome = WindowChrome {
-        titlebar_height: 34,
+        titlebar_height: 0,
         button_width: 38,
         button_icon_size: 13,
         button_icon_stroke: 1.25,
@@ -231,6 +236,31 @@ pub struct Launcher {
 }
 
 impl Launcher {
+    /// Centered card fitted to the available logical layer extent.
+    /// Shared by drawing, input hit tests and the compositor glass backdrop.
+    pub fn fitted_rect(self, width: u32, height: u32) -> (i32, i32, u32, u32) {
+        let width = width.max(1);
+        let height = height.max(1);
+        let w = (self.width as u32).min(width);
+        let h = (self.height as u32).min(height);
+        (((width - w) / 2) as i32, ((height - h) / 2) as i32, w, h)
+    }
+
+    /// Search-only launcher; Settings retains its independent larger viewport.
+    pub const SEARCH: Launcher = Launcher {
+        width: 640,
+        height: 480,
+        header_height: 96,
+        footer_height: 40,
+        app_card_height: 56,
+        grid_gap: 4,
+        grid_columns: 1,
+        sidebar_width: 0,
+        content_pad: 16,
+        app_heading_height: 0,
+        ..Self::DEFAULT
+    };
+
     pub const DEFAULT: Launcher = Launcher {
         width: 880,
         height: 620,
@@ -418,17 +448,17 @@ pub struct QuickSettings {
 
 impl QuickSettings {
     pub const DEFAULT: QuickSettings = QuickSettings {
-        width: 384,
-        height: 468,
+        width: 360,
+        height: 400,
         panel_gap: 2,
-        outer_pad: 18,
-        header_height: 50,
-        tile_height: 74,
+        outer_pad: 16,
+        header_height: 48,
+        tile_height: 72,
         tile_gap: 10,
         section_gap: 12,
-        audio_height: 126,
-        status_height: 70,
-        footer_height: 46,
+        audio_height: 112,
+        status_height: 64,
+        footer_height: 40,
         control_radius: crate::Radius::DEFAULT.md,
         slider_height: crate::Controls::TRACK_HEIGHT,
         slider_thumb_size: crate::Controls::THUMB_SIZE,
@@ -475,11 +505,11 @@ mod tests {
         assert_eq!(Launcher::DEFAULT.app_icon_size, 32);
         assert_eq!(Launcher::DEFAULT.sidebar_width, 224);
         assert_eq!(Launcher::DEFAULT.grid_columns, 2);
-        assert_eq!(Panel::DEFAULT.surface_height(), 72);
-        assert_eq!(Panel::DEFAULT.window_reservation(), 56);
+        assert_eq!(Panel::DEFAULT.surface_height(), 48);
+        assert_eq!(Panel::DEFAULT.window_reservation(), 48);
         assert_eq!(Panel::DEFAULT.control_height, 32);
         assert_eq!(Panel::DEFAULT.app_icon_size, 22);
-        assert_eq!(Panel::DEFAULT.status_icon_size, 18);
+        assert_eq!(Panel::DEFAULT.status_icon_size, 22);
         assert_eq!(Calendar::DEFAULT.width, 384);
         assert_eq!(Calendar::DEFAULT.height, 356);
         assert_eq!(Calendar::DEFAULT.columns, 7);
@@ -490,7 +520,7 @@ mod tests {
         assert_eq!(WorkspaceSwitcher::DEFAULT.rows, 3);
         assert_eq!(WorkspaceSwitcher::DEFAULT.tile_pad, 10);
         assert_eq!(WorkspaceSwitcher::DEFAULT.occupied_dot_size, 6);
-        assert_eq!(WindowChrome::DEFAULT.titlebar_height, 34);
+        assert_eq!(WindowChrome::DEFAULT.titlebar_height, 0);
         assert_eq!(WindowChrome::DEFAULT.button_width, 38);
         assert_eq!(WindowChrome::DEFAULT.button_icon_size, 13);
         assert_eq!(WindowChrome::DEFAULT.separator_height, 1);
@@ -523,8 +553,8 @@ mod tests {
             Launcher::DEFAULT.divider_alpha
         );
         assert_eq!(Mask::DEFAULT.dim_alpha, 160);
-        assert_eq!(QuickSettings::DEFAULT.width, 384);
-        assert_eq!(QuickSettings::DEFAULT.height, 468);
+        assert_eq!(QuickSettings::DEFAULT.width, 360);
+        assert_eq!(QuickSettings::DEFAULT.height, 400);
         assert_eq!(QuickSettings::DEFAULT.slider_thumb_size, 16);
     }
 

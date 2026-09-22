@@ -36,6 +36,7 @@ struct PanelChip {
 }
 
 struct PanelStatusIcon {
+    show_label: bool,
     label: Box<str>,
     icon: Option<Pixmap>,
 }
@@ -44,7 +45,7 @@ impl Widget for PanelStatusIcon {
     fn style(&self) -> WidgetStyle {
         WidgetStyle {
             size: UiSize {
-                width: ui_length(TRAY_W as f32),
+                width: ui_length((TRAY_W + if self.show_label { LAUNCHER_W } else { 0 }) as f32),
                 height: ui_length(CHIP_H as f32),
             },
             ..Default::default()
@@ -53,7 +54,7 @@ impl Widget for PanelStatusIcon {
 
     fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, _state: WidgetState) {
         if let Some(ref icon) = self.icon {
-            let x = area.x + (area.width - icon.width() as i32) / 2;
+            let x = area.x + (TRAY_W - icon.width() as i32) / 2;
             let y = area.y + (area.height - icon.height() as i32) / 2;
             canvas.draw_pixmap(
                 x,
@@ -74,6 +75,16 @@ impl Widget for PanelStatusIcon {
                 theme.palette.text,
             );
         }
+        if self.show_label {
+            paint_text(
+                canvas,
+                &self.label,
+                area.x + TRAY_W,
+                area.y + area.height / 2 + theme.spacing.xs,
+                FONT_SIZE,
+                theme.palette.text_dim,
+            );
+        }
     }
 }
 
@@ -92,7 +103,14 @@ impl Widget for PanelStatusGroup {
             flex_direction: FlexDirection::Row,
             align_items: Some(AlignItems::Center),
             size: UiSize {
-                width: ui_length((TRAY_W * self.children.len() as i32) as f32),
+                width: ui_length(
+                    (TRAY_W * self.children.len() as i32
+                        + if self.children.len() == 3 {
+                            LAUNCHER_W
+                        } else {
+                            0
+                        }) as f32,
+                ),
                 height: ui_length(CHIP_H as f32),
             },
             ..Default::default()
@@ -214,11 +232,11 @@ impl Widget for PanelWorkspaceChip {
 
     fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
         paint_panel_control_background(area, canvas, state);
-        let label = format!("{}", self.active);
-        let suffix = format!("/ {}", self.total.max(1));
-        let (label_w, _) = measure_text(&label, FONT_SIZE);
-        let (suffix_w, _) = measure_text(&suffix, CAPTION_SIZE);
-        let dot_diameter = theme.spacing.sm;
+        let label = "Räume";
+        let suffix = if self.total > 1 { "⌄" } else { "" };
+        let (label_w, _) = measure_text(label, FONT_SIZE);
+        let (suffix_w, _) = measure_text(suffix, CAPTION_SIZE);
+        let dot_diameter = if self.active > 0 { theme.spacing.xs } else { 0 };
         let content_w = dot_diameter + theme.spacing.xs + label_w + theme.spacing.xs + suffix_w;
         let mut x = area.x + (area.width - content_w) / 2;
         draw_circle(
@@ -230,10 +248,10 @@ impl Widget for PanelWorkspaceChip {
         );
         x += dot_diameter + theme.spacing.xs;
         let baseline = area.y + area.height / 2 + theme.spacing.xs;
-        paint_text(canvas, &label, x, baseline, FONT_SIZE, theme.palette.text);
+        paint_text(canvas, label, x, baseline, FONT_SIZE, theme.palette.text);
         paint_text(
             canvas,
-            &suffix,
+            suffix,
             x + label_w + theme.spacing.xs,
             baseline,
             CAPTION_SIZE,
@@ -265,34 +283,23 @@ impl Widget for PanelClockChip {
         paint_panel_control_background(area, canvas, state);
         let (time, date) = self.value.split_once("  ").unwrap_or((&self.value, ""));
         let (time_w, _) = measure_text(time, FONT_SIZE);
+        let (date_w, _) = measure_text(date, FONT_SIZE);
+        let gap = if date.is_empty() { 0 } else { theme.spacing.lg };
+        let x = area.x + (area.width - time_w - date_w - gap) / 2;
+        let baseline = area.y + area.height / 2 + theme.spacing.xs;
+        paint_text(canvas, date, x, baseline, FONT_SIZE, theme.palette.text_dim);
         paint_text(
             canvas,
             time,
-            area.x + (area.width - time_w) / 2,
-            area.y + FONT_SIZE as i32,
+            x + date_w + gap,
+            baseline,
             FONT_SIZE,
             theme.palette.text,
         );
-        if !date.is_empty() {
-            let compact_date = date.get(..5).unwrap_or(date);
-            let (date_w, _) = measure_text(compact_date, CAPTION_SIZE);
-            paint_text(
-                canvas,
-                compact_date,
-                area.x + (area.width - date_w) / 2,
-                area.y + area.height - theme.spacing.xs,
-                CAPTION_SIZE,
-                theme.palette.text_dim,
-            );
-        }
     }
 }
 
-fn paint_panel_control_background(
-    area: Rect,
-    canvas: &mut PixmapMut<'_>,
-    state: WidgetState,
-) {
+fn paint_panel_control_background(area: Rect, canvas: &mut PixmapMut<'_>, state: WidgetState) {
     let color = match state {
         WidgetState::Idle => None,
         WidgetState::Hovered => Some(Interaction::DEFAULT.neutral_hover),

@@ -39,7 +39,18 @@ pub(super) fn formatted_time() -> String {
             return String::new();
         }
         let mut out = [0_i8; 64];
-        let fmt = CString::new("%H:%M  %d.%m.%Y").expect("valid strftime format");
+        let weekday = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+            .get(tm.tm_wday as usize)
+            .copied()
+            .unwrap_or("");
+        let month = [
+            "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez",
+        ]
+        .get(tm.tm_mon as usize)
+        .copied()
+        .unwrap_or("");
+        let fmt =
+            CString::new(format!("%H:%M  {weekday}, %d. {month}")).expect("valid strftime format");
         let len = libc::strftime(out.as_mut_ptr(), out.len(), fmt.as_ptr(), &tm);
         if len == 0 {
             String::new()

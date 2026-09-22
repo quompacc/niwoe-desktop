@@ -13,21 +13,34 @@ use crate::state::{
 impl NiwoeState {
     pub fn tile_workspace(&mut self, idx: usize) {
         tracing::debug!("tiling output geometry requested: workspace={}", idx + 1);
-        let output_rect =
-            if let Some(selected) = select_tiling_output_from_infos(self.output_registry.list()) {
-                tracing::debug!(
-                    "tiling selected output: id={} name={} fallback_reason={}",
-                    selected.id.0,
-                    selected.name,
-                    selected.fallback_reason
-                );
-                selected.geometry
-            } else {
-                tracing::debug!(
-                    "tiling selected output: none (registry empty), using default geometry"
-                );
-                Rectangle::new((0, 0).into(), (1920, 1080).into())
-            };
+        let focused = self
+            .focused_output()
+            .filter(|id| self.active_workspace_for_output(Some(*id)) == idx);
+        let assigned = focused.or_else(|| {
+            self.output_registry
+                .list()
+                .iter()
+                .find(|info| self.active_workspace_for_output(Some(info.id)) == idx)
+                .map(|info| info.id)
+        });
+        let output_rect = if let Some(info) = assigned.and_then(|id| self.output_registry.by_id(id))
+        {
+            output_geometry_to_rect(info.geometry)
+        } else if let Some(selected) = select_tiling_output_from_infos(self.output_registry.list())
+        {
+            tracing::debug!(
+                "tiling selected output: id={} name={} fallback_reason={}",
+                selected.id.0,
+                selected.name,
+                selected.fallback_reason
+            );
+            selected.geometry
+        } else {
+            tracing::debug!(
+                "tiling selected output: none (registry empty), using default geometry"
+            );
+            Rectangle::new((0, 0).into(), (1920, 1080).into())
+        };
         let gap = self.theme_manager.current().config.decorations.gap as i32;
 
         let space_windows: Vec<Window> =
@@ -49,6 +62,13 @@ impl NiwoeState {
         let space = self.workspaces.space_at_mut(idx);
         for (window, rect) in assignments {
             if let Some(toplevel) = window.toplevel() {
+                if toplevel
+                    .with_pending_state(|s| s.states.contains(xdg_toplevel::State::Fullscreen))
+                {
+                    continue;
+                }
+                self.decoration_manager
+                    .set_tiled(toplevel.wl_surface(), true);
                 toplevel.with_pending_state(|state| {
                     state.size = Some(rect.size);
                     state.states.set(xdg_toplevel::State::TiledLeft);
@@ -57,6 +77,13 @@ impl NiwoeState {
                     state.states.set(xdg_toplevel::State::TiledBottom);
                 });
                 toplevel.send_pending_configure();
+            } else if let Some(x11) = window.x11_surface() {
+                if x11.is_fullscreen() {
+                    continue;
+                }
+                if let Err(error) = x11.configure(rect) {
+                    tracing::warn!(%error, "failed to configure tiled XWayland window");
+                }
             }
             space.map_element(window, rect.loc, false);
         }
@@ -112,7 +139,7 @@ fn select_tiling_output_from_infos(infos: &[OutputInfo]) -> Option<SelectedTilin
 mod tests {
     use smithay::utils::Transform;
 
-    use crate::state::{OutputGeometry, OutputId, OutputInfo, NORMAL_WINDOW_BOTTOM_RESERVED_PX};
+    use crate::state::{OutputGeometry, OutputId, OutputInfo, NORMAL_WINDOW_TOP_RESERVED_PX};
 
     use super::select_tiling_output_from_infos;
 
@@ -141,7 +168,7 @@ mod tests {
         assert_eq!(selected.fallback_reason, "primary");
         assert_eq!(
             selected.geometry.size.h,
-            1080 - NORMAL_WINDOW_BOTTOM_RESERVED_PX
+            1080 - NORMAL_WINDOW_TOP_RESERVED_PX
         );
     }
 

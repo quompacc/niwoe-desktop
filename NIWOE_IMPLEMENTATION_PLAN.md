@@ -10,6 +10,17 @@ Es gibt keine Übergabe zwischen Modellen und keinen manuellen Reviewstopp am
 Phasenende. Die fachlichen Phasen und ihre Prüfgates bleiben bestehen. Ein kurzer
 fortgeschriebener Phasenbericht dokumentiert Ergebnis, Prüfungen und offene Risiken.
 
+**Scope-Korrektur auf Nutzerauftrag, 22.09.2026:** Keine weitere Ausbau- oder
+Abnahmerunde für die abzulösende untere Taskleiste und den alten kombinierten
+Launcher/Settings-Container. P02 liefert die wiederverwendbaren Designgrundlagen;
+die vollständige visuelle, Scale-/Input- und native Performance-Abnahme erfolgt
+an den neuen Oberflächen in P03–P05. Die dokumentierten offenen DRM-/HiDPI-Befunde
+bleiben sichtbar, sind aber keine Voraussetzung für den Beginn von P03.
+Nächste Implementierung: neue obere Leiste nach Manifest und Desktop-Mockup.
+Vorhandene Backends weiterverwenden; keine zusätzliche Alt-UI-Politur.
+Pflichtchecks nach tatsächlichen Codeänderungen bleiben bestehen. Bestandene
+Prüfungen ohne relevante Änderung oder neuen Befund nicht wiederholen.
+
 **Explizite Nutzerentscheidung vom 21.09.2026:** Der gesamte alte Meridian-Plan
 ist obsolet. Zuerst entsteht niwoe-desktop auf einer bestehenden Linux-Distribution,
 danach ein eigenes Linux-basiertes OS. Eine erneute BSD-vs.-Linux-Evaluation ist
@@ -17,6 +28,22 @@ kein Arbeitspaket. Bestehender Code bleibt nutzbar, alte Roadmap-Verpflichtungen
 Empfohlener Entwicklungshost: Fedora KDE Plasma Desktop, siehe
 [Distributionsentscheidung](docs/NIWOE_DEVELOPMENT_DISTRO.md). Der Nutzer hat
 Fedora 44 KDE auf dem Acer installiert; der SSH-Testhost ist jetzt verfügbar.
+
+**Neubauentscheidung, 22.09.2026:** Panel, Such-Launcher und System-Deck werden
+als neue Oberflächen mit eigenen Layouts und Eingabemodellen gebaut und an die
+vorhandenen Backends angeschlossen. Die alte Shell-Komposition ist keine
+Ausbaubasis. P03–P05 bilden gemeinsam diesen Lieferumfang; die Reihenfolge bleibt
+Panel, Launcher, Deck, die Integration darf phasenübergreifend erfolgen.
+Compositor, IPC, App-Katalog, Systemdienste und zentrale UI-Grundbausteine bleiben.
+Zusätzlich ersetzt ein dünner Außenrahmen die compositor-eigene SSD-Titelleiste
+auch bei freien Fenstern. Verschieben, Resize und Schließen müssen ohne sie
+erreichbar sein. Native CSD wird nicht aus Anwendungen entfernt.
+
+**Bedienentscheidung:** Omarchy ist die konkrete Referenz; verbindliche
+Kernbelegung und Migrationskonflikte in
+[NIWOE_INTERACTION_MODEL.md](docs/NIWOE_INTERACTION_MODEL.md). Diese Entscheidung
+ersetzt widersprechende frühere Shortcutvorschläge, insbesondere Super+Space
+für das Deck. Tiling und vollständige Tastaturbedienung sind das Produktziel.
 
 ## 1. Ziel und Einordnung
 
@@ -326,6 +353,11 @@ Ein grüner Compiler allein nimmt die Namensmigration nicht ab.
 5. P02-05: Kontrastpaare, 100/150/200%-Skalierung und helles/dunkles Wallpaper
    prüfen. Messwerte und Screenshots ablegen. Aus einem PNG keine Animation ableiten.
 
+**Abgrenzung seit 22.09.:** P02-05 betrifft die gemeinsamen Komponenten. Die
+vollständige Screenshotmatrix und Bedienprüfung des alten Desktops entfällt.
+Output-Skalierung und Rasterqualität werden mit den neuen P03–P05-Oberflächen
+integriert geprüft; dafür keine zweite Testreihe am ersetzten Layout starten.
+
 **Abnahme:** Nur Farbtabellen unterscheiden sich zwischen Themes; keine neue lokale
 Designkonstante außerhalb zentraler Tokens; Dark-/Light-Komponentenblatt lesbar.
 Kontrastziele des Briefs erreicht. Keine neue dauerhafte Render-/Timerlast.
@@ -365,12 +397,11 @@ Raumlogik in UI-Dateien vor P06.
    Alpha-Suchumfang: installierte Apps und vorhandene Settings/Systemaktionen.
 2. P04-02: Tastatur: Tippen, Pfeile, Enter, Escape; Mausklick gleichwertig.
    Stabile Auswahl bei Ergebnisupdates, Leerzustand und Startfehler darstellen.
-3. P04-03: Super allein öffnet beim Loslassen nur dann, wenn keine Kombination
-   benutzt wurde. Super+L, Super+Zahl und Super+Space dürfen keinen zweiten
-   Launcher-Trigger auslösen; Taste wiederholen/halten berücksichtigen.
-4. P04-04: Neue Defaults `Super` Launcher, `Super+Space` Deck. Benutzerdefinierte
-   Bindings erhalten; Konflikt erkennen und verständlich anzeigen. `Super+Tab`
-   erst mit funktionsfähigem Hub aktivieren.
+3. P04-03: Omarchy-Belegung: Super+Space öffnet den Launcher. Super allein
+   löst keine Aktion aus; kombinierte Kürzel dürfen keinen zweiten Trigger auslösen.
+4. P04-04: Super+Alt+Space öffnet die Steuerung/Einstellungen, Super+Escape das
+   Deck. Super+Tab wechselt zum nächsten Raum. Benutzerdefinierte Bindings
+   erhalten; Konflikt erkennen und verständlich anzeigen.
 5. P04-05: Gemeinsamen Overlay-Lifecycle für Launcher/Deck und später Hub festlegen:
    höchstens ein Hauptoverlay, Escape schließt, alter Fensterfokus wird korrekt
    zurückgegeben, Lock übersteuert und schließt Overlays.
@@ -462,7 +493,8 @@ keine zweite Policy in der Shell.
 **Betroffen:** neue kleine `niwoe-shell/src/hub/`-Module, vorhandene
 Thumbnail-/IPC-/Overlaypfade, Launcher-Provider für Räume/Fenster.
 
-1. P08-01: Auf `Super+Tab` und per Maus ein Overlay mit Raumkarten öffnen.
+1. P08-01: Per Maus und über eine später konfliktfrei festgelegte Belegung ein
+   Overlay mit Raumkarten öffnen. Super+Tab bleibt Omarchys Raumwechsel.
    Karten: Name, aktive/belegte Zustände, App-Icons, Fensteranzahl und Auswahl.
 2. P08-02: Pfeile/Tab/Enter/Escape, Scrollen und Filter nach Raumname; Klick auf
    Raum wechselt, Klick auf Fenster aktiviert das konkrete Fenster.

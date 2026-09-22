@@ -47,11 +47,11 @@ impl NiwoeShell {
 
         self.thumbnail_popup_open = true;
         self.thumbnail_layer.set_anchor(
-            smithay_client_toolkit::shell::wlr_layer::Anchor::BOTTOM
+            smithay_client_toolkit::shell::wlr_layer::Anchor::TOP
                 | smithay_client_toolkit::shell::wlr_layer::Anchor::LEFT,
         );
         self.thumbnail_layer
-            .set_margin(0, 0, crate::SHELL_POPUP_BOTTOM_MARGIN, left_margin);
+            .set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, left_margin);
         self.thumbnail_layer.set_exclusive_zone(0);
         self.thumbnail_layer.set_size(
             crate::popup_surface_w(popup_w),
@@ -84,7 +84,7 @@ impl NiwoeShell {
                 .map(|c| (c - new_w as i32 / 2).max(0))
                 .unwrap_or(0);
             self.thumbnail_layer
-                .set_margin(0, 0, crate::SHELL_POPUP_BOTTOM_MARGIN, left_margin);
+                .set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, left_margin);
             self.thumbnail_layer.set_size(
                 crate::popup_surface_w(new_w),
                 crate::popup_surface_h(crate::THUMBNAIL_POPUP_HEIGHT),

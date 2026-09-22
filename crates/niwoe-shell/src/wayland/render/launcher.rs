@@ -1,5 +1,29 @@
 impl NiwoeShell {
+    pub(crate) fn launcher_geometry(&self) -> niwoe_tokens::Launcher {
+        if self.launcher_settings_open {
+            niwoe_tokens::Launcher::DEFAULT
+        } else {
+            niwoe_tokens::Launcher::SEARCH
+        }
+    }
+
+    pub(crate) fn launcher_content_size(&self) -> (u32, u32) {
+        if self.launcher_is_fullscreen {
+            let (_, _, width, height) = self.launcher_geometry()
+                .fitted_rect(self.launcher_width, self.launcher_height);
+            (width, height)
+        } else {
+            let geometry = self.launcher_geometry();
+            (geometry.width as u32, geometry.height as u32)
+        }
+    }
+
     pub(crate) fn draw_launcher(&mut self, _qh: &QueueHandle<Self>, reason: RepaintReason) {
+        if self.launcher_is_fullscreen {
+            let (x, y, _, _) = self.launcher_geometry().fitted_rect(self.launcher_width, self.launcher_height);
+            self.launcher_visual_x = x;
+            self.launcher_visual_y = y;
+        }
         debug!(
             "draw_launcher: reason={:?} open={} configured={} launcher_dirty={} commit_expected={}",
             reason,
@@ -41,6 +65,7 @@ impl NiwoeShell {
         self.render_stats.launcher.renders += 1;
 
         let stride = buffer::shm_buffer_stride(width);
+        let (content_width, content_height) = self.launcher_content_size();
         for attempt in 0..CANVAS_RETRY_ATTEMPTS {
             let buf = buffer::buffer_for(
                 &mut self.pool,
@@ -76,9 +101,9 @@ impl NiwoeShell {
                 }
             };
 
-            // Render launcher content to a fixed-size buffer.
-            let lw = LAUNCHER_WIDTH as usize;
-            let lh = LAUNCHER_HEIGHT as usize;
+            // Draw and hit-test the same card fitted to the logical layer size.
+            let lw = content_width as usize;
+            let lh = content_height as usize;
             let mut content = vec![0u8; lw * lh * 4];
             let armed_power: Option<(&str, f32)> = self.armed_power.as_ref().map(|(id, at)| {
                 let p = (at.elapsed().as_millis() as f32 / crate::POWER_ARM_TIMEOUT_MS as f32)
@@ -88,8 +113,8 @@ impl NiwoeShell {
             if self.launcher_settings_open {
                 crate::settings_view::draw_settings_launcher(
                     &mut content,
-                    LAUNCHER_WIDTH,
-                    LAUNCHER_HEIGHT,
+                    content_width,
+                    content_height,
                     self.settings_category,
                     &self.settings_search,
                     &self.available_themes,
@@ -125,8 +150,8 @@ impl NiwoeShell {
             } else {
                 crate::app_view::draw_command_palette(
                     &mut content,
-                    LAUNCHER_WIDTH,
-                    LAUNCHER_HEIGHT,
+                    content_width,
+                    content_height,
                     &self.pinned_apps,
                     &self.launcher_state.apps,
                     self.launcher_state.category,
@@ -151,8 +176,8 @@ impl NiwoeShell {
                 );
                 crate::context_menu::draw_overlay(
                     &mut content,
-                    LAUNCHER_WIDTH,
-                    LAUNCHER_HEIGHT,
+                    content_width,
+                    content_height,
                     cm,
                     &items,
                     &[],
@@ -168,7 +193,7 @@ impl NiwoeShell {
             round_buffer_corners(&mut content, lw, lh, launcher_radius);
 
             if self.launcher_is_fullscreen {
-                // Blit LAUNCHER_WxH content into the full-screen canvas at visual offset.
+                // Blit fitted card content into the full-screen canvas at visual offset.
                 let fw = width as usize;
                 let vx = self.launcher_visual_x.max(0) as usize;
                 let vy = self.launcher_visual_y.max(0) as usize;

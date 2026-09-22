@@ -261,7 +261,7 @@ fn render_outputs_for_crtc(
 
         let space = state.workspaces.active_space();
         let theme = &state.theme_manager.current().config;
-        let scale = Scale::from(1.0f64);
+        let scale = Scale::from(out.output.current_scale().fractional_scale());
 
         let scene_compose_started = Instant::now();
         out.scratch_normal.clear();
@@ -360,6 +360,7 @@ fn render_outputs_for_crtc(
                         batch.first_behind,
                         glass_size,
                         glass_scale,
+                        scale,
                         &mut buffers.scene,
                     ) {
                         continue;

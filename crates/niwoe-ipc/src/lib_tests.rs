@@ -10,6 +10,21 @@ use super::{
 };
 
 #[test]
+fn default_app_shortcut_events_roundtrip() {
+    for event in [
+        ShellEvent::LaunchTerminal,
+        ShellEvent::LaunchBrowser,
+        ShellEvent::LaunchFiles,
+    ] {
+        let encoded = encode_event(&event).unwrap();
+        assert_eq!(
+            decode_event(std::str::from_utf8(&encoded).unwrap()).unwrap(),
+            event
+        );
+    }
+}
+
+#[test]
 fn quick_settings_control_commands_roundtrip() {
     for command in [
         ShellCommand::AudioVolumeSet { percent: 72 },

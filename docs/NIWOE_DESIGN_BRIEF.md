@@ -1,5 +1,11 @@
 # NIWOE: Design-Brief aus den aktuellen Mockups
 
+**Verbindliche Korrektur, 22.09.2026:** Nutzer erklärt die acht Mockups zur
+visuellen Vorgabe. Nachfolgende frühere redaktionelle Reduktionen gelten nur,
+soweit sie ausdrücklich vom Nutzer bestätigt wurden oder technisch notwendig
+sind. Nicht als Erlaubnis für eine vereinfachte Ersatzgestaltung verwenden.
+Siehe die aktuelle Entscheidung im Designmanifest.
+
 Stand: 21.09.2026. Alle acht PNGs unter `assets/` wurden visuell angesehen.
 Dieser Brief präzisiert den vorgeschlagenen Produktentwurf. P00 übernimmt ihn
 in das verbindliche Designmanifest; bis dahin ersetzt er es nicht stillschweigend.
@@ -128,11 +134,14 @@ Panel oben: Launcher, Räume, flexible Lücke, verfügbare Module, Uhr. Aktiver 
 Gold, nicht aktive Räume neutral. Bei Platzmangel Overflow statt kollidierender
 Texte. Optionen ändern Module, nicht die grundlegende Designsprache.
 
-Tiled Apps ohne zusätzliche dekorative NIWOE-Titlebar. Native CSD bleibt erhalten.
-Apps, die SSD benötigen, behalten einen funktionalen Fallback mit erreichbarem
-Schließen/Verschieben/Resize; keine pauschale Entfernung von Controls ohne
-Bedienalternative. Floating hat eine feine Kontur und optional bestehenden
-gecachten Schatten. Alpha führt keinen neuen Effekt allein für die Mockupnähe ein.
+Nutzerentscheidung vom 22.09.2026: keine zusätzliche NIWOE-Titelleiste, auch
+nicht bei freien Fenstern. Compositor-eigene Dekoration beschränkt sich auf
+eine feine Außenkontur von 1–2 logischen Pixeln. Schließen ist per Super+W
+erreichbar; Super+Ziehen verschiebt,
+Super+Rechtsziehen vergrößert/verkleinert. Das verbindliche vollständige
+Bedienziel steht in [NIWOE_INTERACTION_MODEL.md](NIWOE_INTERACTION_MODEL.md).
+Native CSD bleibt erhalten. Floating darf den bestehenden gecachten Schatten
+nutzen. Alpha führt keinen neuen Effekt allein für die Mockupnähe ein.
 
 ### Launcher
 

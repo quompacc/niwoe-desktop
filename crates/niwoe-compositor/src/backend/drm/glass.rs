@@ -136,17 +136,10 @@ impl GlassTitlebarElement {
     ) -> Self {
         let loc_phys: Point<f64, Physical> = info.rect.loc.to_f64().to_physical(scale);
         let size_log: Size<i32, Logical> = info.rect.size;
+        let size_phys = size_log.to_f64().to_physical(scale);
         let src: Rectangle<f64, Logical> = Rectangle::new(
-            (
-                info.rect.loc.x as f64 * texture_scale.0,
-                info.rect.loc.y as f64 * texture_scale.1,
-            )
-                .into(),
-            (
-                info.rect.size.w as f64 * texture_scale.0,
-                info.rect.size.h as f64 * texture_scale.1,
-            )
-                .into(),
+            (loc_phys.x * texture_scale.0, loc_phys.y * texture_scale.1).into(),
+            (size_phys.w * texture_scale.0, size_phys.h * texture_scale.1).into(),
         );
 
         // The pane opacity (theme glass_alpha / surface fill_alpha) rides on the
@@ -164,16 +157,16 @@ impl GlassTitlebarElement {
 
         let (ow, oh) = (out_size.0.max(1) as f32, out_size.1.max(1) as f32);
         let u_src = [
-            info.rect.loc.x as f32 / ow,
-            info.rect.loc.y as f32 / oh,
-            info.rect.size.w as f32 / ow,
-            info.rect.size.h as f32 / oh,
+            loc_phys.x as f32 / ow,
+            loc_phys.y as f32 / oh,
+            size_phys.w as f32 / ow,
+            size_phys.h as f32 / oh,
         ];
 
-        let geo_size = (info.rect.size.w as f32, info.rect.size.h as f32);
+        let geo_size = (size_phys.w as f32, size_phys.h as f32);
         let uniforms = vec![
             Uniform::new("geo_size", geo_size),
-            Uniform::new("corner_radius", info.radius),
+            Uniform::new("corner_radius", info.radius.map(|r| r * scale.x as f32)),
             Uniform::new("u_tint", info.tint),
             Uniform::new("u_tint_amount", info.tint_amount),
             Uniform::new("u_src", u_src),

@@ -1,211 +1,73 @@
-use niwoe_tokens::Interaction;
-use std::collections::HashSet;
-
-use tiny_skia::{
-    FillRule, LineCap, LineJoin, Paint as SkPaint, PathBuilder, Pixmap, PixmapMut, PixmapPaint,
-    Stroke, Transform,
-};
-
-use crate::launcher::{DesktopApp, LauncherCategory};
-use crate::panel::PinnedApp;
+//! Native search launcher. One row geometry for paint, pointer and keyboard.
 use crate::{
     icons::{icon_image_to_pixmap, IconCache},
-    ui::tokens::glass_theme_from_config,
+    launcher::{DesktopApp, LauncherCategory},
+    panel::PinnedApp,
 };
+use niwoe_tokens::{Controls, Launcher, Radius, Spacing, Typography};
 use niwoe_ui::{
     effect::{paint_border, paint_fill, paint_text, rounded_rect_path, truncate_to_fit},
     paint::Rect,
     style::Color,
 };
-
-// ─── Layout constants ─────────────────────────────────────────────────────────
-const LAUNCHER_LAYOUT: niwoe_tokens::Launcher = niwoe_tokens::Launcher::DEFAULT;
-pub(crate) const CP_HEADER_H: i32 = LAUNCHER_LAYOUT.header_height;
-const CP_DIVIDER_H: i32 = 1;
-pub(crate) const CP_SECTION_LABEL_H: i32 = LAUNCHER_LAYOUT.sidebar_heading_height;
-pub(crate) const CP_SECTION_PAD: i32 = LAUNCHER_LAYOUT.outer_pad;
-
-pub(crate) const CP_BENTO_TILE_W: i32 =
-    LAUNCHER_LAYOUT.sidebar_width - LAUNCHER_LAYOUT.outer_pad * 2;
-pub(crate) const CP_BENTO_TILE_H: i32 = LAUNCHER_LAYOUT.favorite_row_height;
-const CP_BENTO_TILE_GAP: i32 = LAUNCHER_LAYOUT.footer_button_gap;
-pub(crate) const CP_MAX_BENTO: usize = 8;
-pub(crate) const CP_BENTO_TOP: i32 = CP_HEADER_H + CP_DIVIDER_H;
-pub(crate) const CP_APPS_TOP: i32 = CP_HEADER_H + CP_DIVIDER_H;
-
-pub(crate) const CP_APP_ROW_H: i32 = LAUNCHER_LAYOUT.app_card_height + LAUNCHER_LAYOUT.grid_gap;
-pub(crate) const CP_APP_COLS: usize = LAUNCHER_LAYOUT.grid_columns as usize;
-pub(crate) const CP_GUTTER: i32 = LAUNCHER_LAYOUT.sidebar_width + LAUNCHER_LAYOUT.content_pad;
-pub(crate) const CP_COL_GAP: i32 = LAUNCHER_LAYOUT.grid_gap;
-pub(crate) const CP_CARD_W: i32 = (LAUNCHER_LAYOUT.width
-    - LAUNCHER_LAYOUT.sidebar_width
-    - LAUNCHER_LAYOUT.content_pad * 2
-    - LAUNCHER_LAYOUT.grid_gap)
-    / LAUNCHER_LAYOUT.grid_columns;
-
-// Power footer
-pub(crate) const CP_FOOTER_H: i32 = LAUNCHER_LAYOUT.footer_height;
-const CP_PWR_BTN_SIZE: i32 = LAUNCHER_LAYOUT.footer_button_size;
-const CP_PWR_BTN_STRIDE: i32 = CP_PWR_BTN_SIZE + LAUNCHER_LAYOUT.footer_button_gap;
-const CP_FOOTER_ACTIONS: i32 = 6;
-const CP_PWR_START_X: i32 = LAUNCHER_LAYOUT.width
-    - LAUNCHER_LAYOUT.outer_pad
-    - CP_FOOTER_ACTIONS * CP_PWR_BTN_SIZE
-    - (CP_FOOTER_ACTIONS - 1) * LAUNCHER_LAYOUT.footer_button_gap
-    + CP_PWR_BTN_STRIDE;
-
-// Header settings button
-const CP_HDR_ICON_W: i32 = CP_PWR_BTN_SIZE;
-const CP_HDR_ICON_H: i32 = CP_PWR_BTN_SIZE;
-
-const POWER_IDS: [&str; 5] = [
-    "power-lock",
-    "power-logout",
-    "power-sleep",
-    "power-restart",
-    "power-off",
-];
-
-// Launcher overlay opacities now live centrally in `niwoe_tokens::Launcher`
-// / `Scrollbar` so a global look change touches one place (GUI-centralization
-// plan §6, DoD §9). These aliases keep the call sites readable.
-const LAUNCHER_BAND_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.band_alpha;
-const LAUNCHER_HOVER_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.hover_alpha;
-const LAUNCHER_SELECTED_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.selected_alpha;
-const LAUNCHER_TILE_RADIUS: i32 = niwoe_tokens::Radius::DEFAULT.md;
-
-const LAUNCHER_SEARCH_FIELD_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.search_field_alpha;
-const LAUNCHER_SEARCH_FOCUS_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.search_focus_alpha;
-const LAUNCHER_POWER_ARMED_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.power_armed_alpha;
-const LAUNCHER_SCROLLBAR_TRACK_ALPHA: u8 = niwoe_tokens::Scrollbar::DEFAULT.track_alpha;
-const LAUNCHER_SCROLLBAR_THUMB_ALPHA: u8 = niwoe_tokens::Scrollbar::DEFAULT.thumb_alpha;
-const LAUNCHER_DIVIDER_ALPHA: u8 = niwoe_tokens::Launcher::DEFAULT.divider_alpha;
-
-// ─── Hit testing ──────────────────────────────────────────────────────────────
-
-fn cp_settings_btn_x(launcher_w: u32) -> i32 {
-    launcher_w as i32
-        - LAUNCHER_LAYOUT.outer_pad
-        - CP_FOOTER_ACTIONS * CP_PWR_BTN_SIZE
-        - (CP_FOOTER_ACTIONS - 1) * LAUNCHER_LAYOUT.footer_button_gap
-}
-
-fn cp_hdr_icon_y(launcher_h: u32) -> i32 {
-    cp_footer_y(launcher_h) + (CP_FOOTER_H - CP_HDR_ICON_H) / 2
-}
-
-fn cp_footer_y(launcher_h: u32) -> i32 {
-    launcher_h as i32 - CP_FOOTER_H
-}
-
-pub(crate) fn hit_bento_tile(cx: i32, cy: i32, n_tiles: usize) -> Option<usize> {
-    if n_tiles == 0 {
-        return None;
-    }
-    let tile_y = CP_BENTO_TOP + CP_SECTION_LABEL_H;
-    if !(CP_SECTION_PAD..CP_SECTION_PAD + CP_BENTO_TILE_W).contains(&cx) || cy < tile_y {
-        return None;
-    }
-    let stride = CP_BENTO_TILE_H + CP_BENTO_TILE_GAP;
-    let row = (cy - tile_y) / stride;
-    let in_tile = (cy - tile_y) % stride < CP_BENTO_TILE_H;
-    if in_tile && row < n_tiles.min(CP_MAX_BENTO) as i32 {
-        Some(row as usize)
-    } else {
-        None
-    }
-}
-
-pub(crate) fn hit_app_row(
-    cx: i32,
-    cy: i32,
-    scroll_y: i32,
-    launcher_h: u32,
-    _search_active: bool,
-) -> Option<usize> {
-    let footer_y = cp_footer_y(launcher_h);
-    let content_y = CP_APPS_TOP + LAUNCHER_LAYOUT.content_pad + LAUNCHER_LAYOUT.app_heading_height;
-    if cy < content_y || cy >= footer_y - 1 {
-        return None;
-    }
-    let row_y = cy - content_y + scroll_y;
-    if row_y < 0 {
-        return None;
-    }
-    let row = (row_y / CP_APP_ROW_H) as usize;
-    let rel_x = cx - CP_GUTTER;
-    if rel_x < 0 {
-        return None;
-    }
-    let col_stride = CP_CARD_W + CP_COL_GAP;
-    let col = (rel_x / col_stride) as usize;
-    let in_card_y = row_y % CP_APP_ROW_H < LAUNCHER_LAYOUT.app_card_height;
-    if in_card_y && rel_x % col_stride < CP_CARD_W && col < CP_APP_COLS {
-        Some(row * CP_APP_COLS + col)
-    } else {
-        None
-    }
-}
-
-pub(crate) fn hit_header_settings(cx: i32, cy: i32, launcher_w: u32) -> bool {
-    let bx = cp_settings_btn_x(launcher_w);
-    let by = cp_hdr_icon_y(LAUNCHER_LAYOUT.height as u32);
-    cx >= bx && cx < bx + CP_HDR_ICON_W && cy >= by && cy < by + CP_HDR_ICON_H
-}
-
-/// Returns power button index 0=lock 1=logout 2=sleep 3=restart 4=off, or None.
-pub(crate) fn hit_footer_power_btn(cx: i32, cy: i32, launcher_h: u32) -> Option<usize> {
-    let footer_y = cp_footer_y(launcher_h);
-    let btn_y = footer_y + (CP_FOOTER_H - CP_PWR_BTN_SIZE) / 2;
-    if cy < btn_y || cy >= btn_y + CP_PWR_BTN_SIZE {
-        return None;
-    }
-    let rel_x = cx - CP_PWR_START_X;
-    if rel_x < 0 {
-        return None;
-    }
-    let btn = (rel_x / CP_PWR_BTN_STRIDE) as usize;
-    let in_btn = rel_x % CP_PWR_BTN_STRIDE < CP_PWR_BTN_SIZE;
-    if in_btn && btn < 5 {
-        Some(btn)
-    } else {
-        None
-    }
-}
-
-pub(crate) fn power_widget_action_for_idx(
-    idx: usize,
-) -> Option<crate::widget_action::WidgetAction> {
-    Some(match idx {
-        0 => crate::widget_action::WidgetAction::PowerLock,
-        1 => crate::widget_action::WidgetAction::PowerLogout,
-        2 => crate::widget_action::WidgetAction::PowerSleep,
-        3 => crate::widget_action::WidgetAction::PowerRestart,
-        4 => crate::widget_action::WidgetAction::PowerOff,
-        _ => return None,
-    })
-}
-
-// ─── App filtering ────────────────────────────────────────────────────────────
+use std::collections::HashSet;
+use tiny_skia::{Pixmap, PixmapMut, PixmapPaint, Transform};
+const L: Launcher = Launcher::SEARCH;
+const S: Spacing = Spacing::DEFAULT;
+const ROW: i32 = L.app_card_height + L.grid_gap;
 
 pub(crate) fn collect_palette_apps<'a>(
     apps: &'a [DesktopApp],
-    search_query: &str,
-    hidden_execs: &HashSet<String>,
-    category: LauncherCategory,
-    pinned_apps: &[PinnedApp],
+    query: &str,
+    hidden: &HashSet<String>,
+    _category: LauncherCategory,
+    pinned: &[PinnedApp],
 ) -> Vec<&'a DesktopApp> {
-    let query = search_query.to_lowercase();
-    apps.iter()
+    let query = query.trim().to_lowercase();
+    let mut matches: Vec<_> = apps
+        .iter()
         .filter(|app| {
-            !app.terminal
-                && !hidden_execs.contains(&app.program)
-                && (query.is_empty() || app.name.to_lowercase().contains(&query))
-                && app_matches_category(app, category, pinned_apps)
+            !hidden.contains(&app.program)
+                && query.split_whitespace().all(|word| {
+                    app.name.to_lowercase().contains(word)
+                        || app.program.to_lowercase().contains(word)
+                })
         })
-        .collect()
+        .collect();
+    matches.sort_by_cached_key(|app| {
+        let name = app.name.to_lowercase();
+        let rank = if !query.is_empty() && name == query {
+            0
+        } else if !query.is_empty() && name.starts_with(&query) {
+            1
+        } else if pinned.iter().any(|p| p.program == app.program) {
+            2
+        } else {
+            3
+        };
+        (rank, name, app.program.clone())
+    });
+    matches
 }
-
+fn view_height(height: u32) -> i32 {
+    (height as i32 - L.header_height - L.footer_height - S.md).max(0)
+}
+pub(crate) fn hit_app_row(x: i32, y: i32, scroll: i32, width: u32, height: u32) -> Option<usize> {
+    if x < S.lg
+        || x >= width as i32 - S.lg
+        || y < L.header_height
+        || y >= L.header_height + view_height(height)
+    {
+        return None;
+    }
+    let local = y - L.header_height + scroll;
+    let row_y = L.header_height + (local / ROW) * ROW - scroll;
+    if row_y < L.header_height || row_y + L.app_card_height > L.header_height + view_height(height)
+    {
+        return None;
+    }
+    (local >= 0 && local % ROW < L.app_card_height).then_some((local / ROW) as usize)
+}
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum GridDirection {
     Left,
@@ -213,204 +75,216 @@ pub(crate) enum GridDirection {
     Up,
     Down,
 }
-
 pub(crate) fn next_grid_selection(
     current: Option<usize>,
-    app_count: usize,
+    count: usize,
     direction: GridDirection,
 ) -> Option<usize> {
-    if app_count == 0 {
+    if count == 0 {
         return None;
     }
-
-    let last = app_count - 1;
-    Some(match (current, direction) {
-        (None, GridDirection::Up) => last,
-        (None, _) => 0,
-        (Some(index), GridDirection::Left) => index.saturating_sub(1),
-        (Some(index), GridDirection::Right) => (index + 1).min(last),
-        (Some(index), GridDirection::Up) => index.saturating_sub(CP_APP_COLS),
-        (Some(index), GridDirection::Down) => (index + CP_APP_COLS).min(last),
+    let current = current.unwrap_or(0).min(count - 1);
+    Some(match direction {
+        GridDirection::Up | GridDirection::Left => current.saturating_sub(1),
+        GridDirection::Down | GridDirection::Right => (current + 1).min(count - 1),
     })
 }
-
 pub(crate) fn scroll_grid_selection_into_view(
-    current_scroll: i32,
-    selected_idx: usize,
-    app_count: usize,
+    scroll: i32,
+    selected: usize,
+    count: usize,
+    height: u32,
 ) -> i32 {
-    let content_y = CP_APPS_TOP + LAUNCHER_LAYOUT.content_pad + LAUNCHER_LAYOUT.app_heading_height;
-    let view_h =
-        (LAUNCHER_LAYOUT.height - content_y - CP_FOOTER_H - LAUNCHER_LAYOUT.content_pad).max(0);
-    let card_top = (selected_idx / CP_APP_COLS) as i32 * CP_APP_ROW_H;
-    let card_bottom = card_top + LAUNCHER_LAYOUT.app_card_height;
-    let wanted = if card_top < current_scroll {
-        card_top
-    } else if card_bottom > current_scroll + view_h {
-        card_bottom - view_h
+    let view = view_height(height);
+    let top = selected as i32 * ROW;
+    let bottom = top + L.app_card_height;
+    let next = if top < scroll {
+        top
+    } else if bottom > scroll + view {
+        bottom - view
     } else {
-        current_scroll
+        scroll
     };
-    let rows = app_count.div_ceil(CP_APP_COLS);
-    let content_h = rows as i32 * CP_APP_ROW_H - CP_COL_GAP;
-    wanted.clamp(0, (content_h - view_h).max(0))
+    next.clamp(0, (count as i32 * ROW - L.grid_gap - view).max(0))
 }
-
-fn app_matches_category(
-    app: &DesktopApp,
-    category: LauncherCategory,
-    pinned_apps: &[PinnedApp],
-) -> bool {
-    use LauncherCategory::*;
-    if category == Favorites {
-        return pinned_apps
-            .iter()
-            .any(|pinned| pinned.program == app.program);
-    }
-    if category == All {
-        return true;
-    }
-    app.categories.iter().any(|value| {
-        let value = value.as_str();
-        match category {
-            Internet => matches!(
-                value,
-                "network" | "webbrowser" | "email" | "chat" | "instantmessaging"
-            ),
-            Office => matches!(
-                value,
-                "office" | "wordprocessor" | "spreadsheet" | "presentation" | "calendar"
-            ),
-            Development => matches!(value, "development" | "ide" | "debugger"),
-            Graphics => matches!(
-                value,
-                "graphics" | "photography" | "2dgraphics" | "rastergraphics" | "vectorgraphics"
-            ),
-            System => matches!(
-                value,
-                "system" | "settings" | "security" | "monitor" | "filesystem"
-            ),
-            Utilities => matches!(
-                value,
-                "utility" | "accessories" | "filemanager" | "archiving" | "terminalemulator"
-            ),
-            Favorites | All => false,
-        }
-    })
-}
-
 pub(crate) fn max_scroll_for_palette(
     apps: &[DesktopApp],
-    search_query: &str,
-    hidden_execs: &HashSet<String>,
+    query: &str,
+    hidden: &HashSet<String>,
     category: LauncherCategory,
-    pinned_apps: &[PinnedApp],
-    launcher_h: u32,
+    pinned: &[PinnedApp],
+    height: u32,
 ) -> i32 {
-    let filtered = collect_palette_apps(apps, search_query, hidden_execs, category, pinned_apps);
-    let content_y = CP_APPS_TOP + LAUNCHER_LAYOUT.content_pad + LAUNCHER_LAYOUT.app_heading_height;
-    let n_rows = filtered.len().div_ceil(CP_APP_COLS);
-    let content_h = n_rows as i32 * CP_APP_ROW_H - CP_COL_GAP;
-    let view_h = launcher_h as i32 - content_y - CP_FOOTER_H - LAUNCHER_LAYOUT.content_pad;
-    (content_h - view_h).max(0)
+    let count = collect_palette_apps(apps, query, hidden, category, pinned).len();
+    (count as i32 * ROW - L.grid_gap - view_height(height)).max(0)
 }
-
-// ─── Rendering ────────────────────────────────────────────────────────────────
-
+fn fill(pm: &mut PixmapMut<'_>, rect: Rect, color: Color, radius: i32) {
+    if let Some(path) = rounded_rect_path(rect, radius) {
+        paint_fill(pm, &path, color);
+    }
+}
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn draw_command_palette(
     canvas: &mut [u8],
     width: u32,
     height: u32,
-    pinned_apps: &[PinnedApp],
-    all_apps: &[DesktopApp],
+    pinned: &[PinnedApp],
+    apps: &[DesktopApp],
     category: LauncherCategory,
-    search_query: &str,
-    scroll_y: i32,
-    selected_idx: Option<usize>,
-    armed_power: Option<(&str, f32)>,
-    icon_cache: &IconCache,
-    hidden_execs: &HashSet<String>,
-    hovered_app_idx: Option<usize>,
-    hovered_bento_idx: Option<usize>,
-    settings_hovered: bool,
-    hovered_power_btn: Option<usize>,
-    theme_config: &niwoe_config::ThemeConfig,
+    query: &str,
+    scroll: i32,
+    selected: Option<usize>,
+    _power: Option<(&str, f32)>,
+    icons: &IconCache,
+    hidden: &HashSet<String>,
+    hovered: Option<usize>,
+    _bento: Option<usize>,
+    _settings: bool,
+    _power_hover: Option<usize>,
+    config: &niwoe_config::ThemeConfig,
 ) {
-    let expected = (width as usize) * (height as usize) * 4;
-    if canvas.len() != expected {
+    if canvas.len() != width as usize * height as usize * 4 {
         return;
     }
-    let Some(mut pixmap) = Pixmap::new(width, height) else {
+    let Some(mut image) = Pixmap::new(width, height) else {
         return;
     };
-
-    let theme = glass_theme_from_config(theme_config);
-    let pal = theme.palette;
-    // The shell supplies the token-driven tint while the compositor supplies
-    // the cached live blur behind it. Keeping the tint in this buffer also
-    // makes the colour swap reliable on DRM paths where a custom glass shader
-    // cannot be applied to an overlay plane.
-    let body_alpha = theme_config
+    let theme = crate::ui::tokens::glass_theme_from_config(config);
+    let p = theme.palette;
+    let alpha = config
         .decorations
         .surface_treatment(niwoe_config::ThemeSurface::Launcher)
         .fill_alpha;
-    pixmap.fill(to_tiny_skia_color(with_alpha(pal.surface_alt, body_alpha)));
-
-    {
-        let mut pm = pixmap.as_mut();
-
-        draw_header(
+    image.fill(tiny_skia::Color::from_rgba8(
+        p.background.r,
+        p.background.g,
+        p.background.b,
+        alpha,
+    ));
+    let body = Typography::DEFAULT.body_size as f32;
+    let caption = Typography::DEFAULT.caption_size as f32;
+    let mut pm = image.as_mut();
+    let filtered = collect_palette_apps(apps, query, hidden, category, pinned);
+    chrome::header(&mut pm, width, query, filtered.len(), config);
+    let selected = selected.unwrap_or(0);
+    if filtered.is_empty() {
+        paint_text(
             &mut pm,
-            width,
-            search_query,
-            settings_hovered,
-            icon_cache,
-            &pal,
-        );
-        divider(&mut pm, width, CP_HEADER_H, &pal);
-
-        draw_bento_strip(
-            &mut pm,
-            all_apps,
-            hidden_execs,
-            pinned_apps,
-            category,
-            hovered_bento_idx,
-            &pal,
-        );
-        draw_app_grid(
-            &mut pm,
-            width,
-            height,
-            all_apps,
-            pinned_apps,
-            category,
-            search_query,
-            scroll_y,
-            selected_idx,
-            icon_cache,
-            hidden_execs,
-            hovered_app_idx,
-            &pal,
-        );
-
-        draw_power_footer(
-            &mut pm,
-            width,
-            height,
-            settings_hovered,
-            hovered_power_btn,
-            armed_power,
-            &pal,
+            if query.is_empty() {
+                "Keine Anwendungen verfügbar"
+            } else {
+                "Keine Treffer"
+            },
+            S.xl,
+            L.header_height + S.xxl,
+            body,
+            p.text_dim,
         );
     }
-
-    blit_rgba_to_argb(pixmap.data(), canvas);
+    // Paint visible rows only; icon lookup uses the existing warmed cache.
+    for (index, app) in filtered.iter().enumerate() {
+        let y = L.header_height + index as i32 * ROW - scroll;
+        if y < L.header_height || y + L.app_card_height > L.header_height + view_height(height) {
+            continue;
+        }
+        let rect = Rect {
+            x: S.lg,
+            y,
+            width: width as i32 - S.lg * 2,
+            height: L.app_card_height,
+        };
+        if index == selected || hovered == Some(index) {
+            let color = if index == selected {
+                niwoe_tokens::Interaction::DEFAULT.accent_idle(p.accent)
+            } else {
+                niwoe_tokens::Interaction::DEFAULT.neutral_hover
+            };
+            fill(&mut pm, rect, color, Radius::DEFAULT.md);
+            if index == selected {
+                fill(
+                    &mut pm,
+                    Rect {
+                        x: rect.x,
+                        y: rect.y + S.sm,
+                        width: Controls::FOCUS_WIDTH,
+                        height: rect.height - S.sm * 2,
+                    },
+                    p.accent,
+                    0,
+                );
+                paint_text(
+                    &mut pm,
+                    "↵",
+                    rect.x + rect.width - S.xxl,
+                    y + S.xxl,
+                    body,
+                    p.accent,
+                );
+            }
+        }
+        let ix = rect.x + S.md;
+        let iy = y + (L.app_card_height - L.app_icon_size) / 2;
+        fill(
+            &mut pm,
+            Rect {
+                x: ix - S.xs,
+                y: iy - S.xs,
+                width: L.app_icon_size + S.sm,
+                height: L.app_icon_size + S.sm,
+            },
+            p.surface_alt,
+            Radius::DEFAULT.md,
+        );
+        if let Some(icon) = app
+            .icon_name
+            .as_deref()
+            .and_then(|name| icons.lookup(name, L.app_icon_size as u32))
+            .and_then(icon_image_to_pixmap)
+        {
+            pm.draw_pixmap(
+                ix,
+                iy,
+                icon.as_ref(),
+                &PixmapPaint::default(),
+                Transform::identity(),
+                None,
+            );
+        } else {
+            let fallback = app.name.chars().next().unwrap_or('?').to_string();
+            paint_text(&mut pm, &fallback, ix + S.sm, iy + S.xl, body, p.text_dim);
+        }
+        let tx = ix + L.app_icon_size + S.md;
+        let text_width = rect.x + rect.width - S.xxl - S.lg - tx;
+        let name = truncate_to_fit(&app.name, text_width, body);
+        paint_text(&mut pm, &name, tx, y + S.xl, body, p.text);
+        let detail = truncate_to_fit(chrome::detail(app), text_width, caption);
+        paint_text(&mut pm, &detail, tx, y + S.xl + S.lg, caption, p.text_dim);
+    }
+    let footer_y = height as i32 - L.footer_height;
+    chrome::footer(&mut pm, width, footer_y, config);
+    if let Some(path) = rounded_rect_path(
+        Rect {
+            x: 0,
+            y: 0,
+            width: width as i32,
+            height: height as i32,
+        },
+        Radius::DEFAULT.lg,
+    ) {
+        paint_border(&mut pm, &path, p.border, Controls::BORDER as f32);
+    }
+    for (rgba, bgra) in image
+        .data()
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .zip(canvas.as_chunks_mut::<4>().0)
+    {
+        bgra.copy_from_slice(&[rgba[2], rgba[1], rgba[0], rgba[3]]);
+    }
 }
-
-include!("app_view/header_and_grid.rs");
-include!("app_view/rows_and_helpers.rs");
+#[path = "app_view_chrome.rs"]
+mod chrome;
 
 #[cfg(test)]
 #[path = "app_view_tests.rs"]

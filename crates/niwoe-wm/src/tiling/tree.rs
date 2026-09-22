@@ -12,6 +12,18 @@ pub(super) enum Node<T> {
     },
 }
 
+pub(super) fn swap_leaves<T: Clone + PartialEq>(node: &mut Node<T>, a: &T, b: &T) {
+    match node {
+        Node::Leaf(value) if value == a => *value = b.clone(),
+        Node::Leaf(value) if value == b => *value = a.clone(),
+        Node::Leaf(_) => {}
+        Node::Internal { left, right, .. } => {
+            swap_leaves(left, a, b);
+            swap_leaves(right, a, b);
+        }
+    }
+}
+
 pub(super) fn collect_windows<T: Clone>(node: &Node<T>, out: &mut Vec<T>) {
     match node {
         Node::Leaf(window) => out.push(window.clone()),
@@ -275,6 +287,21 @@ mod tests {
         assert!(left.size.h >= 1);
         assert!(right.size.w >= 1);
         assert!(right.size.h >= 1);
+    }
+
+    #[test]
+    fn swapping_leaves_preserves_layout_and_window_set() {
+        let mut node = Node::Leaf(1u32);
+        insert_at_last(&mut node, 2, SplitDir::Horizontal);
+        insert_at_last(&mut node, 3, SplitDir::Vertical);
+        super::swap_leaves(&mut node, &1, &3);
+        let mut values = Vec::new();
+        collect_windows(&node, &mut values);
+        assert_eq!(values, vec![3, 2, 1]);
+        super::swap_leaves(&mut node, &1, &3);
+        values.clear();
+        collect_windows(&node, &mut values);
+        assert_eq!(values, vec![1, 2, 3]);
     }
 
     #[test]

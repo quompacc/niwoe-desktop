@@ -16,6 +16,17 @@ pub struct TilingLayout {
 }
 
 impl TilingLayout {
+    pub fn swap_windows(&mut self, a: &Window, b: &Window) -> bool {
+        let Some(root) = &mut self.root else {
+            return false;
+        };
+        if !super::tree::contains_window(root, a) || !super::tree::contains_window(root, b) {
+            return false;
+        }
+        super::tree::swap_leaves(root, a, b);
+        true
+    }
+
     pub fn new() -> Self {
         Self {
             root: None,

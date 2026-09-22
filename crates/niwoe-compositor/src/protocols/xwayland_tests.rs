@@ -1,6 +1,6 @@
 use smithay::utils::{Rectangle, Size};
 
-use crate::state::{OutputGeometry, NORMAL_WINDOW_BOTTOM_RESERVED_PX};
+use crate::state::{OutputGeometry, NORMAL_WINDOW_TOP_RESERVED_PX};
 
 use super::{
     adjusted_configure_request_rect, apply_managed_map_ssd, apply_override_redirect_ssd,
@@ -27,7 +27,7 @@ fn normal_xwayland_window_centers_its_complete_frame() {
     assert_eq!(centered.loc.x, 560);
     assert_eq!(
         centered.loc.y,
-        (1080 - NORMAL_WINDOW_BOTTOM_RESERVED_PX - 636) / 2 + 34
+        NORMAL_WINDOW_TOP_RESERVED_PX + (1080 - NORMAL_WINDOW_TOP_RESERVED_PX - 636) / 2 + 34
     );
     assert_eq!(centered.size, Size::from((800, 600)));
 }
@@ -108,10 +108,7 @@ fn normal_xwayland_rect_is_clamped_to_panel_safe_bottom() {
     };
     let requested = Rectangle::new((100, 900).into(), (800, 300).into());
     let adjusted = panel_safe_normal_xwayland_rect(requested, output);
-    assert_eq!(
-        adjusted.loc.y,
-        1080 - NORMAL_WINDOW_BOTTOM_RESERVED_PX - 300
-    );
+    assert_eq!(adjusted.loc.y, 1080 - 300);
     assert_eq!(adjusted.size.h, 300);
     assert_eq!(adjusted.loc.x, 100);
 }
@@ -128,9 +125,12 @@ fn decorated_xwayland_rect_keeps_the_complete_frame_on_screen() {
     let adjusted = panel_safe_normal_xwayland_rect_with_insets(requested, output, (2, 34, 2, 2));
 
     assert_eq!(adjusted.loc.x, 2);
-    assert_eq!(adjusted.loc.y, 34);
+    assert_eq!(adjusted.loc.y, NORMAL_WINDOW_TOP_RESERVED_PX + 34);
     assert_eq!(adjusted.loc.x - 2, output.x);
-    assert_eq!(adjusted.loc.y - 34, output.y);
+    assert_eq!(
+        adjusted.loc.y - 34,
+        output.y + NORMAL_WINDOW_TOP_RESERVED_PX
+    );
 }
 
 #[test]
@@ -145,7 +145,7 @@ fn output_sized_rect_is_treated_as_fullscreen_and_left_unchanged() {
     let adjusted = panel_safe_normal_xwayland_rect(requested, output);
     assert_eq!(adjusted, requested);
     assert_eq!(
-        output.height - NORMAL_WINDOW_BOTTOM_RESERVED_PX,
+        output.height - NORMAL_WINDOW_TOP_RESERVED_PX,
         output.height - niwoe_tokens::Panel::DEFAULT.window_reservation() as i32,
         "sanity check: panel-safe height differs from fullscreen height"
     );
@@ -184,10 +184,7 @@ fn managed_configure_still_clamps_to_panel_safe_workarea() {
     };
     let requested = Rectangle::new((500, 980).into(), (400, 200).into());
     let adjusted = adjusted_configure_request_rect(requested, Some(output), false);
-    assert_eq!(
-        adjusted.loc.y,
-        1080 - NORMAL_WINDOW_BOTTOM_RESERVED_PX - 200
-    );
+    assert_eq!(adjusted.loc.y, 1080 - 200);
     assert_eq!(adjusted.size.h, 200);
 }
 

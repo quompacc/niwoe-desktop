@@ -10,7 +10,7 @@ use crate::{
     AUDIO_POPUP_HEIGHT, AUDIO_POPUP_RIGHT_MARGIN, AUDIO_POPUP_WIDTH, CALENDAR_POPUP_HEIGHT,
     CALENDAR_POPUP_RIGHT_MARGIN, CALENDAR_POPUP_WIDTH, LAUNCHER_HEIGHT, LAUNCHER_WIDTH,
     NETWORK_POPUP_HEIGHT, NETWORK_POPUP_RIGHT_MARGIN, NETWORK_POPUP_WIDTH, SNI_MENU_RIGHT_MARGIN,
-    WORKSPACE_POPUP_HEIGHT, WORKSPACE_POPUP_RIGHT_MARGIN, WORKSPACE_POPUP_WIDTH,
+    WORKSPACE_POPUP_HEIGHT, WORKSPACE_POPUP_LEFT_MARGIN, WORKSPACE_POPUP_WIDTH,
 };
 
 impl LayerShellHandler for NiwoeShell {
@@ -240,9 +240,9 @@ impl LayerShellHandler for NiwoeShell {
                 self.launcher_configured = true;
                 self.launcher_width = w;
                 self.launcher_height = h;
-                self.launcher_visual_x = crate::PANEL_SIDE_MARGIN as i32;
-                self.launcher_visual_y =
-                    h as i32 - crate::LAUNCHER_HEIGHT as i32 - crate::SHELL_POPUP_BOTTOM_MARGIN;
+                let (x, y, _, _) = self.launcher_geometry().fitted_rect(w, h);
+                self.launcher_visual_x = x;
+                self.launcher_visual_y = y;
                 tracing::debug!(
                     "launcher fullscreen: {}x{} visual@({},{})",
                     w,
@@ -275,12 +275,11 @@ impl LayerShellHandler for NiwoeShell {
                 surface_w,
                 surface_h
             );
-            self.calendar_layer
-                .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
+            self.calendar_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
             self.calendar_layer.set_margin(
-                0,
+                crate::PANEL_POPUP_TOP_MARGIN,
                 CALENDAR_POPUP_RIGHT_MARGIN,
-                crate::SHELL_POPUP_BOTTOM_MARGIN,
+                0,
                 0,
             );
             self.calendar_layer.set_exclusive_zone(0);
@@ -301,13 +300,12 @@ impl LayerShellHandler for NiwoeShell {
                 surface_w,
                 surface_h
             );
-            self.workspace_layer
-                .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
+            self.workspace_layer.set_anchor(Anchor::TOP | Anchor::LEFT);
             self.workspace_layer.set_margin(
+                crate::PANEL_POPUP_TOP_MARGIN,
                 0,
-                WORKSPACE_POPUP_RIGHT_MARGIN,
-                crate::SHELL_POPUP_BOTTOM_MARGIN,
                 0,
+                WORKSPACE_POPUP_LEFT_MARGIN,
             );
             self.workspace_layer.set_exclusive_zone(0);
             self.workspace_layer.set_size(surface_w, surface_h);
@@ -326,12 +324,11 @@ impl LayerShellHandler for NiwoeShell {
                     self.status_notifier_menu_width,
                     self.status_notifier_menu_height
                 );
-                self.network_layer
-                    .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
+                self.network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
                 self.network_layer.set_margin(
-                    0,
+                    crate::PANEL_POPUP_TOP_MARGIN,
                     SNI_MENU_RIGHT_MARGIN,
-                    crate::SHELL_POPUP_BOTTOM_MARGIN,
+                    0,
                     0,
                 );
                 self.network_layer.set_exclusive_zone(0);
@@ -376,12 +373,11 @@ impl LayerShellHandler for NiwoeShell {
                     AUDIO_POPUP_WIDTH,
                     AUDIO_POPUP_HEIGHT
                 );
-                self.network_layer
-                    .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
+                self.network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
                 self.network_layer.set_margin(
-                    0,
+                    crate::PANEL_POPUP_TOP_MARGIN,
                     AUDIO_POPUP_RIGHT_MARGIN,
-                    crate::SHELL_POPUP_BOTTOM_MARGIN,
+                    0,
                     0,
                 );
                 self.network_layer.set_exclusive_zone(0);
@@ -416,12 +412,11 @@ impl LayerShellHandler for NiwoeShell {
                 NETWORK_POPUP_WIDTH,
                 NETWORK_POPUP_HEIGHT
             );
-            self.network_layer
-                .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
+            self.network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
             self.network_layer.set_margin(
-                0,
+                crate::PANEL_POPUP_TOP_MARGIN,
                 NETWORK_POPUP_RIGHT_MARGIN,
-                crate::SHELL_POPUP_BOTTOM_MARGIN,
+                0,
                 0,
             );
             self.network_layer.set_exclusive_zone(0);

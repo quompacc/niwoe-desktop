@@ -245,10 +245,8 @@ pub(crate) fn maximized_client_loc_from_output(
     ))
 }
 
-// Stop maximized windows at the visible panel island. The layer surface also
-// contains transparent room above the island for its shadow; that canvas must
-// not become a visible gap below maximized windows.
-pub(crate) const NORMAL_WINDOW_BOTTOM_RESERVED_PX: i32 =
+// Normal windows start below the top panel; fullscreen keeps the entire output.
+pub(crate) const NORMAL_WINDOW_TOP_RESERVED_PX: i32 =
     niwoe_tokens::Panel::DEFAULT.window_reservation() as i32;
 
 pub(crate) fn normal_window_workarea_from_output_geometry(
@@ -256,9 +254,10 @@ pub(crate) fn normal_window_workarea_from_output_geometry(
 ) -> OutputGeometry {
     OutputGeometry {
         x: output_geometry.x,
-        y: output_geometry.y,
+        y: output_geometry.y
+            + NORMAL_WINDOW_TOP_RESERVED_PX.min(output_geometry.height.saturating_sub(1)),
         width: output_geometry.width,
-        height: (output_geometry.height - NORMAL_WINDOW_BOTTOM_RESERVED_PX).max(1),
+        height: (output_geometry.height - NORMAL_WINDOW_TOP_RESERVED_PX).max(1),
     }
 }
 

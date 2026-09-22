@@ -44,7 +44,7 @@ fn serve_screencopy_frames(
             let _ = gles_frame.clear([0.0f32, 0.0, 0.0, 1.0].into(), &[phys_region]);
             for element in out.scratch_final.iter().rev() {
                 let src = element.src();
-                let dst = element.geometry(Scale::from(1.0f64));
+                let dst = element.geometry(Scale::from(out.output.current_scale().fractional_scale()));
                 // damage must be in element-local coords (origin at 0,0 within dst),
                 // not absolute physical coords — passing dst directly would clamp y≥dst.size.h to 0.
                 let element_damage = [smithay::utils::Rectangle::from_size(dst.size)];
@@ -132,7 +132,7 @@ fn process_thumbnail_requests(
         let _ = gles_frame.clear([0.0f32, 0.0, 0.0, 1.0].into(), &[phys_region]);
         for element in out.scratch_final.iter().rev() {
             let src = element.src();
-            let dst = element.geometry(Scale::from(1.0f64));
+            let dst = element.geometry(Scale::from(out.output.current_scale().fractional_scale()));
             let element_damage = [Rectangle::from_size(dst.size)];
             if let Err(e) = element.draw(&mut gles_frame, src, dst, &element_damage, &[], None) {
                 tracing::warn!("thumbnail: output draw error: {:?}", e);
@@ -183,10 +183,15 @@ fn process_thumbnail_requests(
             } else {
                 (0, 0, 0, 0)
             };
-            let frame_x = geo.loc.x - inset_l;
-            let frame_y = geo.loc.y - inset_t;
-            let frame_w = geo.size.w + inset_l + inset_r;
-            let frame_h = geo.size.h + inset_t + inset_b;
+            let output_loc = out.output.current_location();
+            let frame = Rectangle::new(
+                (geo.loc.x - output_loc.x - inset_l, geo.loc.y - output_loc.y - inset_t).into(),
+                (geo.size.w + inset_l + inset_r, geo.size.h + inset_t + inset_b).into(),
+            ).to_physical_precise_round::<f64, i32>(Scale::from(out.output.current_scale().fractional_scale()));
+            let frame_x = frame.loc.x;
+            let frame_y = frame.loc.y;
+            let frame_w = frame.size.w;
+            let frame_h = frame.size.h;
             let wx = frame_x.clamp(0, out_w - 1) as u32;
             let wy = frame_y.clamp(0, out_h - 1) as u32;
             let wx2 = (frame_x + frame_w).clamp(0, out_w) as u32;
@@ -275,7 +280,7 @@ fn process_screenshot_requests(
         let _ = gles_frame.clear([0.0f32, 0.0, 0.0, 1.0].into(), &[phys_region]);
         for element in out.scratch_final.iter().rev() {
             let src = element.src();
-            let dst = element.geometry(Scale::from(1.0f64));
+            let dst = element.geometry(Scale::from(out.output.current_scale().fractional_scale()));
             let element_damage = [Rectangle::from_size(dst.size)];
             if let Err(e) = element.draw(&mut gles_frame, src, dst, &element_damage, &[], None) {
                 tracing::warn!("screenshot: output draw error: {:?}", e);

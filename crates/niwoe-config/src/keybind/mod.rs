@@ -33,10 +33,21 @@ pub enum Action {
     SwitchWorkspace(usize),
     MoveToWorkspace(usize),
     ToggleTiling,
+    ToggleFloating,
+    ToggleFullscreen,
+    LaunchTerminal,
+    LaunchBrowser,
+    LaunchFiles,
+    SwapDirection { dx: i8, dy: i8 },
+    FocusDirection { dx: i8, dy: i8 },
+    CycleWorkspace(i8),
+    CycleWindow(i8),
     ForceSplit(SplitDir),
     ResizeTile { dir: SplitDir, delta: f32 },
     CloseWindow,
     ToggleLauncher,
+    ToggleQuickSettings,
+    OpenSystemSettings,
     LockSession,
     ReloadConfig,
     Quit,
@@ -106,6 +117,30 @@ mod tests {
     use std::collections::HashMap;
 
     use super::{Action, KeybindConfig, Modifiers};
+
+    #[test]
+    fn omarchy_shell_entry_points_are_distinct_and_parseable() {
+        let cfg = KeybindConfig::default();
+        for (mods, key, action) in [
+            (Modifiers::SUPER, 0x20, Action::ToggleLauncher),
+            (
+                Modifiers::SUPER | Modifiers::ALT,
+                0x20,
+                Action::OpenSystemSettings,
+            ),
+            (Modifiers::SUPER, 0xff1b, Action::ToggleQuickSettings),
+            (Modifiers::SUPER, 0x77, Action::CloseWindow),
+            (
+                Modifiers::SUPER | Modifiers::CTRL,
+                0x6c,
+                Action::LockSession,
+            ),
+        ] {
+            assert_eq!(cfg.find_action(mods, key), Some(&action));
+        }
+        assert_eq!(cfg.find_action(Modifiers::SUPER, 0x71), None);
+        assert_eq!(cfg.find_action(Modifiers::SUPER, 0x6c), None);
+    }
 
     #[test]
     fn valid_keybinds_are_parsed() {

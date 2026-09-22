@@ -264,6 +264,8 @@ impl NiwoeState {
                 Some(scale),
                 Some((output.x, output.y).into()),
             );
+            // Reconfigure layer clients immediately for the new logical extent.
+            layer_map_for_output(&smithay_output).arrange();
             self.workspaces
                 .active_space_mut()
                 .map_output(&smithay_output, (output.x, output.y));

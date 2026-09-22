@@ -32,8 +32,11 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
   schlägt bei neuen Hardcodes fehl. Roten Guard nie ignorieren — entweder
   zentralisieren oder bewusst mit `// guard:allow: <grund>` freigeben.
 - Definition of Done für Zentralität: `docs/GUI_CENTRALIZATION_PLAN.md` §9.
-- Archivierte Mockups sind nicht normativ. Native Produkt-UI bezieht alle
-  Designwerte direkt aus `niwoe-tokens` + `niwoe-config`.
+- Die acht Mockups unter `assets/` sind gemäß Nutzerentscheidung vom 22.09.2026
+  visuell verbindlich; Abweichungen nur bei konkret dokumentierter technischer
+  Notwendigkeit oder ausdrücklicher Nutzerkorrektur. Launcher/Suche orientieren
+  sich auf Nutzerwunsch an Apple Spotlight. Native Produkt-UI bezieht weiterhin
+  alle Designwerte direkt aus `niwoe-tokens` + `niwoe-config`.
 
 ## Harte Regeln für Codex
 1. Keine Feature-Änderung ohne expliziten Auftrag.

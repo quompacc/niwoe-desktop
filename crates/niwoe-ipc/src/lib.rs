@@ -206,6 +206,9 @@ pub enum ScreenshotBridgeMessage {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellEvent {
+    LaunchTerminal,
+    LaunchBrowser,
+    LaunchFiles,
     // Legacy transition event. Kept for backward compatibility while output-aware
     // workspace events are introduced in parallel.
     WorkspaceChanged {

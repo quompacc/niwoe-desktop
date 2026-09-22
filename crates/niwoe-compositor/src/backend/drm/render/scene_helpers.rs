@@ -7,7 +7,11 @@ fn themed_layer_glass_info(
     let tint = theme.glass_tint_color();
     super::glass::GlassTitlebarInfo {
         rect,
-        radius: [treatment.radius; 4],
+        radius: [if surface == ThemeSurface::Panel {
+            niwoe_tokens::Panel::DEFAULT.edge_radius as f32
+        } else {
+            treatment.radius
+        }; 4],
         tint: [
             tint.r as f32 / 255.0,
             tint.g as f32 / 255.0,
@@ -33,6 +37,7 @@ fn render_scene_for_blur(
     first_behind: usize,
     render_size: (u32, u32),
     source_scale: (f64, f64),
+    output_scale: Scale<f64>,
     texture: &mut GlesTexture,
 ) -> bool {
     use smithay::backend::{
@@ -41,7 +46,7 @@ fn render_scene_for_blur(
             Bind, Frame as RendererFrame, Renderer,
         },
     };
-    use smithay::utils::{Physical, Rectangle, Scale, Size, Transform};
+    use smithay::utils::{Physical, Rectangle, Size, Transform};
 
     let w = render_size.0 as i32;
     let h = render_size.1 as i32;
@@ -61,7 +66,7 @@ fn render_scene_for_blur(
                 continue;
             }
             let src = element.src();
-            let full_dst = element.geometry(Scale::from(1.0f64));
+            let full_dst = element.geometry(output_scale);
             let dst = Rectangle::new(
                 (
                     (full_dst.loc.x as f64 * source_scale.0).round() as i32,

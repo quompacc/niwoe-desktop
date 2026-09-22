@@ -38,33 +38,16 @@ fn collect_click_zones(
 
 // ── draw_panel_ui ───────────────────────────────────────────────────────────
 
-/// Add a fine, position-deterministic brightness grain to a rectangular
-/// region of a tiny-skia RGBA(premultiplied) buffer. Deterministic so it does
-/// not shimmer between redraws; only touches pixels that belong to the island
-/// (alpha > 0). Kept at zero strength while the compositor provides live blur.
-fn apply_frost_noise(data: &mut [u8], w: usize, _h: usize, x0: i32, y0: i32, x1: i32, y1: i32) {
-    for y in y0.max(0)..y1 {
-        for x in x0.max(0)..x1 {
-            let idx = (y as usize * w + x as usize) * 4;
-            if idx + 4 > data.len() || data[idx + 3] == 0 {
-                continue;
-            }
-            let mut n = (x as u32).wrapping_mul(374_761_393) ^ (y as u32).wrapping_mul(668_265_263);
-            n = (n ^ (n >> 13)).wrapping_mul(1_274_126_177);
-            n ^= n >> 16;
-            let delta = ((n & 0xff) as i32 - 128) * PANEL_NOISE_STRENGTH / 128;
-            for k in 0..3 {
-                data[idx + k] = (data[idx + k] as i32 + delta).clamp(0, 255) as u8;
-            }
-        }
-    }
-}
-
 fn blit_rgba_to_argb(src: &[u8], dst: &mut [u8]) {
     if src.len() != dst.len() || !src.len().is_multiple_of(4) {
         return;
     }
-    for (rgba, argb) in src.as_chunks::<4>().0.iter().zip(dst.as_chunks_mut::<4>().0.iter_mut()) {
+    for (rgba, argb) in src
+        .as_chunks::<4>()
+        .0
+        .iter()
+        .zip(dst.as_chunks_mut::<4>().0.iter_mut())
+    {
         argb[0] = rgba[2];
         argb[1] = rgba[1];
         argb[2] = rgba[0];
@@ -111,7 +94,6 @@ pub(crate) fn draw_panel_ui(
     let treatment = theme_config
         .decorations
         .surface_treatment(ThemeSurface::Panel);
-    let island_radius = treatment.radius.round() as i32;
 
     let root = build_panel_widget_tree(
         width,
@@ -139,85 +121,35 @@ pub(crate) fn draw_panel_ui(
     let Some(mut pixmap) = Pixmap::new(width, height) else {
         return;
     };
-    // Transparent everywhere; only the inset island is painted, so the
-    // wallpaper shows through the side margins and the bottom gap.
-    pixmap.fill(tiny_skia::Color::TRANSPARENT);
-
-    // The shell supplies the token-driven tint while the compositor supplies
-    // the cached live blur behind it. Keeping the tint in this buffer also
-    // makes the colour swap reliable on DRM paths where a custom glass shader
-    // cannot be applied to an overlay plane.
-    let inner_w = (width as i32 - 2 * SIDE_MARGIN).max(0);
-    let base = theme.palette.surface_alt;
-    let body_alpha = treatment.fill_alpha;
-    let body_col = Color::rgba(base.r, base.g, base.b, body_alpha);
-    let outline = Rect {
+    // Edge-attached bar: one token-driven surface and a quiet bottom separator.
+    let base = theme.palette.background;
+    let body = Rect {
         x: SIDE_MARGIN,
         y: ISLAND_TOP,
-        width: inner_w,
+        width: (width as i32 - 2 * SIDE_MARGIN).max(0),
         height: PANEL_H,
     };
-    let body = Rect {
-        x: SIDE_MARGIN + 1,
-        y: ISLAND_TOP + 1,
-        width: (inner_w - 2).max(0),
-        height: PANEL_H - 2,
-    };
-    // Soft drop shadow around the floating island (cast up onto the desktop).
-    crate::soft_shadow::draw_soft_shadow(
-        pixmap.data_mut(),
-        width as i32,
-        height as i32,
-        outline.x,
-        outline.y,
-        outline.width,
-        outline.height,
-        island_radius as f32,
-        Elevation::PANEL.blur,
-        Elevation::PANEL.alpha,
-        Elevation::PANEL.offset_y,
-        true,
-    );
     {
         let mut pc = pixmap.as_mut();
-        if let Some(path) = rounded_rect_path(body, island_radius.saturating_sub(1)) {
-            paint_fill(&mut pc, &path, body_col);
+        if let Some(path) = rounded_rect_path(body, PanelTokens::DEFAULT.edge_radius) {
+            paint_fill(
+                &mut pc,
+                &path,
+                Color::rgba(base.r, base.g, base.b, treatment.fill_alpha),
+            );
         }
-        let frost_alpha = ((treatment.frame_alpha as f32) * 0.10).round() as u8;
-        // guard:allow: glass specular frost — white sheen is a material highlight
-        // (manifest §7.1 "leichte Innenaufhellung"), theme-independent; its
-        // strength is already theme-driven via `treatment.frame_alpha`.
-        let frost = Color::rgba(0xFF, 0xFF, 0xFF, frost_alpha);
-        if let Some(path) = rounded_rect_path(body, island_radius.saturating_sub(1)) {
-            paint_fill(&mut pc, &path, frost);
-        }
-    }
-    apply_frost_noise(
-        pixmap.data_mut(),
-        width as usize,
-        height as usize,
-        body.x,
-        body.y,
-        body.x + body.width,
-        body.y + body.height,
-    );
-    {
-        let mut pc = pixmap.as_mut();
-        // guard:allow: glass specular top-edge highlight — white sheen (material,
-        // not a theme colour); strength is theme-driven via `treatment.frame_alpha`.
-        let hl = Color::rgba(0xFF, 0xFF, 0xFF, treatment.frame_alpha / 4);
-        let highlight = Rect {
-            x: SIDE_MARGIN + island_radius,
-            y: ISLAND_TOP + 1,
-            width: (inner_w - 2 * island_radius).max(0),
-            height: 1,
+        let border = niwoe_tokens::Controls::BORDER;
+        let separator = Rect {
+            x: body.x,
+            y: body.y + body.height - border,
+            width: body.width,
+            height: border,
         };
-        if let Some(path) = rounded_rect_path(highlight, 0) {
-            paint_fill(&mut pc, &path, hl);
+        if let Some(path) = rounded_rect_path(separator, PanelTokens::DEFAULT.edge_radius) {
+            paint_fill(&mut pc, &path, theme.palette.border);
         }
         let _ = render(&*root, &layout, &mut pc, &theme, state_fn);
     }
-
     blit_rgba_to_argb(pixmap.data(), canvas);
 
     clicks_out.clear();

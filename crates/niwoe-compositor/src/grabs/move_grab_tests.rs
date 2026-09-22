@@ -2,8 +2,7 @@ use smithay::reexports::wayland_protocols::xdg::shell::server::xdg_toplevel;
 use smithay::utils::{Logical, Point, Size};
 
 use crate::state::{
-    HalfSnapRestoreGeometry, MaximizeRestoreGeometry, OutputGeometry,
-    NORMAL_WINDOW_BOTTOM_RESERVED_PX,
+    HalfSnapRestoreGeometry, MaximizeRestoreGeometry, OutputGeometry, NORMAL_WINDOW_TOP_RESERVED_PX,
 };
 
 use super::{
@@ -209,9 +208,9 @@ fn move_release_workarea_subtracts_panel_reservation() {
     };
     let workarea = move_release_workarea_geometry(output);
     assert_eq!(workarea.x, 0);
-    assert_eq!(workarea.y, 0);
+    assert_eq!(workarea.y, NORMAL_WINDOW_TOP_RESERVED_PX);
     assert_eq!(workarea.width, 1920);
-    assert_eq!(workarea.height, 1080 - NORMAL_WINDOW_BOTTOM_RESERVED_PX);
+    assert_eq!(workarea.height, 1080 - NORMAL_WINDOW_TOP_RESERVED_PX);
 }
 
 #[test]

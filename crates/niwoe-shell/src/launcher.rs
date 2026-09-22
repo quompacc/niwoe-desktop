@@ -6,40 +6,7 @@ use tracing::{info, warn};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LauncherCategory {
-    Favorites,
     All,
-    Internet,
-    Office,
-    Development,
-    Graphics,
-    System,
-    Utilities,
-}
-
-impl LauncherCategory {
-    pub const ALL: [Self; 8] = [
-        Self::Favorites,
-        Self::All,
-        Self::Internet,
-        Self::Office,
-        Self::Development,
-        Self::Graphics,
-        Self::System,
-        Self::Utilities,
-    ];
-
-    pub const fn label(self) -> &'static str {
-        match self {
-            Self::Favorites => "Favoriten",
-            Self::All => "Alle Anwendungen",
-            Self::Internet => "Internet",
-            Self::Office => "Büro",
-            Self::Development => "Entwicklung",
-            Self::Graphics => "Grafik",
-            Self::System => "System",
-            Self::Utilities => "Dienstprogramme",
-        }
-    }
 }
 
 #[derive(Debug, Clone)]
@@ -54,7 +21,7 @@ impl LauncherState {
         Self {
             open: false,
             apps,
-            category: LauncherCategory::Favorites,
+            category: LauncherCategory::All,
         }
     }
 
@@ -70,22 +37,6 @@ impl LauncherState {
 
     pub fn close(&mut self) {
         self.open = false;
-    }
-
-    pub fn reshuffle(&mut self) {
-        let seed = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .map(|d| d.subsec_nanos() as u64 ^ d.as_secs().wrapping_mul(0x9e37_79b9))
-            .unwrap_or(0xdead_beef);
-        let mut rng = seed;
-        let n = self.apps.len();
-        for i in (1..n).rev() {
-            rng = rng
-                .wrapping_mul(6364136223846793005)
-                .wrapping_add(1442695040888963407);
-            let j = (rng >> 33) as usize % (i + 1);
-            self.apps.swap(i, j);
-        }
     }
 
     pub(crate) fn launch_desktop_app(app: DesktopApp, ipc: &mut crate::IpcClient) {
@@ -183,7 +134,7 @@ fn is_executable_file(path: &Path) -> bool {
     }
 }
 
-fn terminal_program() -> Option<String> {
+pub(crate) fn terminal_program() -> Option<String> {
     env::var("TERMINAL")
         .ok()
         .filter(|value| !value.trim().is_empty())

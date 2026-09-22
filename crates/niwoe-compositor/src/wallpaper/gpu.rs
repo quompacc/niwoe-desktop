@@ -10,7 +10,7 @@ use smithay::{
             ImportMem,
         },
     },
-    utils::{Buffer, Logical, Physical, Point, Rectangle, Size, Transform},
+    utils::{Buffer, Logical, Physical, Point, Rectangle, Scale, Size, Transform},
 };
 use tracing::{info, warn};
 
@@ -65,12 +65,21 @@ impl WallpaperGpuCache {
     }
 
     pub fn render_element(&self) -> TextureRenderElement<GlesTexture> {
+        self.render_element_at_scale(Scale::from(1.0))
+    }
+
+    /// Keep the cached physical output texture unchanged when UI scale changes.
+    pub fn render_element_at_scale(&self, scale: Scale<f64>) -> TextureRenderElement<GlesTexture> {
+        let physical =
+            Size::<i32, Physical>::from((self.output_size.0 as i32, self.output_size.1 as i32));
         TextureRenderElement::from_texture_buffer(
             Point::<f64, Physical>::from((0.0, 0.0)),
             &self.buffer,
             Some(1.0),
-            None::<Rectangle<f64, Logical>>,
-            None::<Size<i32, Logical>>,
+            Some(Rectangle::<f64, Logical>::from_size(
+                physical.to_f64().to_logical(1.0),
+            )),
+            Some(physical.to_f64().to_logical(scale).to_i32_round()),
             Kind::Unspecified,
         )
     }

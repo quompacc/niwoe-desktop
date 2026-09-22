@@ -27,7 +27,7 @@ use crate::{
     CALENDAR_POPUP_WIDTH, LAUNCHER_HEIGHT, LAUNCHER_WIDTH, NETWORK_POPUP_HEIGHT,
     NETWORK_POPUP_RIGHT_MARGIN, NETWORK_POPUP_WIDTH, SHELL_POPUP_BOTTOM_MARGIN,
     THUMBNAIL_POPUP_HEIGHT, THUMBNAIL_POPUP_MAX_WIDTH, WORKSPACE_POPUP_HEIGHT,
-    WORKSPACE_POPUP_RIGHT_MARGIN, WORKSPACE_POPUP_WIDTH,
+    WORKSPACE_POPUP_LEFT_MARGIN, WORKSPACE_POPUP_WIDTH,
 };
 
 use super::{calendar::CalendarDisplayPolicy, CommitStats, IpcClient, NiwoeShell, SurfaceKind};
@@ -148,7 +148,7 @@ pub(crate) fn initialize(
     let panel_surface = compositor.create_surface(&qh);
     let panel =
         layer_shell.create_layer_surface(&qh, panel_surface, Layer::Top, Some("niwoe-panel"), None);
-    panel.set_anchor(Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
+    panel.set_anchor(Anchor::TOP | Anchor::LEFT | Anchor::RIGHT);
     panel.set_size(0, crate::PANEL_SURFACE_HEIGHT);
     panel.set_exclusive_zone(crate::PANEL_SURFACE_HEIGHT as i32);
     panel.set_keyboard_interactivity(KeyboardInteractivity::None);
@@ -163,7 +163,7 @@ pub(crate) fn initialize(
         None,
     );
     launcher_layer.set_anchor(Anchor::BOTTOM);
-    launcher_layer.set_margin(0, 0, SHELL_POPUP_BOTTOM_MARGIN, 0);
+    launcher_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, 0);
     launcher_layer.set_size(LAUNCHER_WIDTH, LAUNCHER_HEIGHT);
     launcher_layer.set_exclusive_zone(0);
     launcher_layer.set_keyboard_interactivity(KeyboardInteractivity::Exclusive);
@@ -183,9 +183,9 @@ pub(crate) fn initialize(
         Some("niwoe-calendar-popup"),
         None,
     );
-    calendar_layer.set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
+    calendar_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
     let calendar_right = CALENDAR_POPUP_RIGHT_MARGIN;
-    calendar_layer.set_margin(0, calendar_right, SHELL_POPUP_BOTTOM_MARGIN, 0);
+    calendar_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, calendar_right, 0, 0);
     calendar_layer.set_size(
         crate::popup_surface_w(CALENDAR_POPUP_WIDTH),
         crate::popup_surface_h(CALENDAR_POPUP_HEIGHT),
@@ -193,7 +193,7 @@ pub(crate) fn initialize(
     calendar_layer.set_exclusive_zone(0);
     calendar_layer.set_keyboard_interactivity(KeyboardInteractivity::OnDemand);
     debug!(
-        "Calendar popup surface created: namespace=niwoe-calendar-popup layer=Overlay anchor=Bottom|Right size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
+        "Calendar popup surface created: namespace=niwoe-calendar-popup layer=Overlay anchor=Top|Right size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
         CALENDAR_POPUP_WIDTH,
         CALENDAR_POPUP_HEIGHT,
         SHELL_POPUP_BOTTOM_MARGIN,
@@ -208,9 +208,9 @@ pub(crate) fn initialize(
         Some("niwoe-workspace-popup"),
         None,
     );
-    workspace_layer.set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-    let workspace_right = WORKSPACE_POPUP_RIGHT_MARGIN;
-    workspace_layer.set_margin(0, workspace_right, SHELL_POPUP_BOTTOM_MARGIN, 0);
+    workspace_layer.set_anchor(Anchor::TOP | Anchor::LEFT);
+    let workspace_left = WORKSPACE_POPUP_LEFT_MARGIN;
+    workspace_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, workspace_left);
     workspace_layer.set_size(
         crate::popup_surface_w(WORKSPACE_POPUP_WIDTH),
         crate::popup_surface_h(WORKSPACE_POPUP_HEIGHT),
@@ -218,11 +218,11 @@ pub(crate) fn initialize(
     workspace_layer.set_exclusive_zone(0);
     workspace_layer.set_keyboard_interactivity(KeyboardInteractivity::OnDemand);
     debug!(
-        "Workspace popup surface created: namespace=niwoe-workspace-popup layer=Overlay anchor=Bottom|Right size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
+        "Workspace popup surface created: namespace=niwoe-workspace-popup layer=Overlay anchor=Top|Left size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
         WORKSPACE_POPUP_WIDTH,
         WORKSPACE_POPUP_HEIGHT,
         SHELL_POPUP_BOTTOM_MARGIN,
-        WORKSPACE_POPUP_RIGHT_MARGIN
+        WORKSPACE_POPUP_LEFT_MARGIN
     );
 
     let network_surface = compositor.create_surface(&qh);
@@ -233,8 +233,13 @@ pub(crate) fn initialize(
         Some("niwoe-network-popup"),
         None,
     );
-    network_layer.set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-    network_layer.set_margin(0, NETWORK_POPUP_RIGHT_MARGIN, SHELL_POPUP_BOTTOM_MARGIN, 0);
+    network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
+    network_layer.set_margin(
+        crate::PANEL_POPUP_TOP_MARGIN,
+        NETWORK_POPUP_RIGHT_MARGIN,
+        0,
+        0,
+    );
     network_layer.set_size(
         crate::popup_surface_w(NETWORK_POPUP_WIDTH),
         crate::popup_surface_h(NETWORK_POPUP_HEIGHT),
@@ -242,7 +247,7 @@ pub(crate) fn initialize(
     network_layer.set_exclusive_zone(0);
     network_layer.set_keyboard_interactivity(KeyboardInteractivity::OnDemand);
     debug!(
-        "Network popup surface created: namespace=niwoe-network-popup layer=Overlay anchor=Bottom|Right size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
+        "Network popup surface created: namespace=niwoe-network-popup layer=Overlay anchor=Top|Right size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
         NETWORK_POPUP_WIDTH,
         NETWORK_POPUP_HEIGHT,
         SHELL_POPUP_BOTTOM_MARGIN,
@@ -289,8 +294,8 @@ pub(crate) fn initialize(
         Some("niwoe-thumbnail-popup"),
         None,
     );
-    thumbnail_layer.set_anchor(Anchor::BOTTOM | Anchor::LEFT);
-    thumbnail_layer.set_margin(0, 0, crate::SHELL_POPUP_BOTTOM_MARGIN, 0);
+    thumbnail_layer.set_anchor(Anchor::TOP | Anchor::LEFT);
+    thumbnail_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, 0);
     thumbnail_layer.set_size(
         crate::popup_surface_w(THUMBNAIL_POPUP_MAX_WIDTH),
         crate::popup_surface_h(THUMBNAIL_POPUP_HEIGHT),

@@ -124,8 +124,8 @@ macro_rules! compose_output_scene {
                                 // Preserve compositor-managed resize cursors for SSD/X11 edge hit-tests.
                                 if !matches!($cursor_icon, super::DrmCursorIcon::Default) {
                                     let mut cursor_loc = cursor_pos;
-                                    cursor_loc.x -= $cursor_image.xhot as i32;
-                                    cursor_loc.y -= $cursor_image.yhot as i32;
+                                    cursor_loc.x -= ($cursor_image.xhot as f64 * $scale.x).round() as i32;
+                                    cursor_loc.y -= ($cursor_image.yhot as f64 * $scale.y).round() as i32;
                                     if let Ok(element) =
                                         MemoryRenderBufferRenderElement::from_buffer(
                                             $renderer,
@@ -160,8 +160,8 @@ macro_rules! compose_output_scene {
                                             )
                                         });
                                     let mut cursor_loc = cursor_pos;
-                                    cursor_loc.x -= hotspot.x;
-                                    cursor_loc.y -= hotspot.y;
+                                    cursor_loc.x -= (hotspot.x as f64 * $scale.x).round() as i32;
+                                    cursor_loc.y -= (hotspot.y as f64 * $scale.y).round() as i32;
                                     if let Ok(element) =
                                         MemoryRenderBufferRenderElement::from_buffer(
                                             $renderer,
@@ -234,17 +234,16 @@ macro_rules! compose_output_scene {
                 // Liquid-glass panel: a blurred-scene backdrop behind the
                 // translucent panel island. Pushed last in the upper-layer block so
                 // it sits behind the panel surface but in front of windows. The
-                // island insets/radius mirror the shell panel constants
-                // (PANEL_SIDE_MARGIN=12, PANEL_TOP_SHADOW=16, PANEL_HEIGHT=42,
-                // ISLAND_RADIUS=12).
+                // island geometry comes from the same tokens as the shell.
                 if let Some((_, pg)) = $out
                     .scratch_upper_layer_data
                     .iter()
                     .find(|(ls, _)| ls.namespace() == "niwoe-panel")
                 {
+                    let panel = niwoe_tokens::Panel::DEFAULT;
                     let island = smithay::utils::Rectangle::<i32, smithay::utils::Logical>::new(
-                        (pg.loc.x + 12, pg.loc.y + 16).into(),
-                        ((pg.size.w - 24).max(1), 42).into(),
+                        (pg.loc.x + panel.side_margin as i32, pg.loc.y + panel.top_shadow as i32).into(),
+                        ((pg.size.w - 2 * panel.side_margin as i32).max(1), panel.height as i32).into(),
                     );
                     let info = themed_layer_glass_info(theme_config, island, ThemeSurface::Panel);
                     $out.scratch_upper_layer_elements
@@ -262,26 +261,11 @@ macro_rules! compose_output_scene {
                     .iter()
                     .find(|(ls, _)| ls.namespace() == "niwoe-launcher")
                 {
-                    let launcher_w = 880;
-                    let launcher_h = 620;
-                    let popup_bottom_margin = 2;
-                    let visual_x = if lg.size.w > launcher_w {
-                        lg.loc.x + 12
-                    } else {
-                        lg.loc.x
-                    };
-                    let visual_y = if lg.size.h > launcher_h {
-                        lg.loc.y + lg.size.h - launcher_h - popup_bottom_margin
-                    } else {
-                        lg.loc.y
-                    };
+                    let (x, y, w, h) = niwoe_tokens::Launcher::SEARCH
+                        .fitted_rect(lg.size.w.max(1) as u32, lg.size.h.max(1) as u32);
                     let card = smithay::utils::Rectangle::<i32, smithay::utils::Logical>::new(
-                        (visual_x.max(lg.loc.x), visual_y.max(lg.loc.y)).into(),
-                        (
-                            launcher_w.min(lg.size.w).max(1),
-                            launcher_h.min(lg.size.h).max(1),
-                        )
-                            .into(),
+                        (lg.loc.x + x, lg.loc.y + y).into(),
+                        (w as i32, h as i32).into(),
                     );
                     let info = themed_layer_glass_info(theme_config, card, ThemeSurface::Launcher);
                     $out.scratch_upper_layer_elements
@@ -362,7 +346,7 @@ macro_rules! compose_output_scene {
             let wallpaper_elem = $out
                 .wallpaper
                 .as_ref()
-                .map(WallpaperGpuCache::render_element);
+                .map(|wallpaper| wallpaper.render_element_at_scale($scale));
 
             #[cfg(debug_assertions)]
             {

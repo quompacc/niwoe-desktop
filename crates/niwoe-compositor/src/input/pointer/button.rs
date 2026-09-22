@@ -30,6 +30,7 @@ use crate::{
 };
 
 include!("button/helpers.rs");
+include!("button/modifier_drag.rs");
 pub fn handle_pointer_button<I: InputBackend>(
     state: &mut NiwoeState,
     event: &impl PointerButtonEvent<I>,
@@ -68,12 +69,15 @@ pub fn handle_pointer_button<I: InputBackend>(
             .map(|(surface, _)| surface_belongs_to_layer(state, surface))
             .unwrap_or(false);
 
-        let hit_info = decoration_hit_info(
-            state,
-            location,
-            selected_output_info,
-            under_is_layer_surface,
-        );
+        let hit_info =
+            modifier_drag_hit(state, location, button, under_is_layer_surface).or_else(|| {
+                decoration_hit_info(
+                    state,
+                    location,
+                    selected_output_info,
+                    under_is_layer_surface,
+                )
+            });
 
         if let Some((window, hit, initial_window_location, output_geo)) = hit_info {
             match hit {

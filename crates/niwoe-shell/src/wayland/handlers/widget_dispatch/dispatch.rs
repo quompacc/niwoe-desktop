@@ -1,5 +1,5 @@
 impl NiwoeShell {
-    pub(super) fn dispatch_widget_action(
+    pub(crate) fn dispatch_widget_action(
         &mut self,
         qh: &QueueHandle<NiwoeShell>,
         action: WidgetAction,

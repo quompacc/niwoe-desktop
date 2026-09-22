@@ -19,34 +19,6 @@ fn tray_chip_widths_match() {
 }
 
 #[test]
-fn panel_pinned_chip_pinned_app_idx_returns_idx() {
-    let chip = PanelPinnedChip {
-        idx: 2,
-        label: "App".into(),
-        icon: None,
-        program: "prog".into(),
-        args: vec![],
-        window_count: 0,
-        has_focused: false,
-    };
-    assert_eq!(chip.pinned_app_idx(), Some(2));
-}
-
-#[test]
-fn panel_pinned_chip_launch_info_returns_program_and_args() {
-    let chip = PanelPinnedChip {
-        idx: 0,
-        label: "Firefox".into(),
-        icon: None,
-        program: "firefox".into(),
-        args: vec![],
-        window_count: 0,
-        has_focused: false,
-    };
-    assert_eq!(chip.launch_info(), Some(("firefox", &[] as &[String])));
-}
-
-#[test]
 fn panel_window_chip_focus_window_id_returns_id() {
     let chip = PanelWindowChip {
         window_id: "win-1".into(),
@@ -90,8 +62,8 @@ fn status_notifier_label_prefers_title_then_icon_then_service() {
 }
 
 #[test]
-fn status_icons_are_smaller_than_application_icons() {
-    const { assert!(STATUS_ICON_SIZE < APP_ICON_SIZE) };
+fn status_icons_have_legible_native_size() {
+    const { assert!(STATUS_ICON_SIZE >= 20) };
 }
 
 #[test]
@@ -149,7 +121,13 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
         &mut canvas,
         width,
         height,
-        &[],
+        &[PinnedApp {
+            label: "Terminal".into(),
+            program: "foot".into(),
+            args: vec![],
+            terminal: false,
+            icon_name: None,
+        }],
         &[],
         &network,
         &audio,
@@ -169,7 +147,35 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
     );
 
     assert!(canvas.iter().any(|byte| *byte != 0));
+    if let Ok(path) = std::env::var("NIWOE_PANEL_PREVIEW") {
+        let mut rgba = canvas.clone();
+        for pixel in rgba.as_chunks_mut::<4>().0 {
+            pixel.swap(0, 2);
+        }
+        tiny_skia::Pixmap::from_vec(rgba, tiny_skia::IntSize::from_wh(width, height).unwrap())
+            .unwrap()
+            .save_png(path)
+            .unwrap();
+    }
     assert!(!clicks.is_empty());
+    assert!(
+        clicks
+            .iter()
+            .all(|zone| !matches!(zone.action, ClickAction::LaunchPinnedApp(_))),
+        "app shortcuts must not return to the panel"
+    );
+    let zone = |id| clicks.iter().find(|z| z.id.as_deref() == Some(id)).unwrap();
+    let launcher = zone("panel-launcher");
+    let workspace = zone("panel-workspace");
+    let status = zone("panel-status");
+    let clock = zone("panel-clock");
+    assert!(launcher.rect.x + launcher.rect.w <= workspace.rect.x);
+    assert!(workspace.rect.x + workspace.rect.w <= status.rect.x);
+    assert!(status.rect.x + status.rect.w <= clock.rect.x);
+    assert!(clicks.iter().all(|z| z.rect.y >= 0
+        && z.rect.y + z.rect.h <= height as i32
+        && z.rect.x >= 0
+        && z.rect.x + z.rect.w <= width as i32));
     assert_eq!(
         clicks
             .iter()

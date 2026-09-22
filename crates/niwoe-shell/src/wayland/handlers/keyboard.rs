@@ -300,6 +300,45 @@ impl KeyboardHandler for NiwoeShell {
             }
             return;
         }
+        if self.network_popup_open
+            && self.network_popup_tab == crate::network_popup::NetworkTab::Status
+            && !is_escape
+        {
+            use crate::quick_settings_popup::{self as deck, QuickSettingsHit};
+            match event.keysym {
+                Keysym::Tab | Keysym::Down => deck::focus_next(false),
+                Keysym::ISO_Left_Tab | Keysym::Up => deck::focus_next(true),
+                Keysym::Left | Keysym::Right => {
+                    if matches!(deck::focused_action(), Some(QuickSettingsHit::Volume(_))) {
+                        if let Some(volume) = self
+                            .audio_snapshot
+                            .default_output
+                            .as_ref()
+                            .and_then(|d| d.volume_percent)
+                        {
+                            let next = if event.keysym == Keysym::Left {
+                                volume.saturating_sub(5)
+                            } else {
+                                volume.saturating_add(5).min(100)
+                            };
+                            self.dispatch_deck_action(qh, QuickSettingsHit::Volume(next));
+                        }
+                    }
+                }
+                Keysym::Return | Keysym::KP_Enter | Keysym::space => {
+                    if let Some(action) = deck::focused_action() {
+                        if !matches!(action, QuickSettingsHit::Volume(_)) {
+                            self.dispatch_deck_action(qh, action);
+                        }
+                    } else {
+                        deck::focus_next(false);
+                    }
+                }
+                _ => {}
+            }
+            self.draw_network_popup(qh, RepaintReason::Keyboard);
+            return;
+        }
         if self.network_popup_open && is_escape {
             self.close_network_popup(CommitReason::Input);
             self.draw_panel(qh, RepaintReason::Keyboard);
@@ -366,14 +405,7 @@ impl KeyboardHandler for NiwoeShell {
         let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
 
         if is_escape {
-            if !self.search_query.is_empty() {
-                self.search_query.clear();
-                self.launcher_selected_idx = None;
-                self.app_view_scroll_y = 0;
-                self.draw_launcher(qh, RepaintReason::Keyboard);
-            } else {
-                self.close_launcher_after_launch(qh, RepaintReason::Keyboard);
-            }
+            self.close_launcher_after_launch(qh, RepaintReason::Keyboard);
             return;
         }
 
@@ -401,6 +433,7 @@ impl KeyboardHandler for NiwoeShell {
                     self.app_view_scroll_y,
                     selected_idx,
                     n,
+                    self.launcher_content_size().1,
                 );
             }
             self.draw_launcher(qh, RepaintReason::Keyboard);

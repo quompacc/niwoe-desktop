@@ -1,7 +1,67 @@
-# P02 – Übergabe an Codex in VS Code
+# NIWOE – aktueller Handoff, 22.09.2026
 
-Repository: `D:\300_Projekte\310_Aktiv\niwoe-desktop`, Branch `codex/niwoe-p00`.
-P02 **in-progress**, P03 nicht begonnen. Vollbericht: [P02.md](P02.md).
+Repository: `D:/300_Projekte/310_Aktiv/niwoe-desktop`, Branch `codex/niwoe-p00`.
+P02–P05 **in-progress**, nicht visuell abgenommen. Aktueller Bericht:
+[P03–P05 Native Shell](P03_P05_NATIVE_REBUILD.md). Die älteren Abschnitte unten
+sind historische Evidenz und keine Aufforderung, abgeschlossene Tests zu wiederholen.
+
+## Verbindlicher Auftrag und Design
+
+- Bestehenden nativen Rust-Unterbau weiterverwenden; Panel, Launcher und Deck neu bauen.
+- Alle acht Originalmockups unter `assets/` sind visuell verbindlich. Abweichungen
+  nur bei konkreter technischer Notwendigkeit oder expliziter Nutzerkorrektur.
+- Launcher/Suche dürfen sich ausdrücklich an Apple Spotlight orientieren.
+- Kein Alltagsbranding, keine angehefteten Programmsymbole im Panel.
+- Tiling und Omarchy-Bedienung, keine compositor-eigene Titelleiste, nur 1–2px Kontur.
+- Designwerte zentral in Tokens/Config; keine neuen Dependencies.
+
+## Aktueller installierter Stand
+
+Acer: Fedora, `drm-0`, 1920×1080, 100 %, Dark. Nutzer ist angemeldet.
+Letzte Änderung installiert und die Shell über den Watchdog neu geladen;
+Compositor-Sitzung blieb bestehen. Kein weiteres Login angefordert.
+Alle sechs installierten Programme bytegleich zum letzten Release. Der bereits
+laufende Compositor stammt aus dem vorherigen Release; die aktuelle Korrektur
+betrifft Shell-Darstellung, nicht das IPC-Protokoll. Vollständiger Release ab
+nächstem regulärem Sitzungsstart. Gemeinsame KDE-/GTK-Konfiguration unverändert.
+
+Panel ohne App-Pins, mit Raumkontur, konsistenten Statussymbolen, Akku-Prozentwert
+und einzeiliger Datums-/Uhranzeige. Launcher: Suchzeile nach Spotlight-Vorbild,
+App-Ergebnisse, Auswahl, Tastaturhinweise. Deck mit echten Backendaktionen und
+Tab-/Pfeilbedienung. Quelländerungen und offene Einschränkungen stehen im Bericht.
+
+## Verifikation und Belege
+
+Linux: fmt, workspace check, workspace test (**1.093 bestanden, 0 fehlgeschlagen,
+1 ignoriert**), Design-Guard, Clippy `-D warnings`, Release erfolgreich.
+Live-Screenshots der letzten Panel-/Launcher-Korrektur angesehen und dauerhaft
+unter [docs/design/evidence/P03](../design/evidence/P03/README.md) abgelegt.
+Der Deck-Beleg ist eine native Rastervorschau, kein aktueller Live-Screenshot.
+
+## Nächster Arbeitsschritt
+
+Am bestehenden Mockup-Abgleich weiterarbeiten; keine freie Ersatzgestaltung und
+keine weitere Alt-UI-Testschleife. Noch offen: vollständige visuelle Übereinstimmung
+(u. a. Deck/Wallpaper), benannte Räume, vollständige Omarchy-Belegung/Kürzelhilfe,
+Tastaturnavigation in Settings/WLAN, weitere Suchanbieter und Startfehleranzeige,
+Light-/HiDPI-/Idle-Nachweise. Technisch noch nicht implementiert bedeutet nicht
+technisch unmöglich. Keine dieser Lücken als akzeptierte Designabweichung ausgeben.
+
+Nutzer hat Commit und Push des gesamten Arbeitsstands beauftragt; Ziel ist der
+bestehende Branch im GitHub-Remote `github`. Keine Zugangsdaten einchecken.
+
+## Historischer Stand vor der Scope-Korrektur
+
+**Aktualisierung 22.09.:** Scale-Korrektur im noch uncommitteten Arbeitsbaum
+implementiert, auf Fedora vollständig geprüft und installiert. Details und
+Dateiliste: [P02_SCALE_FOLLOWUP.md](P02_SCALE_FOLLOWUP.md). Abschließende Gates:
+Format, Check, **1.092 Tests (2 ignoriert)**, Clippy, Release und isolierter
+Nested-Smoke grün. Alle sechs installierten Binaries bytegleich zum Release.
+Neue Belege: `target/p02-evidence/scale-final.tar.gz` lokal und `scale-final/`
+auf Acer. KDE blieb aktiv; als erster koordinierter Hardware-Testschritt wurde
+der Nutzer gebeten, sich regulär von KDE abzumelden. Auf Bestätigung warten.
+Die folgenden älteren Befunde beschreiben die Ausgangslage; der Code-Fix aus
+Schritt 2 ist umgesetzt, die echten DRM-Nachweise aus Schritt 3/4 stehen aus.
 
 Produktcommits:
 

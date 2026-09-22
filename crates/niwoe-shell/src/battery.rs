@@ -78,28 +78,6 @@ impl BatterySnapshot {
         snap
     }
 
-    /// Freedesktop symbolic icon name (recoloured to the theme text colour by the
-    /// icon pipeline, so it always contrasts). Charging variants when on power.
-    pub fn icon_name(&self) -> &'static str {
-        let charging =
-            matches!(self.state, ChargeState::Charging) || (self.on_ac && self.capacity >= 100);
-        if charging {
-            return match self.capacity {
-                c if c >= 90 => "battery-full-charging-symbolic",
-                c if c >= 60 => "battery-good-charging-symbolic",
-                c if c >= 30 => "battery-low-charging-symbolic",
-                _ => "battery-caution-charging-symbolic",
-            };
-        }
-        match self.capacity {
-            c if c >= 90 => "battery-full-symbolic",
-            c if c >= 60 => "battery-good-symbolic",
-            c if c >= 30 => "battery-low-symbolic",
-            c if c >= 10 => "battery-caution-symbolic",
-            _ => "battery-empty-symbolic",
-        }
-    }
-
     /// Short tray label, e.g. "72%".
     pub fn label(&self) -> String {
         format!("{}%", self.capacity)
@@ -168,33 +146,6 @@ pub const ICON_NAMES: &[&str] = &[
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn icon_buckets_pick_level_and_charging() {
-        let full = BatterySnapshot {
-            present: true,
-            capacity: 95,
-            state: ChargeState::Discharging,
-            on_ac: false,
-        };
-        assert_eq!(full.icon_name(), "battery-full-symbolic");
-
-        let low = BatterySnapshot {
-            present: true,
-            capacity: 15,
-            state: ChargeState::Discharging,
-            on_ac: false,
-        };
-        assert_eq!(low.icon_name(), "battery-caution-symbolic");
-
-        let charging = BatterySnapshot {
-            present: true,
-            capacity: 50,
-            state: ChargeState::Charging,
-            on_ac: true,
-        };
-        assert_eq!(charging.icon_name(), "battery-low-charging-symbolic");
-    }
 
     #[test]
     fn label_is_percent() {

@@ -134,6 +134,29 @@ pub(super) fn parse_action(input: &str) -> Result<Action, String> {
             Ok(Action::MoveToWorkspace(n - 1))
         }
         "toggle-tiling" => Ok(Action::ToggleTiling),
+        "toggle-floating" => Ok(Action::ToggleFloating),
+        "toggle-fullscreen" => Ok(Action::ToggleFullscreen),
+        "launch-terminal" => Ok(Action::LaunchTerminal),
+        "launch-browser" => Ok(Action::LaunchBrowser),
+        "launch-files" => Ok(Action::LaunchFiles),
+        "swap" => match rest.trim() {
+            "left" => Ok(Action::SwapDirection { dx: -1, dy: 0 }),
+            "right" => Ok(Action::SwapDirection { dx: 1, dy: 0 }),
+            "up" => Ok(Action::SwapDirection { dx: 0, dy: -1 }),
+            "down" => Ok(Action::SwapDirection { dx: 0, dy: 1 }),
+            other => Err(format!("unknown swap direction: {other:?}")),
+        },
+        "focus" => match rest.trim() {
+            "left" => Ok(Action::FocusDirection { dx: -1, dy: 0 }),
+            "right" => Ok(Action::FocusDirection { dx: 1, dy: 0 }),
+            "up" => Ok(Action::FocusDirection { dx: 0, dy: -1 }),
+            "down" => Ok(Action::FocusDirection { dx: 0, dy: 1 }),
+            other => Err(format!("unknown focus direction: {other:?}")),
+        },
+        "next-workspace" => Ok(Action::CycleWorkspace(1)),
+        "previous-workspace" => Ok(Action::CycleWorkspace(-1)),
+        "next-window" => Ok(Action::CycleWindow(1)),
+        "previous-window" => Ok(Action::CycleWindow(-1)),
         "force-split" => match rest.trim() {
             "horizontal" | "h" => Ok(Action::ForceSplit(SplitDir::Horizontal)),
             "vertical" | "v" => Ok(Action::ForceSplit(SplitDir::Vertical)),
@@ -163,6 +186,8 @@ pub(super) fn parse_action(input: &str) -> Result<Action, String> {
         }
         "close" | "close-window" => Ok(Action::CloseWindow),
         "toggle-launcher" => Ok(Action::ToggleLauncher),
+        "toggle-quick-settings" => Ok(Action::ToggleQuickSettings),
+        "open-system-settings" => Ok(Action::OpenSystemSettings),
         "lock" | "lock-session" => Ok(Action::LockSession),
         "reload-config" => Ok(Action::ReloadConfig),
         "quit" | "exit" => Ok(Action::Quit),

@@ -67,13 +67,8 @@ impl NiwoeShell {
         self.audio_snapshot = crate::audio::AudioSnapshot::poll();
         self.audio_popup_open = true;
         self.network_layer
-            .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-        self.network_layer.set_margin(
-            0,
-            crate::AUDIO_POPUP_RIGHT_MARGIN,
-            crate::SHELL_POPUP_BOTTOM_MARGIN,
-            0,
-        );
+            .set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::AUDIO_POPUP_RIGHT_MARGIN, 0, 0);
         self.network_layer.set_exclusive_zone(0);
         self.network_layer.set_size(
             crate::popup_surface_w(crate::AUDIO_POPUP_WIDTH),
@@ -255,13 +250,8 @@ impl NiwoeShell {
         self.status_notifier_menu = Some(menu_state);
         self.status_notifier_menu_open = true;
         self.network_layer
-            .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-        self.network_layer.set_margin(
-            0,
-            crate::SNI_MENU_RIGHT_MARGIN,
-            crate::SHELL_POPUP_BOTTOM_MARGIN,
-            0,
-        );
+            .set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::SNI_MENU_RIGHT_MARGIN, 0, 0);
         self.network_layer.set_exclusive_zone(0);
         self.network_layer.set_size(
             self.status_notifier_menu_width,

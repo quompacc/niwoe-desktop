@@ -6,7 +6,7 @@ use super::{
     normal_window_workarea_from_output_geometry, normal_window_workarea_from_rect,
     remember_maximize_restore_geometry, resolve_unmaximize_restore_client_loc,
     restore_client_loc_or_fallback, HalfSnapDirection, MaximizeRestoreGeometry, OutputGeometry,
-    NORMAL_WINDOW_BOTTOM_RESERVED_PX,
+    NORMAL_WINDOW_TOP_RESERVED_PX,
 };
 
 #[test]
@@ -68,7 +68,7 @@ fn maximize_mapping_adds_decoration_offset_to_output_origin() {
 }
 
 #[test]
-fn normal_window_workarea_subtracts_bottom_panel_reservation() {
+fn normal_window_workarea_reserves_top_and_preserves_bottom() {
     let output = OutputGeometry {
         x: 0,
         y: 0,
@@ -77,11 +77,12 @@ fn normal_window_workarea_subtracts_bottom_panel_reservation() {
     };
     let workarea = normal_window_workarea_from_output_geometry(output);
     assert_eq!(workarea.x, output.x);
-    assert_eq!(workarea.y, output.y);
+    assert_eq!(workarea.y, output.y + NORMAL_WINDOW_TOP_RESERVED_PX);
+    assert_eq!(workarea.y + workarea.height, output.y + output.height);
     assert_eq!(workarea.width, output.width);
     assert_eq!(
         workarea.height,
-        output.height - NORMAL_WINDOW_BOTTOM_RESERVED_PX
+        output.height - NORMAL_WINDOW_TOP_RESERVED_PX
     );
 }
 
@@ -89,12 +90,10 @@ fn normal_window_workarea_subtracts_bottom_panel_reservation() {
 fn normal_window_workarea_rect_preserves_origin_and_width() {
     let rect = Rectangle::new((50, 20).into(), (1600, 900).into());
     let workarea = normal_window_workarea_from_rect(rect);
-    assert_eq!(workarea.loc, rect.loc);
+    assert_eq!(workarea.loc.x, rect.loc.x);
+    assert_eq!(workarea.loc.y, rect.loc.y + NORMAL_WINDOW_TOP_RESERVED_PX);
     assert_eq!(workarea.size.w, rect.size.w);
-    assert_eq!(
-        workarea.size.h,
-        rect.size.h - NORMAL_WINDOW_BOTTOM_RESERVED_PX
-    );
+    assert_eq!(workarea.size.h, rect.size.h - NORMAL_WINDOW_TOP_RESERVED_PX);
 }
 
 #[test]

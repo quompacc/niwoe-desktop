@@ -65,16 +65,17 @@ impl WindowDecoration {
     }
 
     pub(super) fn should_draw_title_bar(&self) -> bool {
-        self.should_draw() && !self.is_tiled
+        self.should_draw() && !self.is_tiled && super::TITLE_BAR_HEIGHT > 0
     }
 
     pub(super) fn border_width(&self, theme: &Decorations) -> i32 {
         if self.is_maximized || self.is_fullscreen {
             0
-        } else if self.is_tiled {
-            1
         } else {
-            theme.border_width as i32
+            (theme.border_width as i32).clamp(
+                niwoe_tokens::Controls::BORDER,
+                niwoe_tokens::Controls::FOCUS_WIDTH,
+            )
         }
     }
 
@@ -131,6 +132,23 @@ mod tests {
             .into_iter()
             .any(|deco| deco.set_hover(None));
         assert!(any);
+    }
+
+    #[test]
+    fn frame_has_no_titlebar_and_respects_thin_border_bounds() {
+        let mut deco = WindowDecoration::new();
+        let mut theme = Decorations::default();
+        for tiled in [false, true] {
+            deco.is_tiled = tiled;
+            assert!(!deco.should_draw_title_bar());
+            for (configured, expected) in [(0, 1), (1, 1), (2, 2), (12, 2)] {
+                theme.border_width = configured;
+                assert_eq!(deco.border_width(&theme), expected);
+            }
+        }
+        deco.is_fullscreen = true;
+        assert!(!deco.should_draw());
+        assert_eq!(deco.border_width(&theme), 0);
     }
 
     #[test]

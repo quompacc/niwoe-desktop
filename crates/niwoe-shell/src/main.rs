@@ -99,6 +99,8 @@ pub const SHELL_POPUP_BOTTOM_MARGIN: i32 = niwoe_tokens::Launcher::DEFAULT.panel
 /// at `(PAD, PAD)` inside; the popup's anchor-margin is reduced by PAD so
 /// the visible card stays exactly where it was before shadows landed.
 pub const POPUP_SHADOW_PAD: i32 = 16;
+/// Layer-shell already excludes the top panel; align the visible card below it.
+pub const PANEL_POPUP_TOP_MARGIN: i32 = SHELL_POPUP_BOTTOM_MARGIN - POPUP_SHADOW_PAD;
 
 /// Layer-shell surface width that fits a card of `card_w` plus the shadow pad.
 pub const fn popup_surface_w(card_w: u32) -> u32 {
@@ -112,7 +114,8 @@ pub const fn popup_surface_h(card_h: u32) -> u32 {
 // visible card edge aligns with the panel island's tokenized right edge.
 pub const NETWORK_POPUP_RIGHT_MARGIN: i32 = PANEL_SIDE_MARGIN as i32 - POPUP_SHADOW_PAD;
 pub const CALENDAR_POPUP_RIGHT_MARGIN: i32 = NETWORK_POPUP_RIGHT_MARGIN;
-pub const WORKSPACE_POPUP_RIGHT_MARGIN: i32 = NETWORK_POPUP_RIGHT_MARGIN;
+pub const WORKSPACE_POPUP_LEFT_MARGIN: i32 =
+    PANEL_SIDE_MARGIN as i32 + niwoe_tokens::Panel::DEFAULT.control_width as i32 - POPUP_SHADOW_PAD;
 pub const NOTIFICATION_WIDTH: u32 = 360;
 pub const NOTIFICATION_HEIGHT: u32 = 90;
 pub const NOTIFICATION_TOP_MARGIN: i32 = 20;
@@ -543,11 +546,15 @@ fn insert_network_poll_timer(
 
 #[cfg(test)]
 mod tests {
-    use super::{default_pinned_apps, NETWORK_POPUP_RIGHT_MARGIN, WORKSPACE_POPUP_RIGHT_MARGIN};
+    use super::{default_pinned_apps, NETWORK_POPUP_RIGHT_MARGIN, WORKSPACE_POPUP_LEFT_MARGIN};
 
     #[test]
-    fn workspace_and_quick_settings_share_right_anchor() {
-        assert_eq!(WORKSPACE_POPUP_RIGHT_MARGIN, NETWORK_POPUP_RIGHT_MARGIN);
+    fn workspace_and_quick_settings_align_below_their_panel_groups() {
+        assert_eq!(
+            WORKSPACE_POPUP_LEFT_MARGIN + super::POPUP_SHADOW_PAD,
+            niwoe_tokens::Panel::DEFAULT.control_width as i32
+        );
+        assert_eq!(NETWORK_POPUP_RIGHT_MARGIN + super::POPUP_SHADOW_PAD, 0);
     }
 
     #[test]

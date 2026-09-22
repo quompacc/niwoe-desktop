@@ -49,7 +49,9 @@ impl NiwoeShell {
             self.launcher_is_fullscreen = true;
             self.launcher_configured = false;
             self.commit_surface(CommitSurfaceKind::Launcher, CommitReason::Input);
-            self.launcher_state.reshuffle();
+            self.search_query.clear();
+            self.app_view_scroll_y = 0;
+            self.launcher_selected_idx = None;
         } else {
             self.launcher_is_fullscreen = false;
             self.launcher_settings_open = false;
@@ -176,13 +178,8 @@ impl NiwoeShell {
 
         self.calendar_popup_open = true;
         self.calendar_layer
-            .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-        self.calendar_layer.set_margin(
-            0,
-            crate::CALENDAR_POPUP_RIGHT_MARGIN,
-            crate::SHELL_POPUP_BOTTOM_MARGIN,
-            0,
-        );
+            .set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.calendar_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::CALENDAR_POPUP_RIGHT_MARGIN, 0, 0);
         self.calendar_layer.set_exclusive_zone(0);
         self.calendar_layer.set_size(
             crate::popup_surface_w(crate::CALENDAR_POPUP_WIDTH),
@@ -243,14 +240,8 @@ impl NiwoeShell {
         self.workspace_popup_open = true;
         self.workspace_hover_idx = None;
         self.workspace_layer
-            .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-        self.workspace_layer
-            .set_margin(
-                0,
-                crate::WORKSPACE_POPUP_RIGHT_MARGIN,
-                crate::SHELL_POPUP_BOTTOM_MARGIN,
-                0,
-            );
+            .set_anchor(Anchor::TOP | Anchor::LEFT);
+        self.workspace_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, crate::WORKSPACE_POPUP_LEFT_MARGIN);
         self.workspace_layer.set_exclusive_zone(0);
         self.workspace_layer.set_size(
             crate::popup_surface_w(crate::WORKSPACE_POPUP_WIDTH),
@@ -315,18 +306,14 @@ impl NiwoeShell {
         }
 
         self.network_popup_open = true;
+        crate::quick_settings_popup::reset_keyboard_focus();
         // Refresh the live network state on open so the Status tab always shows
         // the current primary connection (e.g. right after connecting Wi-Fi or
         // unplugging the cable), not the last timer-polled snapshot.
         self.network_controller.poll();
         self.network_layer
-            .set_anchor(Anchor::BOTTOM | Anchor::RIGHT);
-        self.network_layer.set_margin(
-            0,
-            crate::NETWORK_POPUP_RIGHT_MARGIN,
-            crate::SHELL_POPUP_BOTTOM_MARGIN,
-            0,
-        );
+            .set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::NETWORK_POPUP_RIGHT_MARGIN, 0, 0);
         self.network_layer.set_exclusive_zone(0);
         self.network_layer.set_size(
             crate::popup_surface_w(crate::NETWORK_POPUP_WIDTH),

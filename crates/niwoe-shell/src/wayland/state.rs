@@ -28,18 +28,12 @@ fn apply_workspace_changed(active_workspace: &mut u8, next_workspace_raw: u8) {
 
 fn panel_global_activation_point(
     pointer_position: (f64, f64),
-    output_height: Option<i32>,
+    _output_height: Option<i32>,
 ) -> status_notifier::ActivationPoint {
-    let x = pointer_position.0.round() as i32;
-    let local_y = pointer_position.1.round() as i32;
-    let y = output_height
-        .map(|height| {
-            height
-                .saturating_sub(crate::PANEL_SURFACE_HEIGHT as i32)
-                .saturating_add(local_y)
-        })
-        .unwrap_or(local_y);
-    status_notifier::ActivationPoint { x, y }
+    status_notifier::ActivationPoint {
+        x: pointer_position.0.round() as i32,
+        y: pointer_position.1.round() as i32,
+    }
 }
 
 fn normalize_workspace_1_based(workspace: usize) -> usize {
@@ -440,3 +434,5 @@ pub(crate) fn load_wallpaper_thumbnail(
 #[cfg(test)]
 #[path = "state_tests.rs"]
 mod tests;
+
+include!("state/deck_actions.rs");

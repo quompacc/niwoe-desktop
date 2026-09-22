@@ -1,16 +1,17 @@
 macro_rules! handle_launcher_pointer {
     ($shell:ident, $qh:ident, $event:ident) => {{
             if $shell.pointer_surface == SurfaceKind::Launcher {
+                let (content_width, content_height) = $shell.launcher_content_size();
                 // Translate to content-buffer coordinates first.
                 // In fullscreen mode the launcher surface covers the full screen but
-                // draw_overlay / hit tests operate on the fixed LAUNCHER_WxH content
+                // draw_overlay / hit tests operate on the fitted content
                 // buffer, so we need coords relative to that buffer, not the surface.
                 // A click outside the visual area is discarded early.
                 let local_pos = if $shell.launcher_is_fullscreen {
                     let (px, py) = $event.position;
                     let vx = $shell.launcher_visual_x as f64;
                     let vy = $shell.launcher_visual_y as f64;
-                    let (lw, lh) = (crate::LAUNCHER_WIDTH as f64, crate::LAUNCHER_HEIGHT as f64);
+                    let (lw, lh) = (content_width as f64, content_height as f64);
                     if px < vx || px >= vx + lw || py < vy || py >= vy + lh {
                         if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
                             $shell.close_launcher_after_launch($qh, RepaintReason::Pointer);
@@ -64,23 +65,13 @@ macro_rules! handle_launcher_pointer {
                 // ── Step 2b: Command-palette hover tracking.
                 if let PointerEventKind::Motion { .. } = $event.kind {
                     if !$shell.launcher_settings_open {
-                        let search_active = !$shell.search_query.is_empty();
-                        let new_bento = if !search_active {
-                            crate::app_view::hit_bento_tile(
-                                local_pos.0 as i32,
-                                local_pos.1 as i32,
-                                crate::launcher::LauncherCategory::ALL.len(),
-                            )
-                        } else {
-                            None
-                        };
                         let new_app = {
                             let hit = crate::app_view::hit_app_row(
                                 local_pos.0 as i32,
                                 local_pos.1 as i32,
                                 $shell.app_view_scroll_y,
-                                crate::LAUNCHER_HEIGHT,
-                                search_active,
+                                content_width,
+                                content_height,
                             );
                             let filtered = crate::app_view::collect_palette_apps(
                                 &$shell.launcher_state.apps,
@@ -91,25 +82,8 @@ macro_rules! handle_launcher_pointer {
                             );
                             hit.filter(|&i| i < filtered.len())
                         };
-                        let new_settings = crate::app_view::hit_header_settings(
-                            local_pos.0 as i32,
-                            local_pos.1 as i32,
-                            crate::LAUNCHER_WIDTH,
-                        );
-                        let new_pwr = crate::app_view::hit_footer_power_btn(
-                            local_pos.0 as i32,
-                            local_pos.1 as i32,
-                            crate::LAUNCHER_HEIGHT,
-                        );
-                        let changed = new_bento != $shell.hovered_bento_idx
-                            || new_app != $shell.hovered_app_card_idx
-                            || new_settings != $shell.settings_hovered
-                            || new_pwr != $shell.hovered_power_btn;
-                        if changed {
-                            $shell.hovered_bento_idx = new_bento;
+                        if new_app != $shell.hovered_app_card_idx {
                             $shell.hovered_app_card_idx = new_app;
-                            $shell.settings_hovered = new_settings;
-                            $shell.hovered_power_btn = new_pwr;
                             $shell.draw_launcher($qh, RepaintReason::Pointer);
                         }
                     }
@@ -119,7 +93,6 @@ macro_rules! handle_launcher_pointer {
                 if let PointerEventKind::Press { button: 0x111, .. } = $event.kind {
                     $shell.context_menu = None;
                     if !$shell.launcher_settings_open {
-                        let search_active = !$shell.search_query.is_empty();
                         let filtered = crate::app_view::collect_palette_apps(
                             &$shell.launcher_state.apps,
                             &$shell.search_query,
@@ -131,8 +104,8 @@ macro_rules! handle_launcher_pointer {
                             local_pos.0 as i32,
                             local_pos.1 as i32,
                             $shell.app_view_scroll_y,
-                            crate::LAUNCHER_HEIGHT,
-                            search_active,
+                            content_width,
+                                content_height,
                         );
                         if let Some(idx) = hit.filter(|&i| i < filtered.len()) {
                             let app = filtered[idx];
@@ -163,8 +136,8 @@ macro_rules! handle_launcher_pointer {
                                 local_pos.0 as i32,
                                 local_pos.1 as i32,
                                 items.len(),
-                                crate::LAUNCHER_WIDTH as i32,
-                                crate::LAUNCHER_HEIGHT as i32,
+                                content_width as i32,
+                                content_height as i32,
                             );
                             $shell.context_menu = Some(context_menu::ContextMenuState {
                                 x: mx,
@@ -183,8 +156,8 @@ macro_rules! handle_launcher_pointer {
                     // Fall through to widget tree for settings right-click
                     let tree = if $shell.launcher_settings_open {
                         crate::settings_view::build_settings_widget_tree(
-                            crate::LAUNCHER_WIDTH,
-                            crate::LAUNCHER_HEIGHT,
+                            content_width,
+                            content_height,
                             $shell.settings_category,
                             &$shell.settings_search,
                             &$shell.available_themes,
@@ -220,8 +193,8 @@ macro_rules! handle_launcher_pointer {
                         return;
                     };
                     let pixel_size = niwoe_ui::PixelSize {
-                        width: crate::LAUNCHER_WIDTH,
-                        height: crate::LAUNCHER_HEIGHT,
+                        width: content_width,
+                        height: content_height,
                     };
                     if let Ok(layout) = niwoe_ui::compute_layout(&*tree, pixel_size) {
                         let pos = niwoe_ui::PointerPosition {
@@ -264,8 +237,8 @@ macro_rules! handle_launcher_pointer {
                                         local_pos.0 as i32,
                                         local_pos.1 as i32,
                                         items.len(),
-                                        crate::LAUNCHER_WIDTH as i32,
-                                        crate::LAUNCHER_HEIGHT as i32,
+                                        content_width as i32,
+                                        content_height as i32,
                                     );
                                     $shell.context_menu = Some(context_menu::ContextMenuState {
                                         x: mx,
@@ -308,7 +281,7 @@ macro_rules! handle_launcher_pointer {
                             &$shell.hidden_execs,
                             $shell.launcher_state.category,
                             &$shell.pinned_apps,
-                            crate::LAUNCHER_HEIGHT,
+                            content_height,
                         );
                         if delta_px != 0 {
                             let new_scroll =
@@ -326,34 +299,14 @@ macro_rules! handle_launcher_pointer {
                     if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
                         let cx = local_pos.0 as i32;
                         let cy = local_pos.1 as i32;
-                        let search_active = !$shell.search_query.is_empty();
-
-                        // Category strip
-                        if let Some(idx) =
-                            crate::app_view::hit_bento_tile(
-                                cx,
-                                cy,
-                                crate::launcher::LauncherCategory::ALL.len(),
-                            )
-                        {
-                            if let Some(category) =
-                                crate::launcher::LauncherCategory::ALL.get(idx).copied()
-                            {
-                                $shell.launcher_state.category = category;
-                                $shell.app_view_scroll_y = 0;
-                                $shell.launcher_selected_idx = None;
-                                $shell.draw_launcher($qh, RepaintReason::Pointer);
-                                continue;
-                            }
-                        }
 
                         // App grid / search results
                         if let Some(idx) = crate::app_view::hit_app_row(
                             cx,
                             cy,
                             $shell.app_view_scroll_y,
-                            crate::LAUNCHER_HEIGHT,
-                            search_active,
+                            content_width,
+                                content_height,
                         ) {
                             let filtered = crate::app_view::collect_palette_apps(
                                 &$shell.launcher_state.apps,
@@ -372,36 +325,15 @@ macro_rules! handle_launcher_pointer {
                             }
                         }
 
-                        // Header settings button
-                        if crate::app_view::hit_header_settings(cx, cy, crate::LAUNCHER_WIDTH) {
-                            $shell.dispatch_widget_action(
-                                $qh,
-                                crate::widget_action::WidgetAction::ToggleSettings,
-                            );
-                            continue;
-                        }
-
-                        // Footer power buttons
-                        if let Some(btn_idx) =
-                            crate::app_view::hit_footer_power_btn(cx, cy, crate::LAUNCHER_HEIGHT)
-                        {
-                            if let Some(action) =
-                                crate::app_view::power_widget_action_for_idx(btn_idx)
-                            {
-                                $shell.dispatch_widget_action($qh, action);
-                                continue;
-                            }
-                        }
                     }
                 }
 
-                // ── Step 6: Widget-tree pointer events — settings view only.
                 if $shell.launcher_settings_open {
                     if let Some(ev) = translate_pointer_event(&$event.kind, local_pos) {
                         let tree = {
                             crate::settings_view::build_settings_widget_tree(
-                                crate::LAUNCHER_WIDTH,
-                                crate::LAUNCHER_HEIGHT,
+                                content_width,
+                                content_height,
                                 $shell.settings_category,
                                 &$shell.settings_search,
                                 &$shell.available_themes,
@@ -435,8 +367,8 @@ macro_rules! handle_launcher_pointer {
                             )
                         };
                         let pixel_size = niwoe_ui::PixelSize {
-                            width: crate::LAUNCHER_WIDTH,
-                            height: crate::LAUNCHER_HEIGHT,
+                            width: content_width,
+                            height: content_height,
                         };
                         let layout = niwoe_ui::compute_layout(&*tree, pixel_size);
                         match layout {

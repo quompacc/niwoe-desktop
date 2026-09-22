@@ -8,6 +8,17 @@
 
 ## Produkt und Quelle
 
+**Nutzerentscheidung 22.09.2026:** Die acht Mockup-PNGs unter `assets/` sind
+verbindliche visuelle Vorgaben, keine frei interpretierbare Inspiration.
+Abweichungen sind nur bei konkreter technischer Notwendigkeit zulässig und
+müssen mit Bild, betroffener Stelle und Begründung dokumentiert werden.
+Explizite Nutzerkorrekturen bleiben vorrangig: NIWOE statt MERIDIAN, kein
+Alltagsbranding, keine SSD-Titelleiste und keine angehefteten Programmsymbole im
+Panel. Die native Implementierung verwendet weiterhin zentrale Tokens/Config.
+Für Launcher und Suche ist Apple Spotlight ausdrücklich als Beispiel freigegeben;
+NIWOE-Farben und Material bleiben erhalten. Die Light-Ansicht übernimmt die
+vorhandene Komponentenfamilie mit zentraler heller Farbtabelle.
+
 NIWOE ist eine native Rust-Desktopoberfläche. Es gibt genau eine Designquelle:
 `niwoe-tokens` (`Palette`, `Interaction`, `Elevation`, `Radius`) und
 `niwoe-config` (`Decorations`). Jede Farbe,
@@ -54,6 +65,11 @@ verwenden neutrale funktionale Symbole. Wallpaper und illustrative Mockups sind
 keine pro Frame berechneten Effekte und müssen nicht vorhanden sein, damit die
 UI lesbar bleibt.
 
+Fenster erhalten keine compositor-eigene Titelleiste. Die SSD-Geometrie liefert
+nur eine 1–2 logische Pixel dünne Außenkontur; Farben und Breite kommen aus
+Tokens/Decorations. App-eigene CSD bleibt erhalten. Schließen, Verschieben und
+Resize bleiben über Tastatur und Modifier-Mausbedienung erreichbar.
+
 ## Performance und Abnahme
 
 Statische Flächen sind eventgetrieben. Icons, Fonts, Schatten und Assets werden
@@ -64,4 +80,6 @@ und Hardwarebelege.
 
 Native Ausgaben werden in beiden Themes für leere, volle, lange, fehlerhafte und
 fokussierte Zustände bei 1366×768 und 1920×1080 sowie verfügbaren Skalierungen
-geprüft. Die Mockups liefern Hierarchie und Tonalität, keinen Pixelgleichheitstest.
+geprüft. Die Mockups bestimmen Hierarchie, Tonalität, Material, Konturen,
+Ikonografie und Abstände. Native Screenshots werden direkt daneben geprüft;
+freie Vereinfachung ist kein technischer Grund für eine Abweichung.

@@ -20,9 +20,13 @@ pub struct WmWorkspace {
 }
 
 impl WmWorkspace {
+    pub fn swap_windows(&mut self, a: &Window, b: &Window) -> bool {
+        self.tiling.swap_windows(a, b)
+    }
+
     pub fn new() -> Self {
         Self {
-            mode: WorkspaceMode::Floating,
+            mode: WorkspaceMode::Tiling,
             tiling: TilingLayout::new(),
             floating_windows: Vec::new(),
         }
@@ -139,7 +143,7 @@ mod tests {
     fn new_sets_expected_defaults() {
         let workspace = WmWorkspace::new();
 
-        assert_eq!(workspace.mode, WorkspaceMode::Floating);
+        assert_eq!(workspace.mode, WorkspaceMode::Tiling);
         assert!(workspace.tiling.is_empty());
         assert_eq!(workspace.tiling.next_split, SplitDir::Horizontal);
     }
@@ -149,11 +153,11 @@ mod tests {
         let mut workspace = WmWorkspace::new();
 
         let first = workspace.toggle_mode();
-        assert_eq!(first, WorkspaceMode::Tiling);
-        assert_eq!(workspace.mode, WorkspaceMode::Tiling);
+        assert_eq!(first, WorkspaceMode::Floating);
+        assert_eq!(workspace.mode, WorkspaceMode::Floating);
 
         let second = workspace.toggle_mode();
-        assert_eq!(second, WorkspaceMode::Floating);
-        assert_eq!(workspace.mode, WorkspaceMode::Floating);
+        assert_eq!(second, WorkspaceMode::Tiling);
+        assert_eq!(workspace.mode, WorkspaceMode::Tiling);
     }
 }

@@ -10,6 +10,8 @@ use smithay::{
 use tracing::debug;
 
 use crate::state::NiwoeState;
+#[path = "navigation.rs"]
+mod navigation;
 
 struct KeyMatch {
     modifiers: Modifiers,
@@ -192,6 +194,25 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
             state.move_focused_window_to_workspace_consistent(idx)
         }
         Action::ToggleTiling => state.toggle_tiling(),
+        Action::ToggleFloating => navigation::toggle_floating(state),
+        Action::ToggleFullscreen => navigation::toggle_fullscreen(state),
+        Action::SwapDirection { dx, dy } => navigation::swap_direction(state, dx, dy),
+        Action::LaunchTerminal => {
+            state.ipc.broadcast(&ShellEvent::LaunchTerminal);
+        }
+        Action::LaunchBrowser => {
+            state.ipc.broadcast(&ShellEvent::LaunchBrowser);
+        }
+        Action::LaunchFiles => {
+            state.ipc.broadcast(&ShellEvent::LaunchFiles);
+        }
+        Action::FocusDirection { dx, dy } => navigation::focus_direction(state, dx, dy),
+        Action::CycleWindow(step) => navigation::cycle_window(state, step),
+        Action::CycleWorkspace(step) => {
+            let count = state.workspaces.count() as i32;
+            let next = (state.current_workspace_index() as i32 + i32::from(step)).rem_euclid(count);
+            state.switch_workspace_for_focused_output(next as usize);
+        }
         Action::ForceSplit(dir) => {
             let active = state.workspaces.active;
             state.wm_workspaces[active].force_split(wm_split_dir(dir));
@@ -221,6 +242,12 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
         }
         Action::ToggleLauncher => {
             state.broadcast_toggle_launcher();
+        }
+        Action::ToggleQuickSettings => {
+            state.ipc.broadcast(&ShellEvent::ToggleQuickSettings);
+        }
+        Action::OpenSystemSettings => {
+            state.ipc.broadcast(&ShellEvent::OpenSystemSettings);
         }
         Action::LockSession => {
             state.spawn_lock_screen();

@@ -60,136 +60,119 @@ pub fn draw(
     state: QuickSettingsState<'_>,
 ) {
     let q = QuickSettings::DEFAULT;
+    let gap = niwoe_tokens::Spacing::DEFAULT;
     draw_card_body(painter, theme);
-    text(
-        painter,
-        font,
-        theme,
-        "Schnelleinstellungen",
-        q.outer_pad,
-        31,
-        false,
-    );
-    text(painter, font, theme, "System", q.outer_pad, 47, true);
-
+    text(painter, font, theme, "System", q.outer_pad, gap.xxl, false);
     let settings = Rect {
-        x: q.width - q.outer_pad - 96,
-        y: 12,
-        w: 96,
-        h: 34,
+        x: q.width - q.outer_pad - q.footer_height * 3,
+        y: gap.md,
+        w: q.footer_height * 3,
+        h: niwoe_tokens::Controls::MIN_HEIGHT,
     };
     draw_control(painter, font, theme, settings, "Einstellungen", false);
     SETTINGS.with(|slot| slot.set(settings));
-
-    let content_w = q.width - q.outer_pad * 2;
-    let tile_w = (content_w - q.tile_gap) / 2;
-    let tile_y = q.header_height + q.section_gap;
-    let network = Rect {
+    let width = q.width - q.outer_pad * 2;
+    let audio = Rect {
         x: q.outer_pad,
-        y: tile_y,
-        w: tile_w,
-        h: q.tile_height,
-    };
-    let profile = Rect {
-        x: network.x + tile_w + q.tile_gap,
-        ..network
-    };
-    draw_network_tile(painter, font, theme, network, state.network);
-    draw_profile_tile(painter, font, theme, profile, state.power_profile);
-    NETWORK.with(|slot| slot.set(network));
-    POWER_PROFILE.with(|slot| slot.set(profile));
-
-    let audio_y = tile_y + q.tile_height + q.section_gap;
-    let audio_rect = Rect {
-        x: q.outer_pad,
-        y: audio_y,
-        w: content_w,
+        y: q.header_height + q.section_gap,
+        w: width,
         h: q.audio_height,
     };
-    draw_panel(painter, theme, audio_rect);
-    let muted = state
-        .audio
-        .default_output
-        .as_ref()
-        .map(|output| output.muted)
-        .unwrap_or(true);
+    draw_panel(painter, theme, audio);
+    let device = state.audio.default_output.as_ref();
+    let muted = device.is_none_or(|d| d.muted);
     let mute = Rect {
-        x: audio_rect.x + 12,
-        y: audio_rect.y + 12,
-        w: 42,
-        h: 34,
+        x: audio.x + gap.md,
+        y: audio.y + gap.md,
+        w: niwoe_tokens::Controls::MIN_HEIGHT * 2,
+        h: niwoe_tokens::Controls::MIN_HEIGHT,
     };
     draw_control(
         painter,
         font,
         theme,
         mute,
-        if muted { "MUT" } else { "AUD" },
+        if muted { "Stumm" } else { "Ton an" },
         muted,
     );
-    AUDIO_MUTE.with(|slot| slot.set(mute));
+    AUDIO_MUTE.with(|slot| slot.set(if device.is_some() { mute } else { ZERO_RECT }));
+    let tx = mute.x + mute.w + gap.md;
     text(
         painter,
         font,
         theme,
-        "Audio",
-        audio_rect.x + 66,
-        audio_rect.y + 27,
+        "Lautstärke",
+        tx,
+        audio.y + gap.xl,
         false,
     );
-    let output = state
-        .audio
-        .default_output
-        .as_ref()
-        .map(|device| fit(&device.name, 34))
-        .unwrap_or_else(|| "Nicht verfügbar".to_string());
     text(
         painter,
         font,
         theme,
-        &output,
-        audio_rect.x + 66,
-        audio_rect.y + 44,
+        &device
+            .map(|d| fit(&d.name, 24))
+            .unwrap_or_else(|| "Nicht verfügbar".into()),
+        tx,
+        audio.y + gap.xl + gap.lg,
         true,
     );
-
-    let volume = state
-        .audio
-        .default_output
-        .as_ref()
-        .and_then(|output| output.volume_percent)
-        .unwrap_or(0);
+    let volume = device.and_then(|d| d.volume_percent);
     let slider = Rect {
-        x: audio_rect.x + 18,
-        y: audio_rect.y + 76,
-        w: audio_rect.w - 76,
-        h: 28,
+        x: audio.x + gap.lg,
+        y: audio.y + q.audio_height - gap.xxl - gap.md,
+        w: audio.w - gap.lg * 2 - niwoe_tokens::Controls::MIN_HEIGHT * 2,
+        h: niwoe_tokens::Controls::MIN_HEIGHT,
     };
-    draw_slider(painter, theme, slider, volume, muted);
-    VOLUME.with(|slot| slot.set(slider));
+    draw_slider(painter, theme, slider, volume.unwrap_or(0), muted);
+    VOLUME.with(|slot| slot.set(if volume.is_some() { slider } else { ZERO_RECT }));
     text(
         painter,
         font,
         theme,
-        &format!("{volume}%"),
-        audio_rect.x + audio_rect.w - 50,
-        audio_rect.y + 94,
+        &volume
+            .map(|v| format!("{v}%"))
+            .unwrap_or_else(|| "—".into()),
+        slider.x + slider.w + gap.md,
+        slider.y + gap.xl,
         false,
     );
-
-    let status_y = audio_y + q.audio_height + q.section_gap;
+    let tile_y = audio.y + audio.h + q.section_gap;
+    let tile = Rect {
+        x: q.outer_pad,
+        y: tile_y,
+        w: (width - q.tile_gap) / 2,
+        h: q.tile_height,
+    };
+    let profile = Rect {
+        x: tile.x + tile.w + q.tile_gap,
+        ..tile
+    };
+    draw_network_tile(painter, font, theme, tile, state.network);
+    draw_profile_tile(painter, font, theme, profile, state.power_profile);
+    NETWORK.with(|slot| {
+        slot.set(if matches!(state.network, NetworkState::Offline) {
+            ZERO_RECT
+        } else {
+            tile
+        })
+    });
+    POWER_PROFILE.with(|slot| {
+        slot.set(if state.power_profile.is_some() {
+            profile
+        } else {
+            ZERO_RECT
+        })
+    });
     let status = Rect {
         x: q.outer_pad,
-        y: status_y,
-        w: content_w,
+        y: tile_y + q.tile_height + q.section_gap,
+        w: width,
         h: q.status_height,
     };
     draw_panel(painter, theme, status);
-    let half = status.w / 2;
-    let appearance = Rect { w: half, ..status };
-    let battery = Rect {
-        x: status.x + half,
-        w: status.w - half,
+    let appearance = Rect {
+        w: status.w / 2,
         ..status
     };
     draw_status_cell(
@@ -204,24 +187,32 @@ pub fn draw(
             "Hell"
         },
     );
-    let battery_value = if state.battery.present {
-        format!("{}%", state.battery.capacity)
-    } else {
-        "Netzbetrieb".to_string()
-    };
-    draw_status_cell(painter, font, theme, battery, "Akku", &battery_value);
     APPEARANCE.with(|slot| slot.set(appearance));
-
-    let footer_y = status_y + q.status_height + q.section_gap;
-    let footer_w = (content_w - q.tile_gap) / 2;
+    let battery = Rect {
+        x: status.x + appearance.w,
+        w: status.w - appearance.w,
+        ..status
+    };
+    draw_status_cell(
+        painter,
+        font,
+        theme,
+        battery,
+        "Energie",
+        &if state.battery.present {
+            format!("{}% Akku", state.battery.capacity)
+        } else {
+            "Netzbetrieb".into()
+        },
+    );
     let lock = Rect {
         x: q.outer_pad,
-        y: footer_y,
-        w: footer_w,
+        y: status.y + status.h + q.section_gap,
+        w: (width - q.tile_gap) / 2,
         h: q.footer_height,
     };
     let power = Rect {
-        x: lock.x + footer_w + q.tile_gap,
+        x: lock.x + lock.w + q.tile_gap,
         ..lock
     };
     draw_control(painter, font, theme, lock, "Sperren", false);
@@ -239,6 +230,7 @@ pub fn draw(
     );
     LOCK.with(|slot| slot.set(lock));
     POWER_OFF.with(|slot| slot.set(power));
+    draw_keyboard_focus(painter, theme);
 }
 
 fn draw_network_tile(
@@ -265,17 +257,26 @@ fn draw_network_tile(
         NetworkState::Disconnected => ("Netzwerk", "Getrennt".to_string(), false),
         NetworkState::Offline => ("Netzwerk", "Nicht verfügbar".to_string(), false),
     };
-    draw_badge(painter, font, theme, rect.x + 12, rect.y + 12, "N", active);
-    text(painter, font, theme, label, rect.x + 52, rect.y + 31, false);
+    let gap = niwoe_tokens::Spacing::DEFAULT;
     text(
         painter,
         font,
         theme,
-        &detail,
-        rect.x + 52,
-        rect.y + 50,
-        true,
+        label,
+        rect.x + gap.md,
+        rect.y + gap.xl,
+        false,
     );
+    let color = glass_dim_from_config(theme);
+    painter.text_clipped(
+        font,
+        &detail,
+        rect.x + gap.md,
+        rect.y + gap.xl + gap.xl,
+        rect.w - gap.md * 2,
+        color,
+    );
+    let _ = active;
 }
 
 fn draw_profile_tile(
@@ -285,25 +286,26 @@ fn draw_profile_tile(
     rect: Rect,
     profile: Option<PowerProfile>,
 ) {
+    let gap = niwoe_tokens::Spacing::DEFAULT;
     draw_panel(painter, theme, rect);
-    draw_badge(painter, font, theme, rect.x + 12, rect.y + 12, "E", false);
     text(
         painter,
         font,
         theme,
-        "Energie",
-        rect.x + 52,
-        rect.y + 31,
+        "Leistung",
+        rect.x + gap.md,
+        rect.y + gap.xl,
         false,
     );
-    text(
-        painter,
+    painter.text_clipped(
         font,
-        theme,
-        profile.map(PowerProfile::label).unwrap_or("Standard"),
-        rect.x + 52,
-        rect.y + 50,
-        true,
+        profile
+            .map(PowerProfile::label)
+            .unwrap_or("Nicht verfügbar"),
+        rect.x + gap.md,
+        rect.y + gap.xl + gap.xl,
+        rect.w - gap.md * 2,
+        glass_dim_from_config(theme),
     );
 }
 
@@ -317,29 +319,6 @@ fn draw_status_cell(
 ) {
     text(painter, font, theme, label, rect.x + 14, rect.y + 28, false);
     text(painter, font, theme, value, rect.x + 14, rect.y + 49, true);
-}
-
-fn draw_badge(
-    painter: &mut Painter<'_>,
-    font: &RefCell<Option<TextRenderer>>,
-    theme: &ThemeConfig,
-    x: i32,
-    y: i32,
-    label: &str,
-    active: bool,
-) {
-    let q = QuickSettings::DEFAULT;
-    let rect = Rect { x, y, w: 32, h: 32 };
-    painter.roundish_rect_with_radius(
-        rect,
-        if active {
-            Interaction::DEFAULT.accent_idle(theme.colors.accent)
-        } else {
-            Interaction::DEFAULT.neutral_hover
-        },
-        q.control_radius,
-    );
-    text(painter, font, theme, label, x + 11, y + 21, false);
 }
 
 fn draw_panel(painter: &mut Painter<'_>, theme: &ThemeConfig, rect: Rect) {
@@ -510,9 +489,92 @@ fn volume_from_slider_x(volume: Rect, x: f64) -> u8 {
     (fraction * 100.0).round() as u8
 }
 
+include!("deck_keyboard.rs");
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unavailable_controls_are_not_clickable_or_keyboard_targets() {
+        let q = QuickSettings::DEFAULT;
+        let mut canvas = vec![0; (q.width * q.height * 4) as usize];
+        let font = RefCell::new(TextRenderer::new(
+            "sans",
+            niwoe_tokens::Typography::DEFAULT.body_size.into(),
+        ));
+        let theme = ThemeConfig::default();
+        reset_keyboard_focus();
+        draw(
+            &mut Painter::new(&mut canvas, q.width, q.height),
+            &font,
+            &theme,
+            QuickSettingsState {
+                network: &NetworkState::Offline,
+                audio: &AudioSnapshot::unavailable(),
+                battery: &BatterySnapshot::default(),
+                power_profile: None,
+                theme_name: "dark",
+                power_armed: false,
+            },
+        );
+        let targets = focus_targets();
+        assert!(!targets.iter().any(|(_, action)| matches!(
+            action,
+            QuickSettingsHit::AudioMute
+                | QuickSettingsHit::Volume(_)
+                | QuickSettingsHit::PowerProfile
+                | QuickSettingsHit::Network
+        )));
+        for (rect, action) in &targets {
+            assert!(
+                rect.x >= 0
+                    && rect.y >= 0
+                    && rect.x + rect.w <= q.width
+                    && rect.y + rect.h <= q.height
+            );
+            assert_eq!(
+                hit_test(
+                    q.width as u32,
+                    q.height as u32,
+                    f64::from(rect.x + rect.w / 2),
+                    f64::from(rect.y + rect.h / 2)
+                ),
+                Some(*action)
+            );
+        }
+        for (_, action) in &targets {
+            focus_next(false);
+            assert_eq!(focused_action(), Some(*action));
+        }
+        focus_next(false);
+        assert_eq!(focused_action(), targets.first().map(|(_, action)| *action));
+        if let Ok(path) = std::env::var("NIWOE_DECK_PREVIEW") {
+            // The live compositor supplies the glass surface below this transparent layer.
+            // Show the foreground against its theme tint in the standalone preview.
+            let background = theme.glass_tint_color();
+            for pixel in canvas.as_chunks_mut::<4>().0 {
+                let inverse = 255 - u16::from(pixel[3]);
+                for (channel, base) in
+                    pixel[..3]
+                        .iter_mut()
+                        .zip([background.b, background.g, background.r])
+                {
+                    *channel = (u16::from(*channel) + u16::from(base) * inverse / 255) as u8;
+                }
+                pixel[3] = 255;
+                pixel.swap(0, 2);
+            }
+            tiny_skia::Pixmap::from_vec(
+                canvas,
+                tiny_skia::IntSize::from_wh(q.width as u32, q.height as u32).unwrap(),
+            )
+            .unwrap()
+            .save_png(path)
+            .unwrap();
+        }
+        reset_keyboard_focus();
+    }
 
     #[test]
     fn outside_is_not_a_hit() {

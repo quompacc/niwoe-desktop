@@ -8,10 +8,10 @@ fn workspace_changed_clamps_workspace_range() {
 }
 
 #[test]
-fn panel_global_activation_point_offsets_bottom_panel_y() {
+fn panel_global_activation_point_uses_top_panel_y() {
     assert_eq!(
         panel_global_activation_point((938.2, 20.7), Some(800)),
-        crate::status_notifier::ActivationPoint { x: 938, y: 800 - niwoe_tokens::Panel::DEFAULT.surface_height() as i32 + 21 }
+        crate::status_notifier::ActivationPoint { x: 938, y: 21 }
     );
     assert_eq!(
         panel_global_activation_point((938.2, 20.7), None),

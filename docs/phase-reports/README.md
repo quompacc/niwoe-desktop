@@ -5,7 +5,16 @@
 | P00 | accepted | [P00.md](P00.md) |
 | P01 | accepted | [P01.md](P01.md) |
 | P02 | in-progress | [P02.md](P02.md) |
-| P03–P13 | not-started | — |
+| P03 | in-progress | [P03.md](P03.md) |
+| P04–P05 | in-progress | [Native Shell-Neubau](P03_P05_NATIVE_REBUILD.md) |
+| P06–P13 | not-started | — |
+
+**Aktueller Einstieg, 22.09.:** P02-Designgrundlagen implementiert und geprüft.
+Auf Nutzerauftrag keine weitere Abnahmerunde der alten Shell. Panel, Such-Launcher
+und System-Deck sind nativ neu aufgebaut: [Umsetzungsstand](P03_P05_NATIVE_REBUILD.md).
+Offene Scale-/HiDPI-/Performance-Nachweise an den neuen
+Oberflächen erbringen; P02 bleibt bis dahin ausdrücklich unvollständig abgenommen.
+Maßgeblich: [aktueller Handoff](P02_HANDOFF.md) und die Scope-Korrektur im Plan.
 
 P01, Abschluss 22.09.2026: Namensmigration und nicht überschreibende
 XDG-/Installationsmigration implementiert und lokal committet. Fedora-Gates

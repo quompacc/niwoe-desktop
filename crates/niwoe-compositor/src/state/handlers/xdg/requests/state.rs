@@ -362,7 +362,7 @@ fn select_output_from_infos_for_point(
 mod tests {
     use smithay::utils::Transform;
 
-    use crate::state::{OutputGeometry, OutputId, OutputInfo, NORMAL_WINDOW_BOTTOM_RESERVED_PX};
+    use crate::state::{OutputGeometry, OutputId, OutputInfo, NORMAL_WINDOW_TOP_RESERVED_PX};
 
     use super::{
         normal_maximize_client_for_output, remeasured_maximized_frame,
@@ -389,7 +389,7 @@ mod tests {
         // Output shrank: the maximized frame must follow to the smaller workarea.
         assert_eq!(
             remeasured_maximized_frame(big_size, small, insets),
-            Some(((0, 32).into(), small_size))
+            Some(((0, NORMAL_WINDOW_TOP_RESERVED_PX + 32).into(), small_size))
         );
         // Unchanged geometry: no re-measure (avoid a redundant configure).
         assert_eq!(remeasured_maximized_frame(small_size, small, insets), None);
@@ -443,8 +443,8 @@ mod tests {
             height: 900,
         };
         let (loc, size) = normal_maximize_client_for_output(output, (0, 32, 0, 0));
-        assert_eq!(loc, (42, 39).into());
+        assert_eq!(loc, (42, NORMAL_WINDOW_TOP_RESERVED_PX + 39).into());
         assert_eq!(size.w, 1600);
-        assert_eq!(size.h, 900 - NORMAL_WINDOW_BOTTOM_RESERVED_PX - 32);
+        assert_eq!(size.h, 900 - NORMAL_WINDOW_TOP_RESERVED_PX - 32);
     }
 }
