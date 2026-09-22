@@ -1,6 +1,6 @@
 //! Metro-styled button widget used by preview footer controls.
 
-use niwoe_tokens::Interaction;
+use niwoe_tokens::{Controls, Interaction, Typography};
 use taffy::prelude::{length, Size, Style};
 use tiny_skia::{Pixmap, PixmapMut, PixmapPaint, Transform};
 
@@ -13,12 +13,12 @@ use crate::{
 
 use super::{tile::STRIPE_HEIGHT, Widget};
 
-pub const BUTTON_DEFAULT_WIDTH: i32 = 48;
-pub const BUTTON_DEFAULT_HEIGHT: i32 = 48;
-pub const BUTTON_LABEL_PADDING_X: i32 = 6;
-pub const BUTTON_LABEL_BASELINE_FROM_BOTTOM: i32 = 8;
-pub const BUTTON_LABEL_FONT_PX: f32 = 11.0;
-pub const BUTTON_ARMED_LABEL_FONT_PX: f32 = 14.0;
+pub const BUTTON_DEFAULT_WIDTH: i32 = Controls::ICON_BUTTON_SIZE;
+pub const BUTTON_DEFAULT_HEIGHT: i32 = Controls::ICON_BUTTON_SIZE;
+pub const BUTTON_LABEL_PADDING_X: i32 = Controls::ICON_LABEL_PADDING;
+pub const BUTTON_LABEL_BASELINE_FROM_BOTTOM: i32 = Controls::ICON_LABEL_BASELINE;
+pub const BUTTON_LABEL_FONT_PX: f32 = Typography::DEFAULT.caption_size as f32;
+pub const BUTTON_ARMED_LABEL_FONT_PX: f32 = Typography::DEFAULT.body_size as f32;
 const DEFAULT_ARMED_LABEL: &str = "OK?";
 
 pub struct Button {
@@ -152,7 +152,8 @@ impl Widget for Button {
             let label = self.armed_label.unwrap_or(DEFAULT_ARMED_LABEL);
             let (text_w, text_h) = measure_text(label, BUTTON_ARMED_LABEL_FONT_PX);
             let x = area.x + (area.width - text_w) / 2;
-            let baseline = area.y + (area.height + text_h) / 2 - 2;
+            let baseline =
+                area.y + (area.height + text_h) / 2 - Controls::ARMED_LABEL_BASELINE_OFFSET;
             paint_text(
                 canvas,
                 label,
@@ -205,7 +206,7 @@ fn paint_progress_ring(canvas: &mut PixmapMut<'_>, area: Rect, color: Color, pro
     if progress >= 1.0 {
         return;
     }
-    let radius = (area.width.min(area.height) as f32 / 2.0) - 3.0;
+    let radius = (area.width.min(area.height) as f32 / 2.0) - Controls::PROGRESS_RING_INSET as f32;
     if radius <= 0.0 {
         return;
     }
@@ -216,7 +217,7 @@ fn paint_progress_ring(canvas: &mut PixmapMut<'_>, area: Rect, color: Color, pro
 
     let mut pb = PathBuilder::new();
     pb.move_to(cx + radius * start.cos(), cy + radius * start.sin());
-    let segments = 64;
+    let segments = Controls::PROGRESS_RING_SEGMENTS;
     for i in 1..=segments {
         let t = i as f32 / segments as f32;
         let angle = start + sweep * t;
@@ -229,10 +230,10 @@ fn paint_progress_ring(canvas: &mut PixmapMut<'_>, area: Rect, color: Color, pro
         ..Paint::default()
     };
     paint.set_color(tiny_skia::Color::from_rgba8(
-        color.r, color.g, color.b, 0xFF,
+        color.r, color.g, color.b, color.a,
     ));
     let stroke = Stroke {
-        width: 3.0,
+        width: Controls::PROGRESS_RING_WIDTH,
         line_cap: LineCap::Round,
         ..Stroke::default()
     };

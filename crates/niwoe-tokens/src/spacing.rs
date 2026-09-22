@@ -32,4 +32,16 @@ impl Controls {
     pub const TRACK_HEIGHT: i32 = 4;
     pub const THUMB_SIZE: i32 = 16;
     pub const CARD_HEIGHT: i32 = 72;
+    /// Existing icon footer geometry; retained while the panel/launcher layout
+    /// is migrated in later phases.
+    pub const ICON_BUTTON_SIZE: i32 = 48;
+    pub const ICON_LABEL_PADDING: i32 = Spacing::DEFAULT.sm;
+    pub const ICON_LABEL_BASELINE: i32 = Spacing::DEFAULT.sm;
+    pub const ARMED_LABEL_BASELINE_OFFSET: i32 = 2;
+    pub const TILE_BASE_SIZE: i32 = 96;
+    pub const TILE_LABEL_BASELINE: i32 = Spacing::DEFAULT.md;
+    pub const TILE_ICON_CENTER_FRACTION: f32 = 0.35;
+    pub const PROGRESS_RING_INSET: i32 = 3;
+    pub const PROGRESS_RING_WIDTH: f32 = 3.0;
+    pub const PROGRESS_RING_SEGMENTS: usize = 64;
 }

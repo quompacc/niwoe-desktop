@@ -173,7 +173,7 @@ impl WindowChrome {
         button_icon_size: 13,
         button_icon_stroke: 1.25,
         button_hover_inset: 3,
-        button_hover_radius: 6.0,
+        button_hover_radius: crate::Radius::DEFAULT.sm as f32,
         separator_height: 1,
         resize_handle: 8,
     };
@@ -429,7 +429,7 @@ impl QuickSettings {
         audio_height: 126,
         status_height: 70,
         footer_height: 46,
-        control_radius: 10,
+        control_radius: crate::Radius::DEFAULT.md,
         slider_height: crate::Controls::TRACK_HEIGHT,
         slider_thumb_size: crate::Controls::THUMB_SIZE,
         icon_size: 20,

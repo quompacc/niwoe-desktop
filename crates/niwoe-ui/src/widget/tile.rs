@@ -1,11 +1,10 @@
 //! Metro tile widget.
 //!
-//! The `label` is stored for future text rendering but is not painted yet.
 //! This implementation rebuilds rounded-rect paths in `paint`; that allocates
 //! in the render path and is an accepted step-5 trade-off until path caching
 //! is introduced.
 
-use niwoe_tokens::Interaction;
+use niwoe_tokens::{Controls, Interaction, Spacing, Typography};
 use taffy::prelude::{span, Style};
 use tiny_skia::{Pixmap, PixmapMut, PixmapPaint, Transform};
 
@@ -18,7 +17,7 @@ use crate::{
 
 use super::Widget;
 
-pub const TILE_BASE_SIZE: i32 = 96;
+pub const TILE_BASE_SIZE: i32 = Controls::TILE_BASE_SIZE;
 pub const TILE_SMALL_WIDTH: i32 = TILE_BASE_SIZE;
 pub const TILE_SMALL_HEIGHT: i32 = TILE_BASE_SIZE;
 pub const TILE_MEDIUM_WIDTH: i32 = TILE_BASE_SIZE * 2;
@@ -27,12 +26,12 @@ pub const TILE_WIDE_WIDTH: i32 = TILE_BASE_SIZE * 4;
 pub const TILE_WIDE_HEIGHT: i32 = TILE_BASE_SIZE * 2;
 pub const TILE_LARGE_WIDTH: i32 = TILE_BASE_SIZE * 4;
 pub const TILE_LARGE_HEIGHT: i32 = TILE_BASE_SIZE * 4;
-pub const STRIPE_HEIGHT: i32 = 4;
+pub const STRIPE_HEIGHT: i32 = Spacing::DEFAULT.xs;
 
-pub const TILE_LABEL_PADDING_X: i32 = 8;
-pub const TILE_LABEL_BASELINE_FROM_BOTTOM: i32 = 10;
-pub const TILE_LABEL_FONT_SMALL_PX: f32 = 11.0;
-pub const TILE_LABEL_FONT_DEFAULT_PX: f32 = 14.0;
+pub const TILE_LABEL_PADDING_X: i32 = Spacing::DEFAULT.sm;
+pub const TILE_LABEL_BASELINE_FROM_BOTTOM: i32 = Controls::TILE_LABEL_BASELINE;
+pub const TILE_LABEL_FONT_SMALL_PX: f32 = Typography::DEFAULT.caption_size as f32;
+pub const TILE_LABEL_FONT_DEFAULT_PX: f32 = Typography::DEFAULT.body_size as f32;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TileSize {
@@ -168,7 +167,8 @@ impl Widget for Tile {
             let iw = icon.width() as i32;
             let ih = icon.height() as i32;
             let x = area.x + (area.width - iw) / 2;
-            let icon_center_y = area.y + (area.height as f32 * 0.35) as i32;
+            let icon_center_y =
+                area.y + (area.height as f32 * Controls::TILE_ICON_CENTER_FRACTION) as i32;
             let y = icon_center_y - ih / 2;
             canvas.draw_pixmap(
                 x,

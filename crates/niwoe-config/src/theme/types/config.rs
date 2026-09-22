@@ -412,7 +412,7 @@ mod tests {
     #[test]
     fn surface_treatment_uses_theme_radius_and_glass_alpha() {
         let decorations = Decorations {
-            corner_radius: niwoe_tokens::Radius::DEFAULT.md as u32,
+            corner_radius: 10,
             glass: true,
             glass_alpha: 0.5,
             glass_frame_alpha: 0.25,
@@ -421,16 +421,16 @@ mod tests {
         };
 
         let modal = decorations.surface_treatment(ThemeSurface::Modal);
-        assert_eq!(modal.radius, 12.0);
+        assert_eq!(modal.radius, 15.0);
         assert_eq!(modal.fill_alpha, 128);
         assert_eq!(modal.frame_alpha, 64);
         // Tint solidity is driven by glass_alpha (the one knob), not a tint field.
         assert_eq!(modal.tint_amount, 0.5);
         assert_eq!(modal.blur_radius, 12.0);
-        assert_eq!(decorations.surface_radius(ThemeSurface::Control), 8.0);
+        assert_eq!(decorations.surface_radius(ThemeSurface::Control), 10.0);
 
         let panel = decorations.surface_treatment(ThemeSurface::Panel);
-        assert_eq!(panel.radius, 12.0);
+        assert_eq!(panel.radius, 15.0);
         // Tint, blur and fill are uniform across every surface (only the radius
         // differs) — panel == modal == popup == titlebar.
         assert_eq!(panel.fill_alpha, 128);
@@ -438,7 +438,7 @@ mod tests {
         assert_eq!(panel.blur_radius, 12.0);
 
         let popup = decorations.surface_treatment(ThemeSurface::Popup);
-        assert_eq!(popup.radius, 12.0);
+        assert_eq!(popup.radius, 15.0);
         assert_eq!(popup.tint_amount, 0.5);
         assert_eq!(popup.blur_radius, 12.0);
     }
