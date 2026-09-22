@@ -28,6 +28,15 @@ impl SessionLockHandler for NiwoeState {
             .map(|info| info.name.clone())
             .collect::<Vec<_>>();
 
+        // Popup grabs may ignore set_focus. Revoke them before acquisition so
+        // keys cannot reach a previously focused application behind the lock.
+        if let Some(keyboard) = self.seat.get_keyboard() {
+            keyboard.unset_grab(self);
+        }
+        if let Some(pointer) = self.seat.get_pointer() {
+            pointer.unset_grab(self, SERIAL_COUNTER.next_serial(), 0);
+        }
+
         match self
             .lock_manager
             .begin_lock_with_targets(confirmation, targets)
@@ -44,12 +53,13 @@ impl SessionLockHandler for NiwoeState {
                 self.refresh_lock_focus();
             }
         }
+        self.refresh_lock_focus();
     }
 
     fn unlock(&mut self) {
         let serial = SERIAL_COUNTER.next_serial();
-        self.set_keyboard_focus_with_decorations(None, serial);
         if self.lock_manager.unlock() {
+            self.set_keyboard_focus_with_decorations(None, serial);
             tracing::info!("session unlock → phase=Unlocked");
             self.mark_all_outputs_dirty("session-lock-released");
         }

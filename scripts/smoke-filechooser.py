@@ -5,6 +5,8 @@ Run in the development desktop's session bus. Requires python3-gobject.
 Use --cancel and cancel the dialog to check response 1 instead of success.
 """
 import argparse
+import os
+import subprocess
 import sys
 
 from gi.repository import Gio, GLib
@@ -13,6 +15,14 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("mode", choices=["open", "save", "save-many"])
 parser.add_argument("--cancel", action="store_true")
 args = parser.parse_args()
+# A manual smoke must never place an interactive dialog behind a known lock.
+# This is an additional guard, not proof of an unlocked compositor: the operator
+# still confirms successful unlock before starting each hardware test.
+for lock_name in ("niwoe-lock", "meridian-lock"):
+    lock_check = subprocess.run(["pgrep", "-u", str(os.getuid()), "-x", lock_name],
+                                stdout=subprocess.DEVNULL, check=False)
+    if lock_check.returncode != 1:
+        sys.exit("REFUSED: lock process active or lock preflight unavailable; confirm unlock first")
 bus = Gio.bus_get_sync(Gio.BusType.SESSION, None)
 loop = GLib.MainLoop()
 exit_code = 1

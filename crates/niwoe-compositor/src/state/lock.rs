@@ -193,8 +193,29 @@ impl LockManager {
 }
 
 impl NiwoeState {
-    pub fn refresh_lock_focus(&mut self) {
+    /// The only keyboard focus allowed during a lock is a live lock surface.
+    /// Pending acquisition and loss of the locker remain fail-closed.
+    pub(crate) fn lock_keyboard_focus(
+        &self,
+    ) -> Option<smithay::reexports::wayland_server::protocol::wl_surface::WlSurface> {
         if !matches!(self.lock_manager.phase(), LockPhase::Locked) {
+            return None;
+        }
+        self.workspace_output_state
+            .focused_output(&self.output_registry)
+            .and_then(|id| self.output_registry.by_id(id))
+            .and_then(|output| self.lock_manager.surface_for_output(&output.name))
+            .or_else(|| {
+                self.lock_manager
+                    .surfaces_iter()
+                    .next()
+                    .map(|(_, surface)| surface)
+            })
+            .map(|surface| surface.wl_surface().clone())
+    }
+
+    pub fn refresh_lock_focus(&mut self) {
+        if !self.lock_manager.is_locked_or_pending() {
             return;
         }
 
@@ -203,24 +224,7 @@ impl NiwoeState {
             tracing::debug!("pruned dead lock surfaces: {}", dropped);
         }
 
-        let Some(focused_output_id) = self
-            .workspace_output_state
-            .focused_output(&self.output_registry)
-        else {
-            return;
-        };
-        let Some(focused_output_name) = self
-            .output_registry
-            .by_id(focused_output_id)
-            .map(|info| info.name.clone())
-        else {
-            return;
-        };
-
-        let new_focus = self
-            .lock_manager
-            .surface_for_output(&focused_output_name)
-            .map(|surface| surface.wl_surface().clone());
+        let new_focus = self.lock_keyboard_focus();
         let serial = SERIAL_COUNTER.next_serial();
         self.set_keyboard_focus_with_decorations(new_focus, serial);
     }

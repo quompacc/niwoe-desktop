@@ -12,7 +12,11 @@ grün: 1.085 Tests bestanden, 2 bewusst ignoriert, Release und Guards bestanden.
 Nested, Staging-Installation, Live-IPC, Portal-Backendneustart, fehlender Picker
 und Polkit-Neuregistrierung einschließlich Passwort-/Abbruchfällen geprüft.
 Beim Shellneustart gefundene doppelte Polkit-Instanz korrigiert und nachgeprüft.
-Für die Abnahme fehlen Lock, Dateiportal-Hardwarefälle und der abschließende
+Sperrfokusfehler nach Portalstart korrigiert: alter Release fällt im isolierten
+Protokolltest durch, korrigierter Release besteht einschließlich Popup-Grab,
+Unlock und fail-closed bei Clientverlust. Korrektur installiert; Nutzer wieder
+in KDE, gemeinsame Einstellungen unverändert. Echte Lock-Abnahme bleibt offen.
+Für die Abnahme fehlen außerdem Dateiportal-Hardwarefälle und der abschließende
 KDE-Rundlauf. Details und Nachweise: [P01.md](P01.md). P02 nicht begonnen.
 
 P00: Fedora 44 KDE eingerichtet; zusätzliche Entwicklungssitzung installiert.

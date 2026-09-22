@@ -114,6 +114,10 @@ impl XdgShellHandler for NiwoeState {
     }
 
     fn grab(&mut self, surface: PopupSurface, seat: WlSeat, serial: Serial) {
+        if self.lock_manager.is_locked_or_pending() {
+            surface.send_popup_done();
+            return;
+        }
         let Some(seat) = Seat::<Self>::from_resource(&seat) else {
             tracing::warn!("popup grab: wl_seat not associated with a known seat");
             return;
@@ -145,7 +149,7 @@ impl XdgShellHandler for NiwoeState {
                 grab.ungrab(PopupUngrabStrategy::All);
                 return;
             }
-            keyboard.set_focus(self, grab.current_grab(), serial);
+            self.set_keyboard_focus_with_decorations(grab.current_grab(), serial);
             keyboard.set_grab(self, PopupKeyboardGrab::new(&grab), serial);
         }
 

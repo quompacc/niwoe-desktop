@@ -7,7 +7,7 @@ if [[ "${1:-}" == --inside ]]; then
   repo="$2"
   evidence="$3"
   cd "$repo"
-  RUST_LOG=info "target/${NIWOE_SMOKE_PROFILE:-release}/niwoe" > "$evidence/compositor.log" 2>&1 &
+  RUST_LOG=info "${NIWOE_SMOKE_COMPOSITOR:-target/${NIWOE_SMOKE_PROFILE:-release}/niwoe}" > "$evidence/compositor.log" 2>&1 &
   compositor_pid=$!
   cleanup_inner() {
     kill "$compositor_pid" 2>/dev/null || true
@@ -37,6 +37,10 @@ if [[ "${1:-}" == --inside ]]; then
   [[ "$client_exit" == 0 || "$client_exit" == 124 ]]
   grep -Eq 'xdg_surface.*configure\(' "$evidence/client.log"
   grep -Eq 'wl_surface.*attach\(wl_buffer' "$evidence/client.log"
+  if [[ "${NIWOE_LOCK_FOCUS_SMOKE:-0}" == 1 ]]; then
+    timeout 15s "target/${NIWOE_SMOKE_PROFILE:-release}/examples/lock_focus_probe" > "$evidence/lock-focus.log" 2>&1
+    cat "$evidence/lock-focus.log"
+  fi
   kill -0 "$compositor_pid"
   echo 'PASS: nested compositor, authenticated shell, Wayland globals, configured client buffer'
   exit 0

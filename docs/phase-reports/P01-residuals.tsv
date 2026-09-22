@@ -40,3 +40,4 @@ scripts/measure-openbsd-drm.ksh	1	Legacy performance output directory override; 
 scripts/migrate-legacy-install.sh	30	Detect and retire old installed names; staged migration fixtures
 scripts/smoke-drm.sh	3	Legacy smoke overrides; present NIWOE values win; no old executable is launched
 scripts/test-install-migration.sh	8	Detect and retire old installed names; staged migration fixtures
+scripts/smoke-filechooser.py	1	Refuse manual portal smoke when a legacy lock process is still running

@@ -535,3 +535,4 @@ M	themes/dark/theme.toml	themes/dark/theme.toml	Own identifiers, type prefixes, 
 M	themes/light/theme.toml	themes/light/theme.toml	Own identifiers, type prefixes, imports and referenced paths renamed consistently
 M	third_party/smithay/Cargo.toml	third_party/smithay/Cargo.toml	Own package and path names; external dependency versions unchanged
 M	third_party/smithay/OPENBSD_PORT.md	third_party/smithay/OPENBSD_PORT.md	Active names/links, migration documentation or evidence
+A		crates/niwoe-lock/examples/lock_focus_probe.rs	Isolated protocol regression for lock focus, popup grabs, unlock and client loss

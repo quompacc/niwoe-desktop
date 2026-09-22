@@ -337,6 +337,14 @@ impl NiwoeState {
             return;
         };
 
+        // All window, layer, activation and IPC focus requests pass here.
+        // Neither creating nor destroying a background dialog may steal the
+        // lock's focus or leave it without a keyboard target.
+        let new_focus = if self.lock_manager.is_locked_or_pending() {
+            self.lock_keyboard_focus()
+        } else {
+            new_focus
+        };
         let old_focus = keyboard.current_focus();
         tracing::debug!(
             "set_keyboard_focus_with_decorations: old_has={} new_has={}",

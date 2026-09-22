@@ -48,6 +48,11 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
         return;
     };
     let lock_active = state.lock_manager.is_locked_or_pending();
+    if lock_active {
+        // Repair a stale target (for example after output/client removal)
+        // before forwarding any key, including while acquisition is pending.
+        state.refresh_lock_focus();
+    }
 
     let match_result = keyboard.input::<KeyMatch, _>(
         state,
