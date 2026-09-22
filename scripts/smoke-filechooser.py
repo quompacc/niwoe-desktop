@@ -39,10 +39,14 @@ def response(_bus, _sender, _path, _interface, _signal, parameters):
 
 def timeout():
     print("FAIL: no portal response within 180 seconds", flush=True)
-    bus.call_sync("org.freedesktop.portal.Desktop", request_path,
-                  "org.freedesktop.portal.Request", "Close", None, None,
-                  Gio.DBusCallFlags.NONE, 5000, None)
-    loop.quit()
+    try:
+        bus.call_sync("org.freedesktop.portal.Desktop", request_path,
+                      "org.freedesktop.portal.Request", "Close", None, None,
+                      Gio.DBusCallFlags.NONE, 5000, None)
+    except GLib.Error as error:
+        print("Request cleanup failed:", error, flush=True)
+    finally:
+        loop.quit()
     return GLib.SOURCE_REMOVE
 
 

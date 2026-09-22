@@ -1,16 +1,18 @@
-# Meridian Agent Rules
+# NIWOE Agent Rules
 
 ## Projekt (Kurz)
-Meridian ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess und
-erstklassigem BSD-Ziel. Meridian-eigene UI bleibt vollständig nativ in Rust und
-baut auf `meridian-ui`, `meridian-tokens` und `meridian-config` auf. Der
-archivierte WebKit-Prototyp ist nur eine visuelle Referenz und kein Produktpfad.
-OpenBSD wird zuerst auf realer Intel-Hardware evaluiert, FreeBSD bleibt die
-ernsthafte Alternative. Aktive Reihenfolge: `docs/NATIVE_UI_PLAN.md` +
-`MERIDIAN_OS_PLAN.md` + `ROADMAP.md`.
+NIWOE ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess. Produktziel
+ist zuerst ein kohärenter nativer Linux-Desktop auf einer bestehenden Linux-
+Distribution; ein eigenes Linux-basiertes OS folgt erst nach der Desktop-Alpha.
+NIWOE-eigene UI bleibt vollständig nativ in Rust und baut bis P01 auf
+`meridian-ui`, `meridian-tokens` und `meridian-config` auf. Der archivierte
+WebKit-Prototyp ist nur visuelle Referenz und kein Produktpfad. Die aktive
+Reihenfolge ist ausschließlich `NIWOE_IMPLEMENTATION_PLAN.md`; frühere
+Meridian-/BSD-Roadmaps sind historische Evidenz und keine offenen Pflichten.
 
 ## Design – VERBINDLICHE Vorgabe (gilt für jede UI-/Render-Änderung)
-Die Datei **`docs/meridian_design_manifest.md` ist die maßgebliche Design-Spezifikation.**
+Die Datei **`docs/meridian_design_manifest.md` ist bis zur P01-Umbenennung die
+maßgebliche Design-Spezifikation.** Sie präzisiert `docs/NIWOE_DESIGN_BRIEF.md`.
 Jede Änderung an Aussehen, Farben, Geometrie oder Effekten MUSS ihr entsprechen.
 Bei Konflikt schlägt das Manifest jede andere Quelle (Audits, Altcode).
 
@@ -23,9 +25,9 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
   via `// guard:allow: <grund>` bzw. `guard:allow-file` begründet.
 - Genau **2 Themes (hell/dunkel)**, identisch bis auf Farben (Layout, Geometrie,
   Radien, Glas/Blur/Schatten gleich). Theme-Wechsel = nur Farbtabelle tauschen.
-- **Branding (Kompass/Meridian-Grafik) nur subtil in Login + Bootsplash**
-  (Manifest §11/§12). NICHT in der Alltags-UI/Taskbar/Startbutton
-  (Manifest §3.4 „kein Kompass-Theater", §9 „kein buntes Logo", §14 „Kompass überall").
+- **Branding nur als NIWOE-Wortmarke in Welcome, Login und About**; keine
+  Meridian-Kompassgrafik und keine Markenfläche in der Alltags-UI, Taskbar oder
+  dem Launcher-Button.
 - **Guard-Test muss grün bleiben:** `cargo test -p meridian-tokens --test design_guard`
   schlägt bei neuen Hardcodes fehl. Roten Guard nie ignorieren — entweder
   zentralisieren oder bewusst mit `// guard:allow: <grund>` freigeben.

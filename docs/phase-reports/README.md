@@ -1,0 +1,50 @@
+# NIWOE-Phasenstatus
+
+| Phase | Status | Bericht |
+|---|---|---|
+| P00 | accepted | [P00.md](P00.md) |
+| P01–P13 | not-started | — |
+
+P00: Fedora 44 KDE eingerichtet; zusätzliche Entwicklungssitzung installiert.
+Format, Workspace-Check, Clippy mit `-D warnings`, alle 1.076 Workspace-Tests
+und Build bestehen ohne zusätzlichen Paket-Ausschluss. Der isolierte Nested-
+Test prüft Shell-Authentifizierung und ein tatsächlich zeichnendes Clientfenster.
+Session-Vertragstest und systemd-Unit-Prüfung bestehen ebenfalls.
+Am 22.09. bestehen außerdem echter Display-Manager-/DRM-Start, Panel/Launcher,
+Portal-Theme-Abfrage und Polkit-Passwortdialog auf dem Acer. Folgearbeit bleiben
+vollständige Portal-Konformität und die breiteren Hardwaremessreihen. Die im Plan
+verlangte P00-Baseline ist abgenommen.
+Video-Brücken-Autostart korrigiert und nach erneutem Login am 22.09. bestätigt:
+kein Hilfsfenster, kein laufender Brückenprozess.
+Details und Nachweise: [P00.md](P00.md).
+
+Launcher-Performance: Debug-Zeichenpfad ca. 166 ms, Release ca. 5,9 ms im
+reproduzierbaren CPU-Test. Release ist seit dem 22.09. installiert; der Nutzer
+bestätigt deutlich schnellere Bedienung. Beim Logout gefundenes Portal-Frontend-Problem
+im Wrapper korrigiert und mit beiden Desktop-Eigentumsfällen getestet;
+Stop/Neustart beider Portal-Dienste beim NIWOE-Neulogin und korrekter Wechsel
+zurück zu KDE bestätigt.
+
+Der aktuelle Agent setzt um und prüft selbstständig; manuelle Modellübergaben
+entfallen. Abhängige Phasen beginnen nach bestandenen fachlichen Gates.
+
+KDE-Isolation: Alter Theme-Export hatte gemeinsame KDE-/GTK-Dateien und
+Icon-Einstellungen überschrieben. Originaldateien restauriert; Nutzer bestätigt
+vollständige Wiederherstellung der KDE-Symbole. Export auf privaten NIWOE-Pfad
+begrenzt und persistente GSettings-Schreibaufrufe entfernt; Regressionstest und
+Gates grün, korrigierte Release-Shell installiert. Erneuter Desktop-Rundlauf
+bestanden: alle fünf KDE-/GTK-Dateien bytegleich, KDE-Theme/Icon-Einstellungen
+erhalten, NIWOE-Dienste unter KDE beendet.
+
+Polkit-Neuregistrierung implementiert und als Release installiert; privater
+D-Bus-Integrationstest mit zwei Besitzerwechseln und Request-Abbruch besteht.
+Alle Workspace-Gates grün. Echter Dienstneustart am 22.09. ebenfalls bestanden:
+gleicher Agentprozess, neue polkitd-PID, anschließende Authentifizierung Exit 0.
+Negativfälle auf Hardware ebenfalls bestanden: falsches Passwort wird
+abgewiesen, Esc bricht nach Fehler sowie ohne Eingabe ab; jeweils Exit 1 und
+keine Autorisierung. Sichtbarer Abbrechen-Button fehlt; Esc ist der Abbruchweg.
+
+Dateiportal: SaveFile/SaveFiles liefern korrigierte URI-Arrays. Öffentlicher
+Portalpfad auf Hardware für Speichern, Mehrfachspeichern und Abbruch bestanden.
+Prüfstand am 22.09.: 1.076 Tests bestanden, 2 manuelle Tests bewusst ignoriert.
+Nächste Phase: P01, vollständige NIWOE-Namensmigration.

@@ -1,10 +1,14 @@
 # Project Status
 
+> **Historischer Snapshot:** Die folgenden Angaben und offenen Aufgaben beziehen
+> sich auf den Meridian-Stand vom August 2026. Sie definieren keine aktive
+> BSD-/WebKit-Strategie. Seit 21.09.2026 gelten `../NIWOE_IMPLEMENTATION_PLAN.md`
+> und `phase-reports/README.md` für Richtung und tatsächlich verifizierten Fortschritt.
+
 Stand: 2026-08-26 auf Branch `codex/openbsd-native`.
 
-Dieses Dokument beschreibt den **implementierten Ist-Stand**. Die aktive
-Zielrichtung steht in `../MERIDIAN_OS_PLAN.md`, `../ROADMAP.md` und
-`NATIVE_UI_PLAN.md`. Zielarchitektur ist nicht automatisch implementierter Stand.
+Dieses Dokument beschreibt den damaligen implementierten Stand. Die früheren
+Verweise auf Meridian-Roadmaps und BSD-Evaluationen sind abgelöst.
 
 ## Strategische Einordnung
 

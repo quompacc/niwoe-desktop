@@ -1,6 +1,7 @@
-# Meridian Architecture
+# NIWOE Architecture
 
-> Updated 2026-08-25. Meridian's product UI is implemented natively in Rust.
+> Updated 2026-09-21. Product UI is native Rust; Linux is the product target.
+> Existing `meridian-*` identifiers remain until the P01 naming migration.
 > The retired WebKit prototype is retained only as a visual reference.
 
 ## Stable system boundary
@@ -61,7 +62,7 @@ native meridian-shell (unprivileged)
 ```
 
 The shell is a separate unprivileged Wayland client, not a compositor plugin.
-Detailed sequencing and acceptance gates are in `NATIVE_UI_PLAN.md`.
+Detailed sequencing and acceptance gates are in `../NIWOE_IMPLEMENTATION_PLAN.md`.
 
 ## UI boundary
 
@@ -90,16 +91,15 @@ Visual stacking is correctness and remains:
 5. overlay surfaces/launcher/popups
 6. cursor
 
-Moving a surface from native drawing to WebKit does not authorize reordering.
+Changing native surface composition does not authorize reordering.
 
 ## Backends and platforms
 
 - DRM/KMS is the authoritative real-session path.
 - Winit/nested execution supports development and regression tests.
-- Linux is the currently exercised implementation platform.
-- FreeBSD has an existing logind-free installer/session path.
-- OpenBSD is the next hardware/portability evaluation; support is not yet
-  claimed.
+- Linux is the active development and product platform.
+- Existing FreeBSD/OpenBSD adapters remain technical references, not active
+  evaluation targets or mandatory release gates.
 
 OS integrations live behind explicit platform adapters. OpenBSD `pledge` and
 `unveil` and FreeBSD Capsicum/jails/MAC are not treated as interchangeable APIs.
@@ -117,38 +117,36 @@ GTK, Qt, browsers, Electron and wxWidgets remain external. See `APP_STACK.md`.
 
 ```text
 meridian-tokens + meridian-config
-              ├─ native render consumers
-              └─ generated CSS variables → shared Web Components
+              └─ native meridian-ui and render consumers
 ```
 
-There is no hand-maintained parallel CSS palette. The design guard must cover
-web assets before production migration.
+There is no parallel product CSS palette or planned WebKit migration.
+Archived web assets are historical visual references only.
 
 ## Security boundaries
 
-- WebKit runs without root, DRM/input handles or ambient command execution.
+- The native shell runs without root or raw DRM/input handles.
 - Privileged operations remain in small Rust services/helpers.
-- Every bridge call is typed, validated and capability-checked.
-- Packaged local content is the default; remote navigation is denied.
-- A compromised document must not imply compositor or root compromise.
+- IPC calls are typed, validated and subject to existing authentication/policy.
+- A shell failure must not bypass compositor-owned session locking.
 
 ## Performance-sensitive paths
 
 - compositor DRM/Winit render and damage paths
 - decorations, wallpaper and captures
-- UI surface commits and WebKit paints
+- native UI surface commits
 - icon/font decode and launcher population
 - bridge event fan-out and state serialization
 
 Static UI must be event-driven. Reusable assets are cached with explicit
-theme/scale/content invalidation. The Acer/OpenBSD evaluation provides the
-low-end measurement baseline.
+theme/scale/content invalidation. The documented Linux host provides the
+measurement baseline; old BSD results do not substitute for it.
 
 ## Related documents
 
-- `../MERIDIAN_OS_PLAN.md` — strategy and OS decision
-- `../ROADMAP.md` — execution phases
-- `UI_PLATFORM.md` — runtime/bridge target
-- `PROJECT_STATUS.md` — implemented behavior
+- `../NIWOE_IMPLEMENTATION_PLAN.md` — strategy and execution phases
+- `NIWOE_LINUX_BASELINE.md` — setup and validation
+- `phase-reports/README.md` — verified implementation status
+- `PROJECT_STATUS.md` — historical implementation snapshot
 - `OPENBSD.md` / `FREEBSD.md` — platform evidence
 - `meridian_design_manifest.md` — binding visual specification

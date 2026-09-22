@@ -1,8 +1,9 @@
 # Controlled Hardware Smoke
 
-> **Scope note (2026-08-19):** this documents the current Linux/native-shell
-> hardware pass. For the new OpenBSD/Acer decision path use `OPENBSD.md`; do not
-> report this smoke as BSD validation.
+> **Scope note (2026-09-21):** NIWOE targets Linux. Start with
+> [the current baseline](NIWOE_LINUX_BASELINE.md), keeping the existing desktop
+> and display manager available. The boot-login replacement procedure below is
+> historical and optional; it is not a P00 requirement. BSD evidence is historical.
 
 This runbook separates preflight work from checks that can only be proven on
 real DRM/input hardware.

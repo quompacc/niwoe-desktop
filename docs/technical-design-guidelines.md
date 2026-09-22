@@ -1,9 +1,10 @@
 # Technical Design Guidelines
 
-These guidelines define implementation discipline for Meridian patches.
+These guidelines define implementation discipline for NIWOE patches.
 
-The active product direction is a BSD-capable Rust compositor plus a separate,
-unprivileged native Rust shell for Meridian-owned surfaces.
+The active product direction is a Linux Rust compositor plus a separate,
+unprivileged native Rust shell. Existing BSD adapters remain technical reference;
+the old BSD evaluation roadmap is superseded by `../NIWOE_IMPLEMENTATION_PLAN.md`.
 
 ## Native Shell Boundary
 - Keep DRM/KMS, input, Wayland policy, window management, IPC authority and

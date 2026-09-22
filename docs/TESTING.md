@@ -1,7 +1,25 @@
 # Testing Guide
 
-> Updated 2026-08-25. Meridian's product UI and its test requirements are fully
-> native Rust. OpenBSD results must not be claimed from another platform.
+> **Active baseline updated 2026-09-21.** NIWOE's product UI is native Rust and
+> Linux is the product target. The detailed Meridian/OpenBSD/FreeBSD material
+> below is historical evidence only; it does not define active release gates.
+
+## Active NIWOE platform matrix
+
+| Environment | Build/lint/test | Runtime/DRM evidence | Role |
+|---|---|---|---|
+| Documented Linux host (Fedora KDE recommended) | required | required for hardware claims | primary development baseline; host setup pending |
+| Ubuntu CI | required | no | retained portable build baseline |
+| Debian Stable | later compatibility target | optional | conservative second Linux target |
+| Nested/Winit session | useful | no DRM/performance authority | fast shell and IPC regression path |
+| Windows | no Unix validation | no | editing only |
+| historical BSD hosts | evidence only | no active gate | provenance |
+
+Record every Linux result with date, distribution/version, kernel, Rust, GPU,
+display/scale and backend. SELinux remains enforcing; portal, Polkit and session
+activation must be verified within the NIWOE session rather than globally
+disabled. The P00 commands and required runtime evidence are in
+`NIWOE_LINUX_BASELINE.md`.
 
 ## Standardchecks
 Diese Checks sind die Baseline und werden vom pre-push-Hook
