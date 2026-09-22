@@ -48,3 +48,30 @@ Dateiportal: SaveFile/SaveFiles liefern korrigierte URI-Arrays. Öffentlicher
 Portalpfad auf Hardware für Speichern, Mehrfachspeichern und Abbruch bestanden.
 Prüfstand am 22.09.: 1.076 Tests bestanden, 2 manuelle Tests bewusst ignoriert.
 Nächste Phase: P01, vollständige NIWOE-Namensmigration.
+
+## Pause und Wiedereinstieg — 22.09.2026 vormittags
+
+Auf Nutzerwunsch beendet; Fortsetzung am Nachmittag. P00 ist accepted,
+P01 noch nicht begonnen. Kein Testdialog und kein Build mehr offen.
+Auf dem Acer ist die geprüfte Release-Version installiert; zuletzt lief die
+NIWOE-Sitzung und der eigene Portal-Dienst war aktiv. Vor weiteren Hardwaretests
+SSH-Erreichbarkeit und aktuelle Desktop-Sitzung neu prüfen.
+
+Code, Sitzungsintegration und Abnahme sind in `e051efb`, `309110c` und `a3e2e81`
+gesichert. Auf den ausdrücklichen Abschlussauftrag „alles … commiten“ werden
+auch die acht bereitgestellten NIWOE-Mockups und die elf bereits vorhandenen
+Löschungen alter Assets unverändert übernommen. Die frühere Entscheidung,
+diese Bildänderungen separat im Arbeitsbaum zu belassen, ist damit aufgehoben.
+
+Wiedereinstieg: P01 im `NIWOE_IMPLEMENTATION_PLAN.md` lesen, Umbenennungsinventar
+erstellen und Migration einschließlich bestehender Konfigurationspfade planen.
+GitHub wurde vom Nutzer bereits zu `niwoe-desktop` umbenannt; lokale Remotes
+sind noch zu prüfen/anzupassen. Codeberg nicht ungeprüft auf einen neuen Namen
+umstellen. KDE-Isolation und die dokumentierten Runtime-Tests müssen erhalten
+bleiben. Kein neuer Featureblock vor dieser Migration.
+
+Linux-Nachweise liegen unter `target/p00-evidence/`; lokale Evidence-Archive
+liegen unter `target/` und sind bewusst keine Git-Artefakte. Ausführbare
+Prüfverfahren und Ergebnisse sind im Repository dokumentiert. Keine erneuten
+Rust-Gates für diesen reinen Dokumentations-/Asset-Abschluss erforderlich;
+letzter geprüfter Code unverändert, 1.076 Tests bestanden.
