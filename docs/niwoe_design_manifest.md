@@ -2,8 +2,9 @@
 
 > Dieses Manifest ist die verbindliche Design-Spezifikation. Der
 > [NIWOE Design-Brief](NIWOE_DESIGN_BRIEF.md) ist seine Mockup-Präzisierung;
-> dessen Rollen und Einschränkungen sind verbindlich, seine P02-Startwerte sind
-> noch keine Renderer-Hardcodes.
+> dessen Rollen und Einschränkungen sind verbindlich. Die in P02 geprüften
+> Werte stehen in [Komponenten und Messungen](design/P02_COMPONENTS.md);
+> editierbare Quelle bleiben ausschließlich Rust-Tokens und Config.
 
 ## Produkt und Quelle
 
@@ -30,9 +31,14 @@ und Text/Icon, nie allein Farbe.
 Feine Konturen, klare Flächen, ruhige Überschriften und kompakte sachliche
 Bedienung bilden eine Familie. Die zentrale Abstandsleiter startet mit
 4/8/12/16/24/32 logischen Pixeln; Panel (48), Controls (mindestens 32),
-Formularfelder (36) sowie Radien (4/8/12) werden erst in P02 als Tokens
-festgeschrieben. Textkontrast beträgt mindestens 4,5:1 für normalen Text und
+Formularfelder (36) sowie Radien (4/8/12) sind in P02 als Tokens definiert.
+Sans-Schriftgrößen sind 12/14/18/28. Serif bleibt großen Überschriften
+vorbehalten und ist keine Voraussetzung für ein vollständig lesbares UI.
+Textkontrast beträgt mindestens 4,5:1 für normalen Text und
 3:1 für große Schrift/wesentliche Grenzen auf der zusammengesetzten Fläche.
+Dekorative Konturen und notwendige Controlgrenzen sind getrennte Rollen.
+Fokus hat einen zusätzlichen 2-Pixel-Rahmen mit 4-Pixel-Innenabstand; auf
+gefülltem Akzent verwendet er die kontrastierende Vordergrundfarbe.
 
 ## Oberflächen und Branding
 

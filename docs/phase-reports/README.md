@@ -4,7 +4,8 @@
 |---|---|---|
 | P00 | accepted | [P00.md](P00.md) |
 | P01 | accepted | [P01.md](P01.md) |
-| P02–P13 | not-started | — |
+| P02 | in-progress | [P02.md](P02.md) |
+| P03–P13 | not-started | — |
 
 P01, Abschluss 22.09.2026: Namensmigration und nicht überschreibende
 XDG-/Installationsmigration implementiert und lokal committet. Fedora-Gates

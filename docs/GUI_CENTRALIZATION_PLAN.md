@@ -51,7 +51,7 @@ shared niwoe-ui primitives
    its keyboard-first application-catalog behavior;
 3. implement one coherent native Quick Settings surface;
 4. verify both themes, accessibility, scale and input paths;
-5. record start-up, idle and interaction performance on the OpenBSD Acer;
+5. record start-up, idle and interaction performance on the Fedora Acer;
 6. only then expand Settings, notifications, overview and system tools.
 
 ## 6. Performance and invalidation
@@ -70,7 +70,15 @@ literal production colors, alpha values, local radii, unapproved geometry,
 duplicate theme tables and files above the project size limit. Exceptions need
 the narrow documented `guard:allow` form required by the repository rules.
 
-## 8. Definition of Done
+## 8. P02 native component evidence
+
+`niwoe-ui::widget::Component` uses the existing widget and paint pipeline.
+Its offline example renders both palettes with identical geometry and native
+glyph rasterization. Theme files are generated from `Palette`, never a second
+manually maintained palette. See [P02 components](design/P02_COMPONENTS.md)
+and the [phase report](phase-reports/P02.md) for measured scope and open gates.
+
+## 9. Definition of Done
 
 Centralization is complete only when:
 

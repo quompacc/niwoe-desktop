@@ -53,15 +53,14 @@ UI muss auch ohne dieses Wallpaper und vor einem hellen Bild lesbar sein.
 Die sichtbaren App-Innenflächen sind illustrative Beispiele; NIWOE zeichnet sie
 nicht nach und injiziert kein erzwungenes GTK-/Qt-/Electron-Theme.
 
-Vorgeschlagene Branding-Regel für P00: einfache NIWOE-Wortmarke in Welcome, Login,
-About und optional als Launcher-Beschriftung. Kein weiterverwendeter NIWOE-
+Verbindliche Branding-Regel seit P00: einfache NIWOE-Wortmarke nur in Welcome,
+Login und About. Kein weiterverwendeter NIWOE-
 Kompass als Standardicon. Launcher bekommt ein neutrales funktionales Symbol.
 Eine endgültige eigenständige NIWOE-Bildmarke ist ein späteres Asset, kein Blocker.
 
 ## 4. Semantische Designquelle
 
-Vor Umbenennung `niwoe-tokens` + `niwoe-config`, danach `niwoe-tokens` +
-`niwoe-config`. Bestehende `Palette`, `Interaction`, `Elevation`, `Radius`,
+`niwoe-tokens` + `niwoe-config`. Bestehende `Palette`, `Interaction`, `Elevation`, `Radius`,
 `Decorations` und Geometrietokens erweitern. Keine zweite JSON-/CSS-Palette,
 keine gemessenen PNG-Farben direkt im Renderer.
 
@@ -77,6 +76,10 @@ Benötigte Rollen, auf bestehende Felder abbilden oder zentral ergänzen:
 | spacing / typography / radius / elevation | gemeinsame Geometrie beider Themes |
 
 ### Startwerte für P02
+
+Die folgende Tabelle bewahrt die Entwurfsbasis. Verbindliche implementierte
+P02-Werte samt Kontrastbegründung: [P02-Komponenten](design/P02_COMPONENTS.md).
+Insbesondere Light-Sekundärtext und Statusfarben wurden nach Messung verfeinert.
 
 Dies sind begründete Entwurfswerte, keine pixelgenaue Extraktion aus den Bildern.
 P02 darf sie nach Kontrast- und Rastervergleich innerhalb dieser Rollen verfeinern
