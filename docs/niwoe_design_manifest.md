@@ -33,6 +33,11 @@ Zentralitätsplan bleiben verbindlich.
 
 ## Visuelle Richtung
 
+**Light-Korrektur 23.09.2026:** Auf Nutzerwunsch ersetzt gedämpftes Stein- und
+Salbeigrau die nahezu weißen Flächen. Dunkle grünliche Schrift und zurückhaltendes
+Messing bilden einen ruhigen Gegenpol zu Dark. Die Korrektur betrifft nur die
+Light-Farbtabelle; das freigegebene Dark und die gemeinsame Glasbehandlung bleiben.
+
 Die Oberfläche ist ruhig, präzise und materialorientiert: tiefe entsättigte
 Grünflächen, warmes Off-White und zurückhaltendes Messing/Gold. Gold markiert
 nur aktuelle Auswahl, Fokus und die wesentliche Aktion; inaktive Icons und

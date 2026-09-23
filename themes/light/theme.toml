@@ -2,17 +2,17 @@
 # Edit the Rust palette, then regenerate. Geometry is shared.
 
 [colors]
-background = "#f4f1e7"
-surface = "#fffcf3"
-surface_alt = "#e9e9dc"
-accent = "#735715"
-accent_alt = "#644910"
-text = "#18271d"
-text_dim = "#404d41"
-border = "#bdc5b5"
-error = "#872820"
-warning = "#6d370d"
-success = "#245631"
+background = "#d0d5ca"
+surface = "#dce0d5"
+surface_alt = "#c0cbbb"
+accent = "#5d4618"
+accent_alt = "#503b14"
+text = "#202b23"
+text_dim = "#2d3a31"
+border = "#869583"
+error = "#6a1f18"
+warning = "#552c14"
+success = "#15401f"
 
 [icons]
 theme = "Papirus"

@@ -1,5 +1,18 @@
 # NIWOE – aktueller Handoff, 23.09.2026
 
+**Light-Neufassung:** Die zentrale Light-Palette verwendet jetzt gedämpftes
+Stein-/Salbeigrau, dunkle Schrift und Messing. Auf Fedora als Benutzertheme unter
+`~/.config/niwoe/themes/light/theme.toml` installiert und per nativer IPC aktiviert.
+Die Datei ist bytegleich mit `themes/light/theme.toml`; bei künftigen systemweiten
+Theme-Updates muss diese vorrangige Benutzerkopie ebenfalls aktualisiert werden.
+Dark, Geometrie und Materialparameter unverändert. Keine zusätzlichen Renderpässe
+oder laufenden Berechnungen: bestehender Theme-Reload invalidiert die Farb-Caches.
+`cargo fmt --all`, Linux `cargo check --workspace --locked` und
+`cargo test --workspace --locked` bestanden, einschließlich Design-Guard und
+Kontrastprüfungen. Aktuelle Kontrastminima in `docs/design/P02_COMPONENTS.md`.
+Visuelle Nutzerabnahme der neuen Palette steht aus; das bisherige Light-Bild zeigt
+weiterhin den verworfenen Stand. Danach bleiben Deckzustände/Fehlerrückmeldung offen.
+
 **Aktueller Nutzerstand:** Dark-Material und Panel-/Launcher-Anordnung nach
 Installation/Neustart positiv bestätigt. Textzentrierung und größere Uhr ebenfalls
 bestätigt. Light wurde bei der Abnahme als zu grell abgelehnt; zuerst die helle

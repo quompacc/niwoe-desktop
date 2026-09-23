@@ -11,18 +11,18 @@ dezente dekorative Kontur. Gold bleibt Auswahl, Fokus und Hauptaktion vorbehalte
 
 | Feld/Rolle | Dark | Light |
 |---|---|---|
-| background / surface.base | #101710 | #F4F1E7 |
-| surface / surface.raised | #19221A | #FFFCF3 |
-| surface_alt / surface.overlay | #202B22 | #E9E9DC |
-| text / primary | #F1EEE3 | #18271D |
-| text_dim / secondary, disabled, control border | #BAC3B7 | #404D41 |
-| border / subtle | #435044 | #BDC5B5 |
-| accent / focus | #D6B35B | #735715 |
-| accent_alt | #C4A149 | #644910 |
+| background / surface.base | #101710 | #D0D5CA |
+| surface / surface.raised | #19221A | #DCE0D5 |
+| surface_alt / surface.overlay | #202B22 | #C0CBBB |
+| text / primary | #F1EEE3 | #202B23 |
+| text_dim / secondary, disabled, control border | #BAC3B7 | #2D3A31 |
+| border / subtle | #435044 | #869583 |
+| accent / focus | #D6B35B | #5D4618 |
+| accent_alt | #C4A149 | #503B14 |
 | on_accent | #151B13 | #FFFFFF |
-| success | #A0CFA9 | #245631 |
-| warning | #EFB47D | #6D370D |
-| error | #FFB7AD | #872820 |
+| success | #A0CFA9 | #15401F |
+| warning | #EFB47D | #552C14 |
+| error | #FFB7AD | #6A1F18 |
 
 Der Light-Sekundärtext weicht bewusst vom Brief-Startwert ab. Die Messung über
 Hover/Pressed und transparente Flächen erforderte dunkleren Text. Statusfarben
@@ -31,14 +31,14 @@ Alpha-Komposition, einschließlich schwarzem und weißem Hintergrund.
 
 | Gemessenes Minimum | Dark | Light | Ziel |
 |---|---:|---:|---:|
-| Primärtext | 7,312 | 8,237 | 4,5 |
-| Sekundär-/Disabled-Text | 4,683 | 4,709 | 4,5 |
-| Erfolg | 4,851 | 4,527 | 4,5 |
-| Warnung | 4,649 | 5,037 | 4,5 |
-| Fehler | 5,108 | 4,712 | 4,5 |
-| wesentliche Grenzen | 4,683 | 4,709 | 3,0 |
-| Fokus | 4,230 | 3,575 | 3,0 |
-| Text auf Akzent, inklusive Hover/Pressed | 6,798 | 5,317 | 4,5 |
+| Primärtext | 7,312 | 5,764 | 4,5 |
+| Sekundär-/Disabled-Text | 4,683 | 4,684 | 4,5 |
+| Erfolg | 4,851 | 4,621 | 4,5 |
+| Warnung | 4,649 | 4,696 | 4,5 |
+| Fehler | 5,108 | 4,527 | 4,5 |
+| wesentliche Grenzen | 4,683 | 4,684 | 3,0 |
+| Fokus | 4,230 | 3,503 | 3,0 |
+| Text auf Akzent, inklusive Hover/Pressed | 6,798 | 6,730 | 4,5 |
 
 Dekorative subtile Konturen haben ausdrücklich kein 3:1-Versprechen. Sie dürfen
 keine notwendige Controlgrenze oder alleinige Fokuskennzeichnung ersetzen.

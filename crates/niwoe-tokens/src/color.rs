@@ -148,21 +148,21 @@ impl Palette {
     };
 
     /// The single source of truth for the **light** desktop theme. Derived from
-    /// the NIWOE design brief (ivory/green/gold). The
+    /// the user-requested muted stone/sage/brass direction (2026-09-23). The
     /// only thing that differs from [`Palette::DARK`] is the colour table —
     /// see `themes/light/theme.toml`.
     pub const LIGHT: Palette = Palette {
-        background: Color::rgb(0xf4, 0xf1, 0xe7),
-        surface: Color::rgb(0xff, 0xfc, 0xf3),
-        surface_alt: Color::rgb(0xe9, 0xe9, 0xdc),
-        accent: Color::rgb(0x73, 0x57, 0x15),
-        accent_alt: Color::rgb(0x64, 0x49, 0x10),
-        text: Color::rgb(0x18, 0x27, 0x1d),
-        text_dim: Color::rgb(0x40, 0x4d, 0x41),
-        border: Color::rgb(0xbd, 0xc5, 0xb5),
-        error: Color::rgb(0x87, 0x28, 0x20),
-        warning: Color::rgb(0x6d, 0x37, 0x0d),
-        success: Color::rgb(0x24, 0x56, 0x31),
+        background: Color::rgb(0xd0, 0xd5, 0xca),
+        surface: Color::rgb(0xdc, 0xe0, 0xd5),
+        surface_alt: Color::rgb(0xc0, 0xcb, 0xbb),
+        accent: Color::rgb(0x5d, 0x46, 0x18),
+        accent_alt: Color::rgb(0x50, 0x3b, 0x14),
+        text: Color::rgb(0x20, 0x2b, 0x23),
+        text_dim: Color::rgb(0x2d, 0x3a, 0x31),
+        border: Color::rgb(0x86, 0x95, 0x83),
+        error: Color::rgb(0x6a, 0x1f, 0x18),
+        warning: Color::rgb(0x55, 0x2c, 0x14),
+        success: Color::rgb(0x15, 0x40, 0x1f),
     };
 
     /// The historical Tokyo-Night-Metro palette. No longer a shipped theme;
@@ -344,12 +344,12 @@ mod tests {
     }
 
     #[test]
-    fn light_palette_anchors_match_mockup() {
+    fn light_palette_anchors_match_muted_user_direction() {
         let p = Palette::LIGHT;
-        assert_eq!(p.background, Color::rgb(0xf4, 0xf1, 0xe7));
-        assert_eq!(p.surface, Color::rgb(0xff, 0xfc, 0xf3));
-        assert_eq!(p.accent, Color::rgb(0x73, 0x57, 0x15));
-        assert_eq!(p.text, Color::rgb(0x18, 0x27, 0x1d));
+        assert_eq!(p.background, Color::rgb(0xd0, 0xd5, 0xca));
+        assert_eq!(p.surface, Color::rgb(0xdc, 0xe0, 0xd5));
+        assert_eq!(p.accent, Color::rgb(0x5d, 0x46, 0x18));
+        assert_eq!(p.text, Color::rgb(0x20, 0x2b, 0x23));
     }
 
     #[test]
