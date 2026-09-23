@@ -1,8 +1,12 @@
 # NIWOE – aktueller Handoff, 23.09.2026
 
 **Nutzerfreigabe:** „Sieht gut aus. Lassen wir so.“ bestätigt auch die gedämpfte
-Light-Neufassung. Beide Themes bleiben visuell bestehen. Aktueller Folgeauftrag:
-[bestätigte Deck-Mutationen](P05_DECK_MUTATIONS.md), ohne Material-/Layoutänderung.
+Light-Neufassung. Auch die [Deck-Mutationen](P05_DECK_MUTATIONS.md) sind nach
+Installation mit „passt, schaut gut aus“ bestätigt. Beide Themes bleiben bestehen.
+Aktueller nächster Schritt: [P06 Raumgrundlage](P06.md).
+
+Die folgenden Abschnitte dokumentieren frühere Zwischenstände; ausstehende
+Light-/Deck-Freigaben darin sind durch die obige Nutzerabnahme erledigt.
 
 **Light-Neufassung:** Die zentrale Light-Palette verwendet jetzt gedämpftes
 Stein-/Salbeigrau, dunkle Schrift und Messing. Auf Fedora als Benutzertheme unter

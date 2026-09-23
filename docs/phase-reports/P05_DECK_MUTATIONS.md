@@ -3,6 +3,10 @@
 Dark und Light sind vom Nutzer visuell freigegeben. Diese Qualitätsrunde
 ändert keine Farben, Materialwerte oder Geometrie.
 
+**Nutzerabnahme:** Nach Installation und bestätigter laufender Shell meldet der
+Nutzer „passt, schaut gut aus.“ Die Deck-Qualitätsrunde ist damit abgenommen.
+Dies ersetzt keine weiter offenen Mehrmonitor-/HiDPI-Hardwarebelege.
+
 ## Verhalten
 
 - Lautstärke/Stummschaltung und Energieprofil laufen außerhalb des UI-Threads.
@@ -48,6 +52,16 @@ Hardwaretastenpfade sind weiterhin separat. Die Profilfunktion bleibt bei einem
 fehlenden Backend deaktiviert. Live-Abnahme erst nach Installation.
 
 ## Verifikation
+
+**Installation bestätigt:** Der Nutzer hat den Installer ausgeführt; alle sechs
+installierten Programme entsprechen dem Release, KDE-/GTK-Dateien unverändert.
+Der Watchdog hat Shell 1642 erfolgreich durch 21194 ersetzt. Das erste Prüfskript
+traf währenddessen auf den bereits beendeten Prozess und brach bei `/proc/1642/exe`
+ab. Der Prozesswechsel wird jetzt bei allen relevanten `/proc`-Lesezugriffen
+abgefangen; eine bereits aktuelle Shell wird nicht erneut gestartet.
+SSH-Nachprüfung: Shell 21194 ist bytegleich mit dem installierten Release.
+Compositor 1626 blieb erhalten. Die unten beschriebene sudo-Blockade ist erledigt;
+die interaktive Funktionsabnahme des Decks steht noch aus.
 
 Fedora: `cargo check --workspace --locked`, `cargo test --workspace --locked`,
 `cargo clippy --workspace --all-targets --locked -- -D warnings` und
