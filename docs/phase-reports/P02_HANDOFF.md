@@ -1,12 +1,22 @@
 # NIWOE – aktueller Handoff, 23.09.2026
 
+**Arbeitsstopp / maßgeblicher letzter Nutzerstand:** Der Nutzer hat den sichtbaren
+Raumeditor aus `7c8e8b4` als nicht der Gestaltungsvorgabe entsprechend abgelehnt
+und die Umsetzung für heute beendet. Nur Dokumentation, Commit und Push sind
+anschließend beauftragt. Keine weiteren Codeänderungen oder Installationen.
+Der Editor ist technisch geprüft, aber ausdrücklich **nicht visuell abgenommen**.
+Bei Wiederaufnahme zuerst die verbindlichen Mockups und das Designmanifest mit
+der tatsächlichen Umsetzung abgleichen; keine weitere freie Ersatzgestaltung.
+Konkrete Abweichungen sind noch nicht einzeln erhoben. Details: [P06](P06_ROOM_EDITOR.md).
+
 **Nutzerfreigabe:** „Sieht gut aus. Lassen wir so.“ bestätigt auch die gedämpfte
 Light-Neufassung. Auch die [Deck-Mutationen](P05_DECK_MUTATIONS.md) sind nach
 Installation mit „passt, schaut gut aus“ bestätigt. Beide Themes bleiben bestehen.
 Aktueller nächster Schritt: [P06 Raumgrundlage](P06.md).
 
-Fortschritt: [sichtbarer Raumeditor](P06_ROOM_EDITOR.md) umgesetzt und geprüft;
-Installation und DRM-Bedienabnahme verfolgen. Dark bleibt ausgewählt.
+Fortschritt: [sichtbarer Raumeditor](P06_ROOM_EDITOR.md) implementiert und technisch
+geprüft, gestalterisch vom Nutzer abgelehnt. Installation dieses Builds nicht
+bestätigt; keine Aufforderung zur Installation des abgelehnten Standes. Dark bleibt ausgewählt.
 
 Die folgenden Abschnitte dokumentieren frühere Zwischenstände; ausstehende
 Light-/Deck-Freigaben darin sind durch die obige Nutzerabnahme erledigt.

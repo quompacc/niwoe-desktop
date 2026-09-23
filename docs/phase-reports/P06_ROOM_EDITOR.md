@@ -1,5 +1,26 @@
 # Räume benennen und sortieren
 
+## Nutzerentscheidung vom 23.09.2026
+
+**Gestalterisch abgelehnt, nicht abgenommen.** Der Nutzer erklärt, dass diese
+Umsetzung nicht der verbindlichen Vorgabe entspricht, und beendet die Arbeit
+für heute. Der Implementierungsstand `7c8e8b4` bleibt zur Nachvollziehbarkeit
+erhalten; er ist keine akzeptierte Designreferenz. Anschließend sind nur
+Dokumentation, Commit und Push beauftragt, keine weitere Umsetzung oder Installation.
+
+Die unten genannten bestandenen technischen Tests und der Offscreen-Renderbeleg
+belegen keine Übereinstimmung mit den verbindlichen Mockups. Der visuelle Abgleich
+war nicht ausreichend. Konkrete Abweichungen sind noch nicht einzeln dokumentiert;
+bei Wiederaufnahme müssen Manifest und Mockups gegen die tatsächliche Darstellung
+geprüft werden, bevor daraus weitere UI-Arbeit abgeleitet wird.
+
+Der Installer wurde bereitgestellt, die Installation dieses Editor-Builds wurde
+im Gespräch nicht bestätigt. Direkte DRM-Bedienabnahme bleibt ebenfalls offen.
+Die zuvor bestätigten Material-/Theme-Stände werden durch diese Ablehnung nicht
+nachträglich als abgelehnt gewertet.
+
+## Implementierter, nicht abgenommener Stand
+
 Der erste sichtbare Raum-Schritt: Rechtsklick auf einen Raum im Panel oder in
 der Raumübersicht öffnet den nativen Editor. Ein neuer Name wird per Enter oder
 „Speichern“ übernommen. „Nach links“/„Nach rechts“ ändern die Anzeigenreihenfolge.
@@ -65,9 +86,10 @@ Direkte Maus-/Tastaturabnahme auf dem DRM-Desktop steht nach Installation noch a
 Compositor und Shell wurden geändert: nach Installation neu bei NIWOE anmelden.
 
 Installer auf Fedora: `target/p06-room-ui/install.sh` (Shell-Syntax geprüft).
-Die Installation dieses Standes steht noch aus: `sudo -n true` verlangt ein
-Passwort. SSH-Schlüsselzugang funktioniert; die Installation erfolgt über den
-interaktiven SSH-Aufruf mit lokaler sudo-Passworteingabe.
+Letzter Installationsversuch scheiterte vor dem Installieren: `sudo -n true`
+verlangt ein Passwort. SSH-Schlüsselzugang funktioniert. Nach der Nutzerablehnung
+wird keine weitere Installation angestoßen; der bereitgestellte Installer ist
+lediglich ein technisches Artefakt, keine Installationsempfehlung.
 
 ## Performance
 
