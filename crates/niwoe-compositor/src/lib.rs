@@ -5,6 +5,7 @@ pub mod grabs;
 pub mod input;
 mod layer_order;
 pub mod protocols;
+pub mod room_registry;
 pub mod state;
 pub mod wallpaper;
 pub mod workspace;

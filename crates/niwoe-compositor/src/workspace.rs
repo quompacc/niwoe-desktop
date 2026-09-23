@@ -13,6 +13,7 @@ use smithay::{
 /// be located regardless of which workspace is currently shown.
 pub struct WorkspaceManager<E: SpaceElement = Window> {
     spaces: Vec<Space<E>>,
+    rooms: crate::room_registry::RoomRegistry,
     pub active: usize,
 }
 
@@ -24,10 +25,32 @@ impl<E: SpaceElement + PartialEq> Default for WorkspaceManager<E> {
 
 impl<E: SpaceElement + PartialEq> WorkspaceManager<E> {
     pub fn new() -> Self {
+        Self::with_rooms(
+            crate::room_registry::RoomRegistry::from_definitions(
+                niwoe_config::rooms::Rooms::from_legacy_slots(),
+            )
+            .expect("built-in legacy rooms are valid"),
+        )
+    }
+
+    pub fn with_rooms(rooms: crate::room_registry::RoomRegistry) -> Self {
         Self {
-            spaces: (0..9).map(|_| Space::default()).collect(),
+            spaces: (0..rooms.slot_count()).map(|_| Space::default()).collect(),
+            rooms,
             active: 0,
         }
+    }
+
+    pub fn rooms(&self) -> &crate::room_registry::RoomRegistry {
+        &self.rooms
+    }
+
+    pub fn find_element_room<F>(&self, pred: F) -> Option<(niwoe_config::rooms::RoomId, &E)>
+    where
+        F: Fn(&E) -> bool,
+    {
+        self.find_element_workspace(pred)
+            .and_then(|(slot, element)| self.rooms.room_at_slot(slot).map(|id| (id, element)))
     }
 
     pub fn count(&self) -> usize {
@@ -232,6 +255,34 @@ mod tests {
         m.space_at_mut(1)
             .map_element(MockWindow { id: 1 }, (0, 0), false);
         assert!(m.find_element_workspace(|w| w.id == 99).is_none());
+    }
+
+    #[test]
+    fn window_room_identity_uses_space_slot_not_display_position() {
+        use niwoe_config::rooms::{RoomId, Rooms};
+        let mut definitions = Rooms::from_legacy_slots();
+        definitions.rooms.reverse();
+        definitions.rooms[8].name = "Arbeit".into();
+        let registry = crate::room_registry::RoomRegistry::from_definitions(definitions).unwrap();
+        let mut m = WorkspaceManager::with_rooms(registry);
+        let window = MockWindow { id: 42 };
+        m.space_at_mut(0)
+            .map_element(window.clone(), (12, 34), false);
+        assert_eq!(
+            m.find_element_room(|w| w.id == 42).map(|(id, _)| id),
+            Some(RoomId(1))
+        );
+        m.move_window_to(window.clone(), 8);
+        assert_eq!(
+            m.find_element_room(|w| w.id == 42).map(|(id, _)| id),
+            Some(RoomId(9))
+        );
+        assert_eq!(
+            m.space_at(8).element_location(&window),
+            Some((12, 34).into())
+        );
+        assert_eq!(m.active, 0);
+        assert!(m.space_at(0).elements().next().is_none());
     }
 
     #[test]

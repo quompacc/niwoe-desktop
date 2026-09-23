@@ -173,6 +173,13 @@ impl NiwoeState {
         let image_copy_capture_state = ImageCopyCaptureState::new::<NiwoeState>(&display_handle);
 
         let niwoe_config = NiwoeConfig::load();
+        let rooms = crate::room_registry::RoomRegistry::open(&niwoe_config::config_directory())?;
+        tracing::info!(
+            revision = rooms.definitions().revision,
+            count = rooms.slot_count(),
+            "persistent room registry loaded"
+        );
+        let workspace_count = rooms.slot_count();
         let idle_timeout = niwoe_config
             .general
             .idle_timeout_secs
@@ -195,7 +202,7 @@ impl NiwoeState {
             loop_signal,
             socket_name,
             seat,
-            workspaces: WorkspaceManager::new(),
+            workspaces: WorkspaceManager::with_rooms(rooms),
             outputs: Vec::new(),
             output_layout,
             output_config_entries,
@@ -204,7 +211,7 @@ impl NiwoeState {
             popups: PopupManager::default(),
             theme_manager,
             wallpaper_manager,
-            wm_workspaces: (0..9).map(|_| WmWorkspace::new()).collect(),
+            wm_workspaces: (0..workspace_count).map(|_| WmWorkspace::new()).collect(),
             ipc: IpcServer::new(),
             keybind_config: niwoe_config.keybinds,
             decoration_manager: DecorationManager::new(),
