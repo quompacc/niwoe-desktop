@@ -16,7 +16,8 @@ impl NiwoeShell {
     }
 
     fn needs_fast_tick(&self) -> bool {
-        self.armed_power.is_some()
+        self.deck_mutation.pending()
+            || self.armed_power.is_some()
             || self.thumbnail_dirty && self.thumbnail_popup_open
             || !self.thumbnail_popup_open
                 && self.thumbnail_hover_app_idx.is_some()
@@ -82,6 +83,7 @@ impl NiwoeShell {
         // Settings pages render cached state immediately. Any slower platform
         // query or image decode completes here without blocking input.
         self.poll_settings_refresh(qh);
+        self.poll_deck_mutations(qh);
 
         self.maybe_log_repaint_stats(now);
         self.maybe_log_commit_stats(now);
@@ -198,7 +200,9 @@ impl NiwoeShell {
                 }
                 crate::settings_refresh::SettingsData::Bluetooth(value) => {
                     self.bluetooth_snapshot = value;
-                    if self.network_popup_open && self.network_popup_tab == crate::network_popup::NetworkTab::Status {
+                    if self.network_popup_open
+                        && self.network_popup_tab == crate::network_popup::NetworkTab::Status
+                    {
                         self.draw_network_popup(qh, RepaintReason::Ipc);
                     }
                 }
@@ -474,7 +478,7 @@ impl NiwoeShell {
                         .info(output)
                         .and_then(|info| info.name.clone())
                         .as_deref()
-                            == Some(name)
+                        == Some(name)
                 });
                 matched.cloned().or_else(|| {
                     tracing::debug!(

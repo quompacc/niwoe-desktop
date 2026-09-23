@@ -53,6 +53,9 @@ pub struct QuickSettingsState<'a> {
     pub audio: &'a AudioSnapshot,
     pub bluetooth: &'a crate::bluetooth::BluetoothSnapshot,
     pub bluetooth_pending: bool,
+    pub volume_preview: Option<u8>,
+    pub audio_status: crate::deck_mutation::Status,
+    pub power_status: crate::deck_mutation::Status,
     pub battery: &'a BatterySnapshot,
     pub power_profile: Option<PowerProfile>,
     pub theme_name: &'a str,
@@ -87,6 +90,8 @@ pub fn draw(
     draw_panel(painter, theme, audio);
     let device = state.audio.default_output.as_ref();
     let muted = device.is_none_or(|d| d.muted);
+    let audio_ready =
+        device.is_some() && state.audio_status != crate::deck_mutation::Status::Pending;
     let mute = Rect {
         x: audio.x,
         y: audio.y,
@@ -98,20 +103,27 @@ pub fn draw(
         theme,
         mute,
         crate::panel_view::status_symbols::Symbol::Audio(muted),
-        device.is_some(),
+        audio_ready,
     );
-    AUDIO_MUTE.with(|slot| slot.set(if device.is_some() { mute } else { ZERO_RECT }));
+    AUDIO_MUTE.with(|slot| slot.set(if audio_ready { mute } else { ZERO_RECT }));
     painter.text_clipped(
         font,
-        &device
-            .map(|d| d.name.clone())
-            .unwrap_or_else(|| "Nicht verfügbar".into()),
+        &match state.audio_status {
+            _ if state.volume_preview.is_some() => "Loslassen zum Ãœbernehmen".into(),
+            crate::deck_mutation::Status::Pending => "Wird geändert …".into(),
+            crate::deck_mutation::Status::Failed => "Nicht übernommen – erneut versuchen".into(),
+            crate::deck_mutation::Status::Idle => device
+                .map(|d| d.name.clone())
+                .unwrap_or_else(|| "Nicht verfügbar".into()),
+        },
         audio.x,
         audio.y + mute.h + gap.lg,
         audio.w,
         glass_dim_from_config(theme),
     );
-    let volume = device.and_then(|d| d.volume_percent);
+    let volume = state
+        .volume_preview
+        .or_else(|| device.and_then(|d| d.volume_percent));
     let slider = Rect {
         x: mute.x + mute.w + gap.md,
         y: audio.y,

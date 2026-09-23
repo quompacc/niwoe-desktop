@@ -139,8 +139,12 @@ impl NiwoeShell {
                 self.toggle_launcher();
             }
             ShellEvent::LaunchTerminal => self.launch_default_app(None),
-            ShellEvent::LaunchBrowser => self.launch_default_app(Some(crate::default_apps::DefaultAppCategory::WebBrowser)),
-            ShellEvent::LaunchFiles => self.launch_default_app(Some(crate::default_apps::DefaultAppCategory::FileManager)),
+            ShellEvent::LaunchBrowser => {
+                self.launch_default_app(Some(crate::default_apps::DefaultAppCategory::WebBrowser))
+            }
+            ShellEvent::LaunchFiles => {
+                self.launch_default_app(Some(crate::default_apps::DefaultAppCategory::FileManager))
+            }
             ShellEvent::ToggleQuickSettings => {
                 // The combined native Quick Settings card shares the network
                 // popup surface; redraw_after_ipc commits it after this state
@@ -176,18 +180,12 @@ impl NiwoeShell {
             }
             ShellEvent::AppearanceWallpaperModeSet { mode } => {
                 let mode = match mode {
-                    niwoe_ipc::AppearanceWallpaperMode::Fill => {
-                        niwoe_config::WallpaperMode::Fill
-                    }
-                    niwoe_ipc::AppearanceWallpaperMode::Fit => {
-                        niwoe_config::WallpaperMode::Fit
-                    }
+                    niwoe_ipc::AppearanceWallpaperMode::Fill => niwoe_config::WallpaperMode::Fill,
+                    niwoe_ipc::AppearanceWallpaperMode::Fit => niwoe_config::WallpaperMode::Fit,
                     niwoe_ipc::AppearanceWallpaperMode::Center => {
                         niwoe_config::WallpaperMode::Center
                     }
-                    niwoe_ipc::AppearanceWallpaperMode::Tile => {
-                        niwoe_config::WallpaperMode::Tile
-                    }
+                    niwoe_ipc::AppearanceWallpaperMode::Tile => niwoe_config::WallpaperMode::Tile,
                 };
                 let effective_path = self.wallpaper_path.clone().or_else(|| {
                     self.theme
@@ -269,25 +267,25 @@ impl NiwoeShell {
                 self.audio_dirty = self.audio_popup_open;
             }
             ShellEvent::QuickSettingsAudioMuteToggle => {
-                crate::audio::toggle_default_sink_mute();
-                self.audio_snapshot = crate::audio::AudioSnapshot::poll();
+                self.start_deck_audio(crate::deck_mutation::AudioChange::Mute(
+                    !self
+                        .audio_snapshot
+                        .default_output
+                        .as_ref()
+                        .is_some_and(|d| d.muted),
+                ));
                 self.panel_dirty = true;
                 self.audio_dirty = self.audio_popup_open;
             }
             ShellEvent::PowerProfileSet { profile } => {
-                use crate::power_profile::{self, PowerProfile};
+                use crate::power_profile::PowerProfile;
                 let profile = match profile {
                     niwoe_ipc::QuickSettingsPowerProfile::Eco => PowerProfile::Eco,
                     niwoe_ipc::QuickSettingsPowerProfile::Standard => PowerProfile::Standard,
-                    niwoe_ipc::QuickSettingsPowerProfile::Performance => {
-                        PowerProfile::Performance
-                    }
+                    niwoe_ipc::QuickSettingsPowerProfile::Performance => PowerProfile::Performance,
                 };
-                if power_profile::set(profile) {
-                    self.power_profile = Some(profile);
-                } else {
-                    self.power_profile = power_profile::current();
-                }
+                self.deck_mutation.power(profile);
+                self.network_dirty = self.network_popup_open;
                 self.panel_dirty = true;
             }
             ShellEvent::PowerSleepPrepared => {
@@ -363,12 +361,20 @@ impl NiwoeShell {
                 self.theme_name = theme_name;
                 self.theme = new_theme;
                 self.available_themes = available_themes;
-                self.wallpaper_path = config.wallpaper.as_ref().map(|wallpaper| wallpaper.path.clone());
+                self.wallpaper_path = config
+                    .wallpaper
+                    .as_ref()
+                    .map(|wallpaper| wallpaper.path.clone());
                 self.wallpaper_mode = config
                     .wallpaper
                     .as_ref()
                     .map(|wallpaper| wallpaper.mode)
-                    .or_else(|| self.theme.wallpaper.as_ref().map(|wallpaper| wallpaper.mode))
+                    .or_else(|| {
+                        self.theme
+                            .wallpaper
+                            .as_ref()
+                            .map(|wallpaper| wallpaper.mode)
+                    })
                     .unwrap_or_default();
 
                 if font_changed {

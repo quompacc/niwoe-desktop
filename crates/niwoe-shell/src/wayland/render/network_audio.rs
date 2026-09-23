@@ -18,8 +18,13 @@ impl NiwoeShell {
                 &network_popup::NetworkPopupState {
                     network: self.network_controller.state(),
                     audio: &self.audio_snapshot,
+                    volume_preview: self.quick_settings_volume_pending,
+                    audio_status: self.deck_mutation.audio.status,
+                    power_status: self.deck_mutation.power.status,
                     bluetooth: &self.bluetooth_snapshot,
-                    bluetooth_pending: self.settings_refresh_inflight.contains(&crate::settings_view::SettingsCategory::Bluetooth),
+                    bluetooth_pending: self
+                        .settings_refresh_inflight
+                        .contains(&crate::settings_view::SettingsCategory::Bluetooth),
                     battery: &self.battery_snapshot,
                     power_profile: self.power_profile,
                     theme_name: &self.theme_name,

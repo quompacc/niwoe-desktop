@@ -371,6 +371,7 @@ pub(crate) struct NiwoeShell {
     pub(crate) settings_refresh_inflight:
         std::collections::HashSet<crate::settings_view::SettingsCategory>,
     pub(crate) printer_snapshot: crate::printers::PrinterSnapshot,
+    pub(crate) deck_mutation: crate::deck_mutation::DeckMutation,
     pub(crate) audio_snapshot: crate::audio::AudioSnapshot,
     /// Once true, the audio stack has settled (running + default sink) and the
     /// startup re-poll stops. Until then `tick()` re-polls audio every second so

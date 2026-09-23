@@ -215,7 +215,7 @@ macro_rules! handle_panel_and_popups_pointer {
                 PointerEventKind::Release { button: 0x110, .. }
                     if $shell.quick_settings_volume_pending.is_some() =>
                 {
-                    $shell.commit_quick_settings_volume();
+                    $shell.commit_quick_settings_volume($qh);
                     continue;
                 }
                 _ => {}

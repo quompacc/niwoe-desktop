@@ -48,7 +48,10 @@ impl PowerProfile {
 
 /// Current active profile, or `None` if the daemon is unavailable.
 pub fn current() -> Option<PowerProfile> {
-    let output = Command::new("powerprofilesctl").arg("get").output().ok()?;
+    let output = crate::process::output_with_timeout(
+        Command::new("powerprofilesctl").arg("get"),
+        std::time::Duration::from_secs(2),
+    )?;
     if !output.status.success() {
         return None;
     }
@@ -57,12 +60,14 @@ pub fn current() -> Option<PowerProfile> {
 
 /// Switch profile. Returns true on success.
 pub fn set(profile: PowerProfile) -> bool {
-    Command::new("powerprofilesctl")
-        .arg("set")
-        .arg(profile.daemon_id())
-        .status()
-        .map(|s| s.success())
-        .unwrap_or(false)
+    crate::process::output_with_timeout(
+        Command::new("powerprofilesctl")
+            .arg("set")
+            .arg(profile.daemon_id()),
+        std::time::Duration::from_secs(2),
+    )
+    .map(|output| output.status.success())
+    .unwrap_or(false)
 }
 
 #[cfg(test)]

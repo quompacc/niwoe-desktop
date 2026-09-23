@@ -315,6 +315,7 @@ impl KeyboardHandler for NiwoeShell {
                             .default_output
                             .as_ref()
                             .and_then(|d| d.volume_percent)
+                            .map(|v| self.deck_mutation.requested_volume.unwrap_or(v))
                         {
                             let next = if event.keysym == Keysym::Left {
                                 volume.saturating_sub(5)

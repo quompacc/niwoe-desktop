@@ -58,6 +58,9 @@ mod tests {
                         ..Default::default()
                     },
                     bluetooth_pending: false,
+                    volume_preview: None,
+                    audio_status: crate::deck_mutation::Status::Idle,
+                    power_status: crate::deck_mutation::Status::Idle,
                     battery: &BatterySnapshot::default(),
                     power_profile: Some(PowerProfile::Standard),
                     theme_name: name,
@@ -114,6 +117,9 @@ mod tests {
                 audio: &AudioSnapshot::unavailable(),
                 bluetooth: &crate::bluetooth::BluetoothSnapshot::default(),
                 bluetooth_pending: false,
+                volume_preview: None,
+                audio_status: crate::deck_mutation::Status::Idle,
+                power_status: crate::deck_mutation::Status::Idle,
                 battery: &BatterySnapshot::default(),
                 power_profile: None,
                 theme_name: "dark",
@@ -215,6 +221,9 @@ mod tests {
                         ..Default::default()
                     },
                     bluetooth_pending: pending,
+                    volume_preview: None,
+                    audio_status: crate::deck_mutation::Status::Idle,
+                    power_status: crate::deck_mutation::Status::Idle,
                     battery: &BatterySnapshot::default(),
                     power_profile: None,
                     theme_name: "dark",
@@ -248,6 +257,60 @@ mod tests {
                 focus_next(false);
             }
             assert_eq!(focused_action(), Some(QuickSettingsHit::Display));
+        }
+        reset_keyboard_focus();
+    }
+
+    #[test]
+    fn pending_controls_block_duplicate_actions_but_allow_latest_volume_and_retry() {
+        use crate::deck_mutation::Status;
+        let q = QuickSettings::DEFAULT;
+        let font = RefCell::new(TextRenderer::new(
+            "sans",
+            niwoe_tokens::Typography::DEFAULT.body_size.into(),
+        ));
+        let mut audio = AudioSnapshot::unavailable();
+        audio.default_output = Some(crate::audio::AudioDevice {
+            id: 1,
+            name: "Test".into(),
+            volume_percent: Some(30),
+            muted: false,
+            is_default: true,
+        });
+        for status in [Status::Pending, Status::Failed, Status::Idle] {
+            let mut canvas = vec![0; (q.width * q.height * 4) as usize];
+            draw(
+                &mut Painter::new(&mut canvas, q.width, q.height),
+                &font,
+                &ThemeConfig::default(),
+                QuickSettingsState {
+                    network: &NetworkState::Offline,
+                    audio: &audio,
+                    bluetooth: &Default::default(),
+                    bluetooth_pending: false,
+                    volume_preview: Some(80),
+                    audio_status: status,
+                    power_status: status,
+                    battery: &Default::default(),
+                    power_profile: Some(PowerProfile::Standard),
+                    theme_name: "dark",
+                    power_armed: false,
+                },
+            );
+            let targets = focus_targets();
+            for action in [QuickSettingsHit::AudioMute, QuickSettingsHit::PowerProfile] {
+                assert_eq!(
+                    targets.iter().any(|(_, hit)| *hit == action),
+                    status != Status::Pending
+                );
+            }
+            assert!(targets
+                .iter()
+                .any(|(_, hit)| matches!(hit, QuickSettingsHit::Volume(_))));
+            assert_eq!(
+                audio.default_output.as_ref().unwrap().volume_percent,
+                Some(30)
+            );
         }
         reset_keyboard_focus();
     }

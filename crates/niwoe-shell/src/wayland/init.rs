@@ -1,5 +1,4 @@
 use std::{cell::RefCell, time::Instant};
-
 pub(super) mod assets;
 mod commit;
 mod flags;
@@ -483,6 +482,7 @@ pub(crate) fn initialize(
         settings_refresh_inflight: std::collections::HashSet::new(),
         printer_snapshot,
         audio_snapshot,
+        deck_mutation: Default::default(),
         audio_settled,
         audio_poll_until: std::time::Instant::now() + std::time::Duration::from_secs(60),
         battery_snapshot: crate::battery::BatterySnapshot::poll(),

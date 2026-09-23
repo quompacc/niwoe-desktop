@@ -19,23 +19,16 @@ impl NiwoeShell {
 
     /// Update only the in-memory value while dragging. Rendering is immediate;
     /// the comparatively expensive platform mixer command runs once on release.
-    pub(crate) fn preview_quick_settings_volume(
-        &mut self,
-        qh: &QueueHandle<Self>,
-        percent: u8,
-    ) {
+    pub(crate) fn preview_quick_settings_volume(&mut self, qh: &QueueHandle<Self>, percent: u8) {
         let percent = percent.min(100);
         self.quick_settings_volume_pending = Some(percent);
-        if let Some(device) = self.audio_snapshot.default_output.as_mut() {
-            device.volume_percent = Some(percent);
-        }
         self.draw_network_popup(qh, RepaintReason::Pointer);
-        self.draw_panel(qh, RepaintReason::Pointer);
     }
 
-    pub(crate) fn commit_quick_settings_volume(&mut self) {
+    pub(crate) fn commit_quick_settings_volume(&mut self, qh: &QueueHandle<Self>) {
         if let Some(percent) = self.quick_settings_volume_pending.take() {
-            crate::audio::set_default_sink_volume(percent);
+            self.start_deck_audio(crate::deck_mutation::AudioChange::Volume(percent));
+            self.draw_network_popup(qh, RepaintReason::Pointer);
         }
     }
 
@@ -66,9 +59,13 @@ impl NiwoeShell {
 
         self.audio_snapshot = crate::audio::AudioSnapshot::poll();
         self.audio_popup_open = true;
-        self.network_layer
-            .set_anchor(Anchor::TOP | Anchor::RIGHT);
-        self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::AUDIO_POPUP_RIGHT_MARGIN, 0, 0);
+        self.network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.network_layer.set_margin(
+            crate::PANEL_POPUP_TOP_MARGIN,
+            crate::AUDIO_POPUP_RIGHT_MARGIN,
+            0,
+            0,
+        );
         self.network_layer.set_exclusive_zone(0);
         self.network_layer.set_size(
             crate::popup_surface_w(crate::AUDIO_POPUP_WIDTH),
@@ -249,9 +246,13 @@ impl NiwoeShell {
         self.status_notifier_menu_entries = entries;
         self.status_notifier_menu = Some(menu_state);
         self.status_notifier_menu_open = true;
-        self.network_layer
-            .set_anchor(Anchor::TOP | Anchor::RIGHT);
-        self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::SNI_MENU_RIGHT_MARGIN, 0, 0);
+        self.network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.network_layer.set_margin(
+            crate::PANEL_POPUP_TOP_MARGIN,
+            crate::SNI_MENU_RIGHT_MARGIN,
+            0,
+            0,
+        );
         self.network_layer.set_exclusive_zone(0);
         self.network_layer.set_size(
             self.status_notifier_menu_width,

@@ -28,11 +28,13 @@ pub(super) fn draw(
     } else {
         "Aus"
     };
-    let profile_detail = match state.power_profile {
-        Some(PowerProfile::Eco) => "Eco",
-        Some(PowerProfile::Standard) => "Standard",
-        Some(PowerProfile::Performance) => "Maximal",
-        None => "Fehlt",
+    let profile_detail = match (state.power_status, state.power_profile) {
+        (crate::deck_mutation::Status::Pending, _) => "Ändert …",
+        (crate::deck_mutation::Status::Failed, _) => "Fehler",
+        (_, Some(PowerProfile::Eco)) => "Eco",
+        (_, Some(PowerProfile::Standard)) => "Standard",
+        (_, Some(PowerProfile::Performance)) => "Maximal",
+        (_, None) => "Fehlt",
     };
     let entries = [
         (
@@ -54,7 +56,8 @@ pub(super) fn draw(
             "Leistung",
             profile_detail,
             Symbol::Performance,
-            state.power_profile.is_some(),
+            state.power_profile.is_some()
+                && state.power_status != crate::deck_mutation::Status::Pending,
             &POWER_PROFILE,
         ),
     ];
