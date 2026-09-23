@@ -25,6 +25,7 @@ fn visible_rooms(active: u8, total: u8, capacity: usize) -> std::ops::RangeInclu
 
 struct RoomTab {
     workspace: u8,
+    label: String,
     active: bool,
 }
 
@@ -53,7 +54,17 @@ impl Widget for RoomTab {
         } else {
             theme.palette.text
         };
-        let label = format!("Raum {}", self.workspace);
+        let mut label = self.label.clone();
+        let limit = area.width
+            - 2 * theme.spacing.sm
+            - Typography::DEFAULT.caption_size as i32
+            - theme.spacing.sm;
+        if measure_text(&label, FONT_SIZE).0 > limit {
+            while !label.is_empty() && measure_text(&format!("{label}…"), FONT_SIZE).0 > limit {
+                label.pop();
+            }
+            label.push('…');
+        }
         let (width, text_height) = measure_text(&label, FONT_SIZE);
         let symbol_size = Typography::DEFAULT.caption_size as i32;
         let content_width = symbol_size + theme.spacing.sm + width;
@@ -121,6 +132,7 @@ mod room_tests {
             let mut image = Pixmap::new(area.width as u32, area.height as u32).unwrap();
             RoomTab {
                 workspace,
+                label: format!("Raum {workspace}"),
                 active: false,
             }
             .paint(area, &mut image.as_mut(), &theme, WidgetState::Idle);

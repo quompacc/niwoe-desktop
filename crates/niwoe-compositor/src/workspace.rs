@@ -41,6 +41,10 @@ impl<E: SpaceElement + PartialEq> WorkspaceManager<E> {
         }
     }
 
+    pub fn rooms_mut(&mut self) -> &mut crate::room_registry::RoomRegistry {
+        &mut self.rooms
+    }
+
     pub fn rooms(&self) -> &crate::room_registry::RoomRegistry {
         &self.rooms
     }

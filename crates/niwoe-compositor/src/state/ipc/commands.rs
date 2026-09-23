@@ -17,6 +17,7 @@ impl NiwoeState {
 
         if poll.accepted_clients > 0 {
             tracing::info!("accepted {} shell IPC client(s)", poll.accepted_clients);
+            self.broadcast_rooms();
             self.broadcast_workspace();
             self.broadcast_window_snapshot();
         }
@@ -98,6 +99,12 @@ impl NiwoeState {
 
     fn handle_shell_command(&mut self, command: ShellCommand) {
         match command {
+            ShellCommand::RequestRoomSnapshot => self.broadcast_rooms(),
+            ShellCommand::MutateRoom {
+                request_id,
+                expected_revision,
+                change,
+            } => self.mutate_room(request_id, expected_revision, change),
             ShellCommand::Authenticate { .. } => {
                 tracing::debug!("ignoring IPC authentication command after server-side handling");
             }

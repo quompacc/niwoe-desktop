@@ -270,6 +270,7 @@ impl NiwoeShell {
                 self.power_profile,
                 panel_active_w,
                 9,
+                &self.workspace_state.rooms.snapshot.rooms,
                 &clock,
                 &self.icon_cache,
                 screenshot_icon,

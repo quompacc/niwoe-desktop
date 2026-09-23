@@ -26,6 +26,7 @@ pub(crate) fn build_panel_widget_tree(
     _power_profile: Option<crate::power_profile::PowerProfile>,
     active_workspace: u8,
     total_workspaces: u8,
+    room_entries: &[niwoe_ipc::RoomEntry],
     clock: &str,
     icon_cache: &IconCache,
     _screenshot_icon: Option<Pixmap>,
@@ -85,10 +86,14 @@ pub(crate) fn build_panel_widget_tree(
     let room_stride = PanelTokens::DEFAULT.room_width as i32 + GAP;
     let capacity =
         ((room_space / room_stride).max(1) as usize).min(PanelTokens::DEFAULT.visible_rooms);
-    let rooms = visible_rooms(active_workspace, total_workspaces, capacity);
-    for workspace in rooms {
+    let active_position = room_entries.iter().position(|r| r.workspace == active_workspace).map(|p| p as u8+1).unwrap_or(active_workspace);
+    let rooms = visible_rooms(active_position, total_workspaces, capacity);
+    for position in rooms {
+        let room = room_entries.get(position as usize-1);
+        let workspace = room.map(|r| r.workspace).unwrap_or(position);
         left_children.push(Box::new(RoomTab {
             workspace,
+            label: room.map(|r| r.name.clone()).unwrap_or_else(|| format!("Raum {workspace}")),
             active: workspace == active_workspace,
         }));
     }

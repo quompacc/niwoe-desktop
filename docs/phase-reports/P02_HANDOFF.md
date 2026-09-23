@@ -5,6 +5,9 @@ Light-Neufassung. Auch die [Deck-Mutationen](P05_DECK_MUTATIONS.md) sind nach
 Installation mit „passt, schaut gut aus“ bestätigt. Beide Themes bleiben bestehen.
 Aktueller nächster Schritt: [P06 Raumgrundlage](P06.md).
 
+Fortschritt: [sichtbarer Raumeditor](P06_ROOM_EDITOR.md) umgesetzt und geprüft;
+Installation und DRM-Bedienabnahme verfolgen. Dark bleibt ausgewählt.
+
 Die folgenden Abschnitte dokumentieren frühere Zwischenstände; ausstehende
 Light-/Deck-Freigaben darin sind durch die obige Nutzerabnahme erledigt.
 

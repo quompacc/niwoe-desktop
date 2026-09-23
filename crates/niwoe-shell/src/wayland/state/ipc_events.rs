@@ -1,6 +1,19 @@
 impl NiwoeShell {
     fn apply_ipc_event(&mut self, event: ShellEvent) {
         match event {
+            ShellEvent::RoomSnapshot { snapshot } => {
+                if self.workspace_state.rooms.accept(snapshot) {
+                    self.panel_last_signature = None;
+                    self.panel_dirty = true;
+                    self.workspace_dirty = true;
+                }
+            }
+            ShellEvent::RoomMutationResult {
+                request_id, error, ..
+            } => {
+                self.workspace_state.rooms.result(&request_id, error);
+                self.workspace_dirty = true;
+            }
             ShellEvent::WorkspaceChanged { workspace } => {
                 let old = self.active_workspace;
                 if !self.output_workspace_state_available {

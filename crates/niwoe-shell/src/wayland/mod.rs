@@ -10,7 +10,7 @@ mod time;
 mod types;
 
 pub use ipc::IpcClient;
-pub use types::{ClickAction, ClickZone, Rect};
+pub use types::{ClickAction, ClickZone, Rect, RoomEditAction};
 
 pub(crate) use init::initialize;
 pub(crate) use shell::{CommitReason, CommitStats, CommitSurfaceKind, NiwoeShell, RepaintReason};

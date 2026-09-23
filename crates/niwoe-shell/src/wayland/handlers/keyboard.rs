@@ -350,6 +350,14 @@ impl KeyboardHandler for NiwoeShell {
             self.draw_panel(qh, RepaintReason::Keyboard);
             return;
         }
+        if self.workspace_popup_open && self.workspace_state.rooms.edit.is_some() {
+            self.room_edit_key(qh, event.keysym);
+            return;
+        }
+        if self.workspace_popup_open && event.keysym == Keysym::F2 {
+            self.open_room_editor(qh, self.panel_active_workspace());
+            return;
+        }
         if self.workspace_popup_open && is_escape {
             self.close_workspace_popup(CommitReason::Input);
             self.draw_panel(qh, RepaintReason::Keyboard);

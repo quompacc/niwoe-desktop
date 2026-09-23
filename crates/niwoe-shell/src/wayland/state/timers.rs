@@ -84,6 +84,10 @@ impl NiwoeShell {
         // query or image decode completes here without blocking input.
         self.poll_settings_refresh(qh);
         self.poll_deck_mutations(qh);
+        if self.workspace_state.rooms.expire() {
+            self.ipc.send(&niwoe_ipc::ShellCommand::RequestRoomSnapshot);
+            self.draw_workspace_popup(qh, RepaintReason::Clock);
+        }
 
         self.maybe_log_repaint_stats(now);
         self.maybe_log_commit_stats(now);

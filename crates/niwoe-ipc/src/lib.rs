@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 mod appearance;
 pub use appearance::{AppearanceSnapshot, AppearanceTheme, AppearanceWallpaperMode};
+mod rooms;
+pub use rooms::{RoomChange, RoomEntry, RoomMutationError, RoomSnapshot};
 mod settings;
 pub use settings::{SettingsSnapshot, SystemSettingsSnapshot};
 
@@ -206,6 +208,14 @@ pub enum ScreenshotBridgeMessage {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellEvent {
+    RoomSnapshot {
+        snapshot: RoomSnapshot,
+    },
+    RoomMutationResult {
+        request_id: String,
+        revision: u64,
+        error: Option<RoomMutationError>,
+    },
     LaunchTerminal,
     LaunchBrowser,
     LaunchFiles,
@@ -313,6 +323,12 @@ pub enum ShellEvent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellCommand {
+    RequestRoomSnapshot,
+    MutateRoom {
+        request_id: String,
+        expected_revision: u64,
+        change: RoomChange,
+    },
     Authenticate {
         role: String,
         token: String,
@@ -386,6 +402,8 @@ pub enum ShellCommand {
 impl ShellCommand {
     pub fn name(&self) -> &'static str {
         match self {
+            Self::RequestRoomSnapshot => "request-room-snapshot",
+            Self::MutateRoom { .. } => "mutate-room",
             Self::Authenticate { .. } => "authenticate",
             Self::SwitchWorkspace { .. } => "switch-workspace",
             Self::ToggleLauncher => "toggle-launcher",

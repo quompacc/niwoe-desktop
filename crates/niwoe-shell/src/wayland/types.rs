@@ -20,8 +20,18 @@ pub(crate) struct WindowInfo {
     pub(crate) app_id: Option<String>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RoomEditAction {
+    Name,
+    Save,
+    Cancel,
+    Left,
+    Right,
+}
+
 #[derive(Debug, Clone)]
 pub enum ClickAction {
+    EditRoom(RoomEditAction),
     SwitchWorkspace(u8),
     FocusWindow(String),
     LaunchPinnedApp(usize),
@@ -42,6 +52,7 @@ pub enum ClickAction {
 impl ClickAction {
     pub(crate) fn test_name(&self) -> String {
         match self {
+            ClickAction::EditRoom(action) => format!("room-edit-{action:?}"),
             ClickAction::SwitchWorkspace(workspace) => format!("switch-workspace-{workspace}"),
             ClickAction::FocusWindow(id) => format!("focus-window-{id}"),
             ClickAction::LaunchPinnedApp(idx) => format!("launch-pinned-app-{idx}"),

@@ -2,7 +2,7 @@
 use niwoe_config::rooms::{store, RoomError, RoomId, Rooms, LEGACY_ROOMS};
 use std::{
     fs::{self, File, OpenOptions},
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 pub struct RoomRegistry {
@@ -11,9 +11,59 @@ pub struct RoomRegistry {
     // OS-owned lock is released even after a crash. Never unlink the lock file:
     // another process may already be waiting on the same inode.
     _writer: Option<File>,
+    path: Option<PathBuf>,
 }
 
 impl RoomRegistry {
+    pub fn apply(
+        &mut self,
+        expected: u64,
+        change: niwoe_ipc::RoomChange,
+    ) -> Result<(), niwoe_ipc::RoomMutationError> {
+        use niwoe_ipc::{RoomChange, RoomMutationError as Error};
+        if expected != self.definitions.revision {
+            return Err(Error::Conflict);
+        }
+        let id = match &change {
+            RoomChange::Rename { id, .. } | RoomChange::Move { id, .. } => *id,
+        };
+        let index = self
+            .definitions
+            .rooms
+            .iter()
+            .position(|r| r.id.0 == id)
+            .ok_or(Error::Invalid)?;
+        if matches!(&change, RoomChange::Move { position, .. } if *position >= self.slots.len()) {
+            return Err(Error::Invalid);
+        }
+        let next = self
+            .definitions
+            .revised(expected, |rooms| match change {
+                RoomChange::Rename { name, .. } => rooms.rooms[index].name = name,
+                RoomChange::Move { position, .. } => {
+                    let room = rooms.rooms.remove(index);
+                    rooms.rooms.insert(position, room);
+                }
+            })
+            .map_err(|_| Error::Invalid)?;
+        let path = self.path.as_ref().ok_or(Error::Storage)?;
+        match store::save(path, &self.definitions, &next) {
+            Ok(()) => {
+                self.definitions = next;
+                Ok(())
+            }
+            Err(store::StoreError::PublishedButNotSynced(_)) => {
+                self.definitions = next;
+                Err(Error::Durability)
+            }
+            Err(store::StoreError::Invalid(RoomError::Conflict)) => Err(Error::Conflict),
+            Err(error) => {
+                tracing::warn!(%error, "room mutation could not be persisted");
+                Err(Error::Storage)
+            }
+        }
+    }
+
     pub fn from_definitions(definitions: Rooms) -> Result<Self, RoomError> {
         definitions.validate()?;
         let mut slots: Vec<_> = definitions.rooms.iter().map(|room| room.id).collect();
@@ -22,6 +72,7 @@ impl RoomRegistry {
             definitions,
             slots,
             _writer: None,
+            path: None,
         })
     }
 
@@ -50,6 +101,7 @@ impl RoomRegistry {
         }
         let mut registry = Self::from_definitions(definitions)?;
         registry._writer = Some(writer);
+        registry.path = Some(directory.join("rooms.toml"));
         Ok(registry)
     }
 

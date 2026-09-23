@@ -35,6 +35,7 @@ mod printers;
 mod process;
 mod quick_settings_popup;
 mod region_picker;
+mod room_editor;
 mod screenshot_consent;
 mod settings_refresh;
 mod settings_view;

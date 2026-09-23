@@ -267,6 +267,7 @@ impl NiwoeShell {
             return false;
         }
         self.workspace_popup_open = false;
+        self.workspace_state.rooms.edit = None;
         self.workspace_hover_idx = None;
         self.workspace_layer
             .set_keyboard_interactivity(KeyboardInteractivity::OnDemand);

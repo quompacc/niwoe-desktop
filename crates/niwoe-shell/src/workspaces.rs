@@ -15,11 +15,15 @@ const CELL_COUNT: usize = (LAYOUT.columns * LAYOUT.rows) as usize;
 
 pub struct WorkspacePopupState {
     pub clicks: Vec<ClickZone>,
+    pub(crate) rooms: crate::room_editor::RoomUi,
 }
 
 impl WorkspacePopupState {
     pub fn new() -> Self {
-        Self { clicks: Vec::new() }
+        Self {
+            clicks: Vec::new(),
+            rooms: Default::default(),
+        }
     }
 }
 
@@ -73,12 +77,26 @@ pub fn draw_workspace_popup(
     let total_workspaces = input.total_workspaces.max(1);
 
     draw_card_body(painter, theme);
-    draw_card_title(painter, font, theme, "Arbeitsbereiche");
+    draw_card_title(
+        painter,
+        font,
+        theme,
+        if state.rooms.edit.is_some() {
+            "Raum bearbeiten"
+        } else {
+            "Räume · Rechtsklick zum Bearbeiten"
+        },
+    );
+    if state.rooms.edit.is_some() {
+        crate::room_editor::draw(painter, font, theme, &state.rooms, &mut state.clicks);
+        return;
+    }
 
     let (left, top, tile_w, tile_h) = grid_geometry();
 
     for i in 0..CELL_COUNT {
-        let ws_id = (i + 1) as u32;
+        let room = &state.rooms.snapshot.rooms[i];
+        let ws_id = room.workspace as u32;
         let col = i as i32 % LAYOUT.columns;
         let row = i as i32 / LAYOUT.columns;
         let rect = Rect {
@@ -89,7 +107,7 @@ pub fn draw_workspace_popup(
         };
 
         let is_active = ws_id == input.active_workspace;
-        let is_occupied = input.occupied[i];
+        let is_occupied = input.occupied[room.workspace.saturating_sub(1) as usize];
         let is_hovered = input.hovered_idx == Some(i);
 
         let resting_bg = if is_active {
@@ -125,7 +143,7 @@ pub fn draw_workspace_popup(
         };
         painter.text_clipped(
             font,
-            &ws_id.to_string(),
+            &room.name,
             rect.x + LAYOUT.tile_pad,
             rect.y + LAYOUT.tile_pad + 10,
             rect.w - 2 * LAYOUT.tile_pad,

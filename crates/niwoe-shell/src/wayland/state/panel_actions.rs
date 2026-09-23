@@ -14,6 +14,7 @@ impl NiwoeShell {
         }
 
         match action {
+            ClickAction::EditRoom(action) => self.room_edit_action(qh, action),
             ClickAction::SwitchWorkspace(workspace) => {
                 if self.active_workspace != workspace {
                     debug!(
@@ -146,6 +147,10 @@ impl NiwoeShell {
     }
 
     pub(crate) fn handle_workspace_click(&mut self, qh: &QueueHandle<Self>, action: ClickAction) {
+        if let ClickAction::EditRoom(action) = action {
+            self.room_edit_action(qh, action);
+            return;
+        }
         if let ClickAction::SwitchWorkspace(workspace) = action {
             if self.active_workspace != workspace {
                 debug!(
@@ -219,6 +224,7 @@ impl NiwoeShell {
 
     pub(crate) fn handle_launcher_click(&mut self, qh: &QueueHandle<Self>, action: ClickAction) {
         match action {
+            ClickAction::EditRoom(action) => self.room_edit_action(qh, action),
             ClickAction::LaunchPinnedApp(_) => {}
             ClickAction::FocusWindow(_) => {}
             ClickAction::SwitchWorkspace(_) => {}

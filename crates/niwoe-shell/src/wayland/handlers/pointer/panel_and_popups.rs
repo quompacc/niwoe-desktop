@@ -15,6 +15,7 @@ macro_rules! handle_panel_and_popups_pointer {
                     $shell.power_profile,
                     $shell.panel_active_workspace(),
                     9,
+                    &$shell.workspace_state.rooms.snapshot.rooms,
                     &$shell.last_clock,
                     &$shell.icon_cache,
                     None, // screenshot_icon — nur für Hover-Layout, Icon irrelevant
@@ -130,6 +131,16 @@ macro_rules! handle_panel_and_popups_pointer {
         }
 
         if let PointerEventKind::Press { button: 0x111, .. } = $event.kind {
+            let pad = if $shell.pointer_surface == SurfaceKind::WorkspacePopup { crate::POPUP_SHADOW_PAD as f64 } else { 0.0 };
+            let zones = match $shell.pointer_surface {
+                SurfaceKind::Panel => Some(&$shell.panel_state.clicks),
+                SurfaceKind::WorkspacePopup => Some(&$shell.workspace_state.clicks),
+                _ => None,
+            };
+            if let Some(workspace) = zones.and_then(|zones| zones.iter().find(|z| z.rect.contains($event.position.0-pad, $event.position.1-pad))).and_then(|z| match z.action { crate::ClickAction::SwitchWorkspace(w) => Some(w), _ => None }) {
+                $shell.open_room_editor($qh, workspace);
+                continue;
+            }
             if $shell.pointer_surface == SurfaceKind::Panel {
                 let action = $shell
                     .panel_state

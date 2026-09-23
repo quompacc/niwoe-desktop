@@ -436,3 +436,4 @@ pub(crate) fn load_wallpaper_thumbnail(
 mod tests;
 
 include!("state/deck_actions.rs");
+include!("state/rooms.rs");

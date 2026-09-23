@@ -60,6 +60,12 @@ impl IpcClient {
                         return;
                     }
                 }
+                if let Err(err) = niwoe_ipc::encode_command(&ShellCommand::RequestRoomSnapshot)
+                    .and_then(|bytes| stream.write_all(&bytes))
+                {
+                    warn!("failed to request room snapshot: {}", err);
+                    return;
+                }
                 if let Err(err) = stream.set_nonblocking(true) {
                     warn!("failed to set niwoe IPC nonblocking: {}", err);
                 }

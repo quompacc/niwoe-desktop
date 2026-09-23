@@ -24,6 +24,78 @@ impl Drop for Fixture {
 }
 
 #[test]
+fn rename_and_move_persist_without_changing_slots_and_reject_stale_writes() {
+    use niwoe_ipc::{RoomChange, RoomMutationError};
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    registry
+        .apply(
+            0,
+            RoomChange::Rename {
+                id: 1,
+                name: "Entwicklung".into(),
+            },
+        )
+        .unwrap();
+    assert_eq!(
+        registry.apply(0, RoomChange::Move { id: 1, position: 8 }),
+        Err(RoomMutationError::Conflict)
+    );
+    registry
+        .apply(1, RoomChange::Move { id: 1, position: 8 })
+        .unwrap();
+    assert_eq!(registry.slot_for_room(RoomId(1)), Some(0));
+    assert_eq!(registry.slot_at_position(8), Some(0));
+    let snapshot = registry.definitions().clone();
+    assert_eq!(snapshot.rooms[8].name, "Entwicklung");
+    assert!(registry
+        .apply(
+            2,
+            RoomChange::Rename {
+                id: 1,
+                name: " ".into()
+            }
+        )
+        .is_err());
+    assert!(registry
+        .apply(
+            2,
+            RoomChange::Move {
+                id: 999,
+                position: 0
+            }
+        )
+        .is_err());
+    assert!(registry
+        .apply(2, RoomChange::Move { id: 1, position: 9 })
+        .is_err());
+    assert_eq!(registry.definitions(), &snapshot);
+    drop(registry);
+    assert_eq!(RoomRegistry::open(&f.0).unwrap().definitions(), &snapshot);
+}
+
+#[test]
+fn failed_disk_write_never_publishes_candidate_in_memory() {
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    let before = registry.definitions().clone();
+    let path = f.0.join("rooms.toml");
+    fs::remove_file(&path).unwrap();
+    fs::create_dir(&path).unwrap();
+    assert_eq!(
+        registry.apply(
+            0,
+            niwoe_ipc::RoomChange::Rename {
+                id: 1,
+                name: "Unbestätigt".into()
+            }
+        ),
+        Err(niwoe_ipc::RoomMutationError::Storage)
+    );
+    assert_eq!(registry.definitions(), &before);
+}
+
+#[test]
 fn display_order_and_name_do_not_change_slot_identity() {
     let original = Rooms::from_legacy_slots();
     let next = original

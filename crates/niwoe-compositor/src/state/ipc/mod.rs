@@ -5,6 +5,7 @@ mod conversions;
 mod launch;
 mod lock_screen;
 mod network;
+mod rooms;
 mod screenshot;
 mod screenshot_policy;
 mod server;

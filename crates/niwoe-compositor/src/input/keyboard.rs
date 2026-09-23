@@ -120,7 +120,9 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
             // Keep Super+1..9 workspace switching available as a stable fallback,
             // even when custom keybind maps omit explicit workspace entries.
             if km.modifiers == Modifiers::SUPER {
-                if let Some(idx) = workspace_idx_from_digit_keysym(km.keysym) {
+                if let Some(idx) = workspace_idx_from_digit_keysym(km.keysym)
+                    .and_then(|position| state.workspaces.rooms().slot_at_position(position))
+                {
                     let focused_output = state.focused_output();
                     let focused_output_name = focused_output.and_then(|id| {
                         state
@@ -138,7 +140,9 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
                     state.switch_workspace_for_focused_output(idx);
                 }
             } else if km.modifiers == (Modifiers::SUPER | Modifiers::SHIFT) {
-                if let Some(idx) = workspace_idx_from_digit_keysym(km.keysym) {
+                if let Some(idx) = workspace_idx_from_digit_keysym(km.keysym)
+                    .and_then(|position| state.workspaces.rooms().slot_at_position(position))
+                {
                     let focused_output = state.focused_output();
                     let focused_output_name = focused_output.and_then(|id| {
                         state
@@ -161,7 +165,10 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
     };
 
     match action {
-        Action::SwitchWorkspace(idx) => {
+        Action::SwitchWorkspace(position) => {
+            let Some(idx) = state.workspaces.rooms().slot_at_position(position) else {
+                return;
+            };
             let focused_output = state.focused_output();
             let focused_output_name = focused_output.and_then(|id| {
                 state
@@ -177,7 +184,10 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
             );
             state.switch_workspace_for_focused_output(idx)
         }
-        Action::MoveToWorkspace(idx) => {
+        Action::MoveToWorkspace(position) => {
+            let Some(idx) = state.workspaces.rooms().slot_at_position(position) else {
+                return;
+            };
             let focused_output = state.focused_output();
             let focused_output_name = focused_output.and_then(|id| {
                 state
@@ -210,8 +220,24 @@ pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl Key
         Action::CycleWindow(step) => navigation::cycle_window(state, step),
         Action::CycleWorkspace(step) => {
             let count = state.workspaces.count() as i32;
-            let next = (state.current_workspace_index() as i32 + i32::from(step)).rem_euclid(count);
-            state.switch_workspace_for_focused_output(next as usize);
+            let current = state
+                .workspaces
+                .rooms()
+                .definitions()
+                .rooms
+                .iter()
+                .position(|room| {
+                    state.workspaces.rooms().slot_for_room(room.id)
+                        == Some(state.current_workspace_index())
+                })
+                .unwrap_or(0);
+            let position = (current as i32 + i32::from(step)).rem_euclid(count);
+            let next = state
+                .workspaces
+                .rooms()
+                .slot_at_position(position as usize)
+                .expect("validated room position");
+            state.switch_workspace_for_focused_output(next);
         }
         Action::ForceSplit(dir) => {
             let active = state.workspaces.active;
