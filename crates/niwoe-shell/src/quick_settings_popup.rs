@@ -1,7 +1,7 @@
 use std::cell::{Cell, RefCell};
 
 use niwoe_config::ThemeConfig;
-use niwoe_tokens::{Interaction, QuickSettings, Radius};
+use niwoe_tokens::{Interaction, QuickSettings};
 
 use crate::{
     audio::AudioSnapshot,
@@ -18,6 +18,8 @@ pub enum QuickSettingsHit {
     Card,
     Settings,
     Network,
+    Bluetooth,
+    Display,
     AudioMute,
     Volume(u8),
     Appearance,
@@ -36,6 +38,8 @@ const ZERO_RECT: Rect = Rect {
 thread_local! {
     static SETTINGS: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static NETWORK: Cell<Rect> = const { Cell::new(ZERO_RECT) };
+    static BLUETOOTH: Cell<Rect> = const { Cell::new(ZERO_RECT) };
+    static DISPLAY: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static AUDIO_MUTE: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static VOLUME: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static APPEARANCE: Cell<Rect> = const { Cell::new(ZERO_RECT) };
@@ -47,6 +51,8 @@ thread_local! {
 pub struct QuickSettingsState<'a> {
     pub network: &'a NetworkState,
     pub audio: &'a AudioSnapshot,
+    pub bluetooth: &'a crate::bluetooth::BluetoothSnapshot,
+    pub bluetooth_pending: bool,
     pub battery: &'a BatterySnapshot,
     pub power_profile: Option<PowerProfile>,
     pub theme_name: &'a str,
@@ -62,15 +68,15 @@ pub fn draw(
     let q = QuickSettings::DEFAULT;
     let gap = niwoe_tokens::Spacing::DEFAULT;
     draw_card_body(painter, theme);
-    text(painter, font, theme, "System", q.outer_pad, gap.xxl, false);
-    let settings = Rect {
-        x: q.width - q.outer_pad - q.footer_height * 3,
-        y: gap.md,
-        w: q.footer_height * 3,
-        h: niwoe_tokens::Controls::MIN_HEIGHT,
-    };
-    draw_control(painter, font, theme, settings, "Einstellungen", false);
-    SETTINGS.with(|slot| slot.set(settings));
+    text(
+        painter,
+        font,
+        theme,
+        "System Deck",
+        q.outer_pad,
+        gap.xxl,
+        false,
+    );
     let width = q.width - q.outer_pad * 2;
     let audio = Rect {
         x: q.outer_pad,
@@ -82,46 +88,34 @@ pub fn draw(
     let device = state.audio.default_output.as_ref();
     let muted = device.is_none_or(|d| d.muted);
     let mute = Rect {
-        x: audio.x + gap.md,
-        y: audio.y + gap.md,
-        w: niwoe_tokens::Controls::MIN_HEIGHT * 2,
+        x: audio.x,
+        y: audio.y,
+        w: niwoe_tokens::Controls::MIN_HEIGHT,
         h: niwoe_tokens::Controls::MIN_HEIGHT,
     };
-    draw_control(
+    deck_controls::draw_symbol(
         painter,
-        font,
         theme,
         mute,
-        if muted { "Stumm" } else { "Ton an" },
-        muted,
+        crate::panel_view::status_symbols::Symbol::Audio(muted),
+        device.is_some(),
     );
     AUDIO_MUTE.with(|slot| slot.set(if device.is_some() { mute } else { ZERO_RECT }));
-    let tx = mute.x + mute.w + gap.md;
-    text(
-        painter,
+    painter.text_clipped(
         font,
-        theme,
-        "Lautstärke",
-        tx,
-        audio.y + gap.xl,
-        false,
-    );
-    text(
-        painter,
-        font,
-        theme,
         &device
-            .map(|d| fit(&d.name, 24))
+            .map(|d| d.name.clone())
             .unwrap_or_else(|| "Nicht verfügbar".into()),
-        tx,
-        audio.y + gap.xl + gap.lg,
-        true,
+        audio.x,
+        audio.y + mute.h + gap.lg,
+        audio.w,
+        glass_dim_from_config(theme),
     );
     let volume = device.and_then(|d| d.volume_percent);
     let slider = Rect {
-        x: audio.x + gap.lg,
-        y: audio.y + q.audio_height - gap.xxl - gap.md,
-        w: audio.w - gap.lg * 2 - niwoe_tokens::Controls::MIN_HEIGHT * 2,
+        x: mute.x + mute.w + gap.md,
+        y: audio.y,
+        w: audio.w - mute.w - gap.md * 2 - niwoe_tokens::Controls::MIN_HEIGHT - gap.lg,
         h: niwoe_tokens::Controls::MIN_HEIGHT,
     };
     draw_slider(painter, theme, slider, volume.unwrap_or(0), muted);
@@ -138,32 +132,13 @@ pub fn draw(
         false,
     );
     let tile_y = audio.y + audio.h + q.section_gap;
-    let tile = Rect {
+    let controls = Rect {
         x: q.outer_pad,
         y: tile_y,
-        w: (width - q.tile_gap) / 2,
+        w: width,
         h: q.tile_height,
     };
-    let profile = Rect {
-        x: tile.x + tile.w + q.tile_gap,
-        ..tile
-    };
-    draw_network_tile(painter, font, theme, tile, state.network);
-    draw_profile_tile(painter, font, theme, profile, state.power_profile);
-    NETWORK.with(|slot| {
-        slot.set(if matches!(state.network, NetworkState::Offline) {
-            ZERO_RECT
-        } else {
-            tile
-        })
-    });
-    POWER_PROFILE.with(|slot| {
-        slot.set(if state.power_profile.is_some() {
-            profile
-        } else {
-            ZERO_RECT
-        })
-    });
+    deck_controls::draw(painter, font, theme, controls, &state);
     let status = Rect {
         x: q.outer_pad,
         y: tile_y + q.tile_height + q.section_gap,
@@ -230,83 +205,22 @@ pub fn draw(
     );
     LOCK.with(|slot| slot.set(lock));
     POWER_OFF.with(|slot| slot.set(power));
-    draw_keyboard_focus(painter, theme);
-}
-
-fn draw_network_tile(
-    painter: &mut Painter<'_>,
-    font: &RefCell<Option<TextRenderer>>,
-    theme: &ThemeConfig,
-    rect: Rect,
-    network: &NetworkState,
-) {
-    draw_panel(painter, theme, rect);
-    let (label, detail, active) = match network {
-        NetworkState::Connected {
-            kind,
-            connection_name,
-        } => {
-            let label = match kind {
-                ConnectionKind::Ethernet => "Ethernet",
-                ConnectionKind::Wifi { .. } => "WLAN",
-                ConnectionKind::Vpn => "VPN",
-                ConnectionKind::Other => "Netzwerk",
-            };
-            (label, fit(connection_name, 19), true)
-        }
-        NetworkState::Disconnected => ("Netzwerk", "Getrennt".to_string(), false),
-        NetworkState::Offline => ("Netzwerk", "Nicht verfügbar".to_string(), false),
+    let settings = Rect {
+        x: q.outer_pad,
+        y: lock.y + lock.h + q.section_gap,
+        w: width,
+        h: q.footer_height,
     };
-    let gap = niwoe_tokens::Spacing::DEFAULT;
-    text(
+    draw_control(
         painter,
         font,
         theme,
-        label,
-        rect.x + gap.md,
-        rect.y + gap.xl,
+        settings,
+        "Systemeinstellungen …",
         false,
     );
-    let color = glass_dim_from_config(theme);
-    painter.text_clipped(
-        font,
-        &detail,
-        rect.x + gap.md,
-        rect.y + gap.xl + gap.xl,
-        rect.w - gap.md * 2,
-        color,
-    );
-    let _ = active;
-}
-
-fn draw_profile_tile(
-    painter: &mut Painter<'_>,
-    font: &RefCell<Option<TextRenderer>>,
-    theme: &ThemeConfig,
-    rect: Rect,
-    profile: Option<PowerProfile>,
-) {
-    let gap = niwoe_tokens::Spacing::DEFAULT;
-    draw_panel(painter, theme, rect);
-    text(
-        painter,
-        font,
-        theme,
-        "Leistung",
-        rect.x + gap.md,
-        rect.y + gap.xl,
-        false,
-    );
-    painter.text_clipped(
-        font,
-        profile
-            .map(PowerProfile::label)
-            .unwrap_or("Nicht verfügbar"),
-        rect.x + gap.md,
-        rect.y + gap.xl + gap.xl,
-        rect.w - gap.md * 2,
-        glass_dim_from_config(theme),
-    );
+    SETTINGS.with(|slot| slot.set(settings));
+    draw_keyboard_focus(painter, theme);
 }
 
 fn draw_status_cell(
@@ -317,19 +231,35 @@ fn draw_status_cell(
     label: &str,
     value: &str,
 ) {
-    text(painter, font, theme, label, rect.x + 14, rect.y + 28, false);
-    text(painter, font, theme, value, rect.x + 14, rect.y + 49, true);
+    let gap = niwoe_tokens::Spacing::DEFAULT;
+    text(
+        painter,
+        font,
+        theme,
+        label,
+        rect.x + gap.md,
+        rect.y + gap.lg,
+        false,
+    );
+    text(
+        painter,
+        font,
+        theme,
+        value,
+        rect.x + gap.md,
+        rect.y + gap.lg * 2,
+        true,
+    );
 }
 
 fn draw_panel(painter: &mut Painter<'_>, theme: &ThemeConfig, rect: Rect) {
-    painter.roundish_rect_with_radius(rect, Interaction::DEFAULT.neutral_hover, Radius::DEFAULT.lg);
     let border = glass_border_from_config(theme);
     painter.rect(
         Rect {
-            x: rect.x + Radius::DEFAULT.lg,
-            y: rect.y,
-            w: rect.w - Radius::DEFAULT.lg * 2,
-            h: 1,
+            x: rect.x,
+            y: rect.y + rect.h - niwoe_tokens::Controls::BORDER,
+            w: rect.w,
+            h: niwoe_tokens::Controls::BORDER,
         },
         border,
     );
@@ -437,15 +367,6 @@ fn measure(font: &RefCell<Option<TextRenderer>>, value: &str) -> i32 {
         .unwrap_or(value.chars().count() as i32 * 8)
 }
 
-fn fit(value: &str, max: usize) -> String {
-    if value.chars().count() <= max {
-        return value.to_string();
-    }
-    let mut out: String = value.chars().take(max.saturating_sub(1)).collect();
-    out.push('\u{2026}');
-    out
-}
-
 pub fn hit_test(width: u32, height: u32, x: f64, y: f64) -> Option<QuickSettingsHit> {
     if !(Rect {
         x: 0,
@@ -460,6 +381,8 @@ pub fn hit_test(width: u32, height: u32, x: f64, y: f64) -> Option<QuickSettings
     for (slot, hit) in [
         (&SETTINGS, QuickSettingsHit::Settings),
         (&NETWORK, QuickSettingsHit::Network),
+        (&BLUETOOTH, QuickSettingsHit::Bluetooth),
+        (&DISPLAY, QuickSettingsHit::Display),
         (&AUDIO_MUTE, QuickSettingsHit::AudioMute),
         (&APPEARANCE, QuickSettingsHit::Appearance),
         (&POWER_PROFILE, QuickSettingsHit::PowerProfile),
@@ -491,108 +414,7 @@ fn volume_from_slider_x(volume: Rect, x: f64) -> u8 {
 
 include!("deck_keyboard.rs");
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[path = "deck_controls.rs"]
+mod deck_controls;
 
-    #[test]
-    fn unavailable_controls_are_not_clickable_or_keyboard_targets() {
-        let q = QuickSettings::DEFAULT;
-        let mut canvas = vec![0; (q.width * q.height * 4) as usize];
-        let font = RefCell::new(TextRenderer::new(
-            "sans",
-            niwoe_tokens::Typography::DEFAULT.body_size.into(),
-        ));
-        let theme = ThemeConfig::default();
-        reset_keyboard_focus();
-        draw(
-            &mut Painter::new(&mut canvas, q.width, q.height),
-            &font,
-            &theme,
-            QuickSettingsState {
-                network: &NetworkState::Offline,
-                audio: &AudioSnapshot::unavailable(),
-                battery: &BatterySnapshot::default(),
-                power_profile: None,
-                theme_name: "dark",
-                power_armed: false,
-            },
-        );
-        let targets = focus_targets();
-        assert!(!targets.iter().any(|(_, action)| matches!(
-            action,
-            QuickSettingsHit::AudioMute
-                | QuickSettingsHit::Volume(_)
-                | QuickSettingsHit::PowerProfile
-                | QuickSettingsHit::Network
-        )));
-        for (rect, action) in &targets {
-            assert!(
-                rect.x >= 0
-                    && rect.y >= 0
-                    && rect.x + rect.w <= q.width
-                    && rect.y + rect.h <= q.height
-            );
-            assert_eq!(
-                hit_test(
-                    q.width as u32,
-                    q.height as u32,
-                    f64::from(rect.x + rect.w / 2),
-                    f64::from(rect.y + rect.h / 2)
-                ),
-                Some(*action)
-            );
-        }
-        for (_, action) in &targets {
-            focus_next(false);
-            assert_eq!(focused_action(), Some(*action));
-        }
-        focus_next(false);
-        assert_eq!(focused_action(), targets.first().map(|(_, action)| *action));
-        if let Ok(path) = std::env::var("NIWOE_DECK_PREVIEW") {
-            // The live compositor supplies the glass surface below this transparent layer.
-            // Show the foreground against its theme tint in the standalone preview.
-            let background = theme.glass_tint_color();
-            for pixel in canvas.as_chunks_mut::<4>().0 {
-                let inverse = 255 - u16::from(pixel[3]);
-                for (channel, base) in
-                    pixel[..3]
-                        .iter_mut()
-                        .zip([background.b, background.g, background.r])
-                {
-                    *channel = (u16::from(*channel) + u16::from(base) * inverse / 255) as u8;
-                }
-                pixel[3] = 255;
-                pixel.swap(0, 2);
-            }
-            tiny_skia::Pixmap::from_vec(
-                canvas,
-                tiny_skia::IntSize::from_wh(q.width as u32, q.height as u32).unwrap(),
-            )
-            .unwrap()
-            .save_png(path)
-            .unwrap();
-        }
-        reset_keyboard_focus();
-    }
-
-    #[test]
-    fn outside_is_not_a_hit() {
-        assert_eq!(hit_test(384, 468, -1.0, 10.0), None);
-    }
-
-    #[test]
-    fn slider_x_maps_and_clamps_to_percent() {
-        let slider = Rect {
-            x: 100,
-            y: 0,
-            w: 200,
-            h: 28,
-        };
-        assert_eq!(volume_from_slider_x(slider, 100.0), 0);
-        assert_eq!(volume_from_slider_x(slider, 200.0), 50);
-        assert_eq!(volume_from_slider_x(slider, 300.0), 100);
-        assert_eq!(volume_from_slider_x(slider, 40.0), 0);
-        assert_eq!(volume_from_slider_x(slider, 500.0), 100);
-    }
-}
+include!("deck_tests.rs");

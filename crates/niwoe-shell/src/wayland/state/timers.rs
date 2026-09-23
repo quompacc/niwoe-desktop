@@ -198,6 +198,9 @@ impl NiwoeShell {
                 }
                 crate::settings_refresh::SettingsData::Bluetooth(value) => {
                     self.bluetooth_snapshot = value;
+                    if self.network_popup_open && self.network_popup_tab == crate::network_popup::NetworkTab::Status {
+                        self.draw_network_popup(qh, RepaintReason::Ipc);
+                    }
                 }
                 crate::settings_refresh::SettingsData::DefaultApps { index, current } => {
                     self.default_apps_index = Some(index);

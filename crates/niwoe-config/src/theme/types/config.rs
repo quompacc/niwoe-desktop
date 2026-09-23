@@ -138,6 +138,23 @@ impl Default for Decorations {
 }
 
 impl Decorations {
+    /// All compositor-owned glass uses the approved popup material.
+    pub fn compositor_surface_treatment(&self, surface: ThemeSurface) -> SurfaceTreatment {
+        self.surface_treatment(surface)
+    }
+
+    /// Panel and launcher paint content over compositor glass, like the deck.
+    /// Keep a tinted fallback when glass or blur is explicitly disabled.
+    pub fn shell_surface_fill_alpha(&self, surface: ThemeSurface) -> u8 {
+        if self.glass
+            && self.glass_blur
+            && matches!(surface, ThemeSurface::Panel | ThemeSurface::Launcher)
+        {
+            0
+        } else {
+            self.surface_treatment(surface).fill_alpha
+        }
+    }
     pub fn surface_radius(&self, surface: ThemeSurface) -> f32 {
         let base = self.corner_radius as f32;
         if base <= 0.0 {
@@ -167,26 +184,19 @@ impl Decorations {
             };
         }
 
-        // ONE solidity source for the whole desktop. Panel/launcher get their
-        // look from the shell painting a body at `glass_alpha`; the glass panes
-        // (titlebar, popups, modals) must read equally solid, so they tint toward
-        // the surface colour by the SAME `glass_alpha`. No separate tint knob, no
-        // per-surface scaling — every element is identical but for its corner
-        // radius (layout). Move `glass_alpha` and every surface moves together.
-        let tint_amount = self.glass_alpha.clamp(0.0, 1.0);
+        // Shared approved material for panel, launcher and popups.
+        let opacity = self.glass_alpha.clamp(0.0, 1.0);
+        let tint_amount = opacity;
         let blur_radius = if self.glass_blur {
             self.glass_blur_radius.max(0.0)
         } else {
             0.0
         };
-        // `glass_alpha` is the single opacity knob for every glass surface —
-        // panel, launcher, popup and titlebar all land at the same fill so the
-        // desktop reads consistently (the launcher look). No per-surface scale.
         SurfaceTreatment {
             radius: self.surface_radius(surface),
             tint_amount,
             blur_radius,
-            fill_alpha: alpha_byte(self.glass_alpha),
+            fill_alpha: alpha_byte(opacity),
             frame_alpha: alpha_byte(self.glass_frame_alpha),
         }
     }
@@ -443,6 +453,32 @@ mod tests {
         assert_eq!(popup.blur_radius, 12.0);
     }
 
+    #[test]
+    fn panel_and_launcher_share_popup_material_without_double_fill() {
+        for decorations in [
+            Decorations::default(),
+            Decorations {
+                glass_alpha: 0.5,
+                ..Decorations::default()
+            },
+        ] {
+            let popup = decorations.compositor_surface_treatment(ThemeSurface::Popup);
+            for surface in [ThemeSurface::Panel, ThemeSurface::Launcher] {
+                assert_eq!(decorations.compositor_surface_treatment(surface), popup);
+                assert_eq!(decorations.shell_surface_fill_alpha(surface), 0);
+                let no_blur = Decorations {
+                    glass_blur: false,
+                    ..decorations.clone()
+                };
+                assert_eq!(no_blur.shell_surface_fill_alpha(surface), popup.fill_alpha);
+                let solid = Decorations {
+                    glass: false,
+                    ..decorations.clone()
+                };
+                assert_eq!(solid.shell_surface_fill_alpha(surface), 255);
+            }
+        }
+    }
     #[test]
     fn surface_treatment_non_glass_is_opaque_without_blur() {
         let decorations = Decorations {

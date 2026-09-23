@@ -53,8 +53,11 @@ pub struct Panel {
     pub clock_width: u32,
     pub room_width: u32,
     pub room_overflow_width: u32,
+    /// Desktop mockup: a short room rail, with remaining rooms in overflow.
+    pub visible_rooms: usize,
     /// Neutral hover overlay over `Palette::surface_alt`.
     pub hover_alpha: u8,
+    pub pressed_alpha: u8,
     /// Focus/running indicator overlay over `Palette::accent`.
     pub active_alpha: u8,
     /// Hairline/group separator over `Palette::text`.
@@ -72,11 +75,13 @@ impl Panel {
         app_icon_size: 22,
         status_icon_size: 22,
         control_width: 40,
-        clock_width: 200,
-        room_width: 88,
-        room_overflow_width: 80,
+        clock_width: 164,
+        room_width: 120,
+        room_overflow_width: 32,
+        visible_rooms: 4,
         hover_alpha: 30,
-        active_alpha: 38,
+        pressed_alpha: 60,
+        active_alpha: 20,
         divider_alpha: 46,
     };
 
@@ -453,11 +458,11 @@ impl QuickSettings {
         panel_gap: 2,
         outer_pad: 16,
         header_height: 48,
-        tile_height: 72,
+        tile_height: 88,
         tile_gap: 10,
         section_gap: 12,
-        audio_height: 112,
-        status_height: 64,
+        audio_height: 64,
+        status_height: 48,
         footer_height: 40,
         control_radius: crate::Radius::DEFAULT.md,
         slider_height: crate::Controls::TRACK_HEIGHT,

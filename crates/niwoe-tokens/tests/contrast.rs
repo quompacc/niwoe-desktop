@@ -17,9 +17,48 @@ fn ratio(a: Color, b: Color) -> f64 {
     (a.max(b) + 0.05) / (a.min(b) + 0.05)
 }
 fn composite(fg: Color, bg: Color) -> Color {
-    let a = niwoe_tokens::chrome::SURFACE_ALPHA as f64 / 255.0;
+    composite_alpha(fg, bg, niwoe_tokens::chrome::SURFACE_ALPHA)
+}
+fn composite_alpha(fg: Color, bg: Color, alpha: u8) -> Color {
+    let a = alpha as f64 / 255.0;
     let blend = |x: u8, y: u8| (x as f64 * a + y as f64 * (1.0 - a)).round() as u8;
     Color::rgb(blend(fg.r, bg.r), blend(fg.g, bg.g), blend(fg.b, bg.b))
+}
+
+#[test]
+fn panel_glass_text_and_active_border_survive_extreme_backdrops() {
+    let panel = niwoe_tokens::Panel::DEFAULT;
+    for p in [Palette::DARK, Palette::LIGHT] {
+        for wallpaper in [Color::rgb(0, 0, 0), Color::rgb(255, 255, 255)] {
+            // Popup shader tint followed by the pane's alpha blend.
+            let base = composite(composite(p.surface_alt, wallpaper), wallpaper);
+            for overlay in [
+                Color::rgba(0, 0, 0, 0),
+                Color::rgba(
+                    p.surface_alt.r,
+                    p.surface_alt.g,
+                    p.surface_alt.b,
+                    panel.hover_alpha,
+                ),
+                Color::rgba(
+                    p.surface_alt.r,
+                    p.surface_alt.g,
+                    p.surface_alt.b,
+                    panel.pressed_alpha,
+                ),
+            ] {
+                let control = composite_alpha(overlay, base, overlay.a);
+                let active = composite_alpha(p.accent, control, panel.active_alpha);
+                assert!(ratio(p.text, control) >= 4.5);
+                assert!(ratio(p.text, active) >= 4.5);
+                assert!(
+                    ratio(p.accent, active) >= 3.0,
+                    "active border contrast: {}",
+                    ratio(p.accent, active)
+                );
+            }
+        }
+    }
 }
 
 #[test]

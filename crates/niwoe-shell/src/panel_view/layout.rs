@@ -1,23 +1,3 @@
-fn draw_circle(canvas: &mut PixmapMut<'_>, cx: f32, cy: f32, radius: f32, color: Color) {
-    use tiny_skia::{FillRule, Paint, PathBuilder, Transform};
-    let mut pb = PathBuilder::new();
-    pb.push_circle(cx, cy, radius);
-    if let Some(path) = pb.finish() {
-        let mut paint = Paint {
-            anti_alias: true,
-            ..Paint::default()
-        };
-        paint.set_color_rgba8(color.r, color.g, color.b, color.a);
-        canvas.fill_path(
-            &path,
-            &paint,
-            FillRule::Winding,
-            Transform::identity(),
-            None,
-        );
-    }
-}
-
 // ── build_panel_widget_tree ─────────────────────────────────────────────────
 
 #[allow(clippy::too_many_arguments)]
@@ -48,7 +28,7 @@ pub(crate) fn build_panel_widget_tree(
     total_workspaces: u8,
     clock: &str,
     icon_cache: &IconCache,
-    screenshot_icon: Option<Pixmap>,
+    _screenshot_icon: Option<Pixmap>,
     theme: &Theme,
 ) -> Box<dyn Widget> {
     use status_symbols::{icon, Symbol};
@@ -85,28 +65,26 @@ pub(crate) fn build_panel_widget_tree(
         LAUNCHER_W,
         false,
     )));
-    left_children.push(Box::new(PanelWorkspaceChip {
-        active: active_workspace,
-        total: total_workspaces,
-    }));
     // Budget rooms before optional app shortcuts. The active room is never
     // hidden; the room menu retains access to every slot on narrow outputs.
-    let tray_count = status_notifier_items.len().min(SNI_PANEL_IDS.len());
+    // Equal side tracks pin the clock to the output midpoint, not the midpoint
+    // of whatever free space happens to remain between the two clusters.
+    let side_width = ((width as i32 - 2 * SIDE_MARGIN - LEFT_PADDING - RIGHT_PADDING - CLOCK_W)
+        .max(0) as f32)
+        / 2.0;
     let status_width =
         TRAY_W * if battery.present { 3 } else { 2 } + if battery.present { LAUNCHER_W } else { 0 };
-    let reserved = LEFT_PADDING
-        + RIGHT_PADDING
-        + LAUNCHER_W
-        + WS_W
-        + CLOCK_W
-        + status_width
-        + SCREENSHOT_W
-        + DIVIDER_W * 3
-        + (tray_count as i32 * (SNI_W + GAP))
-        + GAP * 8;
-    let room_space = (width as i32 - reserved).max(0);
+    let tray_capacity = ((side_width as i32 - status_width - SCREENSHOT_W - DIVIDER_W - GAP * 3)
+        .max(0)
+        / (SNI_W + GAP)) as usize;
+    let tray_count = status_notifier_items
+        .len()
+        .min(SNI_PANEL_IDS.len())
+        .min(tray_capacity);
+    let room_space = (side_width as i32 - LAUNCHER_W - WS_W - GAP * 3).max(0);
     let room_stride = PanelTokens::DEFAULT.room_width as i32 + GAP;
-    let capacity = (room_space / room_stride).max(1) as usize;
+    let capacity =
+        ((room_space / room_stride).max(1) as usize).min(PanelTokens::DEFAULT.visible_rooms);
     let rooms = visible_rooms(active_workspace, total_workspaces, capacity);
     for workspace in rooms {
         left_children.push(Box::new(RoomTab {
@@ -114,8 +92,14 @@ pub(crate) fn build_panel_widget_tree(
             active: workspace == active_workspace,
         }));
     }
+    left_children.push(Box::new(PanelWorkspaceChip));
     let left_cluster = Container::new(
         WidgetStyle {
+            size: UiSize {
+                width: ui_length(side_width),
+                height: ui_length(CHIP_H as f32),
+            },
+            flex_shrink: 0.0,
             flex_direction: FlexDirection::Row,
             align_items: Some(AlignItems::Center),
             gap: UiSize {
@@ -127,12 +111,17 @@ pub(crate) fn build_panel_widget_tree(
         left_children,
     );
 
-    // Center cluster — empty spacer; window indicators are now shown as badges on pinned icons
-    let center_children: Vec<Box<dyn Widget>> = Vec::new();
+    let center_children: Vec<Box<dyn Widget>> = vec![Box::new(PanelClockChip {
+        value: clock.into(),
+    })];
     let center_cluster = Container::new(
         WidgetStyle {
             flex_direction: FlexDirection::Row,
-            flex_grow: 1.0,
+            size: UiSize {
+                width: ui_length(CLOCK_W as f32),
+                height: ui_length(CHIP_H as f32),
+            },
+            flex_shrink: 0.0,
             align_items: Some(AlignItems::Center),
             gap: UiSize {
                 width: ui_length(GAP as f32),
@@ -149,11 +138,7 @@ pub(crate) fn build_panel_widget_tree(
 
     // Right cluster
     let mut right_children: Vec<Box<dyn Widget>> = Vec::new();
-    for (idx, item) in status_notifier_items
-        .iter()
-        .take(SNI_PANEL_IDS.len())
-        .enumerate()
-    {
+    for (idx, item) in status_notifier_items.iter().take(tray_count).enumerate() {
         let icon = item
             .icon_name
             .as_deref()
@@ -174,18 +159,13 @@ pub(crate) fn build_panel_widget_tree(
     if !right_children.is_empty() {
         right_children.push(Box::new(PanelDivider));
     }
-    let screenshot_icon = screenshot_icon.map(|mut icon| {
-        tint_pixmap_premul(&mut icon, theme.palette.text);
-        icon
-    });
     right_children.push(Box::new(PanelChip::new(
-        "panel-screenshot",
-        "Foto".into(),
-        screenshot_icon,
+        "panel-search",
+        "Suche".into(),
+        icon(Symbol::Search, theme.palette.text),
         SCREENSHOT_W,
         false,
     )));
-    right_children.push(Box::new(PanelDivider));
 
     let mut status_children: Vec<Box<dyn Widget>> = vec![
         Box::new(PanelStatusIcon {
@@ -210,14 +190,14 @@ pub(crate) fn build_panel_widget_tree(
         active: network_popup_open || audio_popup_open,
         children: status_children,
     }));
-    right_children.extend([
-        Box::new(PanelDivider) as Box<dyn Widget>,
-        Box::new(PanelClockChip {
-            value: clock.into(),
-        }),
-    ]);
     let right_cluster = Container::new(
         WidgetStyle {
+            size: UiSize {
+                width: ui_length(side_width),
+                height: ui_length(CHIP_H as f32),
+            },
+            flex_shrink: 0.0,
+            justify_content: Some(JustifyContent::FlexEnd),
             flex_direction: FlexDirection::Row,
             align_items: Some(AlignItems::Center),
             gap: UiSize {

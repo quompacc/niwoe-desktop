@@ -82,7 +82,7 @@ impl Widget for PanelStatusIcon {
                 area.x + TRAY_W,
                 area.y + area.height / 2 + theme.spacing.xs,
                 FONT_SIZE,
-                theme.palette.text_dim,
+                theme.palette.text,
             );
         }
     }
@@ -210,10 +210,7 @@ impl Widget for PanelChip {
     }
 }
 
-struct PanelWorkspaceChip {
-    active: u8,
-    total: u8,
-}
+struct PanelWorkspaceChip;
 
 impl Widget for PanelWorkspaceChip {
     fn id(&self) -> Option<&'static str> {
@@ -226,40 +223,25 @@ impl Widget for PanelWorkspaceChip {
                 width: ui_length(WS_W as f32),
                 height: ui_length(CHIP_H as f32),
             },
+            flex_shrink: 0.0,
             ..Default::default()
         }
     }
 
     fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
-        paint_panel_control_background(area, canvas, state);
-        let label = "Räume";
-        let suffix = if self.total > 1 { "⌄" } else { "" };
-        let (label_w, _) = measure_text(label, FONT_SIZE);
-        let (suffix_w, _) = measure_text(suffix, CAPTION_SIZE);
-        let dot_diameter = if self.active > 0 { theme.spacing.xs } else { 0 };
-        let content_w = dot_diameter + theme.spacing.xs + label_w + theme.spacing.xs + suffix_w;
-        let mut x = area.x + (area.width - content_w) / 2;
-        draw_circle(
-            canvas,
-            (x + dot_diameter / 2) as f32,
-            (area.y + area.height / 2) as f32,
-            dot_diameter as f32 / 2.0,
-            theme.palette.accent,
-        );
-        x += dot_diameter + theme.spacing.xs;
-        let baseline = area.y + area.height / 2 + theme.spacing.xs;
-        paint_text(canvas, label, x, baseline, FONT_SIZE, theme.palette.text);
+        paint_panel_control_background(area, canvas, theme, state);
+        let label = "…";
+        let (width, _) = measure_text(label, FONT_SIZE);
         paint_text(
             canvas,
-            suffix,
-            x + label_w + theme.spacing.xs,
-            baseline,
-            CAPTION_SIZE,
-            theme.palette.text_dim,
+            label,
+            area.x + (area.width - width) / 2,
+            area.y + area.height / 2 + theme.spacing.xs,
+            FONT_SIZE,
+            theme.palette.text,
         );
     }
 }
-
 struct PanelClockChip {
     value: Box<str>,
 }
@@ -280,30 +262,46 @@ impl Widget for PanelClockChip {
     }
 
     fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
-        paint_panel_control_background(area, canvas, state);
+        paint_panel_control_background(area, canvas, theme, state);
         let (time, date) = self.value.split_once("  ").unwrap_or((&self.value, ""));
-        let (time_w, _) = measure_text(time, FONT_SIZE);
+        let time_size = Typography::DEFAULT.body_size as f32;
+        let (time_w, time_height) = measure_text(time, time_size);
         let (date_w, _) = measure_text(date, FONT_SIZE);
         let gap = if date.is_empty() { 0 } else { theme.spacing.lg };
         let x = area.x + (area.width - time_w - date_w - gap) / 2;
         let baseline = area.y + area.height / 2 + theme.spacing.xs;
-        paint_text(canvas, date, x, baseline, FONT_SIZE, theme.palette.text_dim);
+        paint_text(canvas, date, x, baseline, FONT_SIZE, theme.palette.text);
         paint_text(
             canvas,
             time,
             x + date_w + gap,
-            baseline,
-            FONT_SIZE,
+            area.y + (area.height + time_height) / 2,
+            time_size,
             theme.palette.text,
         );
     }
 }
 
-fn paint_panel_control_background(area: Rect, canvas: &mut PixmapMut<'_>, state: WidgetState) {
+fn paint_panel_control_background(
+    area: Rect,
+    canvas: &mut PixmapMut<'_>,
+    theme: &Theme,
+    state: WidgetState,
+) {
     let color = match state {
         WidgetState::Idle => None,
-        WidgetState::Hovered => Some(Interaction::DEFAULT.neutral_hover),
-        WidgetState::Pressed => Some(Interaction::DEFAULT.neutral_pressed),
+        WidgetState::Hovered => Some(Color::rgba(
+            theme.palette.surface_alt.r,
+            theme.palette.surface_alt.g,
+            theme.palette.surface_alt.b,
+            PanelTokens::DEFAULT.hover_alpha,
+        )),
+        WidgetState::Pressed => Some(Color::rgba(
+            theme.palette.surface_alt.r,
+            theme.palette.surface_alt.g,
+            theme.palette.surface_alt.b,
+            PanelTokens::DEFAULT.pressed_alpha,
+        )),
     };
     if let Some(color) = color {
         if let Some(path) = rounded_rect_path(area, CHIP_HL_RADIUS) {
@@ -312,4 +310,4 @@ fn paint_panel_control_background(area: Rect, canvas: &mut PixmapMut<'_>, state:
     }
 }
 
-// ── PanelPinnedChip ─────────────────────────────────────────────────────────
+// PanelPinnedChip

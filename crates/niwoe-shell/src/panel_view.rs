@@ -35,8 +35,8 @@ const CLOCK_W: i32 = PanelTokens::DEFAULT.clock_width as i32;
 const STATUS_ICON_SIZE: u32 = PanelTokens::DEFAULT.status_icon_size as u32;
 const PANEL_H: i32 = PANEL_HEIGHT as i32;
 
-const LEFT_PADDING: i32 = niwoe_ui::style::Spacing::DEFAULT.xs;
-const RIGHT_PADDING: i32 = niwoe_ui::style::Spacing::DEFAULT.xs;
+const LEFT_PADDING: i32 = niwoe_ui::style::Spacing::DEFAULT.md;
+const RIGHT_PADDING: i32 = niwoe_ui::style::Spacing::DEFAULT.md;
 // Soft rounded highlight behind active/hovered chips (matches the island/launcher).
 const CHIP_HL_RADIUS: i32 = niwoe_tokens::Radius::DEFAULT.md;
 
@@ -57,8 +57,7 @@ const DIVIDER_W: i32 = niwoe_ui::style::Spacing::DEFAULT.md + 1;
 // Frosted-glass island: transparent shell tint over the compositor-owned
 // live backdrop blur. Noise stays off so the real blurred scene remains legible.
 
-const FONT_SIZE: f32 = Typography::DEFAULT.body_size as f32;
-const CAPTION_SIZE: f32 = Typography::DEFAULT.caption_size as f32;
+const FONT_SIZE: f32 = Typography::DEFAULT.caption_size as f32;
 const ACCENT_LINE_H: i32 = niwoe_tokens::Controls::FOCUS_WIDTH;
 
 /// Neutral application-grid symbol. Branding is deliberately absent from the
@@ -97,7 +96,7 @@ fn build_launcher_icon(theme: &Theme) -> Option<Pixmap> {
 }
 
 #[path = "panel_view/status_symbols.rs"]
-mod status_symbols;
+pub(crate) mod status_symbols;
 
 fn action_for_id_as_click(id: &str) -> Option<ClickAction> {
     if let Some(workspace) = id
@@ -113,7 +112,7 @@ fn action_for_id_as_click(id: &str) -> Option<ClickAction> {
         return Some(ClickAction::ActivateStatusNotifierItem(idx));
     }
     match id {
-        "panel-launcher" => Some(ClickAction::ToggleLauncher),
+        "panel-launcher" | "panel-search" => Some(ClickAction::ToggleLauncher),
         "panel-status" => Some(ClickAction::ToggleNetworkPopup),
         "panel-workspace" => Some(ClickAction::ToggleWorkspacePopup),
         "panel-screenshot" => Some(ClickAction::TakeScreenshot),

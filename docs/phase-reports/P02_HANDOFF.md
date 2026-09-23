@@ -1,4 +1,46 @@
-# NIWOE – aktueller Handoff, 22.09.2026
+# NIWOE – aktueller Handoff, 23.09.2026
+
+**Aktueller Nutzerstand:** Dark-Material und Panel-/Launcher-Anordnung nach
+Installation/Neustart positiv bestätigt. Textzentrierung und größere Uhr ebenfalls
+bestätigt. Light wurde bei der Abnahme als zu grell abgelehnt; zuerst die helle
+Palette als gedämpften Gegenpol überarbeiten. Danach Deckzustände/Fehlerrückmeldung.
+Viewportmatrix (1024/1366/1920, beide Paletten, Räume 1/5/9) mit zentrierter Uhr
+und getrennten Klickzielen bestanden; `target/panel-acceptance/` check/test grün.
+Das ist Layoutprüfung, kein physischer DRM-Moduswechsel. Aktiver DRM-Ausgang
+meldet nur 1920×1080/60 Hz. Light-Livebild unter P05 `accepted-light-deck.png`
+ist ein Prüfbeleg, ausdrücklich keine Nutzerfreigabe des Light-Designs.
+
+**Neueste Nutzerpriorität:** [Panel nach Mockup](PANEL_MOCKUP_CORRECTION.md).
+Andere UI-Arbeiten sind bis zur visuellen Panelabnahme zurückgestellt.
+
+**Vorrangiger offener Auftrag:** [Dialog-Klickfehler und Materialbefund](P05_INPUT_MATERIAL_FINDINGS.md).
+Nutzer meldet nicht bedienbare Screenshot-Zustimmung über Settings (Escape geht)
+und lehnt die bisherige Mockup-Nähe ab. Input-Fix auf Fedora geprüft und
+installiert: 1.098 Tests grün, fmt/check/clippy/Release bestanden. Alle sechs
+Programme bytegleich, KDE-/GTK-Konfiguration unverändert. SSH-Schlüsselzugang
+funktioniert. Nach Neuanmeldung neue Buildidentität bestätigt; Nutzer bestätigt
+erfolgreichen Mausklick auf Erlauben über Settings. Zusätzlich Capturefehler
+gefunden: Aufnahmen erfolgten vor Glasauflösung. Reihenfolge korrigiert,
+Folgeschritt-Gates/Installation im verlinkten Bericht verfolgen.
+Die 1.095 grünen Tests unten gelten ausschließlich für den früheren Symbolstand.
+
+**Aktuellster Schritt:** [Deck-Symbolaktionen und Bluetooth](P05_DECK_SYMBOLS.md).
+1.095 Tests grün, fmt/check/clippy/Release bestanden, installiert. Shell per
+Watchdog erneuert (17228), Compositor 8017 erhalten. Echte Deck-Aufnahme bei
+1920×1080/100 %/Dark geprüft. Bluetoothstatus plus Geräteverwaltung, Anzeigezugang,
+stabiler Tastaturfokus bei asynchronem Status. Details/Restarbeiten im Bericht.
+Nächster Schwerpunkt: bestätigte Backendmutationen mit Pending-/Fehlerzustand;
+danach übrige Mockup-/HiDPI-/Performance-Nachweise. Immer installieren.
+
+**Vorheriger Schritt:** [Deck-Komposition](P05_DECK_COMPOSITION.md), auf Fedora
+geprüft: fmt/check/test/clippy grün, 1.094 Tests bestanden, 1 ignoriert.
+Dark-/Light-Rasterbelege vorhanden. Release am 23.09. installiert, alle sechs
+Binaries bytegleich, KDE-/GTK-Dateien unverändert. Rechner am Greeter; neuer Stand
+beim nächsten NIWOE-Login, Deck über Super+Escape. Nutzerauftrag: geprüfte Stände
+immer installieren (auch in AGENTS.md). Die folgenden älteren Installationsangaben
+sind vom 22.09.
+Weiterarbeit: Deck-Symbolaktionen und übrige dokumentierte Mockup-Lücken;
+P02–P05 bleiben in-progress.
 
 Repository: `D:/300_Projekte/310_Aktiv/niwoe-desktop`, Branch `codex/niwoe-p00`.
 P02–P05 **in-progress**, nicht visuell abgenommen. Aktueller Bericht:

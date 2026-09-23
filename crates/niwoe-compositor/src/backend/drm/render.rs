@@ -291,15 +291,6 @@ fn render_outputs_for_crtc(
         );
         metrics.scene_compose_duration += scene_compose_started.elapsed();
 
-        // Serve screencopy BEFORE render_frame so all Wayland surface textures
-        // are still fresh and not yet assigned to KMS hardware planes (which
-        // bypasses the GLES import path and makes draw() silently skip them).
-        let capture_started = Instant::now();
-        serve_screencopy_frames(state, renderer, out, out_size);
-        process_thumbnail_requests(state, renderer, out, out_size);
-        process_screenshot_requests(state, renderer, out, out_size);
-        metrics.capture_duration += capture_started.elapsed();
-
         // Liquid-glass: for each placeholder, render only the scene behind
         // that placeholder, blur it, and swap in a real sampling element.
         let glass_started = Instant::now();
@@ -398,6 +389,15 @@ fn render_outputs_for_crtc(
             }
         }
         metrics.glass_duration += glass_started.elapsed();
+
+        // Capture the resolved scene: pending glass placeholders draw nothing.
+        // Stay BEFORE render_frame so surface textures have not been assigned
+        // to KMS hardware planes, which bypass the GLES import path.
+        let capture_started = Instant::now();
+        serve_screencopy_frames(state, renderer, out, out_size);
+        process_thumbnail_requests(state, renderer, out, out_size);
+        process_screenshot_requests(state, renderer, out, out_size);
+        metrics.capture_duration += capture_started.elapsed();
 
         let elements: &[NiwoeRenderElements] = if state.idle_blanked {
             &[]

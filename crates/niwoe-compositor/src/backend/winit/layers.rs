@@ -19,28 +19,7 @@ use super::WinitRenderElements;
 pub(super) type LayerRenderData = (LayerSurface, Rectangle<i32, Logical>);
 
 fn is_upper_layer(namespace: &str, layer: WlrLayer) -> bool {
-    // NIWOE's shell overlays (launcher, popups, menus) are created on the
-    // Overlay/Top layer, but smithay can transiently report Background/Bottom for
-    // a layer surface across a null-buffer unmap->remap cycle — which the
-    // calendar/network/workspace popups perform on every open/close. When that
-    // happens the surface would fall into the lower bucket: the glass loop (which
-    // only scans the upper bucket) would miss it (visible popup, no blur) and it
-    // would z-order below windows. Pin every known shell overlay to the upper
-    // bucket by namespace, independent of the reported layer. The launcher already
-    // relied on this; here it is extended to all popups.
-    matches!(
-        namespace,
-        "niwoe-launcher"
-            | "niwoe-quick-settings"
-            | "niwoe-calendar-popup"
-            | "niwoe-workspace-popup"
-            | "niwoe-network-popup"
-            | "niwoe-notification"
-            | "niwoe-thumbnail-popup"
-            | "niwoe-desktop-menu"
-            | "niwoe-screenshot-consent"
-            | "niwoe-screenshot-region-picker"
-    ) || matches!(layer, WlrLayer::Top | WlrLayer::Overlay)
+    crate::layer_order::upper_rank(namespace, layer).is_some()
 }
 
 pub(super) fn collect_layer_data(
@@ -63,6 +42,8 @@ pub(super) fn collect_layer_data(
             lower.push((layer_surface.clone(), geo));
         }
     }
+    // Same stable front-to-back order as DRM and pointer hit-testing.
+    upper.sort_by_key(|(s, _)| crate::layer_order::upper_rank(s.namespace(), s.layer()));
 }
 
 pub(super) fn render_layer_elements(

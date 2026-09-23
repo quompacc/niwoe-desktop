@@ -35,6 +35,8 @@ pub enum NetworkPopupHit {
 pub struct NetworkPopupState<'a> {
     pub network: &'a NetworkState,
     pub audio: &'a AudioSnapshot,
+    pub bluetooth: &'a crate::bluetooth::BluetoothSnapshot,
+    pub bluetooth_pending: bool,
     pub battery: &'a BatterySnapshot,
     pub power_profile: Option<PowerProfile>,
     pub theme_name: &'a str,
@@ -78,6 +80,8 @@ pub fn draw_network_popup(
                 crate::quick_settings_popup::QuickSettingsState {
                     network: state.network,
                     audio: state.audio,
+                    bluetooth: state.bluetooth,
+                    bluetooth_pending: state.bluetooth_pending,
                     battery: state.battery,
                     power_profile: state.power_profile,
                     theme_name: state.theme_name,
@@ -310,6 +314,8 @@ mod tests {
                 network: &NetworkState::Offline,
                 audio: &AudioSnapshot::unavailable(),
                 battery: &crate::battery::BatterySnapshot::default(),
+                bluetooth: &crate::bluetooth::BluetoothSnapshot::default(),
+                bluetooth_pending: false,
                 power_profile: None,
                 theme_name: "niwoe-dark",
                 power_armed: false,

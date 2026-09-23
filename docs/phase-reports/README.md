@@ -1,5 +1,16 @@
 # NIWOE-Phasenstatus
 
+Vorrangig offen: [Dialog-Klickfehler und Materialkritik](P05_INPUT_MATERIAL_FINDINGS.md).
+Lokaler Compositor-Fix noch ohne Linux-Gates/Installation; Toolzugang blockiert.
+
+Aktueller Stand 23.09.: [Deck-Symbolaktionen/Bluetooth](P05_DECK_SYMBOLS.md),
+1.095 Tests grün, installiert, Shell aktualisiert und Live-Deck geprüft.
+
+Fortsetzung 23.09.: [erster Deck-Kompositionsschritt](P05_DECK_COMPOSITION.md)
+mit geprüften Dark-/Light-Rasterbildern und grünen Fedora-Gates. Release auf
+Nutzerauftrag installiert; nächster NIWOE-Login zeigt den Stand. P02–P05 bleiben
+in-progress.
+
 | Phase | Status | Bericht |
 |---|---|---|
 | P00 | accepted | [P00.md](P00.md) |

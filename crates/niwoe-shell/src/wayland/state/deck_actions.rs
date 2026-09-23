@@ -36,6 +36,10 @@ impl NiwoeShell {
     ) {
         use crate::quick_settings_popup::QuickSettingsHit;
         match hit {
+            QuickSettingsHit::Bluetooth => self
+                .open_settings_category(qh, crate::settings_view::SettingsCategory::Bluetooth),
+            QuickSettingsHit::Display => self
+                .open_settings_category(qh, crate::settings_view::SettingsCategory::Display),
             QuickSettingsHit::Settings => self
                 .open_settings_category(qh, crate::settings_view::SettingsCategory::SystemOverview),
             QuickSettingsHit::Appearance => {

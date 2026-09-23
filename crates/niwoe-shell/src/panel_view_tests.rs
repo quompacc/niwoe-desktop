@@ -147,6 +147,8 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
     );
 
     assert!(canvas.iter().any(|byte| *byte != 0));
+    // Like the deck, the shell must leave the compositor glass visible.
+    assert_eq!(canvas[3], 0);
     if let Ok(path) = std::env::var("NIWOE_PANEL_PREVIEW") {
         let mut rgba = canvas.clone();
         for pixel in rgba.as_chunks_mut::<4>().0 {
@@ -158,6 +160,21 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
             .unwrap();
     }
     assert!(!clicks.is_empty());
+    let rooms: Vec<_> = clicks
+        .iter()
+        .filter(|z| {
+            z.id.as_deref()
+                .is_some_and(|id| id.starts_with("panel-room-"))
+        })
+        .collect();
+    assert!(!rooms.is_empty() && rooms.len() <= PanelTokens::DEFAULT.visible_rooms);
+    assert!(rooms
+        .iter()
+        .any(|z| matches!(z.action, ClickAction::SwitchWorkspace(1))));
+    assert!(clicks
+        .iter()
+        .any(|z| z.id.as_deref() == Some("panel-search")
+            && matches!(z.action, ClickAction::ToggleLauncher)));
     assert!(
         clicks
             .iter()
@@ -170,8 +187,9 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
     let status = zone("panel-status");
     let clock = zone("panel-clock");
     assert!(launcher.rect.x + launcher.rect.w <= workspace.rect.x);
-    assert!(workspace.rect.x + workspace.rect.w <= status.rect.x);
-    assert!(status.rect.x + status.rect.w <= clock.rect.x);
+    assert!(workspace.rect.x + workspace.rect.w <= clock.rect.x);
+    assert!(clock.rect.x + clock.rect.w <= status.rect.x);
+    assert!((clock.rect.x * 2 + clock.rect.w - width as i32).abs() <= 1);
     assert!(clicks.iter().all(|z| z.rect.y >= 0
         && z.rect.y + z.rect.h <= height as i32
         && z.rect.x >= 0
@@ -188,6 +206,70 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
         zone.id.as_deref(),
         Some("panel-network" | "panel-sound" | "panel-battery")
     )));
+}
+
+#[test]
+fn panel_layout_keeps_clock_centered_and_controls_separate_across_viewports() {
+    let icons = IconCache::new();
+    let audio = AudioSnapshot::unavailable();
+    for width in [1024, 1366, 1920] {
+        for palette in [niwoe_tokens::Palette::DARK, niwoe_tokens::Palette::LIGHT] {
+            let theme = Theme {
+                palette,
+                ..Theme::TOKYO_NIGHT_METRO
+            };
+            for active in [1, 5, 9] {
+                let tree = build_panel_widget_tree(
+                    width,
+                    &[],
+                    &[],
+                    &NetworkState::Disconnected,
+                    &audio,
+                    &[],
+                    false,
+                    false,
+                    &crate::battery::BatterySnapshot::default(),
+                    None,
+                    active,
+                    9,
+                    "19:18  Mi, 23. Sep",
+                    &icons,
+                    None,
+                    &theme,
+                );
+                let layout = compute_layout(
+                    &*tree,
+                    PixelSize {
+                        width,
+                        height: PANEL_HEIGHT,
+                    },
+                )
+                .unwrap();
+                let mut zones = Vec::new();
+                collect_click_zones(&*tree, &layout.root, 0, 0, &mut zones);
+                let clock = zones
+                    .iter()
+                    .find(|z| z.id.as_deref() == Some("panel-clock"))
+                    .unwrap();
+                assert!((clock.rect.x * 2 + clock.rect.w - width as i32).abs() <= 1);
+                assert!(zones
+                    .iter()
+                    .any(|z| matches!(z.action, ClickAction::SwitchWorkspace(w) if w == active)));
+                for (index, zone) in zones.iter().enumerate() {
+                    assert!(zone.rect.x >= 0 && zone.rect.x + zone.rect.w <= width as i32);
+                    for other in zones.iter().skip(index + 1) {
+                        assert!(
+                            zone.rect.x + zone.rect.w <= other.rect.x
+                                || other.rect.x + other.rect.w <= zone.rect.x,
+                            "overlapping panel targets at {width}: {:?} / {:?}",
+                            zone.id,
+                            other.id
+                        );
+                    }
+                }
+            }
+        }
+    }
 }
 
 #[test]

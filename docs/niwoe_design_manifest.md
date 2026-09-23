@@ -53,8 +53,16 @@ gefülltem Akzent verwendet er die kontrastierende Vordergrundfarbe.
 
 ## Oberflächen und Branding
 
+**Materialfreigabe 23.09.2026:** Der Nutzer bestätigt Farbe, Transparenz und
+Glaswirkung von Systemdeck und Lautstärke ausdrücklich als Referenz.
+Panel und Launcher übernehmen genau diesen compositorseitigen Materialpfad,
+ohne zusätzliche Shell-Tönung oder eigene Opazitätsfaktoren. Die freigegebenen
+beiden Popups werden dafür nicht verändert. Panelgeometrie und mittige Uhr bleiben.
+
 Der Arbeitsdesktop bleibt frei von Dashboardkarten. Das Panel liegt oben:
-Launcher, Räume, flexible Lücke, vorhandene Module und Uhr. Der Launcher ist
+Launcher und Räume links, Statusmodule rechts. Nach Nutzerkorrektur vom
+23.09.2026 steht die Uhr exakt in der Bildschirmmitte, unabhängig von Raum-
+und Statusgruppenbreite. Der Launcher ist
 ein kompaktes zentriertes Such-Popup, das Deck eine kleine Karte rechts oben;
 beide bleiben tastaturfest und datenwahr. Hub, Settings und Wizard folgen den
 im Brief definierten Informationsgrenzen und erfinden keine Datenquellen.

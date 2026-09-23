@@ -153,14 +153,9 @@ pub(crate) fn draw_command_palette(
     let p = theme.palette;
     let alpha = config
         .decorations
-        .surface_treatment(niwoe_config::ThemeSurface::Launcher)
-        .fill_alpha;
-    image.fill(tiny_skia::Color::from_rgba8(
-        p.background.r,
-        p.background.g,
-        p.background.b,
-        alpha,
-    ));
+        .shell_surface_fill_alpha(niwoe_config::ThemeSurface::Launcher);
+    let tint = config.glass_tint_color();
+    image.fill(tiny_skia::Color::from_rgba8(tint.r, tint.g, tint.b, alpha));
     let body = Typography::DEFAULT.body_size as f32;
     let caption = Typography::DEFAULT.caption_size as f32;
     let mut pm = image.as_mut();

@@ -311,6 +311,7 @@ impl NiwoeShell {
         // the current primary connection (e.g. right after connecting Wi-Fi or
         // unplugging the cable), not the last timer-polled snapshot.
         self.network_controller.poll();
+        self.request_settings_refresh(crate::settings_view::SettingsCategory::Bluetooth);
         self.network_layer
             .set_anchor(Anchor::TOP | Anchor::RIGHT);
         self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::NETWORK_POPUP_RIGHT_MARGIN, 0, 0);

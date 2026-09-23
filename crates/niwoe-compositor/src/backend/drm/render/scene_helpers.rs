@@ -3,7 +3,7 @@ fn themed_layer_glass_info(
     rect: smithay::utils::Rectangle<i32, smithay::utils::Logical>,
     surface: ThemeSurface,
 ) -> super::glass::GlassTitlebarInfo {
-    let treatment = theme.decorations.surface_treatment(surface);
+    let treatment = theme.decorations.compositor_surface_treatment(surface);
     let tint = theme.glass_tint_color();
     super::glass::GlassTitlebarInfo {
         rect,

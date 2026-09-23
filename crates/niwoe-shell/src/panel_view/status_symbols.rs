@@ -4,18 +4,22 @@ use std::cell::RefCell;
 use tiny_skia::{LineCap, LineJoin, Paint, PathBuilder, Stroke};
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub(super) enum Symbol {
+pub(crate) enum Symbol {
     Wired(bool),
     Wifi(bool),
     Audio(bool),
     Battery(u8, bool),
+    Bluetooth,
+    Display,
+    Performance,
+    Search,
 }
 
 type Entry = (Symbol, Color, Pixmap);
 thread_local! { static CACHE: RefCell<Vec<Entry>> = const { RefCell::new(Vec::new()) }; }
 
 /// Bounded, theme-keyed raster cache. No icon decoding or rerasterization on idle redraws.
-pub(super) fn icon(symbol: Symbol, color: Color) -> Option<Pixmap> {
+pub(crate) fn icon(symbol: Symbol, color: Color) -> Option<Pixmap> {
     CACHE.with(|cache| {
         let mut cache = cache.borrow_mut();
         if let Some((_, _, pm)) = cache.iter().find(|(s, c, _)| *s == symbol && *c == color) {
@@ -24,6 +28,41 @@ pub(super) fn icon(symbol: Symbol, color: Color) -> Option<Pixmap> {
         let mut pm = Pixmap::new(STATUS_ICON_SIZE, STATUS_ICON_SIZE)?;
         let mut path = PathBuilder::new();
         match symbol {
+            Symbol::Search => {
+                path.push_circle(10., 10., 6.);
+                path.move_to(14.5, 14.5);
+                path.line_to(21., 21.);
+            }
+            Symbol::Bluetooth => {
+                path.move_to(12., 2.);
+                path.line_to(18., 7.);
+                path.line_to(6., 17.);
+                path.move_to(12., 22.);
+                path.line_to(18., 17.);
+                path.line_to(6., 7.);
+                path.move_to(12., 2.);
+                path.line_to(12., 22.);
+            }
+            Symbol::Display => {
+                path.move_to(3., 4.);
+                path.line_to(21., 4.);
+                path.line_to(21., 16.);
+                path.line_to(3., 16.);
+                path.close();
+                path.move_to(12., 16.);
+                path.line_to(12., 20.);
+                path.move_to(8., 20.);
+                path.line_to(16., 20.);
+            }
+            Symbol::Performance => {
+                path.move_to(14., 2.);
+                path.line_to(5., 14.);
+                path.line_to(11., 14.);
+                path.line_to(10., 22.);
+                path.line_to(19., 10.);
+                path.line_to(13., 10.);
+                path.close();
+            }
             Symbol::Wired(connected) => {
                 path.move_to(3., 4.);
                 path.line_to(21., 4.);

@@ -47,21 +47,49 @@ impl Widget for RoomTab {
     }
 
     fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
-        paint_panel_control_background(area, canvas, state);
+        paint_panel_control_background(area, canvas, theme, state);
         let color = if self.active {
             theme.palette.accent
         } else {
-            theme.palette.text_dim
+            theme.palette.text
         };
         let label = format!("Raum {}", self.workspace);
-        let (width, _) = measure_text(&label, FONT_SIZE);
+        let (width, text_height) = measure_text(&label, FONT_SIZE);
+        let symbol_size = Typography::DEFAULT.caption_size as i32;
+        let content_width = symbol_size + theme.spacing.sm + width;
+        let content_x = area.x + (area.width - content_width) / 2;
+        let symbol = Rect {
+            x: content_x,
+            y: area.y + (area.height - symbol_size) / 2,
+            width: symbol_size,
+            height: symbol_size,
+        };
+        if self.active {
+            if let Some(path) = rounded_rect_path(area, niwoe_tokens::Radius::DEFAULT.sm) {
+                paint_fill(
+                    canvas,
+                    &path,
+                    Color::rgba(color.r, color.g, color.b, PanelTokens::DEFAULT.active_alpha),
+                );
+            }
+        }
+        if let Some(path) = rounded_rect_path(symbol, niwoe_tokens::Radius::DEFAULT.sm) {
+            niwoe_ui::effect::paint_border(
+                canvas,
+                &path,
+                color,
+                niwoe_tokens::Controls::BORDER as f32,
+            );
+        }
         paint_text(
             canvas,
             &label,
-            area.x + (area.width - width) / 2,
-            area.y + (area.height + FONT_SIZE as i32) / 2 - theme.spacing.xs,
+            content_x + symbol_size + theme.spacing.sm,
+            // Fixed "Raum 1..9" labels have no descenders. Center their actual
+            // measured ink height rather than subtracting a spacing token.
+            area.y + (area.height + text_height) / 2,
             FONT_SIZE,
-            color,
+            theme.palette.text,
         );
         if self.active {
             if let Some(path) = rounded_rect_path(area, niwoe_tokens::Radius::DEFAULT.sm) {
@@ -80,6 +108,43 @@ impl Widget for RoomTab {
 #[cfg(test)]
 mod room_tests {
     use super::*;
+    #[test]
+    fn room_label_ink_is_vertically_centered() {
+        let theme = Theme::TOKYO_NIGHT_METRO;
+        let area = Rect {
+            x: 0,
+            y: 0,
+            width: PanelTokens::DEFAULT.room_width as i32,
+            height: CHIP_H,
+        };
+        for workspace in 1..=9 {
+            let mut image = Pixmap::new(area.width as u32, area.height as u32).unwrap();
+            RoomTab {
+                workspace,
+                active: false,
+            }
+            .paint(area, &mut image.as_mut(), &theme, WidgetState::Idle);
+            let rows: Vec<_> = image
+                .data()
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .enumerate()
+                // Include antialiased ink, excluding the symbol on the left.
+                .filter(|(index, pixel)| {
+                    pixel[3] > 0 && *index as i32 % area.width > area.width / 2
+                })
+                .map(|(index, _)| index as i32 / area.width)
+                .collect();
+            let top = *rows.iter().min().expect("visible text ink");
+            let bottom = *rows.iter().max().unwrap();
+            assert!(
+                (top + bottom + 1 - area.height).abs() <= 2,
+                "room {workspace}: ink {top}..{bottom} is not centered"
+            );
+        }
+    }
+
     #[test]
     fn active_room_stays_visible_at_both_edges_and_in_the_middle() {
         for capacity in [0, 1, 3, 9, 20] {

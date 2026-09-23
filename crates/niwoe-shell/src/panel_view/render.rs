@@ -122,7 +122,7 @@ pub(crate) fn draw_panel_ui(
         return;
     };
     // Edge-attached bar: one token-driven surface and a quiet bottom separator.
-    let base = theme.palette.background;
+    let base = theme_config.glass_tint_color();
     let body = Rect {
         x: SIDE_MARGIN,
         y: ISLAND_TOP,
@@ -131,11 +131,19 @@ pub(crate) fn draw_panel_ui(
     };
     {
         let mut pc = pixmap.as_mut();
+        // The compositor supplies the same glass body as the approved deck.
         if let Some(path) = rounded_rect_path(body, PanelTokens::DEFAULT.edge_radius) {
             paint_fill(
                 &mut pc,
                 &path,
-                Color::rgba(base.r, base.g, base.b, treatment.fill_alpha),
+                Color::rgba(
+                    base.r,
+                    base.g,
+                    base.b,
+                    theme_config
+                        .decorations
+                        .shell_surface_fill_alpha(ThemeSurface::Panel),
+                ),
             );
         }
         let border = niwoe_tokens::Controls::BORDER;
@@ -146,7 +154,12 @@ pub(crate) fn draw_panel_ui(
             height: border,
         };
         if let Some(path) = rounded_rect_path(separator, PanelTokens::DEFAULT.edge_radius) {
-            paint_fill(&mut pc, &path, theme.palette.border);
+            let color = theme.palette.text_dim;
+            paint_fill(
+                &mut pc,
+                &path,
+                Color::rgba(color.r, color.g, color.b, treatment.frame_alpha),
+            );
         }
         let _ = render(&*root, &layout, &mut pc, &theme, state_fn);
     }

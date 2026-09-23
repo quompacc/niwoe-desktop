@@ -82,6 +82,20 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
 3. Bei formatierungssensitiven Änderungen `cargo fmt`.
 4. Bei Rendering/Input/IPC: betroffene Pfade manuell gegen Call-Flow prüfen.
 
+## Installation auf dem Testrechner
+- Nutzerkorrektur vom 23.09.2026: Zuerst das Panel entsprechend den verbindlichen
+  Mockups einschließlich sichtbarem Glas/Blur/leichter Transparenz fertigstellen
+  und visuell abnehmen. Bis dahin keine Fortsetzung anderer UI-Phasen.
+- Anschließende Nutzerfreigabe: Material von Systemdeck/Lautstärke beibehalten
+  und ausdrücklich sowohl auf Panel als auch Launcher übertragen. Dieser
+  Launcher-Materialabgleich ist Teil des aktuellen Auftrags.
+- Nutzerauftrag vom 23.09.2026: Jeden erfolgreich geprüften Implementierungsstand
+  direkt als Release auf dem vorhandenen Fedora-Testrechner installieren, damit
+  der Nutzer ihn sehen kann. Nicht bei einem nur lokal geprüften Stand aufhören.
+- Installierte Buildidentität prüfen; bei reinen Shell-Änderungen die Shell über
+  den vorhandenen Watchdog erneuern, sofern eine NIWOE-Sitzung läuft. Erforderlichen
+  Neulogin ausdrücklich melden. Bestehende KDE-/GTK-Konfiguration erhalten.
+
 ## Berichtformat
 1. Geänderte Dateien.
 2. Was geändert wurde (pro Datei, 1-3 Zeilen).

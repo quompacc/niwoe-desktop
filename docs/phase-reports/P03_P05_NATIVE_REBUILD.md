@@ -3,6 +3,14 @@
 Dauerhafte [Bildbelege mit Herkunft und Grenzen](../design/evidence/P03/README.md).
 Aktueller Einstieg für Folgesitzungen: [Handoff](P02_HANDOFF.md).
 
+Aktueller Stand 23.09.: [Symbolaktionen und Bluetooth](P05_DECK_SYMBOLS.md),
+geprüft, installiert und im laufenden Desktop angesehen. Keine Gesamtabnahme.
+
+Fortsetzung 23.09.: [Deck-Komposition, erster Korrekturschritt](P05_DECK_COMPOSITION.md).
+Kompakte Audiozeile, ruhige Abschnittstrennung und Settings im Fußbereich;
+Dark/Light nativ geprüft und Release installiert. Rechner am Greeter; Live-Prüfung
+nach Anmeldung und vollständige Mockup-Abnahme offen.
+
 ## Visuelle Korrektur nach Live-Review
 
 Nutzerfeedback: Statussymbole/Uhr passen nicht, Launcher zu flach/generisch;

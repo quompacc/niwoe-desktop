@@ -76,49 +76,27 @@ impl NiwoeState {
             let layer_map = layer_map_for_output(output);
             let local = pos - output_geo.loc.to_f64();
 
-            for layer in [
-                smithay::wayland::shell::wlr_layer::Layer::Overlay,
-                smithay::wayland::shell::wlr_layer::Layer::Top,
-            ] {
-                if let Some(surface) = layer_map.layer_under(layer, local) {
+            if let Some(hit) = crate::layer_order::first_upper_hit(
+                || layer_map.layers(),
+                |layer| crate::layer_order::upper_rank(layer.namespace(), layer.layer()),
+                |layer| {
                     if !layer_accepts_pointer(
-                        surface.namespace(),
-                        surface.cached_state().keyboard_interactivity,
+                        layer.namespace(),
+                        layer.cached_state().keyboard_interactivity,
                     ) {
-                        continue;
+                        return None;
                     }
-                    if let Some(geo) = layer_map.layer_geometry(surface) {
-                        return surface
-                            .surface_under(local - geo.loc.to_f64(), WindowSurfaceType::ALL)
-                            .map(|(surface, point)| {
-                                (surface, (point + output_geo.loc + geo.loc).to_f64())
-                            });
-                    }
-                }
-            }
-
-            // Keep launcher hit-testing top-priority even if its cached role is stale.
-            let launcher_surface = layer_map
-                .layers()
-                .find(|layer| {
-                    layer.namespace() == "niwoe-launcher"
-                        && layer_accepts_pointer(
-                            layer.namespace(),
-                            layer.cached_state().keyboard_interactivity,
-                        )
-                })
-                .cloned();
-            if let Some(launcher_surface) = launcher_surface {
-                if let Some(geo) = layer_map.layer_geometry(&launcher_surface) {
-                    if let Some((surface, point)) = launcher_surface
+                    let geo = layer_map.layer_geometry(layer)?;
+                    layer
                         .surface_under(local - geo.loc.to_f64(), WindowSurfaceType::ALL)
-                    {
-                        return Some((surface, (point + output_geo.loc + geo.loc).to_f64()));
-                    }
-                }
+                        .map(|(surface, point)| {
+                            (surface, (point + output_geo.loc + geo.loc).to_f64())
+                        })
+                },
+            ) {
+                return Some(hit);
             }
         }
-
         let window_surface =
             self.workspaces
                 .active_space()
