@@ -261,17 +261,22 @@ macro_rules! compose_output_scene {
                     .iter()
                     .find(|(ls, _)| ls.namespace() == "niwoe-launcher")
                 {
-                    let (x, y, w, h) = niwoe_tokens::Launcher::SEARCH
-                        .fitted_rect(lg.size.w.max(1) as u32, lg.size.h.max(1) as u32);
-                    let card = smithay::utils::Rectangle::<i32, smithay::utils::Logical>::new(
-                        (lg.loc.x + x, lg.loc.y + y).into(),
-                        (w as i32, h as i32).into(),
-                    );
-                    let info = themed_layer_glass_info(theme_config, card, ThemeSurface::Launcher);
-                    $out.scratch_upper_layer_elements
-                        .push(NiwoeRenderElements::Glass(GlassElement::pending(
-                            info, $scale,
-                        )));
+                    // The Hub opts out of panel reservation and begins at the
+                    // output edge. The Control Center stays in the normal work
+                    // area below the panel and paints its own section material.
+                    if lg.loc.y <= 0 {
+                        let (x, y, w, h) = niwoe_tokens::Launcher::HUB
+                            .fitted_rect(lg.size.w.max(1) as u32, lg.size.h.max(1) as u32);
+                        let card = smithay::utils::Rectangle::<i32, smithay::utils::Logical>::new(
+                            (lg.loc.x + x, lg.loc.y + y).into(),
+                            (w as i32, h as i32).into(),
+                        );
+                        let info =
+                            themed_layer_glass_info(theme_config, card, ThemeSurface::Launcher);
+                        $out.scratch_upper_layer_elements.push(NiwoeRenderElements::Glass(
+                            GlassElement::pending(info, $scale),
+                        ));
+                    }
                 }
 
                 // Liquid-glass desktop context menu. The shell paints only the

@@ -23,20 +23,37 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
 - **Kein hartverdrahteter Farb-/Alpha-/Radius-/Mix-Wert im Render-Code** außerhalb
   dieser Quelle. Ausnahmen nur für Marken-Assets/Icons und Tests, und nur explizit
   via `// guard:allow: <grund>` bzw. `guard:allow-file` begründet.
-- Genau **2 Themes (hell/dunkel)**, identisch bis auf Farben (Layout, Geometrie,
-  Radien, Glas/Blur/Schatten gleich). Theme-Wechsel = nur Farbtabelle tauschen.
+- Nutzerentscheidung vom 25.09.2026: Die Desktop-Alpha verwendet **ein**
+  verbindliches dunkelgrünes NIWOE-Theme. Das helle Theme ist für die Alpha
+  kein Produkt- oder Abnahmeziel; eine spätere helle Variante braucht eine
+  eigene Produktentscheidung. Vorhandener Light-Code darf als ungenutzter
+  Bestand erhalten bleiben, begründet aber keine zweite aktive UI oder
+  Theme-Auswahl. Alle aktiven Designwerte bleiben zentral in Tokens/Config.
 - **Branding nur als NIWOE-Wortmarke in Welcome, Login und About**; keine
   NIWOE-Kompassgrafik und keine Markenfläche in der Alltags-UI, Taskbar oder
-  dem Launcher-Button.
+  dem Hub-Button.
 - **Guard-Test muss grün bleiben:** `cargo test -p niwoe-tokens --test design_guard`
   schlägt bei neuen Hardcodes fehl. Roten Guard nie ignorieren — entweder
   zentralisieren oder bewusst mit `// guard:allow: <grund>` freigeben.
 - Definition of Done für Zentralität: `docs/GUI_CENTRALIZATION_PLAN.md` §9.
-- Die acht Mockups unter `assets/` sind gemäß Nutzerentscheidung vom 22.09.2026
-  visuell verbindlich; Abweichungen nur bei konkret dokumentierter technischer
-  Notwendigkeit oder ausdrücklicher Nutzerkorrektur. Launcher/Suche orientieren
-  sich auf Nutzerwunsch an Apple Spotlight. Native Produkt-UI bezieht weiterhin
+- Nutzerkorrektur vom 24.09.2026: Die letzten vier Mockups unter `assets/`
+  (`17_13_54 (1)` bis `(4)`) sind visuell verbindlich. Die ersten vier
+  (`17_13_13 (1)` bis `(4)`) sind redundante, unverbindliche Kontextbilder.
+  Abweichungen von den letzten vier nur bei konkret dokumentierter technischer
+  Notwendigkeit oder ausdrücklicher Nutzerkorrektur. Nutzerkorrektur vom
+  24.09.2026: Die Panel-Schaltfläche öffnet den vollständigen Hub aus Mockup
+  `17_13_54 (2)`; es gibt keine separate Spotlight-Launcher-Oberfläche. Vom Hub
+  führt der sichtbare Weg zu „Räume verwalten“ und „Raum konfigurieren“ mit der
+  vollständigen Sidebar aus `(3)` und `(4)`. Native Produkt-UI bezieht weiterhin
   alle Designwerte direkt aus `niwoe-tokens` + `niwoe-config`.
+- Nutzerpräzisierung vom 24.09.2026: Der Hub öffnet sich genau einmal zu Beginn
+  jeder neuen NIWOE-Login-Sitzung als Willkommensansicht. Ein Shell-/Watchdog-
+  Neustart innerhalb derselben Sitzung darf ihn nicht erneut öffnen. Danach ist
+  `Super+Space` der reguläre Hub-Zugang; Tippen im Hub startet die Suche.
+- Nutzerauftrag vom 25.09.2026: Jede neue NIWOE-Login-Sitzung beginnt in der
+  neutralen Loge ohne aktiven Raum. Der Willkommens-Hub ist ihr Einstieg; eine
+  Raumwahl aktiviert den gewählten Kontext. Ein direkter App-Schnellstart aus
+  der Loge aktiviert Raum 1 als Fensterziel. Die Loge ist kein zehnter Raum.
 
 ## Harte Regeln für Codex
 1. Keine Feature-Änderung ohne expliziten Auftrag.
@@ -52,7 +69,7 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
 10a. Die native Shell bleibt unprivilegiert; privilegierte Aktionen bleiben in
     kleinen Rust-Services/Helpern mit engen typisierten IPC-Grenzen.
 10b. Keine große neue Desktop-Funktion vor der nativen Qualitätsrunde
-    Panel -> Launcher -> Quick Settings.
+    Panel -> Hub -> Quick Settings.
 11. After every Rust code change, run at least `cargo check --workspace`.
 12. If tests were added or changed, run `cargo test --workspace`.
 13. For formatting-sensitive Rust changes, run `cargo fmt`.
@@ -87,8 +104,8 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
   Mockups einschließlich sichtbarem Glas/Blur/leichter Transparenz fertigstellen
   und visuell abnehmen. Bis dahin keine Fortsetzung anderer UI-Phasen.
 - Anschließende Nutzerfreigabe: Material von Systemdeck/Lautstärke beibehalten
-  und ausdrücklich sowohl auf Panel als auch Launcher übertragen. Dieser
-  Launcher-Materialabgleich ist Teil des aktuellen Auftrags.
+  und ausdrücklich auf Panel und Hub übertragen. Dieser Materialabgleich ist
+  Teil des aktuellen Auftrags.
 - Nutzerauftrag vom 23.09.2026: Jeden erfolgreich geprüften Implementierungsstand
   direkt als Release auf dem vorhandenen Fedora-Testrechner installieren, damit
   der Nutzer ihn sehen kann. Nicht bei einem nur lokal geprüften Stand aufhören.

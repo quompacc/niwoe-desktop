@@ -1,4 +1,4 @@
-const ROOM_IDS: [&str; 9] = [
+const ROOM_IDS: [&str; niwoe_config::rooms::MAX_ROOMS] = [
     "panel-room-1",
     "panel-room-2",
     "panel-room-3",
@@ -8,19 +8,69 @@ const ROOM_IDS: [&str; 9] = [
     "panel-room-7",
     "panel-room-8",
     "panel-room-9",
+    "panel-room-10",
+    "panel-room-11",
+    "panel-room-12",
+    "panel-room-13",
+    "panel-room-14",
+    "panel-room-15",
+    "panel-room-16",
+    "panel-room-17",
+    "panel-room-18",
+    "panel-room-19",
+    "panel-room-20",
+    "panel-room-21",
+    "panel-room-22",
+    "panel-room-23",
+    "panel-room-24",
+    "panel-room-25",
+    "panel-room-26",
+    "panel-room-27",
+    "panel-room-28",
+    "panel-room-29",
+    "panel-room-30",
+    "panel-room-31",
+    "panel-room-32",
+    "panel-room-33",
+    "panel-room-34",
+    "panel-room-35",
+    "panel-room-36",
+    "panel-room-37",
+    "panel-room-38",
+    "panel-room-39",
+    "panel-room-40",
+    "panel-room-41",
+    "panel-room-42",
+    "panel-room-43",
+    "panel-room-44",
+    "panel-room-45",
+    "panel-room-46",
+    "panel-room-47",
+    "panel-room-48",
+    "panel-room-49",
+    "panel-room-50",
+    "panel-room-51",
+    "panel-room-52",
+    "panel-room-53",
+    "panel-room-54",
+    "panel-room-55",
+    "panel-room-56",
+    "panel-room-57",
+    "panel-room-58",
+    "panel-room-59",
+    "panel-room-60",
+    "panel-room-61",
+    "panel-room-62",
+    "panel-room-63",
+    "panel-room-64",
 ];
 
-/// Keep the active room visible, with neighbors and a persistent overflow menu.
-/// Labels reflect actual workspace slots until persistent room names exist.
-fn visible_rooms(active: u8, total: u8, capacity: usize) -> std::ops::RangeInclusive<u8> {
+/// Keep the panel rail stable: activation must never reorder or scroll room tabs.
+/// Rooms beyond the available width remain reachable through the overflow control.
+fn visible_rooms(total: u8, capacity: usize) -> std::ops::RangeInclusive<u8> {
     let total = total.clamp(1, ROOM_IDS.len() as u8);
     let count = capacity.clamp(1, total as usize) as u8;
-    let start = active
-        .clamp(1, total)
-        .saturating_sub(count / 2)
-        .max(1)
-        .min(total - count + 1);
-    start..=start + count - 1
+    1..=count
 }
 
 struct RoomTab {
@@ -158,14 +208,12 @@ mod room_tests {
     }
 
     #[test]
-    fn active_room_stays_visible_at_both_edges_and_in_the_middle() {
+    fn visible_room_sequence_is_stable_and_bounded() {
         for capacity in [0, 1, 3, 9, 20] {
-            for active in 1..=9 {
-                let rooms = visible_rooms(active, 9, capacity);
-                assert!(rooms.contains(&active));
-                assert!(*rooms.start() >= 1 && *rooms.end() <= 9);
-                assert!(rooms.count() <= capacity.clamp(1, 9));
-            }
+            let rooms = visible_rooms(9, capacity);
+            assert_eq!(*rooms.start(), 1);
+            assert!(*rooms.end() <= 9);
+            assert_eq!(rooms.count(), capacity.clamp(1, 9));
         }
     }
 }

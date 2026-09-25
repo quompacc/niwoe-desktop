@@ -2,6 +2,9 @@ use crate::state::NiwoeState;
 use smithay::{desktop::Window, utils::SERIAL_COUNTER, wayland::seat::WaylandFocus};
 
 fn windows(state: &NiwoeState) -> Vec<Window> {
+    if state.lobby_active {
+        return Vec::new();
+    }
     state
         .workspaces
         .space_at(state.current_workspace_index())

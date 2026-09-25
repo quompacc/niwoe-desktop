@@ -1,15 +1,11 @@
 # NIWOE-Phasenstatus
 
-Vorrangig offen: [Dialog-Klickfehler und Materialkritik](P05_INPUT_MATERIAL_FINDINGS.md).
-Lokaler Compositor-Fix noch ohne Linux-Gates/Installation; Toolzugang blockiert.
-
-Aktueller Stand 23.09.: [Deck-Symbolaktionen/Bluetooth](P05_DECK_SYMBOLS.md),
-1.095 Tests grün, installiert, Shell aktualisiert und Live-Deck geprüft.
-
-Fortsetzung 23.09.: [erster Deck-Kompositionsschritt](P05_DECK_COMPOSITION.md)
-mit geprüften Dark-/Light-Rasterbildern und grünen Fedora-Gates. Release auf
-Nutzerauftrag installiert; nächster NIWOE-Login zeigt den Stand. P02–P05 bleiben
-in-progress.
+Aktueller Stand 25.09.: [P06-Raummodell-Zwischenstand](P06_ROOM_MODEL_FOUNDATION.md).
+Dynamische Räume und Basis-Metadaten sind gebaut, geprüft und auf Fedora
+installiert. Die Shell läuft neu; für den Compositor ist ein NIWOE-Neulogin
+erforderlich. P06 bleibt bis zur Live-Integration und den sichtbaren
+Erzeugungs-/Löschabläufen offen. P04/P05-Berichte dokumentieren die zuvor
+installierten Hub- und Systemdeck-Stände.
 
 | Phase | Status | Bericht |
 |---|---|---|
@@ -18,9 +14,12 @@ in-progress.
 | P02 | in-progress | [P02.md](P02.md) |
 | P03 | in-progress | [P03.md](P03.md) |
 | P04–P05 | in-progress | [Native Shell-Neubau](P03_P05_NATIVE_REBUILD.md) |
-| P06–P13 | not-started | — |
+| P06 | in-progress | [Raummodell-Zwischenstand](P06_ROOM_MODEL_FOUNDATION.md) |
+| P07–P13 | not-started | — |
 
-**Aktueller Einstieg, 22.09.:** P02-Designgrundlagen implementiert und geprüft.
+## Historische Chronik
+
+**Eintrag 22.09.:** P02-Designgrundlagen implementiert und geprüft.
 Auf Nutzerauftrag keine weitere Abnahmerunde der alten Shell. Panel, Such-Launcher
 und System-Deck sind nativ neu aufgebaut: [Umsetzungsstand](P03_P05_NATIVE_REBUILD.md).
 Offene Scale-/HiDPI-/Performance-Nachweise an den neuen

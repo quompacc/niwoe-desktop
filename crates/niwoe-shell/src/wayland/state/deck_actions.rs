@@ -75,8 +75,8 @@ impl NiwoeShell {
             }
             QuickSettingsHit::Settings => self
                 .open_settings_category(qh, crate::settings_view::SettingsCategory::SystemOverview),
-            QuickSettingsHit::Appearance => {
-                self.open_settings_category(qh, crate::settings_view::SettingsCategory::Theme)
+            QuickSettingsHit::Room => {
+                self.handle_panel_click(qh, crate::wayland::ClickAction::ToggleLauncher)
             }
             QuickSettingsHit::Network => {
                 self.switch_network_tab(qh, crate::network_popup::NetworkTab::Wifi);
@@ -111,6 +111,12 @@ impl NiwoeShell {
                 self.close_network_popup(crate::wayland::CommitReason::Input);
                 if !self.ipc.send(&niwoe_ipc::ShellCommand::LockSession) {
                     tracing::warn!("quick settings: compositor lock IPC unavailable");
+                }
+            }
+            QuickSettingsHit::Logout => {
+                self.dispatch_widget_action(qh, crate::widget_action::WidgetAction::PowerLogout);
+                if self.network_popup_open {
+                    self.draw_network_popup(qh, RepaintReason::Pointer);
                 }
             }
             QuickSettingsHit::PowerOff => {

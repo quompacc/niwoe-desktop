@@ -360,6 +360,9 @@ pub struct NiwoeState {
     pub socket_name: OsString,
     pub seat: Seat<Self>,
     pub workspaces: WorkspaceManager,
+    /// Neutral login foyer. Workspace slots still own windows, but none is
+    /// presented or focused until the user selects a room.
+    pub lobby_active: bool,
     pub outputs: Vec<Output>,
     pub output_layout: OutputLayout,
     pub output_config_entries: Vec<OutputEntry>,

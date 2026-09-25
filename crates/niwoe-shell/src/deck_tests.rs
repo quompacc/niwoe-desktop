@@ -61,14 +61,14 @@ mod tests {
                     volume_preview: None,
                     audio_status: crate::deck_mutation::Status::Idle,
                     power_status: crate::deck_mutation::Status::Idle,
-                    battery: &BatterySnapshot::default(),
                     power_profile: Some(PowerProfile::Standard),
-                    theme_name: name,
+                    room_name: "Raum 2",
                     power_armed: false,
+                    logout_armed: false,
                 },
             );
             let targets = focus_targets();
-            assert_eq!(targets.len(), 10);
+            assert_eq!(targets.len(), 11);
             assert_eq!(targets.last().unwrap().1, QuickSettingsHit::Settings);
             for (i, (rect, _)) in targets.iter().enumerate() {
                 assert!(rect.x >= 0 && rect.y >= 0);
@@ -120,10 +120,10 @@ mod tests {
                 volume_preview: None,
                 audio_status: crate::deck_mutation::Status::Idle,
                 power_status: crate::deck_mutation::Status::Idle,
-                battery: &BatterySnapshot::default(),
                 power_profile: None,
-                theme_name: "dark",
+                room_name: "Loge",
                 power_armed: false,
+                logout_armed: false,
             },
         );
         let targets = focus_targets();
@@ -224,10 +224,10 @@ mod tests {
                     volume_preview: None,
                     audio_status: crate::deck_mutation::Status::Idle,
                     power_status: crate::deck_mutation::Status::Idle,
-                    battery: &BatterySnapshot::default(),
                     power_profile: None,
-                    theme_name: "dark",
+                    room_name: "Raum 1",
                     power_armed: false,
+                    logout_armed: false,
                 },
             );
             assert_eq!(
@@ -291,10 +291,10 @@ mod tests {
                     volume_preview: Some(80),
                     audio_status: status,
                     power_status: status,
-                    battery: &Default::default(),
                     power_profile: Some(PowerProfile::Standard),
-                    theme_name: "dark",
+                    room_name: "Raum 1",
                     power_armed: false,
+                    logout_armed: false,
                 },
             );
             let targets = focus_targets();

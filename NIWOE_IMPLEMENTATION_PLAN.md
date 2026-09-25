@@ -1,8 +1,77 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
-Stand: 21.09.2026. Grundlage: `NIWOE_Konzeptzusammenfassung.md`, alle acht
-aktuellen PNG-Mockups unter `assets/` und eine gezielte Sichtung der bestehenden
-Rust-Architektur. Dies ist ein Arbeitsplan, kein Nachweis abgeschlossener Features.
+**Verbindliche Präzisierung vom 24.09.2026:** Der
+[Mockup- und Workflowplan](docs/MOCKUP_WORKFLOW_PLAN.md) konkretisiert die vier
+verbindlichen letzten Bildvorlagen und die End-to-End-Wege Desktop → Hub → Räume verwalten → Raum
+konfigurieren → Speichern → Desktop. Seine visuellen Liefergates gelten für
+P00–P13 zusätzlich zu den technischen Paketen unten. Bei Widerspruch zwischen
+einem früheren Reduktionsvorschlag dieses Plans und der Bildvorlage gilt das
+Designmanifest samt ausdrücklicher Nutzerkorrektur, dann der neue Workflowplan.
+Insbesondere sind Hub und beide Control-Center-Seiten vollständige Oberflächen;
+ein kleiner Raumeditor und eine reine Raumliste sind kein Phasenabschluss.
+Das Panel wurde nach der Nutzerklarstellung vom 24.09.2026 visuell als in
+Ordnung bestätigt; weitere Panelgestaltung ist kein eigenes Liefergate.
+Die abgelehnte P06-Editoroberfläche ist nicht abgenommen.
+
+**Verbindliche Ablaufkorrektur vom 24.09.2026:** Die Panel-Schaltfläche öffnet
+direkt den vollständigen Hub aus `17_13_54 (2)`. Alle früheren Anforderungen an
+einen separaten Spotlight-/Such-Launcher sind aufgehoben. P04 baut als einen
+zusammenhängenden sichtbaren Lieferstand den Hub sowie „Räume verwalten“ aus `(3)`
+und „Raum konfigurieren“ aus `(4)`. Die vollständige linke Sidebar gehört zu
+beiden Control-Center-Seiten. Sie wird weder durch einen Popup-Editor noch durch
+eine vereinfachte Liste ersetzt. P08/P10 binden nach dem Raumdatenmodell weitere
+echte Daten und Mutationen an diese bereits vollständigen Oberflächen an.
+
+**Umsetzungscheckpoint vom 24.09.2026:** Der Hub aus `(2)` und die Grundfläche
+„Räume verwalten“ aus `(3)` sind installiert und im Dark Theme visuell bestätigt.
+Der Hub öffnet genau einmal pro neuer NIWOE-Login-Sitzung als Willkommensansicht;
+danach ist `Super+Space` der reguläre Zugang und Tippen startet die Suche. P04
+bleibt offen. Als nächster sichtbarer Schritt folgt „Raum konfigurieren“ aus `(4)`
+mit dem vollständigen Hin- und Rückweg. Details, Prüfungen, Bildbelege und offene
+Grenzen stehen im
+[P04 Hub- und Control-Center-Zwischenstand](docs/phase-reports/P04_HUB_FOUNDATION.md).
+
+**P04-Fortschritt vom 25.09.2026:** Die vollständige native Grundfläche
+„Raum konfigurieren“ aus `(4)` samt Übergang aus „Räume verwalten“ ist gebaut.
+Name und Reihenfolge sind an die vorhandene revisionsgesicherte Raum-IPC
+angebunden; weitere Mockup-Bereiche zeigen ihre Fähigkeitsgrenze. Fedora-Tests
+und Release-Build sind grün. Der Stand ist installiert und als nativer
+Screenshot geprüft; P04 bleibt bis zum vollständigen Bildvergleich und zur
+Bedienabnahme offen. Nachweise stehen im verlinkten P04-Bericht.
+
+**Logen-Auftrag vom 25.09.2026:** Der Sitzungsstart erhält vor der Raumwahl
+einen neutralen Zustand ohne aktiven Raum. Der einmalige Willkommens-Hub bleibt
+sein Einstieg. Compositor und Shell verwenden für diesen Zustand die
+IPC-Kennung 0; ein Raumklick aktiviert den gewählten Raum, ein App-Schnellstart
+aus der Loge aktiviert Raum 1 als Fensterziel. Der Code und beide Releases sind
+gebaut, getestet und installiert. Login-Loge und Raumwahl sind mit nativen
+Screenshots bestätigt; die vollständige Bedienabnahme bleibt offen.
+
+**Theme-Entscheidung vom 25.09.2026:** Die Desktop-Alpha hat ein verbindliches
+dunkelgrünes NIWOE-Theme. Die bisherige Pflicht zu Dark- und Light-Abnahmen
+entfällt in allen nachfolgenden Phasen. Vorhandener Light-Code darf ungenutzt
+erhalten bleiben; im Alpha-Endzustand wird keine Farbtheme-Auswahl angeboten.
+Kontrast, Lesbarkeit, Zustände, Auflösungen und Skalierung werden weiterhin im
+grünen Theme geprüft. Eine helle Variante ist eine spätere Produktentscheidung.
+Der Theme-Wähler in der älteren Settings-Oberfläche ist vorhandener Code und
+noch kein Nachweis dieser Produktumstellung. Bei der Control-Center-Migration
+wird er aus dem Alpha-Ablauf entfernt; bestehende Nutzerkonfigurationen und
+externe GTK-/KDE-Einstellungen dürfen dabei nicht still überschrieben werden.
+
+**P06-Zwischenstand vom 25.09.2026:** Dynamische Raum-Mutationen, vollständige
+Basis-Metadaten im Snapshot, Laufzeit-Slotpflege und eine seitenweise Darstellung
+in „Räume verwalten“ sind implementiert. Die rechte Leiste ist geometrisch
+korrigiert. Workspace-Check, Clippy, Tests und Release-Build auf Fedora sind
+grün. Compositor und Shell sind installiert; die Shell läuft bereits neu, der
+Compositor benötigt noch einen NIWOE-Neulogin. P06 bleibt bis zu den
+Live-Integrationsfällen und den sichtbaren Erzeugungs-/Löschabläufen offen.
+Details: [P06-Raummodell-Zwischenstand](docs/phase-reports/P06_ROOM_MODEL_FOUNDATION.md).
+
+Stand: 21.09.2026. Grundlage: `NIWOE_Konzeptzusammenfassung.md`, die acht
+damals gesichteten PNG-Mockups unter `assets/` und eine gezielte Sichtung der
+bestehenden Rust-Architektur. Seit 24.09.2026 sind nur die letzten vier Bilder
+visuell verbindlich; die ersten vier bleiben Kontext. Dies ist ein Arbeitsplan,
+kein Nachweis abgeschlossener Features.
 
 **Arbeitsweise aktualisiert am 21.09.2026:** Auf ausdrücklichen Nutzerauftrag
 übernimmt der aktuelle Agent Implementierung, Tests und Phasenprüfung selbst.
@@ -12,7 +81,7 @@ fortgeschriebener Phasenbericht dokumentiert Ergebnis, Prüfungen und offene Ris
 
 **Scope-Korrektur auf Nutzerauftrag, 22.09.2026:** Keine weitere Ausbau- oder
 Abnahmerunde für die abzulösende untere Taskleiste und den alten kombinierten
-Launcher/Settings-Container. P02 liefert die wiederverwendbaren Designgrundlagen;
+Hub/Settings-Container. P02 liefert die wiederverwendbaren Designgrundlagen;
 die vollständige visuelle, Scale-/Input- und native Performance-Abnahme erfolgt
 an den neuen Oberflächen in P03–P05. Die dokumentierten offenen DRM-/HiDPI-Befunde
 bleiben sichtbar, sind aber keine Voraussetzung für den Beginn von P03.
@@ -29,7 +98,7 @@ Empfohlener Entwicklungshost: Fedora KDE Plasma Desktop, siehe
 [Distributionsentscheidung](docs/NIWOE_DEVELOPMENT_DISTRO.md). Der Nutzer hat
 Fedora 44 KDE auf dem Acer installiert; der SSH-Testhost ist jetzt verfügbar.
 
-**Neubauentscheidung, 22.09.2026:** Panel, Such-Launcher und System-Deck werden
+**Neubauentscheidung, korrigiert 24.09.2026:** Panel, Hub und System-Deck werden
 als neue Oberflächen mit eigenen Layouts und Eingabemodellen gebaut und an die
 vorhandenen Backends angeschlossen. Die alte Shell-Komposition ist keine
 Ausbaubasis. P03–P05 bilden gemeinsam diesen Lieferumfang; die Reihenfolge bleibt
@@ -54,8 +123,8 @@ WebKit-, Electron- oder Browser-UI-Pfad.
 
 Das überzeugende Produktmerkmal sind benannte, verlässliche Arbeitskontexte.
 Grün/Gold unterstützt diese Identität; allein eine neue Farbwelt wäre kein
-ausreichendes Produktmerkmal. Launcher, Hub, Deck und Settings bekommen klar
-getrennte Aufgaben. NIWOE baut keine eigene IDE, Notiz-App oder Aufgabenverwaltung.
+ausreichendes Produktmerkmal. Hub, Deck und Settings bekommen klar getrennte
+Aufgaben. NIWOE baut keine eigene IDE, Notiz-App oder Aufgabenverwaltung.
 
 Die wichtigsten Einschränkungen für die erste Version:
 
@@ -229,18 +298,18 @@ abbrechbar und zeitlich begrenzt. Mehrdeutige Zuordnung wird angezeigt oder
 | P01 | Vollständige NIWOE-Namensmigration | Sol empfohlen | P00 |
 | P02 | Zentrales NIWOE-Designsystem | Terra | P01 |
 | P03 | Native obere Leiste in neuer Gestaltung | Terra | P02 |
-| P04 | Tastaturfester Spotlight-Launcher | Terra; Sol bei Inputproblemen | P03 |
+| P04 | Hub und Control-Center-Grundflächen nach drei Mockups | Terra; Sol bei Inputproblemen | P03 |
 | P05 | Funktionierendes System Deck | Terra | P04 |
 | P06 | Persistente Räume und zuverlässige Fensterzuordnung | Sol | P05 |
 | P07 | Raumleiste und App-Zuordnungsregeln | Sol Kern, Terra Darstellung | P06 |
-| P08 | Nutzbarer Hub | Terra; Sol bei Lifecycleproblemen | P07 |
+| P08 | Hub mit echten Raum-/Fensterdaten | Terra; Sol bei Lifecycleproblemen | P07 |
 | P09 | Begrenztes, ehrliches Restore | Sol | P08 |
 | P10 | Raum- und Leistenkonfiguration | Terra | P09 |
 | P11 | First-Run-Assistent | Terra | P10 |
 | P12 | Desktop-Alpha auf Linux-Hardware | Sol | P11 |
 | P13 | Entscheidungsreife OS-Architektur | Sol recherchiert, Astra prüft | P12 |
 
-Dieser neue Plan empfiehlt Panel → Launcher → Deck vor großen neuen
+Dieser neue Plan empfiehlt Panel → Hub → Deck vor großen neuen
 Desktopfunktionen. Das ist keine Verpflichtung aus dem abgelösten Meridian-Plan.
 Es weicht bewusst von der groben Reihenfolge in Konzept §40 ab: Die Grundbedienung
 soll tragfähig sein, bevor Räume und Restore sie erweitern.
@@ -266,9 +335,10 @@ Commit für eine komplette mehrteilige Phase.
    markieren; keine unerledigten Altphasen als NIWOE-Pflicht übernehmen.
    Auch Plattformmatrix in `docs/TESTING.md` und Hardware-Smoke-Dokumentation anpassen.
 3. P00-03: Mockup-Katalog aus Design-Brief übernehmen; Konzeptduplikat bereinigen.
-   Fehlende Light-/Launcher-/Wizard-Referenzen ausdrücklich kennzeichnen.
+   Fehlende Launcher-/Wizard-Referenzen ausdrücklich kennzeichnen. Für Light
+   liegt keine verbindliche Mockupvorlage und seit 25.09.2026 kein Alpha-Gate vor.
 4. P00-04: Im alten Manifest die neue Designrichtung explizit festhalten und den
-   Brief als Präzisierung referenzieren. Zentralität, zwei Themes und Effizienz
+   Brief als Präzisierung referenzieren. Zentralität, Theme-Entscheidung und Effizienz
    beibehalten; alte Blau-Palette und Kompassbindung nicht weiter normativ lassen.
 5. P00-05: Linux-Testumgebung nach bestehendem CI-/Installpfad reproduzieren.
    Distribution, Toolchain, Systempakete, Hardware und verfügbare Runtime erfassen.
@@ -341,15 +411,17 @@ Ein grüner Compiler allein nimmt die Namensmigration nicht ab.
 **Betroffen nach P01:** `niwoe-tokens/src/{color,typography,font,radius,elevation,interaction,chrome}.rs`,
 `niwoe-config/src/theme/`, `niwoe-ui`, Manifest und `docs/design/`.
 
-1. P02-01: Semantische Rollen und konkrete Dark-/Light-Paletten aus dem Brief in
-   vorhandene Tokenstrukturen überführen. Keine parallele Palette einführen.
+1. P02-01: Semantische Rollen und die konkrete dunkelgrüne Palette aus dem Brief
+   in vorhandene Tokenstrukturen überführen. Keine parallele Palette einführen.
+   Die bereits implementierte Light-Palette ist historischer Bestand.
 2. P02-02: Abstände, Komponentenhöhen, Fokusrahmen und Schrifthierarchie zentral
    definieren. Neue Tokenmodule dürfen große vorhandene Dateien entlasten.
 3. P02-03: Komponentenblatt mit Surface, Text, Button, Tab, Chip, Karte, Eingabe,
    Slider und Zuständen normal/hover/focus/pressed/disabled/error erzeugen.
    Vorhandene Render-/Testwerkzeuge bevorzugen; kein neuer UI-Testframeworkbau.
-4. P02-04: Beide Themes aus denselben Widgets rendern. Schriftfallback und fehlende
-   Glyphen prüfen; Serif nur für größere Überschriften, Sans für Bedienelemente.
+4. P02-04: Das grüne Theme aus denselben nativen Widgets rendern. Schriftfallback
+   und fehlende Glyphen prüfen; Serif nur für größere Überschriften, Sans für
+   Bedienelemente.
 5. P02-05: Kontrastpaare, 100/150/200%-Skalierung und helles/dunkles Wallpaper
    prüfen. Messwerte und Screenshots ablegen. Aus einem PNG keine Animation ableiten.
 
@@ -358,8 +430,8 @@ vollständige Screenshotmatrix und Bedienprüfung des alten Desktops entfällt.
 Output-Skalierung und Rasterqualität werden mit den neuen P03–P05-Oberflächen
 integriert geprüft; dafür keine zweite Testreihe am ersetzten Layout starten.
 
-**Abnahme:** Nur Farbtabellen unterscheiden sich zwischen Themes; keine neue lokale
-Designkonstante außerhalb zentraler Tokens; Dark-/Light-Komponentenblatt lesbar.
+**Abnahme:** Keine neue lokale Designkonstante außerhalb zentraler Tokens;
+Komponentenblatt des grünen Themes lesbar.
 Kontrastziele des Briefs erreicht. Keine neue dauerhafte Render-/Timerlast.
 
 **Reviewfokus:** Designidentität und Light-Parität, zentrale Werte, Lesbarkeit,
@@ -372,46 +444,69 @@ keine versteckten Ausnahmen zur Umgehung der Guards.
 
 1. P03-01: Panel oben über nutzbare Outputbreite verankern. Exclusive Zone, Popover-
    Anker, Hitboxes und verfügbaren Fensterbereich gemeinsam korrigieren.
-2. P03-02: Layout Launcher | vorhandene Workspace-Auswahl | flexible Lücke |
-   Statusmodule | Uhr. Bestehende Fenster-/Tray-Zugänge solange erhalten, bis
-   P07/P08 einen vollständigen Ersatz für minimierte Fenster und Fensterwahl bieten.
+2. P03-02: Layout Hub-Zugang und stabile Raumfolge links, Uhr exakt in der
+   Outputmitte, Suche/Statusmodule rechts. Alle gespeicherten Räume bleiben
+   über eine beschriftete Raumaktion erreichbar; Aktivierung verschiebt die
+   sichtbare Folge nicht automatisch. Bestehende Fenster-/Tray-Zugänge solange
+   erhalten, bis P07/P08 einen vollständigen Ersatz für minimierte Fenster und
+   Fensterwahl bieten.
 3. P03-03: Netzwerk, Audio, Akku und Uhr an vorhandene Daten anschließen.
    Kein Akku auf Geräten ohne Akku; keine erfundenen CPU-/GPU-Werte.
-4. P03-04: Schmale Displays, lange Texte und Overflow bedienen. Uhr/Launcher
-   bleiben erreichbar; optionale Module dürfen in Overflow wechseln.
+4. P03-04: Schmale Displays, lange Texte und Overflow bedienen. Zuerst
+   optionale Statusmodule verdichten; danach Raumlabels kürzen und vollständige
+   Namen im Raumüberlauf zugänglich halten. Uhr/Hub-Zugang bleiben erreichbar.
 5. P03-05: Popup-Positionen nach Monitorwechsel, Scale-Wechsel und Hotplug testen.
    Uhr ohne Sekunden aktualisiert nur zum Minutenwechsel, nicht pro Frame.
 
 **Abnahme:** Kein überdeckter App-Inhalt, keine veraltete untere Reserved Zone,
-korrekte Eingabe auf zwei Outputs, Tab-/Fokusdarstellung und beide Themes geprüft.
+korrekte Eingabe auf zwei Outputs, Tab-/Fokusdarstellung im grünen Theme geprüft.
 
 **Reviewfokus:** Layer-Shell-Geometrie, Renderreihenfolge, CPU im Idle; keine neue
 Raumlogik in UI-Dateien vor P06.
 
-### P04 — Launcher und eindeutige Overlay-Eingabe
+### P04 — Hub und Control Center als zusammenhängender sichtbarer Workflow
 
-**Betroffen:** `launcher.rs`, `app_view/`, `niwoe-app-catalog`,
-`wayland/handlers/keyboard.rs`, `niwoe-config/src/keybind/`, Compositor-Inputpfad.
+**Betroffen:** neue kleine `niwoe-shell/src/hub/`-Module, bestehender
+Launcher-/Layer-Surface-Pfad als Migrationsbasis, `wayland/handlers/keyboard.rs`,
+`niwoe-config/src/keybind/` und Compositor-Inputpfad.
 
-1. P04-01: Zentriertes Suchpopup auf fokussiertem Output, Suchfeld sofort aktiv.
-   Alpha-Suchumfang: installierte Apps und vorhandene Settings/Systemaktionen.
-2. P04-02: Tastatur: Tippen, Pfeile, Enter, Escape; Mausklick gleichwertig.
-   Stabile Auswahl bei Ergebnisupdates, Leerzustand und Startfehler darstellen.
-3. P04-03: Omarchy-Belegung: Super+Space öffnet den Launcher. Super allein
-   löst keine Aktion aus; kombinierte Kürzel dürfen keinen zweiten Trigger auslösen.
-4. P04-04: Super+Alt+Space öffnet die Steuerung/Einstellungen, Super+Escape das
-   Deck. Super+Tab wechselt zum nächsten Raum. Benutzerdefinierte Bindings
-   erhalten; Konflikt erkennen und verständlich anzeigen.
-5. P04-05: Gemeinsamen Overlay-Lifecycle für Launcher/Deck und später Hub festlegen:
-   höchstens ein Hauptoverlay, Escape schließt, alter Fensterfokus wird korrekt
-   zurückgegeben, Lock übersteuert und schließt Overlays.
+1. P04-01: Die linke neutrale Panel-Schaltfläche öffnet auf dem fokussierten
+   Output das große zentrierte Hub-Overlay aus `assets/…17_13_54 (2).png`.
+   Keine separate Spotlight-, App-Raster- oder Startmenü-Oberfläche behalten.
+2. P04-02: Vollständige Hub-Komposition bauen: atmosphärischer Bildkopf,
+   Titel/Untertitel, Schließen, vier Raumkarten sowie die drei unteren Bereiche
+   „Zuletzt aktiv“, „Schnellhilfe“ und „Systemzustand“. Die Schnellhilfe zeigt
+   Tippen, Pfeile, Enter und Escape als tatsächlich verfügbare Hub-Bedienung.
+   Vor P08 verwenden Raumkarten vorhandene echte Workspace-/Snapshotdaten;
+   fehlende Provider zeigen einen klaren Fähigkeitszustand in ihrem vorgesehenen
+   Bereich.
+3. P04-03: „Räume verwalten“ als vollständige Seite aus Bild `(3)` bauen:
+   linke Sidebar, Bildkopf, Filter/Sortierung/Suche, Neuer Raum, Kartenraster,
+   rechte Schnellaktionen und Statistik. Vorhandene echte Daten verwenden;
+   noch fehlende Mutationen als klaren Fähigkeitszustand darstellen.
+4. P04-04: „Raum konfigurieren“ als vollständige Seite aus Bild `(4)` bauen:
+   Sidebar, Breadcrumb, Reiter, Details, Kontext/Wiederherstellung, Start-Apps,
+   Regeln, Vorschau, Erklärung sowie Abbrechen/Speichern. Vorhandenes Rename/
+   Reorder-Backend anbinden; noch fehlende Fähigkeiten nicht vortäuschen.
+5. P04-05: Hubnavigation mit Tab/Pfeilen/Enter/Escape und Maus. Raumkarte wechselt
+   den Raum; die Verwaltungsaktion öffnet `(3)`, eine Karte dort öffnet `(4)`,
+   Breadcrumb/Zurück führen ohne Zustandsverlust zurück. Escape schließt den Hub
+   beziehungsweise führt aus dem Control Center eine Ebene zurück.
+6. P04-06: Bestehende Öffnungsbelegung auf den Hub umstellen. Super allein löst
+   keine Aktion aus; Super+Escape öffnet das Deck, Super+Tab wechselt den Raum.
+   Benutzerdefinierte Bindings erhalten und Konflikte verständlich anzeigen.
+7. P04-07: Gemeinsamen Overlay-Lifecycle für Hub, Control Center und Deck festlegen: höchstens
+   ein Hauptoverlay, Lock schließt es, Reconnect hinterlässt keine unsichtbare
+   keyboard-exclusive Fläche. Bilder, Icons und statische Vorschauen werden nach
+   Theme/Scale/Identität gecacht und nur bei Änderung invalidiert.
 
-**Abnahme:** Zwanzig Open/Type/Launch/Escape-Zyklen ohne Fokusverlust; Kombinationen
-ohne Fehltrigger; kein Vollscan des Dateisystems je Tastendruck. Reconnect/Shell-
-Neustart hinterlässt kein unsichtbares keyboard-exclusive Overlay.
+**Abnahme:** Native Ausgabe entspricht Aufbau und Hierarchie der Bilder `(2)`,
+`(3)` und `(4)` im grünen Theme. Zwanzig Öffnen/Navigieren/Raumwechsel/
+Verwalten/Konfigurieren/Zurück/Schließen-Zyklen ohne Fokusverlust. Keine fehlenden
+Bildbereiche werden durch ein kleineres Suchpopup oder einen Mini-Editor ersetzt.
 
-**Reviewfokus:** Press-/Release-Semantik, Fokus und Launch-Pfad; keine generische
-Shell-Befehlssuche als ungeplante Erweiterung.
+**Reviewfokus:** Bildtreue, Overlay-/Fokus-Lifecycle, gecachte Assets und echte
+Daten/Fähigkeitszustände.
 
 ### P05 — System Deck auf vorhandenen Systembackends
 
@@ -425,11 +520,18 @@ Shell-Befehlssuche als ungeplante Erweiterung.
    erst nach Backendbestätigung darstellen; Berechtigungen bleiben beim Helper.
 4. P05-04: Power-Aktionen behalten vorhandene Bestätigung. Fehlende Hardware oder
    Provider erzeugen keine toten Attrappen. DND nur anbieten, wenn durchgesetzt.
+   Nutzerwunsch vom 25.09.2026: Das Systemdeck erhält einen sichtbar
+   beschrifteten **Abmelden**-Button. Er nutzt den vorhandenen Logout-Pfad
+   über die Compositor-IPC und wird im Deck-Bedienlauf geprüft.
+   Zwischenstand 25.09.2026: Button und Raumzeile sind nativ gebaut und
+   geprüft. Der Shell-Release ist auf Fedora installiert und läuft bytegleich;
+   die Live-Bild- und Bedienabnahme steht noch aus, siehe
+   [P05-Systemdeck-Bericht](docs/phase-reports/P05_SYSTEM_DECK_LOGOUT.md).
 5. P05-05: Teure Statusabfragen nur bei Sichtbarkeit/Änderung; keine neue Polling-
    Schleife für geschlossene Overlays. Kontextabhängige automatische Sortierung später.
 
 **Abnahme:** Tatsächliche Lautstärke-/Mute-Änderung; Netzwerkzustand/Fehler;
-Bluetooth ohne Adapter; Escape und Fokus; beide Themes. Für noch fehlende Provider
+Bluetooth ohne Adapter; Escape und Fokus im grünen Theme. Für noch fehlende Provider
 klarer Capability-Zustand statt vorgetäuschter Funktion.
 
 **Reviewfokus:** Verbindungen UI → IPC/Provider → bestätigter Zustand;
@@ -488,14 +590,15 @@ Fenster weiterhin auffindbar. Raumwechsel startet keine Programme.
 **Reviewfokus:** Startkorrelation und Transients, Alltag ohne klassische Taskliste,
 keine zweite Policy in der Shell.
 
-### P08 — Hub als schnelle Übersicht
+### P08 — Hub vollständig an Raum- und Fensterdaten anbinden
 
-**Betroffen:** neue kleine `niwoe-shell/src/hub/`-Module, vorhandene
-Thumbnail-/IPC-/Overlaypfade, Launcher-Provider für Räume/Fenster.
+**Betroffen:** die P04-Hubmodule, vorhandene Thumbnail-/IPC-/Overlaypfade und
+Raum-/Fenstersnapshots. **Bildgate:** Die in P04 vollständig gebaute Oberfläche
+bleibt geometrisch unverändert und erhält echte persistente Daten. Eine kompakte
+Raumkartenliste oder ein Suchpopup ist kein Zwischen- oder Endersatz.
 
-1. P08-01: Per Maus und über eine später konfliktfrei festgelegte Belegung ein
-   Overlay mit Raumkarten öffnen. Super+Tab bleibt Omarchys Raumwechsel.
-   Karten: Name, aktive/belegte Zustände, App-Icons, Fensteranzahl und Auswahl.
+1. P08-01: Karten an persistente IDs, Namen, Beschreibungen, Reihenfolge,
+   aktive/belegte Zustände, App-Icons, Fensteranzahl und Auswahl anbinden.
 2. P08-02: Pfeile/Tab/Enter/Escape, Scrollen und Filter nach Raumname; Klick auf
    Raum wechselt, Klick auf Fenster aktiviert das konkrete Fenster.
 3. P08-03: Bestehende Thumbnail-Capture-Fähigkeit wiederverwenden; Alpha statische
@@ -503,8 +606,9 @@ Thumbnail-/IPC-/Overlaypfade, Launcher-Provider für Räume/Fenster.
    Während geschlossen keine Captures. Ohne Bild steht ein sinnvoller Platzhalter.
 4. P08-04: Captureantworten nur für aktuelle Hub-Generation akzeptieren;
    Theme-/Scale-/Fensterende invalidieren; Lock schließt und verwirft Vorschauen.
-5. P08-05: Raum-/Fenstersuche als zusätzliche Launcher-Provider ergänzen. Kein
-   zweiter Suchindex und keine globalen Dateiscans.
+5. P08-05: Suche innerhalb der vorgesehenen Hub-/Control-Center-Struktur an
+   Raum- und Fensterdaten anbinden. Kein zweiter Suchindex und keine globalen
+   Dateiscans.
 
 **Abnahme:** Hub mit leeren/vollen Räumen und 64 Einträgen bedienbar;
 Fenster während offener Vorschau schließen; Output wechseln; wiederholt öffnen
@@ -540,10 +644,13 @@ Abbruch nach Teilstart, Schreibfehler. Kein Start als Nebeneffekt eines Raumwech
 **Reviewfokus:** Datenmodell, sichere Launchargumente, fehlertolerante Zuordnung,
 ehrliche UI und keine unbemerkte Wiederholung externer Aktionen.
 
-### P10 — Control Center für Räume und Leiste
+### P10 — Control-Center-Funktionen und Persistenz vervollständigen
 
 **Betroffen:** `niwoe-shell/src/settings_view/`, bestehende Widgets,
 Config-/Raum-Commands, Manifest-Komponenten.
+**Bildgate:** Die vollständigen, bereits in P04 gebauten Seiten aus `(3)` und `(4)`
+bleiben geometrisch erhalten. P10 vervollständigt ihre echten Datenquellen,
+Mutationen und Persistenz. Ein einzelner Popup-Editor erfüllt P10 nicht.
 
 1. P10-01: Raumliste mit Suche, Erzeugen, Name/Beschreibung/Icon, Reihenfolge,
    belegtem Zustand und sicherem Löschen erstellen.
@@ -551,13 +658,17 @@ Config-/Raum-Commands, Manifest-Komponenten.
    direkt am Feld. Erfolgsanzeige erst nach bestätigter Persistenz.
 3. P10-03: Free/Preferred/Dedicated, App-Präferenzen und Restorefähigkeiten
    konfigurieren. Nicht implementierte Integrationen nicht als aktive Toggles zeigen.
-4. P10-04: Leistenmodule ein-/ausblenden und anordnen. Launcher/Raumzugang/Uhr
+4. P10-04: Leistenmodule ein-/ausblenden und anordnen. Hub-Zugang/Raumzugang/Uhr
    bleiben erreichbar; CPU/GPU/Sensoren nur bei realem Provider.
 5. P10-05: Vorschau aus denselben Komponenten/Tokens rendern; kein zweites
    Designsystem. Vorschauänderung wird bei Abbruch zurückgenommen.
+6. P10-06: Den alten Farbtheme-Wähler aus der aktiven Settings-Navigation
+   entfernen. Cursor-, Wallpaper- und andere eigenständige Einstellungen
+   erhalten. Vorhandene Nutzerkonfigurationen und fremde GTK-/KDE-Preferences
+   beim Umbau nicht überschreiben.
 
 **Abnahme:** Ungültiger Name, doppelte ID aus Eingabe, verschwundene App,
-konkurrierende Änderung, Speichern schlägt fehl, Abbruch, Neustart und Light-Theme.
+konkurrierende Änderung, Speichern schlägt fehl, Abbruch und Neustart im grünen Theme.
 
 **Reviewfokus:** Model/View-Grenze, echte Persistenz, kein unbeauftragtes
 Automatisierungs-, Backup-, Aufgaben- oder Dateimanagerprojekt.
@@ -567,7 +678,7 @@ Automatisierungs-, Backup-, Aufgaben- oder Dateimanagerprojekt.
 **Betroffen:** kleine neue Shell-Wizard-Module, vorhandene Settings-/Room-API,
 benutzerbezogener versionierter First-Run-State.
 
-1. P11-01: Willkommen → Theme → Bedienprofil → Räume → Leiste → Fertig.
+1. P11-01: Willkommen → Bedienprofil → Räume → Leiste → Fertig.
    Defaults brauchbar, jeder optionale Schritt überspringbar.
 2. P11-02: Bedienprofile setzen ausschließlich Defaults; keine verschiedene
    Architektur für Maus/Tastatur. Bestehende Nutzeranpassungen erhalten.
@@ -578,7 +689,7 @@ benutzerbezogener versionierter First-Run-State.
    fortgesetzt werden, ohne Räume zu duplizieren. Erneuter Aufruf in Settings.
 
 **Abnahme:** Frisches Profil, bestehendes migriertes Profil, Überspringen,
-Abbruch/Neustart, Nur-Tastatur, kleiner Bildschirm und beide Themes.
+Abbruch/Neustart, Nur-Tastatur und kleiner Bildschirm im grünen Theme.
 Keine fingierten Datenschutz-/Updateeinstellungen vor einem realen OS-Unterbau.
 
 **Reviewfokus:** Onboarding erklärt vorhandene Funktionen und verändert kein
@@ -663,7 +774,7 @@ nicht ohne Anlass nochmals laufen lassen. Im Bericht konkrete Testnamen belegen.
 
 - Call-Flow für Rendering/Input/IPC: Eintritt → Zustandsänderung → IPC/Backend →
   bestätigter Snapshot → Invalidierung/Rendern → Fokus-/Fehlerbehandlung.
-- UI-Phasen: Screenshots Dark/Light mit identischen Inhalten, zusätzlich kleinster
+- UI-Phasen: Screenshots des grünen Themes mit identischen Inhalten, zusätzlich kleinster
   Zielauflösung 1366×768 und 1920×1080; 100/150/200% Skalierung wo verfügbar.
 - Tastatur und Maus, leere/lange/fehlerhafte Daten, Wiederöffnen und Reconnect.
 - Netzwerk-/Auth-/Hardwarefälle benötigen echte Backendbelege; gemockte Unit-Tests

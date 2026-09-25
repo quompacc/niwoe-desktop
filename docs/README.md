@@ -25,6 +25,7 @@ When documents disagree, use this order:
 - `PROJECT_STATUS.md` — dated pre-NIWOE implementation evidence
 - `GUI_CENTRALIZATION_PLAN.md` — binding native token pipeline and DoD
 - `niwoe_design_manifest.md` — binding visual specification
+- `GENERAL_AUDIT_2026-09-25.md` — current cross-cutting audit and next-step priorities
 - `technical-design-guidelines.md` — engineering decision rules
 
 ## Platforms and compatibility

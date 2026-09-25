@@ -27,4 +27,7 @@ pub(super) fn commit_initial_surfaces(shell: &mut NiwoeShell) {
     info!("Wi-Fi password modal surface initial commit");
     shell.region_picker_layer.commit();
     info!("Screenshot region picker surface initial commit");
+    if crate::first_login::claim_first_login_hub() {
+        shell.open_hub_on_first_login();
+    }
 }

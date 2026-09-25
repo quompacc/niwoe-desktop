@@ -154,7 +154,7 @@ impl Widget for DisplayOutputRow {
                 self.y,
                 self.scale_millis as f32 / 1000.0,
                 transform,
-                self.workspace.clamp(1, 9),
+                self.workspace.clamp(1, niwoe_config::rooms::MAX_ROOMS),
                 self.output_id,
                 self.mode_count
             )
@@ -163,7 +163,7 @@ impl Widget for DisplayOutputRow {
                 "scale {:.2} · {} · workspace {} · id {} · {} modes",
                 self.scale_millis as f32 / 1000.0,
                 transform,
-                self.workspace.clamp(1, 9),
+                self.workspace.clamp(1, niwoe_config::rooms::MAX_ROOMS),
                 self.output_id,
                 self.mode_count
             )

@@ -17,7 +17,7 @@ Fokus sinnvoll, Schließen gibt ihn ans vorherige App-Fenster zurück.
 
 | Kürzel | NIWOE-Aktion |
 |---|---|
-| Super+Space | Such-Launcher |
+| Super+Space | Hub öffnen; Tippen darin startet die Suche |
 | Super+Alt+Space | NIWOE-Steuerung / Einstellungen |
 | Super+Escape | System-Deck mit Sitzungsaktionen |
 | Super+K | Durchsuchbare Übersicht der tatsächlich verfügbaren Kürzel |
@@ -47,7 +47,9 @@ Die bestehende Neuner-Raumgrenze bleibt bis zur echten Raummigration sichtbar.
 
 ## Konflikte mit dem bisherigen NIWOE-Stand
 
-- Super+Space bleibt Launcher und wird nicht wie im früheren Konzept zum Deck.
+- Super+Space öffnet den Hub und wird nicht wie im früheren Konzept zum Deck.
+  Eine separate Launcher-Oberfläche ist durch Nutzerkorrektur vom 24.09.2026
+  entfallen; Tippen im Hub startet die Suche.
 - Super+W ersetzt Super+Q für Schließen.
 - Super+Ctrl+L ersetzt Super+L für Sperren.
 - Super+T muss künftig ein einzelnes Fenster freistellen statt den ganzen Raum.
@@ -57,9 +59,14 @@ Die bestehende Neuner-Raumgrenze bleibt bis zur echten Raummigration sichtbar.
 
 ## Mauswege
 
-Panel: Launcher-Schaltfläche öffnet Suche, Raumwahl wechselt Räume,
-Statusgruppe öffnet Deck, Uhr öffnet Kalender. Das Deck verlinkt Einstellungen.
-Launcher und Steuerung sind durchsuchbar; keine Kategorienwand. Im Deck stehen
-Audio und echte verfügbare Systemfunktionen im Vordergrund. Keine funktionslosen
+Panel: Hub-Schaltfläche öffnet den Hub, die Lupe öffnet dessen Suche, Raumwahl
+wechselt Räume, Statusgruppe öffnet Deck, Uhr öffnet Kalender. Das Deck verlinkt
+Einstellungen.
+Hub und Steuerung sind durchsuchbar; keine Kategorienwand. Der Hub öffnet einmal
+pro neuer NIWOE-Login-Sitzung automatisch als Willkommensansicht; Shell- oder
+Watchdog-Neustarts innerhalb derselben Sitzung öffnen ihn nicht erneut. Die
+Sitzung beginnt in der neutralen Loge ohne aktiven Raum. Raumwahl beendet
+diese Loge; ein App-Schnellstart aktiviert Raum 1 als Fensterkontext. Im Deck
+stehen Audio und echte verfügbare Systemfunktionen im Vordergrund. Keine funktionslosen
 Bedienelemente oder erfundenen Zustände. Eine gemeinsame Aktionsquelle liefert
 Kürzelhilfe und sichtbare Hinweise, damit Beschriftung und Wirkung übereinstimmen.

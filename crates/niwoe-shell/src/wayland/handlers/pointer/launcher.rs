@@ -62,9 +62,38 @@ macro_rules! handle_launcher_pointer {
                     }
                 }
 
-                // ── Step 2b: Command-palette hover tracking.
+                // Hub room-card hover tracking.
                 if let PointerEventKind::Motion { .. } = $event.kind {
-                    if !$shell.launcher_settings_open {
+                    if $shell.room_management_open && $shell.room_configuration_id.is_none() {
+                        let next = crate::room_management_view::hit_room(
+                            local_pos.0 as i32,
+                            local_pos.1 as i32,
+                            content_width,
+                            content_height,
+                            $shell.workspace_state.rooms.snapshot.rooms.len(),
+                            $shell.room_management_page,
+                        );
+                        if next != $shell.hovered_bento_idx {
+                            $shell.hovered_bento_idx = next;
+                            $shell.draw_launcher($qh, RepaintReason::Pointer);
+                        }
+                    } else if !$shell.launcher_settings_open && !$shell.hub_search_active {
+                        let next = crate::hub_view::hit_room(
+                            local_pos.0 as i32,
+                            local_pos.1 as i32,
+                            content_width,
+                            $shell.workspace_state.rooms.snapshot.rooms.len(),
+                        );
+                        if next != $shell.hovered_bento_idx {
+                            $shell.hovered_bento_idx = next;
+                            $shell.draw_launcher($qh, RepaintReason::Pointer);
+                        }
+                    }
+                }
+
+                // ── Step 2b: Hub search-result hover tracking.
+                if let PointerEventKind::Motion { .. } = $event.kind {
+                    if !$shell.launcher_settings_open && $shell.hub_search_active {
                         let new_app = {
                             let hit = crate::app_view::hit_app_row(
                                 local_pos.0 as i32,
@@ -92,7 +121,7 @@ macro_rules! handle_launcher_pointer {
                 // ── Step 3: Right-click — open context menu for app under cursor.
                 if let PointerEventKind::Press { button: 0x111, .. } = $event.kind {
                     $shell.context_menu = None;
-                    if !$shell.launcher_settings_open {
+                    if !$shell.launcher_settings_open && $shell.hub_search_active {
                         let filtered = crate::app_view::collect_palette_apps(
                             &$shell.launcher_state.apps,
                             &$shell.search_query,
@@ -260,7 +289,36 @@ macro_rules! handle_launcher_pointer {
 
                 // ── Step 4: Scroll in the launcher.
                 if let PointerEventKind::Axis { vertical, .. } = $event.kind {
-                    if !$shell.launcher_settings_open {
+                    if $shell.room_configuration_id.is_some() {
+                        let delta = if vertical.discrete != 0 {
+                            -vertical.discrete * niwoe_tokens::Spacing::DEFAULT.xxl
+                        } else {
+                            (-vertical.absolute * 4.0) as i32
+                        };
+                        let max = crate::room_management_view::max_configuration_scroll(content_height);
+                        let next = ($shell.room_configuration_scroll_y + delta).clamp(0, max);
+                        if next != $shell.room_configuration_scroll_y {
+                            $shell.room_configuration_scroll_y = next;
+                            $shell.draw_launcher($qh, RepaintReason::Pointer);
+                        }
+                        continue;
+                    } else if $shell.room_management_open {
+                        let count = $shell.workspace_state.rooms.snapshot.rooms.len();
+                        let max = crate::room_management_view::max_room_page(count);
+                        let next = if vertical.discrete < 0 || vertical.absolute < -1.0 {
+                            $shell.room_management_page.saturating_add(1).min(max)
+                        } else if vertical.discrete > 0 || vertical.absolute > 1.0 {
+                            $shell.room_management_page.saturating_sub(1)
+                        } else {
+                            $shell.room_management_page
+                        };
+                        if next != $shell.room_management_page {
+                            $shell.room_management_page = next;
+                            $shell.hovered_bento_idx = None;
+                            $shell.draw_launcher($qh, RepaintReason::Pointer);
+                        }
+                        continue;
+                    } else if !$shell.launcher_settings_open && $shell.hub_search_active {
                         let step_px: i32 = 60;
                         let delta_px = if vertical.discrete != 0 {
                             $shell.launcher_scroll_remainder = 0.0;
@@ -294,8 +352,79 @@ macro_rules! handle_launcher_pointer {
                     }
                 }
 
-                // ── Step 5: Command-palette left-click hit test.
-                if !$shell.launcher_settings_open {
+                // ── Step 5: Hub overview and inline-search click handling.
+                if $shell.room_management_open {
+                    if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
+                        let cx = local_pos.0 as i32;
+                        let cy = local_pos.1 as i32;
+                        if $shell.room_configuration_id.is_some() {
+                            if let Some(action) = crate::room_management_view::hit_configuration(
+                                cx, cy, content_width, content_height,
+                                $shell.room_configuration_scroll_y,
+                            ) {
+                                $shell.room_configuration_action($qh, action);
+                            }
+                            continue;
+                        } else {
+                            if crate::room_management_view::hit_back(cx, cy, content_height) {
+                                $shell.return_to_hub($qh);
+                                continue;
+                            }
+                            if let Some(index) = crate::room_management_view::hit_room(
+                                cx, cy, content_width, content_height,
+                                $shell.workspace_state.rooms.snapshot.rooms.len(),
+                                $shell.room_management_page,
+                            ) {
+                                if let Some(id) = $shell.workspace_state.rooms.snapshot.rooms
+                                    .get(index).map(|room| room.id) {
+                                    $shell.open_room_configuration($qh, id);
+                                }
+                                continue;
+                            }
+                        }
+                    }
+                } else if !$shell.launcher_settings_open && !$shell.hub_search_active {
+                    if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
+                        let cx = local_pos.0 as i32;
+                        let cy = local_pos.1 as i32;
+                        if crate::hub_view::hit_close(cx, cy, content_width) {
+                            $shell.close_launcher_after_launch($qh, RepaintReason::Pointer);
+                            continue;
+                        }
+                        if crate::hub_view::hit_manage_rooms(cx, cy, content_width) {
+                            $shell.open_room_management($qh);
+                            continue;
+                        }
+                    }
+                    if workspace_click_activation(&$event.kind) {
+                        let cx = local_pos.0 as i32;
+                        let cy = local_pos.1 as i32;
+                        let room_count = $shell.workspace_state.rooms.snapshot.rooms.len();
+                        if let Some(index) = crate::hub_view::hit_room(
+                            cx,
+                            cy,
+                            content_width,
+                            room_count,
+                        ) {
+                            if let Some(workspace) = $shell
+                                .workspace_state
+                                .rooms
+                                .snapshot
+                                .rooms
+                                .get(index)
+                                .map(|room| room.workspace)
+                            {
+                                $shell.handle_panel_click(
+                                    $qh,
+                                    crate::wayland::ClickAction::SwitchWorkspace(workspace),
+                                );
+                                $shell.close_launcher_after_launch($qh, RepaintReason::Pointer);
+                                continue;
+                            }
+                        }
+                    }
+                }
+                if !$shell.launcher_settings_open && $shell.hub_search_active {
                     if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
                         let cx = local_pos.0 as i32;
                         let cy = local_pos.1 as i32;

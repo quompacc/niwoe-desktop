@@ -203,6 +203,7 @@ impl NiwoeState {
             socket_name,
             seat,
             workspaces: WorkspaceManager::with_rooms(rooms),
+            lobby_active: true,
             outputs: Vec::new(),
             output_layout,
             output_config_entries,

@@ -6,12 +6,23 @@ impl NiwoeShell {
                     self.panel_last_signature = None;
                     self.panel_dirty = true;
                     self.workspace_dirty = true;
+                    self.launcher_dirty |= self.room_management_open;
                 }
             }
             ShellEvent::RoomMutationResult {
                 request_id, error, ..
             } => {
+                let configuration_request = self.room_configuration_id.is_some()
+                    && self.workspace_state.rooms.pending.as_ref().is_some_and(|(id, _)| id == &request_id);
                 self.workspace_state.rooms.result(&request_id, error);
+                if configuration_request {
+                    if error.is_none() && self.room_configuration_save_pending {
+                        self.room_configuration_id = None;
+                        self.workspace_state.rooms.edit = None;
+                    }
+                    self.room_configuration_save_pending = false;
+                    self.launcher_dirty = true;
+                }
                 self.workspace_dirty = true;
             }
             ShellEvent::WorkspaceChanged { workspace } => {

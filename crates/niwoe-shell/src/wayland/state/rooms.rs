@@ -1,4 +1,182 @@
 impl NiwoeShell {
+    pub(crate) fn open_room_configuration(&mut self, qh: &QueueHandle<Self>, id: u64) {
+        let Some(workspace) = self
+            .workspace_state
+            .rooms
+            .snapshot
+            .rooms
+            .iter()
+            .find(|room| room.id == id)
+            .map(|room| room.workspace)
+        else {
+            return;
+        };
+        self.workspace_state.rooms.begin(workspace);
+        if !self
+            .workspace_state
+            .rooms
+            .edit
+            .as_ref()
+            .is_some_and(|edit| edit.id == id)
+        {
+            return;
+        }
+        self.room_configuration_id = Some(id);
+        self.room_configuration_scroll_y = 0;
+        self.room_configuration_save_pending = false;
+        self.hovered_bento_idx = None;
+        self.draw_launcher(qh, RepaintReason::Pointer);
+    }
+
+    pub(crate) fn return_to_room_management(&mut self, qh: &QueueHandle<Self>) {
+        self.room_configuration_id = None;
+        self.room_configuration_scroll_y = 0;
+        self.room_configuration_save_pending = false;
+        self.workspace_state.rooms.edit = None;
+        self.draw_launcher(qh, RepaintReason::Pointer);
+    }
+
+    pub(crate) fn room_configuration_action(
+        &mut self,
+        qh: &QueueHandle<Self>,
+        action: crate::room_management_view::ConfigurationAction,
+    ) {
+        use crate::room_management_view::ConfigurationAction;
+        use crate::wayland::RoomEditAction;
+        if self.workspace_state.rooms.pending.is_some() {
+            return;
+        }
+        match action {
+            ConfigurationAction::Back | ConfigurationAction::Cancel => {
+                self.return_to_room_management(qh);
+                return;
+            }
+            ConfigurationAction::Name => {
+                if let Some(edit) = &mut self.workspace_state.rooms.edit {
+                    edit.focus = 0;
+                }
+            }
+            ConfigurationAction::MoveEarlier
+            | ConfigurationAction::MoveLater
+            | ConfigurationAction::Save => {
+                let (edit_action, focus) = match action {
+                    ConfigurationAction::MoveEarlier => (RoomEditAction::Left, 1),
+                    ConfigurationAction::MoveLater => (RoomEditAction::Right, 2),
+                    _ => (RoomEditAction::Save, 3),
+                };
+                if let Some(edit) = &mut self.workspace_state.rooms.edit {
+                    edit.focus = focus;
+                }
+                if !self.workspace_state.rooms.enabled(edit_action) {
+                    self.draw_launcher(qh, RepaintReason::Pointer);
+                    return;
+                }
+                if action == ConfigurationAction::Save {
+                    let unchanged = self
+                        .workspace_state
+                        .rooms
+                        .edit
+                        .as_ref()
+                        .is_some_and(|edit| {
+                            self.workspace_state
+                                .rooms
+                                .snapshot
+                                .rooms
+                                .iter()
+                                .find(|room| room.id == edit.id)
+                                .is_some_and(|room| room.name == edit.name.trim())
+                        });
+                    if unchanged {
+                        self.return_to_room_management(qh);
+                        return;
+                    }
+                }
+                if let Some(command) = self.workspace_state.rooms.request(edit_action) {
+                    self.room_configuration_save_pending = action == ConfigurationAction::Save;
+                    if !self.ipc.send(&command) {
+                        self.workspace_state.rooms.pending = None;
+                        self.room_configuration_save_pending = false;
+                        self.workspace_state.rooms.message =
+                            "Keine Verbindung. Erneut versuchen.".into();
+                    }
+                }
+            }
+        }
+        self.draw_launcher(qh, RepaintReason::Pointer);
+    }
+
+    pub(crate) fn room_configuration_key(
+        &mut self,
+        qh: &QueueHandle<Self>,
+        key: smithay_client_toolkit::seat::keyboard::Keysym,
+    ) {
+        use crate::room_management_view::ConfigurationAction;
+        use smithay_client_toolkit::seat::keyboard::Keysym;
+        if self.workspace_state.rooms.pending.is_some() {
+            return;
+        }
+        if key == Keysym::Escape {
+            self.return_to_room_management(qh);
+            return;
+        }
+        if key == Keysym::Tab || key == Keysym::ISO_Left_Tab {
+            use crate::wayland::RoomEditAction;
+            let actions = [
+                RoomEditAction::Name,
+                RoomEditAction::Left,
+                RoomEditAction::Right,
+                RoomEditAction::Save,
+                RoomEditAction::Cancel,
+            ];
+            if let Some(edit) = self.workspace_state.rooms.edit.as_ref() {
+                let step = if key == Keysym::Tab { 1 } else { 4 };
+                let mut focus = edit.focus;
+                for _ in 0..actions.len() {
+                    focus = (focus + step) % actions.len();
+                    if self.workspace_state.rooms.enabled(actions[focus]) {
+                        break;
+                    }
+                }
+                self.workspace_state.rooms.edit.as_mut().unwrap().focus = focus;
+            }
+        } else if key == Keysym::Return || key == Keysym::KP_Enter {
+            let action = match self
+                .workspace_state
+                .rooms
+                .edit
+                .as_ref()
+                .map(|edit| edit.focus)
+            {
+                Some(1) => ConfigurationAction::MoveEarlier,
+                Some(2) => ConfigurationAction::MoveLater,
+                Some(4) => ConfigurationAction::Cancel,
+                _ => ConfigurationAction::Save,
+            };
+            self.room_configuration_action(qh, action);
+            return;
+        } else if let Some(edit) = &mut self.workspace_state.rooms.edit {
+            if edit.focus == 0 {
+                if key == Keysym::BackSpace {
+                    if edit.replace {
+                        edit.name.clear();
+                    } else {
+                        edit.name.pop();
+                    }
+                    edit.replace = false;
+                } else if let Some(ch) = key.key_char().filter(|ch| !ch.is_control()) {
+                    if edit.replace {
+                        edit.name.clear();
+                        edit.replace = false;
+                    }
+                    if edit.name.chars().count() < niwoe_config::rooms::MAX_NAME_CHARS {
+                        edit.name.push(ch);
+                    }
+                }
+            }
+        }
+        self.draw_launcher(qh, RepaintReason::Keyboard);
+    }
+
     pub(crate) fn open_room_editor(&mut self, qh: &QueueHandle<Self>, workspace: u8) {
         if !self.workspace_state.rooms.ready {
             return;

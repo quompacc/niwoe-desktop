@@ -4,7 +4,6 @@ use niwoe_config::ThemeConfig;
 
 use crate::{
     audio::AudioSnapshot,
-    battery::BatterySnapshot,
     network::{NetworkState, WifiNetwork},
     popup_card::{
         draw_card_body, draw_card_title, draw_footer_link, PAD_X, ROW_HEIGHT,
@@ -40,10 +39,10 @@ pub struct NetworkPopupState<'a> {
     pub volume_preview: Option<u8>,
     pub audio_status: crate::deck_mutation::Status,
     pub power_status: crate::deck_mutation::Status,
-    pub battery: &'a BatterySnapshot,
     pub power_profile: Option<PowerProfile>,
-    pub theme_name: &'a str,
+    pub room_name: &'a str,
     pub power_armed: bool,
+    pub logout_armed: bool,
     pub active_tab: NetworkTab,
     pub wifi_networks: &'a [WifiNetwork],
 }
@@ -88,10 +87,10 @@ pub fn draw_network_popup(
                     volume_preview: state.volume_preview,
                     audio_status: state.audio_status,
                     power_status: state.power_status,
-                    battery: state.battery,
                     power_profile: state.power_profile,
-                    theme_name: state.theme_name,
+                    room_name: state.room_name,
                     power_armed: state.power_armed,
+                    logout_armed: state.logout_armed,
                 },
             );
         }
@@ -319,15 +318,15 @@ mod tests {
             &NetworkPopupState {
                 network: &NetworkState::Offline,
                 audio: &AudioSnapshot::unavailable(),
-                battery: &crate::battery::BatterySnapshot::default(),
                 bluetooth: &crate::bluetooth::BluetoothSnapshot::default(),
                 bluetooth_pending: false,
                 volume_preview: None,
                 audio_status: crate::deck_mutation::Status::Idle,
                 power_status: crate::deck_mutation::Status::Idle,
                 power_profile: None,
-                theme_name: "niwoe-dark",
+                room_name: "Raum 1",
                 power_armed: false,
+                logout_armed: false,
                 active_tab,
                 wifi_networks: nets,
             },

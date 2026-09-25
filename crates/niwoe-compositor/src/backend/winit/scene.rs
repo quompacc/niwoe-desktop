@@ -187,9 +187,11 @@ pub(super) fn render_elements_for_output(
         return;
     }
 
-    scratch
-        .windows
-        .extend(state.workspaces.active_space().elements().cloned());
+    if !state.lobby_active {
+        scratch
+            .windows
+            .extend(state.workspaces.active_space().elements().cloned());
+    }
 
     for window in scratch.windows.iter().rev() {
         let loc = match state.workspaces.active_space().element_location(window) {

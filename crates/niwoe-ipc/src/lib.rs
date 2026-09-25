@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 mod appearance;
 pub use appearance::{AppearanceSnapshot, AppearanceTheme, AppearanceWallpaperMode};
 mod rooms;
-pub use rooms::{RoomChange, RoomEntry, RoomMutationError, RoomSnapshot};
+pub use rooms::{RoomAssignment, RoomChange, RoomEntry, RoomMutationError, RoomSnapshot};
 mod settings;
 pub use settings::{SettingsSnapshot, SystemSettingsSnapshot};
 
@@ -43,6 +43,7 @@ pub struct OutputModeState {
 pub struct OutputWorkspaceState {
     pub output_id: u32,
     pub output_name: Option<String>,
+    /// One-based room number; zero means the neutral login foyer.
     pub active_workspace: usize,
     pub primary: bool,
     pub focused: bool,

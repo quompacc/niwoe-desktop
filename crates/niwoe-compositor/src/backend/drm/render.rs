@@ -268,7 +268,9 @@ fn render_outputs_for_crtc(
         out.scratch_cursor.clear();
         out.scratch_final.clear();
         out.scratch_windows.clear();
-        out.scratch_windows.extend(space.elements().cloned());
+        if !state.lobby_active {
+            out.scratch_windows.extend(space.elements().cloned());
+        }
 
         let mut decoration_element_count = 0usize;
         let mut space_element_count = 0usize;

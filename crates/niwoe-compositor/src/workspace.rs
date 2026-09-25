@@ -61,6 +61,49 @@ impl<E: SpaceElement + PartialEq> WorkspaceManager<E> {
         self.spaces.len()
     }
 
+    /// Keep the runtime Spaces aligned with the registry's persisted slot order.
+    pub fn append_room_space(&mut self) {
+        self.spaces.push(Space::default());
+    }
+
+    /// Move every mapped element to the chosen room, then compact slot indices.
+    /// The registry has already validated and persisted the corresponding edit.
+    pub fn remove_room_space(&mut self, source: usize, target: usize, outputs: &[Output])
+    where
+        E: Clone,
+    {
+        debug_assert!(source < self.spaces.len() && target < self.spaces.len() && source != target);
+        let elements: Vec<_> = self.spaces[source]
+            .elements()
+            .map(|element| {
+                (
+                    element.clone(),
+                    self.spaces[source]
+                        .element_location(element)
+                        .unwrap_or_default(),
+                )
+            })
+            .collect();
+        for (element, location) in elements {
+            self.spaces[source].unmap_elem(&element);
+            self.spaces[target].map_element(element, location, false);
+        }
+        for space in &mut self.spaces {
+            for output in outputs {
+                space.unmap_output(output);
+            }
+        }
+        self.spaces.remove(source);
+        self.active = if self.active == source {
+            target - usize::from(target > source)
+        } else {
+            self.active - usize::from(self.active > source)
+        };
+        for output in outputs {
+            self.spaces[self.active].map_output(output, (0, 0));
+        }
+    }
+
     pub fn active_space(&self) -> &Space<E> {
         &self.spaces[self.active]
     }
@@ -317,6 +360,35 @@ mod tests {
         assert_eq!(
             m.find_element_workspace(|x| x.id == 5).map(|(ws, _)| ws),
             Some(0)
+        );
+    }
+
+    #[test]
+    fn removing_room_moves_windows_and_keeps_other_room_identity() {
+        let mut m = manager();
+        let moved = MockWindow { id: 5 };
+        let later = MockWindow { id: 6 };
+        m.space_at_mut(2)
+            .map_element(moved.clone(), (13, 17), false);
+        m.space_at_mut(5)
+            .map_element(later.clone(), (29, 31), false);
+        m.active = 5;
+        m.remove_room_space(2, 0, &[]);
+        assert_eq!(m.count(), 8);
+        assert_eq!(m.active, 4);
+        assert_eq!(
+            m.find_element_workspace(|w| w.id == 5)
+                .map(|(slot, _)| slot),
+            Some(0)
+        );
+        assert_eq!(
+            m.find_element_workspace(|w| w.id == 6)
+                .map(|(slot, _)| slot),
+            Some(4)
+        );
+        assert_eq!(
+            m.space_at(0).element_location(&moved),
+            Some((13, 17).into())
         );
     }
 

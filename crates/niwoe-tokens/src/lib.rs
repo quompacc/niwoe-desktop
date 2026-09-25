@@ -11,8 +11,10 @@
 
 pub mod chrome;
 pub mod color;
+pub mod control_center;
 pub mod elevation;
 pub mod font;
+pub mod hub;
 pub mod interaction;
 pub mod radius;
 pub mod spacing;
@@ -23,7 +25,9 @@ pub use chrome::{
     WorkspaceSwitcher,
 };
 pub use color::{contrast_text, relative_luminance, Color, Palette};
+pub use control_center::ControlCenter;
 pub use elevation::Elevation;
+pub use hub::Hub;
 pub use interaction::Interaction;
 pub use radius::Radius;
 pub use spacing::{Controls, Spacing};

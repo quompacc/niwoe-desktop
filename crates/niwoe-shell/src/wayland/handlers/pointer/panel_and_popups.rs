@@ -265,6 +265,21 @@ macro_rules! handle_panel_and_popups_pointer {
             continue;
         }
 
+        if $shell.pointer_surface == SurfaceKind::Panel
+            && workspace_click_activation(&$event.kind)
+        {
+            let action = $shell
+                .panel_state
+                .clicks
+                .iter()
+                .find(|zone| zone.rect.contains($event.position.0, $event.position.1))
+                .map(|zone| zone.action.clone());
+            if let Some(action @ crate::wayland::ClickAction::SwitchWorkspace(_)) = action {
+                $shell.handle_panel_click($qh, action);
+                continue;
+            }
+        }
+
         if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
             let action = match $shell.pointer_surface {
                 SurfaceKind::Panel => $shell
@@ -352,6 +367,10 @@ macro_rules! handle_panel_and_popups_pointer {
                 SurfaceKind::Desktop | SurfaceKind::DesktopMenu => None,
                 SurfaceKind::None => None,
             };
+            let action = action.filter(|action| {
+                !($shell.pointer_surface == SurfaceKind::Panel
+                    && matches!(action, crate::wayland::ClickAction::SwitchWorkspace(_)))
+            });
             let keep_workspace_popup_open = matches!(
                 action,
                 Some(crate::wayland::ClickAction::ToggleWorkspacePopup)

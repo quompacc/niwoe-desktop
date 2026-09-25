@@ -72,6 +72,24 @@ fn invalid_snapshots_cannot_rebind_click_targets() {
 }
 
 #[test]
+fn accepts_compact_dynamic_slots_and_rejects_gaps() {
+    let mut ui = RoomUi::default();
+    let mut snapshot = ui.snapshot.clone();
+    snapshot.rooms.push(RoomEntry {
+        id: 10,
+        workspace: 10,
+        name: "Raum 10".into(),
+        description: String::new(),
+        assignment: niwoe_ipc::RoomAssignment::Free,
+    });
+    assert!(ui.accept(snapshot.clone()));
+    assert_eq!(ui.snapshot.rooms.len(), 10);
+    snapshot.revision += 1;
+    snapshot.rooms[9].workspace = 11;
+    assert!(!ui.accept(snapshot));
+}
+
+#[test]
 fn moves_preserve_id_and_timeout_requests_refresh_instead_of_retrying() {
     let mut ui = RoomUi::default();
     ui.accept(ui.snapshot.clone());

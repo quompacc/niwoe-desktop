@@ -29,7 +29,7 @@ pub(crate) fn build_panel_widget_tree(
     room_entries: &[niwoe_ipc::RoomEntry],
     clock: &str,
     icon_cache: &IconCache,
-    _screenshot_icon: Option<Pixmap>,
+    screenshot_icon: Option<Pixmap>,
     theme: &Theme,
 ) -> Box<dyn Widget> {
     use status_symbols::{icon, Symbol};
@@ -75,19 +75,35 @@ pub(crate) fn build_panel_widget_tree(
         / 2.0;
     let status_width =
         TRAY_W * if battery.present { 3 } else { 2 } + if battery.present { LAUNCHER_W } else { 0 };
-    let tray_capacity = ((side_width as i32 - status_width - SCREENSHOT_W - DIVIDER_W - GAP * 3)
+    let tray_capacity = ((side_width as i32
+        - status_width
+        - SCREENSHOT_W * 2
+        - DIVIDER_W
+        - GAP * 4)
         .max(0)
         / (SNI_W + GAP)) as usize;
     let tray_count = status_notifier_items
         .len()
         .min(SNI_PANEL_IDS.len())
         .min(tray_capacity);
-    let room_space = (side_width as i32 - LAUNCHER_W - WS_W - GAP * 3).max(0);
     let room_stride = PanelTokens::DEFAULT.room_width as i32 + GAP;
-    let capacity =
-        ((room_space / room_stride).max(1) as usize).min(PanelTokens::DEFAULT.visible_rooms);
-    let active_position = room_entries.iter().position(|r| r.workspace == active_workspace).map(|p| p as u8+1).unwrap_or(active_workspace);
-    let rooms = visible_rooms(active_position, total_workspaces, capacity);
+    let room_space_without_overflow = (side_width as i32 - LAUNCHER_W - GAP).max(0);
+    let capacity_without_overflow = (room_space_without_overflow / room_stride).max(1) as usize;
+    let total_rooms = total_workspaces.clamp(1, niwoe_config::rooms::MAX_ROOMS as u8) as usize;
+    let capacity = if total_rooms <= capacity_without_overflow {
+        total_rooms
+    } else {
+        let room_space = (side_width as i32 - LAUNCHER_W - WS_W - GAP * 2).max(0);
+        (room_space / room_stride).max(1) as usize
+    }
+    .min(PanelTokens::DEFAULT.visible_rooms)
+    .min(total_rooms);
+    let active_position = room_entries
+        .iter()
+        .position(|r| r.workspace == active_workspace)
+        .map(|position| position as u8 + 1)
+        .unwrap_or(active_workspace);
+    let rooms = visible_rooms(total_workspaces, capacity);
     for position in rooms {
         let room = room_entries.get(position as usize-1);
         let workspace = room.map(|r| r.workspace).unwrap_or(position);
@@ -97,7 +113,13 @@ pub(crate) fn build_panel_widget_tree(
             active: workspace == active_workspace,
         }));
     }
-    left_children.push(Box::new(PanelWorkspaceChip));
+    let hidden_count = total_rooms.saturating_sub(capacity) as u8;
+    if hidden_count > 0 {
+        left_children.push(Box::new(PanelWorkspaceChip {
+            hidden_count,
+            active_hidden: active_position as usize > capacity,
+        }));
+    }
     let left_cluster = Container::new(
         WidgetStyle {
             size: UiSize {
@@ -164,6 +186,17 @@ pub(crate) fn build_panel_widget_tree(
     if !right_children.is_empty() {
         right_children.push(Box::new(PanelDivider));
     }
+    let screenshot_icon = screenshot_icon.map(|mut icon| {
+        tint_pixmap_premul(&mut icon, theme.palette.text);
+        icon
+    });
+    right_children.push(Box::new(PanelChip::new(
+        "panel-screenshot",
+        "Foto".into(),
+        screenshot_icon,
+        SCREENSHOT_W,
+        false,
+    )));
     right_children.push(Box::new(PanelChip::new(
         "panel-search",
         "Suche".into(),

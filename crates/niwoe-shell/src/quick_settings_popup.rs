@@ -5,7 +5,6 @@ use niwoe_tokens::{Interaction, QuickSettings};
 
 use crate::{
     audio::AudioSnapshot,
-    battery::BatterySnapshot,
     network::{ConnectionKind, NetworkState},
     popup_card::draw_card_body,
     power_profile::PowerProfile,
@@ -17,12 +16,13 @@ use crate::{
 pub enum QuickSettingsHit {
     Card,
     Settings,
+    Room,
+    Logout,
     Network,
     Bluetooth,
     Display,
     AudioMute,
     Volume(u8),
-    Appearance,
     PowerProfile,
     Lock,
     PowerOff,
@@ -42,9 +42,10 @@ thread_local! {
     static DISPLAY: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static AUDIO_MUTE: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static VOLUME: Cell<Rect> = const { Cell::new(ZERO_RECT) };
-    static APPEARANCE: Cell<Rect> = const { Cell::new(ZERO_RECT) };
+    static ROOM: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static POWER_PROFILE: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static LOCK: Cell<Rect> = const { Cell::new(ZERO_RECT) };
+    static LOGOUT: Cell<Rect> = const { Cell::new(ZERO_RECT) };
     static POWER_OFF: Cell<Rect> = const { Cell::new(ZERO_RECT) };
 }
 
@@ -56,10 +57,10 @@ pub struct QuickSettingsState<'a> {
     pub volume_preview: Option<u8>,
     pub audio_status: crate::deck_mutation::Status,
     pub power_status: crate::deck_mutation::Status,
-    pub battery: &'a BatterySnapshot,
     pub power_profile: Option<PowerProfile>,
-    pub theme_name: &'a str,
+    pub room_name: &'a str,
     pub power_armed: bool,
+    pub logout_armed: bool,
 }
 
 pub fn draw(
@@ -158,51 +159,53 @@ pub fn draw(
         h: q.status_height,
     };
     draw_panel(painter, theme, status);
-    let appearance = Rect {
-        w: status.w / 2,
-        ..status
-    };
     draw_status_cell(
         painter,
         font,
         theme,
-        appearance,
-        "Darstellung",
-        if state.theme_name.to_ascii_lowercase().contains("dark") {
-            "Dunkel"
-        } else {
-            "Hell"
-        },
+        status,
+        "Aktueller Raum",
+        state.room_name,
     );
-    APPEARANCE.with(|slot| slot.set(appearance));
-    let battery = Rect {
-        x: status.x + appearance.w,
-        w: status.w - appearance.w,
-        ..status
-    };
-    draw_status_cell(
+    text(
         painter,
         font,
         theme,
-        battery,
-        "Energie",
-        &if state.battery.present {
-            format!("{}% Akku", state.battery.capacity)
-        } else {
-            "Netzbetrieb".into()
-        },
+        "›",
+        status.x + status.w - gap.xl,
+        status.y + gap.xl,
+        false,
     );
+    ROOM.with(|slot| slot.set(status));
+    let action_width = (width - q.tile_gap * 2) / 3;
     let lock = Rect {
         x: q.outer_pad,
         y: status.y + status.h + q.section_gap,
-        w: (width - q.tile_gap) / 2,
+        w: action_width,
         h: q.footer_height,
     };
-    let power = Rect {
+    let logout = Rect {
         x: lock.x + lock.w + q.tile_gap,
         ..lock
     };
+    let power = Rect {
+        x: logout.x + logout.w + q.tile_gap,
+        w: width - action_width * 2 - q.tile_gap * 2,
+        ..logout
+    };
     draw_control(painter, font, theme, lock, "Sperren", false);
+    draw_control(
+        painter,
+        font,
+        theme,
+        logout,
+        if state.logout_armed {
+            "Bestätigen"
+        } else {
+            "Abmelden"
+        },
+        state.logout_armed,
+    );
     draw_control(
         painter,
         font,
@@ -216,6 +219,7 @@ pub fn draw(
         state.power_armed,
     );
     LOCK.with(|slot| slot.set(lock));
+    LOGOUT.with(|slot| slot.set(logout));
     POWER_OFF.with(|slot| slot.set(power));
     let settings = Rect {
         x: q.outer_pad,
@@ -253,14 +257,13 @@ fn draw_status_cell(
         rect.y + gap.lg,
         false,
     );
-    text(
-        painter,
+    painter.text_clipped(
         font,
-        theme,
         value,
         rect.x + gap.md,
         rect.y + gap.lg * 2,
-        true,
+        rect.w - gap.md * 2 - gap.xl,
+        glass_dim_from_config(theme),
     );
 }
 
@@ -392,13 +395,14 @@ pub fn hit_test(width: u32, height: u32, x: f64, y: f64) -> Option<QuickSettings
     }
     for (slot, hit) in [
         (&SETTINGS, QuickSettingsHit::Settings),
+        (&ROOM, QuickSettingsHit::Room),
         (&NETWORK, QuickSettingsHit::Network),
         (&BLUETOOTH, QuickSettingsHit::Bluetooth),
         (&DISPLAY, QuickSettingsHit::Display),
         (&AUDIO_MUTE, QuickSettingsHit::AudioMute),
-        (&APPEARANCE, QuickSettingsHit::Appearance),
         (&POWER_PROFILE, QuickSettingsHit::PowerProfile),
         (&LOCK, QuickSettingsHit::Lock),
+        (&LOGOUT, QuickSettingsHit::Logout),
         (&POWER_OFF, QuickSettingsHit::PowerOff),
     ] {
         if slot.with(Cell::get).contains(x, y) {

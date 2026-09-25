@@ -15,15 +15,17 @@ use super::{
 };
 
 fn workspace_idx(workspace: u8) -> usize {
-    workspace.saturating_sub(1).min(8) as usize
+    workspace
+        .saturating_sub(1)
+        .min((niwoe_config::rooms::MAX_ROOMS - 1) as u8) as usize
 }
 
 fn normalize_workspace_1_based_u8(workspace: u8) -> u8 {
-    workspace.clamp(1, 9)
+    workspace.clamp(1, niwoe_config::rooms::MAX_ROOMS as u8)
 }
 
 fn apply_workspace_changed(active_workspace: &mut u8, next_workspace_raw: u8) {
-    *active_workspace = normalize_workspace_1_based_u8(next_workspace_raw);
+    *active_workspace = next_workspace_raw.min(niwoe_config::rooms::MAX_ROOMS as u8);
 }
 
 fn panel_global_activation_point(
@@ -37,7 +39,7 @@ fn panel_global_activation_point(
 }
 
 fn normalize_workspace_1_based(workspace: usize) -> usize {
-    workspace.clamp(1, 9)
+    workspace.min(niwoe_config::rooms::MAX_ROOMS)
 }
 
 fn select_panel_active_workspace(
@@ -47,7 +49,7 @@ fn select_panel_active_workspace(
     output_workspaces: &[OutputWorkspaceState],
 ) -> u8 {
     if !output_workspace_state_available || output_workspaces.is_empty() {
-        return legacy_active_workspace.clamp(1, 9);
+        return legacy_active_workspace.min(niwoe_config::rooms::MAX_ROOMS as u8);
     }
 
     if let Some(workspace) = focused_output_id.and_then(|id| {
@@ -82,7 +84,7 @@ fn select_panel_active_workspace(
         return normalize_workspace_1_based(workspace) as u8;
     }
 
-    legacy_active_workspace.clamp(1, 9)
+    legacy_active_workspace.min(niwoe_config::rooms::MAX_ROOMS as u8)
 }
 
 /// Pick the output name a local (panel-button) screenshot must capture from.
@@ -214,12 +216,12 @@ fn clear_stale_focused_window_id(focused_window_id: &mut Option<String>, windows
 fn apply_full_window_snapshot(
     active_workspace: &mut u8,
     windows: &mut Vec<WindowInfo>,
-    workspace_window_counts: &mut [u16; 9],
+    workspace_window_counts: &mut [u16; niwoe_config::rooms::MAX_ROOMS],
     snapshot_active_workspace: u8,
     snapshot_windows: Vec<WindowSnapshotEntry>,
 ) {
-    *active_workspace = snapshot_active_workspace.clamp(1, 9);
-    *workspace_window_counts = [0; 9];
+    *active_workspace = snapshot_active_workspace.min(niwoe_config::rooms::MAX_ROOMS as u8);
+    *workspace_window_counts = [0; niwoe_config::rooms::MAX_ROOMS];
     windows.clear();
 
     for window in snapshot_windows {
@@ -235,8 +237,10 @@ fn apply_full_window_snapshot(
     }
 }
 
-fn compute_occupied_workspaces(workspace_window_counts: &[u16; 9]) -> [bool; 9] {
-    let mut occupied = [false; 9];
+fn compute_occupied_workspaces(
+    workspace_window_counts: &[u16; niwoe_config::rooms::MAX_ROOMS],
+) -> [bool; niwoe_config::rooms::MAX_ROOMS] {
+    let mut occupied = [false; niwoe_config::rooms::MAX_ROOMS];
     for (i, count) in workspace_window_counts.iter().enumerate() {
         occupied[i] = *count > 0;
     }

@@ -144,7 +144,7 @@ fn output_workspace_changed_clamps_workspace_and_handles_focus_drop() {
         },
     );
 
-    assert_eq!(output_workspaces[0].active_workspace, 9);
+    assert_eq!(output_workspaces[0].active_workspace, 42);
     assert_eq!(focused_output_id, None);
     assert!(output_workspace_state_available);
     assert!(workspace_indicator_dirty);
@@ -173,7 +173,7 @@ fn output_workspace_snapshot_clamps_workspace_values() {
         }],
     );
 
-    assert_eq!(output_workspaces[0].active_workspace, 1);
+    assert_eq!(output_workspaces[0].active_workspace, 0);
     assert!(output_workspace_state_available);
     assert!(workspace_indicator_dirty);
 }
@@ -335,5 +335,5 @@ fn panel_active_workspace_normalizes_out_of_range() {
             ..Default::default()
         }],
     );
-    assert_eq!(active, 9);
+    assert_eq!(active, niwoe_config::rooms::MAX_ROOMS as u8);
 }

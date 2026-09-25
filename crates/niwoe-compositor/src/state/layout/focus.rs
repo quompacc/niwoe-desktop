@@ -7,6 +7,9 @@ use super::super::NiwoeState;
 
 impl NiwoeState {
     pub fn focused_window(&self) -> Option<Window> {
+        if self.lobby_active {
+            return None;
+        }
         let surface = self.seat.get_keyboard()?.current_focus()?;
         let idx = self.current_workspace_index();
         self.workspaces

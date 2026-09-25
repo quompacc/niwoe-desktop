@@ -30,7 +30,7 @@ impl WorkspacePopupState {
 pub struct WorkspacePopupInput {
     pub active_workspace: u32,
     pub total_workspaces: u32,
-    pub occupied: [bool; 9],
+    pub occupied: [bool; niwoe_config::rooms::MAX_ROOMS],
     pub hovered_idx: Option<usize>,
 }
 
@@ -94,7 +94,7 @@ pub fn draw_workspace_popup(
 
     let (left, top, tile_w, tile_h) = grid_geometry();
 
-    for i in 0..CELL_COUNT {
+    for i in 0..CELL_COUNT.min(state.rooms.snapshot.rooms.len()) {
         let room = &state.rooms.snapshot.rooms[i];
         let ws_id = room.workspace as u32;
         let col = i as i32 % LAYOUT.columns;
@@ -217,7 +217,7 @@ mod tests {
             WorkspacePopupInput {
                 active_workspace: 3,
                 total_workspaces: 9,
-                occupied: [false; 9],
+                occupied: [false; niwoe_config::rooms::MAX_ROOMS],
                 hovered_idx: None,
             },
             &mut state,

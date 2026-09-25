@@ -12,6 +12,7 @@ use crate::state::{
 fn build_output_workspace_snapshot(
     outputs: &[OutputInfo],
     focused_output: Option<OutputId>,
+    lobby_active: bool,
     mut active_workspace_for_output: impl FnMut(OutputId) -> usize,
     mut modes_for_output: impl FnMut(OutputId) -> Vec<OutputModeInfo>,
 ) -> (Option<u32>, Vec<OutputWorkspaceState>) {
@@ -24,7 +25,11 @@ fn build_output_workspace_snapshot(
         states.push(OutputWorkspaceState {
             output_id: output.id.0,
             output_name: Some(output.name.clone()),
-            active_workspace: active_workspace_for_output(output.id).saturating_add(1),
+            active_workspace: if lobby_active {
+                0
+            } else {
+                active_workspace_for_output(output.id).saturating_add(1)
+            },
             primary: output.primary,
             focused: focused_output_id == Some(output.id.0),
             x: output.geometry.x,
@@ -53,7 +58,11 @@ fn build_output_workspace_snapshot(
 impl NiwoeState {
     pub fn broadcast_workspace(&mut self) {
         self.ipc.broadcast(&ShellEvent::WorkspaceChanged {
-            workspace: index_to_legacy_ipc_workspace(self.workspaces.active),
+            workspace: if self.lobby_active {
+                0
+            } else {
+                index_to_legacy_ipc_workspace(self.workspaces.active)
+            },
         });
     }
 
@@ -95,11 +104,19 @@ impl NiwoeState {
 
         tracing::debug!(
             "workspace/window snapshot broadcasted: active_workspace={} windows={}",
-            self.workspaces.active + 1,
+            if self.lobby_active {
+                0
+            } else {
+                self.workspaces.active + 1
+            },
             windows.len()
         );
         self.ipc.broadcast(&ShellEvent::WindowSnapshot {
-            active_workspace: index_to_legacy_ipc_workspace(self.workspaces.active),
+            active_workspace: if self.lobby_active {
+                0
+            } else {
+                index_to_legacy_ipc_workspace(self.workspaces.active)
+            },
             windows,
         });
         self.broadcast_output_workspace_snapshot();
@@ -139,6 +156,7 @@ impl NiwoeState {
         let (focused_output_id, outputs) = build_output_workspace_snapshot(
             self.output_registry.list(),
             self.focused_output(),
+            self.lobby_active,
             |output_id| self.active_workspace_for_output(Some(output_id)),
             |output_id| output_modes.get(&output_id).cloned().unwrap_or_default(),
         );
@@ -240,6 +258,7 @@ mod tests {
         let (focused_output_id, outputs) = build_output_workspace_snapshot(
             registry.list(),
             Some(right),
+            false,
             |id| {
                 if id == left {
                     1
@@ -280,10 +299,26 @@ mod tests {
         let (focused_output_id, outputs) = build_output_workspace_snapshot(
             registry.list(),
             Some(OutputId(1)),
+            false,
             |_| 0,
             |id| registry.modes_for_id(id).to_vec(),
         );
         assert_eq!(focused_output_id, None);
         assert!(outputs.is_empty());
+    }
+
+    #[test]
+    fn lobby_snapshot_has_no_active_room_on_any_output() {
+        let mut registry = OutputRegistry::new();
+        registry.upsert(reg("eDP-1", 0, 0));
+        registry.upsert(reg("HDMI-A-1", 1920, 0));
+        let (_, outputs) = build_output_workspace_snapshot(
+            registry.list(),
+            None,
+            true,
+            |_| 0,
+            |id| registry.modes_for_id(id).to_vec(),
+        );
+        assert!(outputs.iter().all(|output| output.active_workspace == 0));
     }
 }

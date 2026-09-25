@@ -1,4 +1,52 @@
 impl NiwoeShell {
+    pub(crate) fn open_hub_on_first_login(&mut self) {
+        if !self.launcher_state.open {
+            self.toggle_launcher();
+        }
+    }
+
+    pub(crate) fn open_room_management(&mut self, qh: &QueueHandle<Self>) {
+        if !self.launcher_state.open {
+            self.toggle_launcher();
+        }
+        self.room_management_open = true;
+        self.room_management_page = 0;
+        self.room_configuration_id = None;
+        self.room_configuration_scroll_y = 0;
+        self.launcher_settings_open = false;
+        self.hub_search_active = false;
+        self.search_query.clear();
+        self.hovered_bento_idx = None;
+        self.room_keyboard_focus = None;
+        self.launcher_layer
+            .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
+        self.launcher_layer.set_margin(0, 0, 0, 0);
+        self.launcher_layer.set_exclusive_zone(0);
+        self.launcher_layer.set_size(0, 0);
+        self.launcher_configured = false;
+        self.launcher_dirty = true;
+        self.commit_surface(CommitSurfaceKind::Launcher, CommitReason::Input);
+        self.draw_panel(qh, RepaintReason::Pointer);
+    }
+
+    pub(crate) fn return_to_hub(&mut self, qh: &QueueHandle<Self>) {
+        self.room_management_open = false;
+        self.room_configuration_id = None;
+        self.room_configuration_save_pending = false;
+        self.workspace_state.rooms.edit = None;
+        self.hovered_bento_idx = None;
+        self.room_keyboard_focus = None;
+        self.launcher_layer
+            .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
+        self.launcher_layer.set_margin(0, 0, 0, 0);
+        self.launcher_layer.set_exclusive_zone(-1);
+        self.launcher_layer.set_size(0, 0);
+        self.launcher_configured = false;
+        self.launcher_dirty = true;
+        self.commit_surface(CommitSurfaceKind::Launcher, CommitReason::Input);
+        self.draw_panel(qh, RepaintReason::Pointer);
+    }
+
     pub(crate) fn open_system_settings_from_ipc(&mut self) {
         if !self.launcher_state.open {
             self.toggle_launcher();
@@ -39,7 +87,7 @@ impl NiwoeShell {
             self.launcher_layer
                 .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
             self.launcher_layer.set_margin(0, 0, 0, 0);
-            self.launcher_layer.set_exclusive_zone(0);
+            self.launcher_layer.set_exclusive_zone(-1);
             self.launcher_layer.set_size(0, 0);
             self.launcher_layer
                 .set_keyboard_interactivity(KeyboardInteractivity::Exclusive);
@@ -50,11 +98,20 @@ impl NiwoeShell {
             self.launcher_configured = false;
             self.commit_surface(CommitSurfaceKind::Launcher, CommitReason::Input);
             self.search_query.clear();
+            self.hub_search_active = false;
+            self.hovered_bento_idx = None;
+            self.room_keyboard_focus = None;
+            self.hovered_app_card_idx = None;
             self.app_view_scroll_y = 0;
             self.launcher_selected_idx = None;
         } else {
             self.launcher_is_fullscreen = false;
             self.launcher_settings_open = false;
+            self.room_management_open = false;
+            self.room_configuration_id = None;
+            self.room_configuration_save_pending = false;
+            self.workspace_state.rooms.edit = None;
+            self.hub_search_active = false;
             self.settings_category = crate::settings_view::SettingsCategory::default();
             self.launcher_layer
                 .set_keyboard_interactivity(KeyboardInteractivity::OnDemand);
@@ -307,11 +364,19 @@ impl NiwoeShell {
         }
 
         self.network_popup_open = true;
+        self.network_popup_tab = crate::network_popup::NetworkTab::Status;
         crate::quick_settings_popup::reset_keyboard_focus();
         // Refresh the live network state on open so the Status tab always shows
         // the current primary connection (e.g. right after connecting Wi-Fi or
         // unplugging the cable), not the last timer-polled snapshot.
+        let network_poll_started = std::time::Instant::now();
         self.network_controller.poll();
+        if network_poll_started.elapsed() >= std::time::Duration::from_millis(50) {
+            tracing::warn!(
+                elapsed_ms = network_poll_started.elapsed().as_millis(),
+                "slow system deck network poll"
+            );
+        }
         self.request_settings_refresh(crate::settings_view::SettingsCategory::Bluetooth);
         self.network_layer
             .set_anchor(Anchor::TOP | Anchor::RIGHT);

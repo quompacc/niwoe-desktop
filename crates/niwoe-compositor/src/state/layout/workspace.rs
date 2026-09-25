@@ -237,7 +237,15 @@ impl NiwoeState {
             return;
         }
 
+        let leaving_lobby = std::mem::replace(&mut self.lobby_active, false);
         if idx == old {
+            if leaving_lobby {
+                self.set_active_workspace_for_output(self.focused_output(), idx);
+                self.mark_all_outputs_dirty("lobby-room-selection");
+                self.broadcast_workspace();
+                self.broadcast_window_snapshot();
+                return;
+            }
             tracing::debug!(
                 "workspace switch ignored: requested workspace {} is already active",
                 idx + 1
@@ -297,12 +305,19 @@ impl NiwoeState {
             focused_output_name
         );
 
+        let leaving_lobby = std::mem::replace(&mut self.lobby_active, false);
         self.set_active_workspace_for_output(focused_output, idx);
         if let Some(output_id) = focused_output {
             self.broadcast_output_workspace_changed(output_id.0, idx);
         }
 
         if idx == old {
+            if leaving_lobby {
+                self.mark_all_outputs_dirty("lobby-room-selection");
+                self.broadcast_workspace();
+                self.broadcast_window_snapshot();
+                return;
+            }
             tracing::debug!(
                 "focused-output workspace switch ignored: requested workspace {} is already active",
                 idx + 1

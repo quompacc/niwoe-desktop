@@ -59,6 +59,14 @@ impl NiwoeShell {
                     self.unmap_launcher(CommitReason::Input);
                 }
             }
+            ClickAction::OpenHubSearch => {
+                if !self.launcher_state.open {
+                    self.toggle_launcher();
+                }
+                self.hub_search_active = true;
+                self.draw_panel(qh, RepaintReason::Pointer);
+                self.draw_launcher(qh, RepaintReason::Pointer);
+            }
             ClickAction::ToggleWorkspacePopup => {
                 self.toggle_workspace_popup(CommitReason::Input);
                 self.draw_panel(qh, RepaintReason::Pointer);
@@ -229,6 +237,7 @@ impl NiwoeShell {
             ClickAction::FocusWindow(_) => {}
             ClickAction::SwitchWorkspace(_) => {}
             ClickAction::ToggleLauncher => {}
+            ClickAction::OpenHubSearch => {}
             ClickAction::ToggleWorkspacePopup => {}
             ClickAction::ToggleNetworkPopup => {}
             ClickAction::ToggleAudioPopup => {}

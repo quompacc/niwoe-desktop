@@ -15,4 +15,4 @@ pub use types::{ClickAction, ClickZone, Rect, RoomEditAction};
 pub(crate) use init::initialize;
 pub(crate) use shell::{CommitReason, CommitStats, CommitSurfaceKind, NiwoeShell, RepaintReason};
 pub(crate) use state::load_wallpaper_thumbnail;
-pub(crate) use types::SurfaceKind;
+pub(crate) use types::{SurfaceKind, WindowInfo};

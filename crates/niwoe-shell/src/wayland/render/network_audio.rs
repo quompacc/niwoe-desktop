@@ -3,10 +3,25 @@ impl NiwoeShell {
         if !self.network_popup_open || !self.network_configured {
             return;
         }
+        let draw_started = std::time::Instant::now();
         let surface_w = self.network_width;
         let surface_h = self.network_height;
         let card_w = NETWORK_POPUP_WIDTH;
         let card_h = NETWORK_POPUP_HEIGHT;
+
+        let active_workspace = self.panel_active_workspace();
+        let room_name = if active_workspace == 0 {
+            "Loge"
+        } else {
+            self.workspace_state
+                .rooms
+                .snapshot
+                .rooms
+                .iter()
+                .find(|room| room.workspace == active_workspace)
+                .map(|room| room.name.as_str())
+                .unwrap_or("Raum")
+        };
 
         let mut card_buf = vec![0u8; (card_w as usize) * (card_h as usize) * 4];
         {
@@ -25,13 +40,17 @@ impl NiwoeShell {
                     bluetooth_pending: self
                         .settings_refresh_inflight
                         .contains(&crate::settings_view::SettingsCategory::Bluetooth),
-                    battery: &self.battery_snapshot,
                     power_profile: self.power_profile,
-                    theme_name: &self.theme_name,
+                    room_name,
                     power_armed: self
                         .armed_power
                         .as_ref()
                         .map(|(id, _)| id == "power-off")
+                        .unwrap_or(false),
+                    logout_armed: self
+                        .armed_power
+                        .as_ref()
+                        .map(|(id, _)| id == "power-logout")
                         .unwrap_or(false),
                     active_tab: self.network_popup_tab,
                     wifi_networks: &self.wifi_networks,
@@ -47,6 +66,7 @@ impl NiwoeShell {
                 niwoe_config::ThemeSurface::Popup,
             ),
         );
+        let card_elapsed = draw_started.elapsed();
 
         let stride = buffer::shm_buffer_stride(surface_w);
         for attempt in 0..CANVAS_RETRY_ATTEMPTS {
@@ -81,6 +101,7 @@ impl NiwoeShell {
                     niwoe_config::ThemeSurface::Popup,
                 ),
             );
+            let composite_elapsed = draw_started.elapsed();
             if let Err(err) = buf.attach_to(self.network_layer.wl_surface()) {
                 warn!("network popup buffer attach failed: {}", err);
                 return;
@@ -89,6 +110,16 @@ impl NiwoeShell {
                 .wl_surface()
                 .damage_buffer(0, 0, surface_w as i32, surface_h as i32);
             self.network_layer.commit();
+            let total_elapsed = draw_started.elapsed();
+            if total_elapsed >= std::time::Duration::from_millis(50) {
+                tracing::warn!(
+                    ?reason,
+                    card_ms = card_elapsed.as_millis(),
+                    composite_ms = composite_elapsed.as_millis(),
+                    total_ms = total_elapsed.as_millis(),
+                    "slow system deck draw"
+                );
+            }
             self.network_dirty = false;
             return;
         }

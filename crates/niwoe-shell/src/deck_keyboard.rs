@@ -14,8 +14,9 @@ fn focus_targets() -> Vec<(Rect, QuickSettingsHit)> {
             POWER_PROFILE.with(Cell::get),
             QuickSettingsHit::PowerProfile,
         ),
-        (APPEARANCE.with(Cell::get), QuickSettingsHit::Appearance),
+        (ROOM.with(Cell::get), QuickSettingsHit::Room),
         (LOCK.with(Cell::get), QuickSettingsHit::Lock),
+        (LOGOUT.with(Cell::get), QuickSettingsHit::Logout),
         (POWER_OFF.with(Cell::get), QuickSettingsHit::PowerOff),
         (SETTINGS.with(Cell::get), QuickSettingsHit::Settings),
     ]

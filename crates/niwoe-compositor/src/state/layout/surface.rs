@@ -97,7 +97,9 @@ impl NiwoeState {
                 return Some(hit);
             }
         }
-        let window_surface =
+        let window_surface = if self.lobby_active {
+            None
+        } else {
             self.workspaces
                 .active_space()
                 .element_under(pos)
@@ -105,7 +107,8 @@ impl NiwoeState {
                     window
                         .surface_under(pos - location.to_f64(), WindowSurfaceType::ALL)
                         .map(|(surface, point)| (surface, (point + location).to_f64()))
-                });
+                })
+        };
 
         if window_surface.is_some() {
             return window_surface;

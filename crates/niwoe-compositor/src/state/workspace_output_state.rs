@@ -9,6 +9,16 @@ pub struct WorkspaceOutputState {
 }
 
 impl WorkspaceOutputState {
+    pub fn remove_room_index(&mut self, source: usize, target: usize) {
+        let fallback = target - usize::from(target > source);
+        for workspace in self.active_workspace_by_output.values_mut() {
+            *workspace = if *workspace == source {
+                fallback
+            } else {
+                *workspace - usize::from(*workspace > source)
+            };
+        }
+    }
     pub fn raw_focused_output(&self) -> Option<OutputId> {
         self.focused_output
     }
@@ -162,6 +172,18 @@ mod tests {
     use crate::state::{OutputGeometry, OutputReconfigure, OutputRegistration, OutputRegistry};
 
     use super::{OutputId, WorkspaceOutputState};
+
+    #[test]
+    fn deleting_room_remaps_every_output_index() {
+        let mut state = WorkspaceOutputState::default();
+        state.active_workspace_by_output.insert(OutputId(1), 2);
+        state.active_workspace_by_output.insert(OutputId(2), 5);
+        state.active_workspace_by_output.insert(OutputId(3), 0);
+        state.remove_room_index(2, 5);
+        assert_eq!(state.active_workspace_by_output[&OutputId(1)], 4);
+        assert_eq!(state.active_workspace_by_output[&OutputId(2)], 4);
+        assert_eq!(state.active_workspace_by_output[&OutputId(3)], 0);
+    }
 
     fn reg(name: &str, x: i32, y: i32, width: i32, height: i32) -> OutputRegistration {
         OutputRegistration {

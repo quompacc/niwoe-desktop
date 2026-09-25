@@ -1,14 +1,12 @@
 impl NiwoeShell {
     pub(crate) fn launcher_geometry(&self) -> niwoe_tokens::Launcher {
-        if self.launcher_settings_open {
-            niwoe_tokens::Launcher::DEFAULT
-        } else {
-            niwoe_tokens::Launcher::SEARCH
-        }
+        niwoe_tokens::Launcher::HUB
     }
 
     pub(crate) fn launcher_content_size(&self) -> (u32, u32) {
-        if self.launcher_is_fullscreen {
+        if self.room_management_open {
+            (self.launcher_width, self.launcher_height)
+        } else if self.launcher_is_fullscreen {
             let (_, _, width, height) = self.launcher_geometry()
                 .fitted_rect(self.launcher_width, self.launcher_height);
             (width, height)
@@ -19,7 +17,10 @@ impl NiwoeShell {
     }
 
     pub(crate) fn draw_launcher(&mut self, _qh: &QueueHandle<Self>, reason: RepaintReason) {
-        if self.launcher_is_fullscreen {
+        if self.room_management_open {
+            self.launcher_visual_x = 0;
+            self.launcher_visual_y = 0;
+        } else if self.launcher_is_fullscreen {
             let (x, y, _, _) = self.launcher_geometry().fitted_rect(self.launcher_width, self.launcher_height);
             self.launcher_visual_x = x;
             self.launcher_visual_y = y;
@@ -66,6 +67,7 @@ impl NiwoeShell {
 
         let stride = buffer::shm_buffer_stride(width);
         let (content_width, content_height) = self.launcher_content_size();
+        let hub_active_workspace = self.panel_active_workspace();
         for attempt in 0..CANVAS_RETRY_ATTEMPTS {
             let buf = buffer::buffer_for(
                 &mut self.pool,
@@ -110,7 +112,43 @@ impl NiwoeShell {
                     .clamp(0.0, 1.0);
                 (id.as_str(), p)
             });
-            if self.launcher_settings_open {
+            if self.room_management_open {
+                let rooms = &self.workspace_state.rooms.snapshot.rooms;
+                if let Some((room, edit, order)) = self.room_configuration_id.and_then(|id| {
+                    let order = rooms.iter().position(|room| room.id == id)?;
+                    let edit = self.workspace_state.rooms.edit.as_ref().filter(|edit| edit.id == id)?;
+                    Some((&rooms[order], edit, order))
+                }) {
+                    crate::room_management_view::draw_room_configuration(
+                        &mut content,
+                        content_width,
+                        content_height,
+                        room,
+                        edit,
+                        order,
+                        rooms.len(),
+                        &self.windows,
+                        &self.workspace_state.rooms.message,
+                        self.workspace_state.rooms.pending.is_some(),
+                        self.room_configuration_scroll_y,
+                        &self.theme,
+                    );
+                } else {
+                    crate::room_management_view::draw_room_management(
+                        &mut content,
+                        content_width,
+                        content_height,
+                        rooms,
+                        hub_active_workspace,
+                        &self.workspace_window_counts,
+                        &self.windows,
+                        self.hovered_bento_idx,
+                        self.room_keyboard_focus,
+                        self.room_management_page,
+                        &self.theme,
+                    );
+                }
+            } else if self.launcher_settings_open {
                 crate::settings_view::draw_settings_launcher(
                     &mut content,
                     content_width,
@@ -146,6 +184,20 @@ impl NiwoeShell {
                     self.default_apps_picker_open,
                     &self.theme,
                     &state_fn,
+                );
+            } else if !self.hub_search_active {
+                crate::hub_view::draw_hub(
+                    &mut content,
+                    content_width,
+                    content_height,
+                    &self.workspace_state.rooms.snapshot.rooms,
+                    hub_active_workspace,
+                    &self.workspace_window_counts,
+                    &self.windows,
+                    &self.system_info,
+                    self.hovered_bento_idx,
+                    self.room_keyboard_focus,
+                    &self.theme,
                 );
             } else {
                 crate::app_view::draw_command_palette(
@@ -190,9 +242,14 @@ impl NiwoeShell {
                 &self.theme,
                 niwoe_config::ThemeSurface::Launcher,
             );
-            round_buffer_corners(&mut content, lw, lh, launcher_radius);
+            if !self.room_management_open {
+                round_buffer_corners(&mut content, lw, lh, launcher_radius);
+            }
 
             if self.launcher_is_fullscreen {
+                if self.room_management_open {
+                    canvas.copy_from_slice(&content);
+                } else {
                 // Blit fitted card content into the full-screen canvas at visual offset.
                 let fw = width as usize;
                 let vx = self.launcher_visual_x.max(0) as usize;
@@ -237,6 +294,7 @@ impl NiwoeShell {
                             }
                         }
                     }
+                }
                 }
             } else {
                 canvas[..lw * lh * 4].copy_from_slice(&content);

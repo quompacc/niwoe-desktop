@@ -1,5 +1,5 @@
 //! Compositor-owned room identity. Presentation order never moves a Space.
-use niwoe_config::rooms::{store, RoomError, RoomId, Rooms, LEGACY_ROOMS};
+use niwoe_config::rooms::{store, AssignmentMode, Room, RoomError, RoomId, Rooms, MAX_ROOMS};
 use std::{
     fs::{self, File, OpenOptions},
     path::{Path, PathBuf},
@@ -24,35 +24,80 @@ impl RoomRegistry {
         if expected != self.definitions.revision {
             return Err(Error::Conflict);
         }
-        let id = match &change {
-            RoomChange::Rename { id, .. } | RoomChange::Move { id, .. } => *id,
+        let index = match &change {
+            RoomChange::Create { .. } => None,
+            RoomChange::Rename { id, .. }
+            | RoomChange::SetDescription { id, .. }
+            | RoomChange::SetAssignment { id, .. }
+            | RoomChange::Move { id, .. }
+            | RoomChange::Delete { id, .. } => Some(
+                self.definitions
+                    .rooms
+                    .iter()
+                    .position(|r| r.id.0 == *id)
+                    .ok_or(Error::Invalid)?,
+            ),
         };
-        let index = self
-            .definitions
-            .rooms
-            .iter()
-            .position(|r| r.id.0 == id)
-            .ok_or(Error::Invalid)?;
         if matches!(&change, RoomChange::Move { position, .. } if *position >= self.slots.len()) {
             return Err(Error::Invalid);
         }
+        if let RoomChange::Delete { id, target_id } = &change {
+            if id == target_id
+                || self.slots.len() <= 1
+                || self.slot_for_room(RoomId(*target_id)).is_none()
+            {
+                return Err(Error::Invalid);
+            }
+        }
+        if matches!(&change, RoomChange::Create { .. })
+            && (self.slots.len() >= MAX_ROOMS || self.definitions.next_id == u64::MAX)
+        {
+            return Err(Error::Invalid);
+        }
+        let created_id = self.definitions.next_id;
         let next = self
             .definitions
             .revised(expected, |rooms| match change {
-                RoomChange::Rename { name, .. } => rooms.rooms[index].name = name,
+                RoomChange::Create { name } => {
+                    rooms.rooms.push(Room {
+                        id: RoomId(created_id),
+                        name,
+                        description: String::new(),
+                        assignment: AssignmentMode::Free,
+                    });
+                    rooms.next_id += 1;
+                }
+                RoomChange::Rename { name, .. } => {
+                    rooms.rooms[index.expect("validated room")].name = name
+                }
+                RoomChange::SetDescription { description, .. } => {
+                    rooms.rooms[index.expect("validated room")].description = description;
+                }
+                RoomChange::SetAssignment { assignment, .. } => {
+                    rooms.rooms[index.expect("validated room")].assignment = match assignment {
+                        niwoe_ipc::RoomAssignment::Free => AssignmentMode::Free,
+                        niwoe_ipc::RoomAssignment::Preferred => AssignmentMode::Preferred,
+                        niwoe_ipc::RoomAssignment::Dedicated => AssignmentMode::Dedicated,
+                    };
+                }
                 RoomChange::Move { position, .. } => {
-                    let room = rooms.rooms.remove(index);
+                    let room = rooms.rooms.remove(index.expect("validated room"));
                     rooms.rooms.insert(position, room);
+                }
+                RoomChange::Delete { .. } => {
+                    rooms.rooms.remove(index.expect("validated room"));
                 }
             })
             .map_err(|_| Error::Invalid)?;
         let path = self.path.as_ref().ok_or(Error::Storage)?;
         match store::save(path, &self.definitions, &next) {
             Ok(()) => {
+                self.sync_slots(&next);
                 self.definitions = next;
                 Ok(())
             }
             Err(store::StoreError::PublishedButNotSynced(_)) => {
+                self.sync_slots(&next);
                 self.definitions = next;
                 Err(Error::Durability)
             }
@@ -60,6 +105,16 @@ impl RoomRegistry {
             Err(error) => {
                 tracing::warn!(%error, "room mutation could not be persisted");
                 Err(Error::Storage)
+            }
+        }
+    }
+
+    fn sync_slots(&mut self, next: &Rooms) {
+        self.slots
+            .retain(|id| next.rooms.iter().any(|room| room.id == *id));
+        for room in &next.rooms {
+            if !self.slots.contains(&room.id) {
+                self.slots.push(room.id);
             }
         }
     }
@@ -76,8 +131,6 @@ impl RoomRegistry {
         })
     }
 
-    /// Temporary nine-slot compatibility boundary. Do not accept a larger
-    /// catalog until all legacy fixed-size shell/WM consumers have migrated.
     pub fn open(directory: &Path) -> Result<Self, Box<dyn std::error::Error>> {
         fs::create_dir_all(directory)?;
         let lock_path = directory.join("rooms.lock");
@@ -96,9 +149,6 @@ impl RoomRegistry {
             .try_lock()
             .map_err(|e| format!("Raumkonfiguration bereits gesperrt oder nicht sperrbar: {e}"))?;
         let definitions = store::load_or_initialize(&directory.join("rooms.toml"))?;
-        if definitions.rooms.len() != LEGACY_ROOMS {
-            return Err("Dieser Übergangsstand unterstützt genau neun persistente Räume; Datei bleibt unverändert".into());
-        }
         let mut registry = Self::from_definitions(definitions)?;
         registry._writer = Some(writer);
         registry.path = Some(directory.join("rooms.toml"));

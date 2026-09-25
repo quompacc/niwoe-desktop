@@ -17,6 +17,10 @@ impl NiwoeShell {
 
     fn needs_fast_tick(&self) -> bool {
         self.deck_mutation.pending()
+            || self.network_popup_open
+                && self.settings_refresh_inflight.contains(
+                    &crate::settings_view::SettingsCategory::Network,
+                )
             || self.armed_power.is_some()
             || self.thumbnail_dirty && self.thumbnail_popup_open
             || !self.thumbnail_popup_open
@@ -86,7 +90,12 @@ impl NiwoeShell {
         self.poll_deck_mutations(qh);
         if self.workspace_state.rooms.expire() {
             self.ipc.send(&niwoe_ipc::ShellCommand::RequestRoomSnapshot);
-            self.draw_workspace_popup(qh, RepaintReason::Clock);
+            if self.room_configuration_id.is_some() {
+                self.room_configuration_save_pending = false;
+                self.draw_launcher(qh, RepaintReason::Clock);
+            } else {
+                self.draw_workspace_popup(qh, RepaintReason::Clock);
+            }
         }
 
         self.maybe_log_repaint_stats(now);
@@ -148,15 +157,19 @@ impl NiwoeShell {
             self.refresh_thumbnail_popup(qh);
         }
 
-        // Drive the power-button countdown ring: on timeout, clear the armed
-        // state and redraw so the ring vanishes; while armed, redraw every
-        // tick so the ring visibly drains.
+        // Drive the launcher's countdown ring while visible. Deck confirmation
+        // is static and only needs a repaint when the armed state expires.
         if let Some((_, armed_at)) = &self.armed_power {
             let elapsed = armed_at.elapsed().as_millis();
             if elapsed >= crate::POWER_ARM_TIMEOUT_MS {
                 self.armed_power = None;
-                self.draw_launcher(qh, crate::wayland::RepaintReason::Pointer);
-            } else {
+                if self.network_popup_open {
+                    self.draw_network_popup(qh, crate::wayland::RepaintReason::Clock);
+                }
+                if self.launcher_state.open {
+                    self.draw_launcher(qh, crate::wayland::RepaintReason::Pointer);
+                }
+            } else if self.launcher_state.open {
                 self.draw_launcher(qh, crate::wayland::RepaintReason::Pointer);
             }
         }
@@ -201,6 +214,11 @@ impl NiwoeShell {
                 crate::settings_refresh::SettingsData::Network { profiles, wifi } => {
                     self.network_profiles = profiles;
                     self.wifi_networks = wifi;
+                    if self.network_popup_open
+                        && self.network_popup_tab == crate::network_popup::NetworkTab::Wifi
+                    {
+                        self.draw_network_popup(qh, RepaintReason::Ipc);
+                    }
                 }
                 crate::settings_refresh::SettingsData::Bluetooth(value) => {
                     self.bluetooth_snapshot = value;
@@ -283,6 +301,11 @@ impl NiwoeShell {
         self.consent_app_id = app_id;
         self.consent_open = true;
         self.consent_hover = None;
+        // A remapped layer can lose its pending interactivity state. Restore
+        // the keyboard grab with the size before the next buffer commit.
+        self.consent_layer.set_keyboard_interactivity(
+            smithay_client_toolkit::shell::wlr_layer::KeyboardInteractivity::Exclusive,
+        );
         // Re-assert the modal's geometry on every open: after the first close +
         // re-open cycle sctk's pending set_size is gone, so without this the next
         // commit attempts width=0 and wlr-layer-shell sends error 1, killing the
@@ -353,8 +376,8 @@ impl NiwoeShell {
     }
 
     /// Switch the network tray popup between the Status and WLAN tabs. Entering
-    /// the WLAN tab refreshes the (cached, fast) scan + saved-profile list so
-    /// the list and "secured/known" decisions are current.
+    /// the WLAN tab shows the last snapshot immediately, then refreshes the
+    /// scan and saved profiles off the Wayland event loop.
     pub(crate) fn switch_network_tab(
         &mut self,
         qh: &QueueHandle<Self>,
@@ -365,8 +388,7 @@ impl NiwoeShell {
         }
         self.network_popup_tab = tab;
         if tab == crate::network_popup::NetworkTab::Wifi {
-            self.network_profiles = crate::network::list_saved_connections();
-            self.wifi_networks = crate::network::scan_wifi_networks();
+            self.request_settings_refresh(crate::settings_view::SettingsCategory::Network);
         } else {
             // Back to the Status tab: re-poll so it reflects the current primary
             // connection (it may have changed while the WLAN tab was open).

@@ -1,5 +1,94 @@
 # Panelkorrektur nach verbindlichem Mockup
 
+## Eingabebefund vom 25.09.2026
+
+Die visuelle Panel-Freigabe vom 24.09. bleibt bestehen. Beim aktuellen
+Fedora-Bedienlauf brauchte die Raum-2-Schaltfläche laut Nutzer mehrere
+Klickversuche. Ein danach aufgenommener nativer Screenshot
+(`target/p03-room2-click-live.png`) zeigt Raum 2 mit aktivem Goldrahmen;
+damit ist die Raumwahl schließlich angekommen. Die Codeprüfung zeigte die
+Ursache: Panel und Hub sendeten `SwitchWorkspace` beim Drücken der linken
+Maustaste. Der Compositor verwirft einen Raumwechsel während eines aktiven
+Zeiger-Grabs. Beide Raumwahlen lösen jetzt beim Loslassen aus, wie bereits
+die Auswahl im Raum-Popup. Andere Panel- und Hub-Aktionen bleiben beim
+Drücken. Die vorübergehende Klickspur wurde vor dem Release entfernt.
+Fedora `cargo fmt --all -- --check`, `cargo check --workspace --locked`,
+`cargo test --workspace --locked -q`,
+`cargo clippy --workspace --all-targets --locked -- -D warnings` und
+`cargo build --release -p niwoe-shell --locked` sind grün. Release-SHA-256:
+`4ffba769df2af79902fd019776326a6c63ae010177d06796b3f8a3ab69593b1d`.
+`/usr/local/bin/niwoe-shell` und `/proc/47939/exe` sind bytegleich mit dem
+Release. Die KDE-/GTK-Konfiguration blieb unverändert. Ein virtueller
+Hardware-Mausklick auf Raum 1 und danach genau einer auf Raum 2 wurde durch
+native Screenshots bestätigt: `target/p03-room1-after-single-click.png` und
+`target/p03-room2-after-single-click.png`. Jeder Klick wechselte sofort den
+markierten aktiven Raum. Ein separater Hub-Kartentest öffnete den Hub mit
+`Super+Space`, wählte Raum 1 mit einem Klick und schloss den Hub; der native
+Beleg liegt unter `target/p04-hub-room1-after-click.png`. Danach wurde Raum 2
+wiederhergestellt. Für diese Klickprüfung entsteht keine Laufzeit-Arbeit im
+Produkt; die virtuelle Eingabe und Screenshots sind externe Testwerkzeuge.
+
+**Nutzerklarstellung 24.09.2026:** Das Panel war bereits in Ordnung. Keine weitere
+Panelgestaltung und kein erneuter visueller Blocker. Der installierte Stand mit
+stabiler Raumfolge bleibt erhalten; die nächste UI-Arbeit ist der vollständige
+Hub aus `17_13_54 (2)`. Die frühere Formulierung einer noch offenen ausdrücklichen
+Panelabnahme ist damit überholt.
+
+## 24.09.2026: stabile Raumfolge statt aktivitätsabhängigem Ausschnitt
+
+Nach erneuter Prüfung der verbindlichen letzten vier Mockups ist die Raumgruppe
+im Panel jetzt stabil. Ein Raumwechsel verschiebt die sichtbaren Tabs nicht mehr
+um den aktiven Raum. Die Leiste zeigt stets den Anfang der gespeicherten
+Raumreihenfolge, soweit er in die linke Spur passt. Weitere Räume bleiben über
+den Überlauf erreichbar. Dieser zeigt die Anzahl der ausgeblendeten Räume und
+erhält Akzentfläche und Kontur, wenn der aktive Raum darin liegt. Wenn alle Räume
+direkt passen, entfällt der bisher ständig sichtbare Überlauf vollständig.
+
+Geändert wurden `panel_view/rooms.rs`, `panel_view/chips.rs`,
+`panel_view/layout.rs` und `panel_view_tests.rs`. Material, mittige Uhr,
+Statusgruppe, Panelhöhe, Renderreihenfolge und IPC bleiben unverändert. Die
+zusätzlichen Regressionen prüfen eine identische sichtbare Folge bei Wechsel von
+Raum 1 zu Raum 9, den vollständigen Vier-Raum-Fall ohne Überlauf sowie weiterhin
+kollisionsfreie Ziele in beiden Themes und den vorhandenen Viewportbreiten.
+
+Performance: keine neuen Abfragen, Timer, Assets oder Renderpasses. Die Auswahl
+der sichtbaren Präfixlänge läuft nur beim bestehenden Panel-Neuaufbau. Der
+Überlauf zeichnet höchstens dieselbe tokenbasierte Akzentfläche und Kontur wie
+ein aktiver Raumtab.
+
+Fedora-Prüfungen: `cargo fmt --all -- --check`,
+`cargo check --workspace --locked`, `cargo test --workspace --locked`,
+`cargo clippy --workspace --all-targets --locked -- -D warnings` und
+`cargo build --release -p niwoe-shell --locked` bestanden. Lokaler Design-Guard
+und `git diff --check` bestanden. Die native 1024-Pixel-Rasterung unter
+`target/p03-room-rail/panel-1024.png` wurde angesehen; sie zeigt die stabile
+Folge `Raum 1`, `Raum 2`, danach den Überlauf `+7`, die mittige Uhr und getrennte
+Statusziele. Die Rasterung belegt keinen compositorseitigen Blur.
+
+Releaseinstallation wurde versucht, aber `sudo -n` verlangt das Nutzerpasswort;
+es wurde nichts installiert. Der geprüfte Ein-Schritt-Installer liegt auf Fedora
+unter `/home/eduard/niwoe-desktop/target/p03-room-rail/install.sh`. Er installiert
+nur die geänderte Shell, prüft Release-/Installationsidentität und unveränderte
+KDE-/GTK-Konfiguration und beendet danach die laufende Shell, damit der
+Compositor-Watchdog den neuen Stand startet. Visuelle DRM-Abnahme bleibt bis zur
+Ausführung dieses Skripts offen.
+
+**Installation anschließend durch den Nutzer ausgeführt und unabhängig geprüft.**
+Release, `/usr/local/bin/niwoe-shell` und `/proc/9344/exe` sind bytegleich mit
+SHA-256 `4e39f6a83997aef2c874b4c1601c1c42df90abb9e9530e3b1eb113cbde688dc9`.
+Der Watchdog ersetzte die vorherige Shell PID 1655 durch PID 9344; der laufende
+Compositor PID 1641 blieb erhalten. Die vor/nach der Installation erfassten
+KDE-/GTK-Konfigurationsdateien sind unverändert.
+
+Reale DRM-Aufnahme des installierten 1920×1080-Stands:
+`target/p03-room-rail/panel-live.png` auf Fedora und lokal
+`target/p03-room-rail-panel-live.png`. Angesehen: vier stabile direkte Tabs
+`Raum 1` bis `Raum 4`, danach `+5`, Uhr exakt in der Outputmitte, Such- und
+Statusgruppe rechts, freigegebenes Panelmaterial über strukturiertem Wallpaper.
+Die technische Installation und Sichtprüfung sind damit belegt. Die ausdrückliche
+Nutzerabnahme des sichtbaren Panels bleibt offen; P03 wird bis dahin nicht als
+`accepted` markiert und P04 nicht begonnen.
+
 ## Aktuell: Schriftzentrierung und größere Uhrzeit
 
 Nutzer hat den installierten Materialabgleich visuell als sehr gut bestätigt.

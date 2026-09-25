@@ -208,7 +208,7 @@ macro_rules! xwm_state_request_methods {
                 true,
             );
 
-            if workspace == self.workspaces.active {
+            if !self.lobby_active && workspace == self.workspaces.active {
                 self.workspaces
                     .space_at_mut(workspace)
                     .raise_element(&minimized.window, true);

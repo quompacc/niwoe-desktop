@@ -28,7 +28,7 @@ niwoe-tokens + niwoe-config
    ▼
 shared niwoe-ui primitives
    ├─ panel
-   ├─ launcher
+   ├─ hub
    ├─ Quick Settings
    ├─ login / lock
    └─ later system tools
@@ -36,7 +36,8 @@ shared niwoe-ui primitives
 
 ## 4. Non-negotiable invariants
 
-- exactly two themes, light and dark, identical except for color tables
+- one active dark green NIWOE theme for the desktop alpha; the existing light
+  palette may remain as unused code pending a later product decision
 - no local color, alpha, radius, mix or geometry constants in production UI
 - explicit guard rationale for unavoidable brand assets or test fixtures
 - no compass/brand theater in everyday UI
@@ -47,10 +48,10 @@ shared niwoe-ui primitives
 ## 5. Native quality sequence
 
 1. stabilize the panel's geometry, content, input and output-scale behavior;
-2. bring the launcher to the archived prototype's visual quality and preserve
-   its keyboard-first application-catalog behavior;
+2. build the complete Hub surface from the binding mockup and preserve
+   keyboard-first navigation;
 3. implement one coherent native Quick Settings surface;
-4. verify both themes, accessibility, scale and input paths;
+4. verify the green theme, accessibility, scale and input paths;
 5. record start-up, idle and interaction performance on the Fedora Acer;
 6. only then expand Settings, notifications, overview and system tools.
 
@@ -84,11 +85,12 @@ Centralization is complete only when:
 
 1. the manifest remains the highest visual authority;
 2. Rust types and validated config are the only editable token source;
-3. panel, launcher and Quick Settings use shared native primitives without local
+3. panel, Hub and Quick Settings use shared native primitives without local
    production design constants;
 4. design and source-size guards are green;
-5. both themes have identical layout, radius, blur and shadow geometry;
-6. theme and config changes propagate without restarting the compositor;
+5. the green theme draws layout, radius, blur and shadow values from the
+   shared token and config sources;
+6. central palette and config changes propagate without restarting the compositor;
 7. caches have explicit invalidation and idle measurements;
 8. branding remains limited to the manifest-approved surfaces;
 9. no WebKit, GTK or alternate shell renderer is required for the desktop.

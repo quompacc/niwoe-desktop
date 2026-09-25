@@ -12,6 +12,8 @@ use crate::wayland::{CommitReason, RepaintReason, SurfaceKind};
 
 use super::NiwoeShell;
 
+mod room_navigation;
+
 impl KeyboardHandler for NiwoeShell {
     fn enter(
         &mut self,
@@ -379,6 +381,17 @@ impl KeyboardHandler for NiwoeShell {
         // grabs the keyboard; the Settings page no longer captures it inline.)
 
         // ── Settings view: type-to-search; Escape clears then exits ───────────
+        if self.room_management_open {
+            if self.room_configuration_id.is_some() {
+                self.room_configuration_key(qh, event.keysym);
+            } else if is_escape {
+                self.return_to_hub(qh);
+            } else {
+                self.room_management_navigation_key(qh, event.keysym);
+            }
+            return;
+        }
+
         if self.launcher_settings_open {
             if is_escape {
                 if !self.settings_search.is_empty() {
@@ -414,7 +427,15 @@ impl KeyboardHandler for NiwoeShell {
         let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
 
         if is_escape {
-            self.close_launcher_after_launch(qh, RepaintReason::Keyboard);
+            if self.hub_search_active {
+                self.search_query.clear();
+                self.hub_search_active = false;
+                self.launcher_selected_idx = None;
+                self.app_view_scroll_y = 0;
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+            } else {
+                self.close_launcher_after_launch(qh, RepaintReason::Keyboard);
+            }
             return;
         }
 
@@ -426,30 +447,36 @@ impl KeyboardHandler for NiwoeShell {
             return;
         }
 
-        if let Some(direction) = grid_direction {
-            let filtered = crate::app_view::collect_palette_apps(
-                &self.launcher_state.apps,
-                &self.search_query,
-                &self.hidden_execs,
-                self.launcher_state.category,
-                &self.pinned_apps,
-            );
-            let n = filtered.len();
-            self.launcher_selected_idx =
-                crate::app_view::next_grid_selection(self.launcher_selected_idx, n, direction);
-            if let Some(selected_idx) = self.launcher_selected_idx {
-                self.app_view_scroll_y = crate::app_view::scroll_grid_selection_into_view(
-                    self.app_view_scroll_y,
-                    selected_idx,
-                    n,
-                    self.launcher_content_size().1,
-                );
-            }
-            self.draw_launcher(qh, RepaintReason::Keyboard);
+        if !self.hub_search_active && self.hub_navigation_key(qh, event.keysym) {
             return;
         }
 
-        if is_enter {
+        if self.hub_search_active {
+            if let Some(direction) = grid_direction {
+                let filtered = crate::app_view::collect_palette_apps(
+                    &self.launcher_state.apps,
+                    &self.search_query,
+                    &self.hidden_execs,
+                    self.launcher_state.category,
+                    &self.pinned_apps,
+                );
+                let n = filtered.len();
+                self.launcher_selected_idx =
+                    crate::app_view::next_grid_selection(self.launcher_selected_idx, n, direction);
+                if let Some(selected_idx) = self.launcher_selected_idx {
+                    self.app_view_scroll_y = crate::app_view::scroll_grid_selection_into_view(
+                        self.app_view_scroll_y,
+                        selected_idx,
+                        n,
+                        self.launcher_content_size().1,
+                    );
+                }
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+                return;
+            }
+        }
+
+        if is_enter && self.hub_search_active {
             let filtered = crate::app_view::collect_palette_apps(
                 &self.launcher_state.apps,
                 &self.search_query,
@@ -468,6 +495,8 @@ impl KeyboardHandler for NiwoeShell {
 
         let ch = event.keysym.key_char().filter(|c| !c.is_control());
         if let Some(c) = ch {
+            self.hub_search_active = true;
+            self.room_keyboard_focus = None;
             self.search_query.push(c);
             self.launcher_selected_idx = None;
             self.app_view_scroll_y = 0;

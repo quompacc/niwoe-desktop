@@ -266,6 +266,21 @@ impl Launcher {
         ..Self::DEFAULT
     };
 
+    /// Shared outer geometry for Hub overview and its inline search state.
+    pub const HUB: Launcher = Launcher {
+        width: crate::Hub::DEFAULT.width,
+        height: crate::Hub::DEFAULT.height,
+        header_height: 104,
+        footer_height: 48,
+        app_card_height: 60,
+        grid_gap: 4,
+        grid_columns: 1,
+        sidebar_width: 0,
+        content_pad: 24,
+        app_heading_height: 0,
+        ..Self::DEFAULT
+    };
+
     pub const DEFAULT: Launcher = Launcher {
         width: 880,
         height: 620,

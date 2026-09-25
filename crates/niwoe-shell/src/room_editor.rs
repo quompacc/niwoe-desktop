@@ -28,6 +28,8 @@ impl Default for RoomUi {
                         id: workspace as u64,
                         workspace,
                         name: format!("Raum {workspace}"),
+                        description: String::new(),
+                        assignment: niwoe_ipc::RoomAssignment::Free,
                     })
                     .collect(),
             },
@@ -63,15 +65,18 @@ impl RoomUi {
         let ids: std::collections::HashSet<_> = snapshot.rooms.iter().map(|r| r.id).collect();
         let slots: std::collections::HashSet<_> =
             snapshot.rooms.iter().map(|r| r.workspace).collect();
-        if snapshot.rooms.len() != 9
-            || ids.len() != 9
-            || slots.len() != 9
+        let count = snapshot.rooms.len();
+        if !(1..=niwoe_config::rooms::MAX_ROOMS).contains(&count)
+            || ids.len() != count
+            || slots.len() != count
             || snapshot.rooms.iter().any(|r| {
                 r.id == 0
-                    || !(1..=9).contains(&r.workspace)
+                    || !(1..=count as u8).contains(&r.workspace)
                     || r.name.trim().is_empty()
                     || r.name.chars().count() > 64
                     || r.name.chars().any(char::is_control)
+                    || r.description.chars().count() > niwoe_config::rooms::MAX_DESCRIPTION_CHARS
+                    || r.description.chars().any(|c| c.is_control() && c != '\n')
             })
             || self.ready && snapshot.revision < self.snapshot.revision
         {

@@ -12,7 +12,7 @@ use niwoe_ui::{
 };
 use std::collections::HashSet;
 use tiny_skia::{Pixmap, PixmapMut, PixmapPaint, Transform};
-const L: Launcher = Launcher::SEARCH;
+const L: Launcher = Launcher::HUB;
 const S: Spacing = Spacing::DEFAULT;
 const ROW: i32 = L.app_card_height + L.grid_gap;
 

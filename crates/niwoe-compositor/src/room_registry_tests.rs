@@ -1,4 +1,5 @@
 use super::*;
+use niwoe_config::rooms::LEGACY_ROOMS;
 use std::{
     path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
@@ -140,7 +141,7 @@ fn damaged_file_is_preserved_and_error_releases_lock() {
 }
 
 #[test]
-fn unsupported_dynamic_count_does_not_rewrite_saved_rooms() {
+fn dynamic_count_reopens_without_rewriting_saved_rooms() {
     let f = Fixture::new();
     let path = f.0.join("rooms.toml");
     let old = store::load_or_initialize(&path).unwrap();
@@ -151,6 +152,97 @@ fn unsupported_dynamic_count_does_not_rewrite_saved_rooms() {
         .unwrap();
     store::save(&path, &old, &next).unwrap();
     let before = fs::read(&path).unwrap();
-    assert!(RoomRegistry::open(&f.0).is_err());
+    let registry = RoomRegistry::open(&f.0).unwrap();
+    assert_eq!(registry.slot_count(), LEGACY_ROOMS - 1);
     assert_eq!(fs::read(&path).unwrap(), before);
+}
+
+#[test]
+fn create_delete_keep_stable_ids_and_compact_slots() {
+    use niwoe_ipc::{RoomChange, RoomMutationError};
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    registry
+        .apply(0, RoomChange::Create { name: "Neu".into() })
+        .unwrap();
+    assert_eq!(registry.slot_for_room(RoomId(10)), Some(9));
+    assert_eq!(registry.slot_count(), 10);
+    assert_eq!(
+        registry.apply(
+            0,
+            RoomChange::Delete {
+                id: 2,
+                target_id: 1
+            }
+        ),
+        Err(RoomMutationError::Conflict)
+    );
+    registry
+        .apply(
+            1,
+            RoomChange::Delete {
+                id: 2,
+                target_id: 1,
+            },
+        )
+        .unwrap();
+    assert_eq!(registry.slot_for_room(RoomId(2)), None);
+    assert_eq!(registry.slot_for_room(RoomId(10)), Some(8));
+    assert_eq!(registry.slot_count(), 9);
+    assert_eq!(
+        registry.apply(
+            2,
+            RoomChange::Delete {
+                id: 1,
+                target_id: 1
+            }
+        ),
+        Err(RoomMutationError::Invalid)
+    );
+    drop(registry);
+    let reopened = RoomRegistry::open(&f.0).unwrap();
+    assert_eq!(reopened.slot_for_room(RoomId(10)), Some(8));
+    assert_eq!(reopened.definitions().next_id, 11);
+}
+
+#[test]
+fn room_metadata_is_validated_and_persisted() {
+    use niwoe_ipc::{RoomAssignment, RoomChange, RoomMutationError};
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    assert_eq!(
+        registry.apply(
+            0,
+            RoomChange::SetDescription {
+                id: 1,
+                description: "x".repeat(201),
+            }
+        ),
+        Err(RoomMutationError::Invalid)
+    );
+    registry
+        .apply(
+            0,
+            RoomChange::SetDescription {
+                id: 1,
+                description: "Entwicklung".into(),
+            },
+        )
+        .unwrap();
+    registry
+        .apply(
+            1,
+            RoomChange::SetAssignment {
+                id: 1,
+                assignment: RoomAssignment::Preferred,
+            },
+        )
+        .unwrap();
+    drop(registry);
+    let reopened = RoomRegistry::open(&f.0).unwrap();
+    assert_eq!(reopened.definitions().rooms[0].description, "Entwicklung");
+    assert_eq!(
+        reopened.definitions().rooms[0].assignment,
+        AssignmentMode::Preferred
+    );
 }

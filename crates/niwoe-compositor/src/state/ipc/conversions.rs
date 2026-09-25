@@ -1,5 +1,4 @@
-const WORKSPACE_COUNT: usize = 9;
-const MAX_WORKSPACE_INDEX: u8 = (WORKSPACE_COUNT - 1) as u8;
+const MAX_WORKSPACE_INDEX: u8 = (niwoe_config::rooms::MAX_ROOMS - 1) as u8;
 
 pub(super) fn ipc_workspace_to_index(workspace: u8) -> usize {
     usize::from(workspace.saturating_sub(1).min(MAX_WORKSPACE_INDEX))
@@ -18,8 +17,8 @@ mod tests {
         assert_eq!(ipc_workspace_to_index(0), 0);
         assert_eq!(ipc_workspace_to_index(1), 0);
         assert_eq!(ipc_workspace_to_index(9), 8);
-        assert_eq!(ipc_workspace_to_index(10), 8);
-        assert_eq!(ipc_workspace_to_index(255), 8);
+        assert_eq!(ipc_workspace_to_index(10), 9);
+        assert_eq!(ipc_workspace_to_index(255), 63);
     }
 
     #[test]

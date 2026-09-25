@@ -189,6 +189,12 @@ impl NiwoeState {
                     return;
                 };
 
+                // A quick launch from the foyer needs a window context. The
+                // first room becomes active only after this explicit action.
+                if self.lobby_active {
+                    self.switch_workspace(0);
+                }
+
                 tracing::info!(
                     "launching app from shell: program={:?} args={:?}",
                     spec.program,
@@ -487,6 +493,16 @@ impl NiwoeState {
     }
 
     pub fn focus_window_by_id(&mut self, id: &str) {
+        if self.lobby_active {
+            let target = (0..self.workspaces.count()).find(|&idx| {
+                self.workspaces.space_at(idx).elements().any(|window| {
+                    window_list_entry(window).is_some_and(|(window_id, _)| window_id == id)
+                })
+            });
+            if let Some(target) = target {
+                self.switch_workspace(target);
+            }
+        }
         let idx = self.current_workspace_index();
         let mapped_window = self
             .workspaces

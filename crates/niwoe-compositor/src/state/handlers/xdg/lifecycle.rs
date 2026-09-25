@@ -92,7 +92,7 @@ pub(super) fn handle_new_toplevel(state: &mut NiwoeState, surface: ToplevelSurfa
     }
 
     let serial = SERIAL_COUNTER.next_serial();
-    if state.seat.get_keyboard().is_some() {
+    if !state.lobby_active && state.seat.get_keyboard().is_some() {
         state.set_keyboard_focus_with_decorations(Some(wl_surface.clone()), serial);
         state.update_focused_output_from_surface(&wl_surface, "keyboard-focus-new-toplevel");
         state.broadcast_toplevel_focused(&wl_surface);

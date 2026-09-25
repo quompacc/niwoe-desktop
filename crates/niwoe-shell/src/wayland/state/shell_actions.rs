@@ -121,11 +121,12 @@ impl NiwoeShell {
     }
 
     /// Arm a power button (1st click of a confirm-twice action). Replaces any
-    /// previously-armed button and triggers a launcher repaint so the user
-    /// sees the countdown ring start filling.
+    /// previously-armed button and repaints the launcher when visible.
     pub(crate) fn arm_power(&mut self, qh: &QueueHandle<Self>, id: &str) {
         self.armed_power = Some((id.to_string(), std::time::Instant::now()));
-        self.draw_launcher(qh, crate::wayland::RepaintReason::Pointer);
+        if self.launcher_state.open {
+            self.draw_launcher(qh, crate::wayland::RepaintReason::Pointer);
+        }
     }
 
     pub(crate) fn close_launcher_after_launch(
@@ -138,11 +139,16 @@ impl NiwoeShell {
         }
         self.launcher_state.close();
         self.launcher_settings_open = false;
+        self.room_management_open = false;
+        self.room_configuration_id = None;
+        self.room_configuration_save_pending = false;
+        self.workspace_state.rooms.edit = None;
         self.settings_pinned_adding = false;
         self.launcher_selected_idx = None;
         self.search_query.clear();
         self.app_view_scroll_y = 0;
         self.hovered_bento_idx = None;
+        self.room_keyboard_focus = None;
         self.hovered_app_card_idx = None;
         self.launcher_layer
             .set_keyboard_interactivity(KeyboardInteractivity::OnDemand);

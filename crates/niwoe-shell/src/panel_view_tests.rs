@@ -176,7 +176,11 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
     assert!(clicks
         .iter()
         .any(|z| z.id.as_deref() == Some("panel-search")
-            && matches!(z.action, ClickAction::ToggleLauncher)));
+            && matches!(z.action, ClickAction::OpenHubSearch)));
+    assert!(clicks.iter().any(|z| {
+        z.id.as_deref() == Some("panel-screenshot")
+            && matches!(z.action, ClickAction::TakeScreenshot)
+    }));
     assert!(
         clicks
             .iter()
@@ -185,9 +189,9 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
     );
     let zone = |id| clicks.iter().find(|z| z.id.as_deref() == Some(id)).unwrap();
     let launcher = zone("panel-launcher");
-    let workspace = zone("panel-workspace");
     let status = zone("panel-status");
     let clock = zone("panel-clock");
+    let workspace = zone("panel-workspace");
     assert!(launcher.rect.x + launcher.rect.w <= workspace.rect.x);
     assert!(workspace.rect.x + workspace.rect.w <= clock.rect.x);
     assert!(clock.rect.x + clock.rect.w <= status.rect.x);
@@ -208,6 +212,106 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
         zone.id.as_deref(),
         Some("panel-network" | "panel-sound" | "panel-battery")
     )));
+}
+
+#[test]
+fn panel_room_rail_keeps_the_same_prefix_when_active_room_changes() {
+    let icons = IconCache::new();
+    let audio = AudioSnapshot::unavailable();
+    let room_ids = |active_workspace| {
+        let tree = build_panel_widget_tree(
+            1366,
+            &[],
+            &[],
+            &NetworkState::Disconnected,
+            &audio,
+            &[],
+            false,
+            false,
+            &crate::battery::BatterySnapshot::default(),
+            None,
+            active_workspace,
+            9,
+            &[],
+            "12:34",
+            &icons,
+            None,
+            &Theme::TOKYO_NIGHT_METRO,
+        );
+        let layout = compute_layout(
+            &*tree,
+            PixelSize {
+                width: 1366,
+                height: PANEL_HEIGHT,
+            },
+        )
+        .unwrap();
+        let mut zones = Vec::new();
+        collect_click_zones(&*tree, &layout.root, 0, 0, &mut zones);
+        zones
+            .into_iter()
+            .filter_map(|zone| zone.id.filter(|id| id.starts_with("panel-room-")))
+            .collect::<Vec<_>>()
+    };
+
+    assert_eq!(room_ids(1), room_ids(9));
+    assert_eq!(
+        room_ids(1),
+        vec![
+            "panel-room-1",
+            "panel-room-2",
+            "panel-room-3",
+            "panel-room-4"
+        ]
+    );
+}
+
+#[test]
+fn panel_omits_room_overflow_when_every_room_fits() {
+    let icons = IconCache::new();
+    let tree = build_panel_widget_tree(
+        1920,
+        &[],
+        &[],
+        &NetworkState::Disconnected,
+        &AudioSnapshot::unavailable(),
+        &[],
+        false,
+        false,
+        &crate::battery::BatterySnapshot::default(),
+        None,
+        4,
+        4,
+        &[],
+        "12:34",
+        &icons,
+        None,
+        &Theme::TOKYO_NIGHT_METRO,
+    );
+    let layout = compute_layout(
+        &*tree,
+        PixelSize {
+            width: 1920,
+            height: PANEL_HEIGHT,
+        },
+    )
+    .unwrap();
+    let mut zones = Vec::new();
+    collect_click_zones(&*tree, &layout.root, 0, 0, &mut zones);
+
+    assert!(zones
+        .iter()
+        .all(|zone| zone.id.as_deref() != Some("panel-workspace")));
+    assert_eq!(
+        zones
+            .iter()
+            .filter(|zone| zone
+                .id
+                .as_deref()
+                .is_some_and(|id| id.starts_with("panel-room-")))
+            .count(),
+        4
+    );
 }
 
 #[test]
@@ -255,9 +359,13 @@ fn panel_layout_keeps_clock_centered_and_controls_separate_across_viewports() {
                     .find(|z| z.id.as_deref() == Some("panel-clock"))
                     .unwrap();
                 assert!((clock.rect.x * 2 + clock.rect.w - width as i32).abs() <= 1);
-                assert!(zones
+                let active_directly_visible = zones
                     .iter()
-                    .any(|z| matches!(z.action, ClickAction::SwitchWorkspace(w) if w == active)));
+                    .any(|z| matches!(z.action, ClickAction::SwitchWorkspace(w) if w == active));
+                let room_overflow_visible = zones
+                    .iter()
+                    .any(|z| matches!(z.action, ClickAction::ToggleWorkspacePopup));
+                assert!(active_directly_visible || room_overflow_visible);
                 for (index, zone) in zones.iter().enumerate() {
                     assert!(zone.rect.x >= 0 && zone.rect.x + zone.rect.w <= width as i32);
                     for other in zones.iter().skip(index + 1) {

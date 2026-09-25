@@ -228,21 +228,27 @@ impl LayerShellHandler for NiwoeShell {
                 self.launcher_is_fullscreen
             );
             if self.launcher_is_fullscreen {
-                // Fullscreen mode: reassert all-edge anchors and zero size on
-                // each configure so reopen cycles keep a valid stretched layer.
+                // Fullscreen mode: the Hub spans the output; Control Center
+                // starts below the persistent panel reservation.
                 self.launcher_layer
                     .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
                 self.launcher_layer.set_margin(0, 0, 0, 0);
-                self.launcher_layer.set_exclusive_zone(0);
+                self.launcher_layer
+                    .set_exclusive_zone(if self.room_management_open { 0 } else { -1 });
                 self.launcher_layer.set_size(0, 0);
                 let w = configure.new_size.0.max(1);
                 let h = configure.new_size.1.max(1);
                 self.launcher_configured = true;
                 self.launcher_width = w;
                 self.launcher_height = h;
-                let (x, y, _, _) = self.launcher_geometry().fitted_rect(w, h);
-                self.launcher_visual_x = x;
-                self.launcher_visual_y = y;
+                if self.room_management_open {
+                    self.launcher_visual_x = 0;
+                    self.launcher_visual_y = 0;
+                } else {
+                    let (x, y, _, _) = self.launcher_geometry().fitted_rect(w, h);
+                    self.launcher_visual_x = x;
+                    self.launcher_visual_y = y;
+                }
                 tracing::debug!(
                     "launcher fullscreen: {}x{} visual@({},{})",
                     w,

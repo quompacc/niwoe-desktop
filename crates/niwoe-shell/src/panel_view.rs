@@ -112,7 +112,8 @@ fn action_for_id_as_click(id: &str) -> Option<ClickAction> {
         return Some(ClickAction::ActivateStatusNotifierItem(idx));
     }
     match id {
-        "panel-launcher" | "panel-search" => Some(ClickAction::ToggleLauncher),
+        "panel-launcher" => Some(ClickAction::ToggleLauncher),
+        "panel-search" => Some(ClickAction::OpenHubSearch),
         "panel-status" => Some(ClickAction::ToggleNetworkPopup),
         "panel-workspace" => Some(ClickAction::ToggleWorkspacePopup),
         "panel-screenshot" => Some(ClickAction::TakeScreenshot),

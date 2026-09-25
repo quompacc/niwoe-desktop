@@ -210,7 +210,10 @@ impl Widget for PanelChip {
     }
 }
 
-struct PanelWorkspaceChip;
+struct PanelWorkspaceChip {
+    hidden_count: u8,
+    active_hidden: bool,
+}
 
 impl Widget for PanelWorkspaceChip {
     fn id(&self) -> Option<&'static str> {
@@ -230,15 +233,39 @@ impl Widget for PanelWorkspaceChip {
 
     fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
         paint_panel_control_background(area, canvas, theme, state);
-        let label = "…";
-        let (width, _) = measure_text(label, FONT_SIZE);
+        let label = format!("+{}", self.hidden_count);
+        let (width, _) = measure_text(&label, FONT_SIZE);
+        if self.active_hidden {
+            if let Some(path) = rounded_rect_path(area, niwoe_tokens::Radius::DEFAULT.sm) {
+                paint_fill(
+                    canvas,
+                    &path,
+                    Color::rgba(
+                        theme.palette.accent.r,
+                        theme.palette.accent.g,
+                        theme.palette.accent.b,
+                        PanelTokens::DEFAULT.active_alpha,
+                    ),
+                );
+                niwoe_ui::effect::paint_border(
+                    canvas,
+                    &path,
+                    theme.palette.accent,
+                    niwoe_tokens::Controls::BORDER as f32,
+                );
+            }
+        }
         paint_text(
             canvas,
-            label,
+            &label,
             area.x + (area.width - width) / 2,
             area.y + area.height / 2 + theme.spacing.xs,
             FONT_SIZE,
-            theme.palette.text,
+            if self.active_hidden {
+                theme.palette.accent
+            } else {
+                theme.palette.text
+            },
         );
     }
 }
