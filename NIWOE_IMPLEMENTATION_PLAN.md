@@ -1,10 +1,16 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-DRM-Nachtest vom 26.09.2026:** Nach Nutzer-Neulogin läuft `e1e21670…`.
+Native Fensterbereinigung im Hintergrundraum mit Dialog und minimiertem
+Elternfenster auf dem Zweimonitor-DRM-System bestanden; keine verwaisten
+Einträge, Raum-/Outputauswahl und Konfiguration unverändert.
+Monitorentfernung mit belegten Fenstern bleibt offen; P06 weiterhin in Arbeit.
+
 **P06-Zweimonitor-/Fehlerrunde vom 26.09.2026:** Unabhängige Raumwahl und
 Fensterzuordnung auf eDP/HDMI live geprüft. Defekte/unbekannte Raumdateien,
 letzter Raum, konkurrierende IPC-Mutation und Reconnect isoliert bestanden.
 Dabei gefundene verwaiste native Fenster im Hintergrundraum werden nun direkt
-beim Destroy entfernt; DRM-Nachprüfung des Fixes steht aus. USB-Hub auf
+beim Destroy entfernt; DRM-Nachprüfung inzwischen wie oben bestätigt. USB-Hub auf
 Nutzerwunsch abgeschlossen (Verkabelung erklärt den Befund). Details:
 [Zweimonitor- und Fehlerfälle](docs/phase-reports/P06_DUAL_OUTPUT_ERRORS.md).
 

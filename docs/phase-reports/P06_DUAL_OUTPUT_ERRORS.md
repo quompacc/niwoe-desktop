@@ -84,7 +84,25 @@ weiter mit `8c1d874c…`; laufende Sitzung nicht beendet.
 
 ## Verbleibende Live-Gates
 
-Korrigierte Fensterbereinigung nach Aktivierung des neuen Compositors auf DRM
-nachprüfen. Monitorentfernung mit belegten Fenstern und die vollständige
+Monitorentfernung mit belegten Fenstern und die vollständige
 Zweimonitor-/Skalierungs-Matrix bleiben offen. P07-Navigation über neun Räume
 wird nicht vorgezogen. Kein Cargo.toml-/Dependency-, Theme- oder Login-Umbau.
+
+## DRM-Nachtest nach Nutzer-Neulogin
+
+Am 26.09.2026 um 15:47:29 gestarteter Compositor PID 87272: tatsächlicher
+Binärhash `e1e2167078f550399c3b87cafea3197a4d0f25541981f6672721b08763e12484`
+bestätigt. Zwei Outputs vorhanden, keine Fenster vor dem Test.
+
+`python3 target/p06-close-live.py` erfolgreich (Exitcode 0): eigene native
+GTK-Anwendung erzeugt Elternfenster und Dialog im Quellraum; Elternfenster
+minimieren, anderen Raum aktivieren, Anwendung beenden. Beide Fenstereinträge
+verschwinden ohne nachträglichen Wechsel in den Quellraum. Aktiver Raum und
+vollständiger Output-Snapshot sind vor/nach Clientende identisch; Raum-Snapshot
+und Konfigurationsdatei bleiben unverändert. Keine Testfenster übrig.
+
+Belege: `target/p06-live-ui/close-after-login.json`,
+`target/p06-close-live-evidence/{before-exit,after-exit}.json`.
+Der korrigierte Destroy-Pfad ist damit zusätzlich zum isolierten Regressionstest
+auf DRM mit zwei angeschlossenen Outputs nachgewiesen. In dieser Nachprüfung
+nur Dokumentation geändert, keine erneute Rust-/Binäränderung.
