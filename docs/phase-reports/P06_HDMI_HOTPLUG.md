@@ -1,7 +1,7 @@
 # P06 – HDMI-Hotplug, 26.09.2026
 
 Status: **in-progress**. Der Nutzer bestätigt Bild auf beiden Monitoren nach
-Neulogin, meldet jedoch fehlschlagendes Hotplug. Die vollständige
+Neulogin und inzwischen erfolgreiches HDMI-Hotplug nach der zweiten Korrektur. Die vollständige
 Zweimonitor-Abnahme bleibt offen.
 
 ## Live-Befund
@@ -118,3 +118,21 @@ Atomar installierter und per `cmp`/SHA-256 geprüfter Compositor:
 `8c1d874cd054bc5994530619f9870b7af257dd477ef2203d6892b72bc1711a56`.
 Shell unverändert. PID 74773 läuft weiterhin mit `7cb65e3f…`; regulärer Neulogin
 ist für die Aktivierung erforderlich. Keine Sitzung automatisch beendet.
+
+## Live-Nachweis nach zweiter Korrektur
+
+Nutzer bestätigt erfolgreiches Hotplug. Compositor PID 79150 läuft mit dem
+installierten Hash `8c1d874c…`. Das Sitzungslog bestätigt am 26.09.2026 um
+13:22:52 UTC das Entfernen von Connector 119 / Output-ID 2 und um 13:22:55 UTC
+das erneute Hinzufügen desselben Connectors. Damit ist dieser physische
+HDMI-Ab-/Ansteckzyklus live nachgewiesen; Raum-/Fenstermigration mit belegten
+Fenstern und die vollständige Zweimonitor-Matrix sind damit nicht abgenommen.
+
+Separater Nutzerbefund: Tastatur/Maus über den Monitor-USB-Hub fehlen.
+`lsusb`, `lsusb -t` und `/proc/bus/input/devices` zeigen aktuell keinen
+externen Hub und keine externe USB-Tastatur/-Maus. Im Kerneljournal ist seit
+dem Boot kein entsprechendes physisches USB-Anstecken sichtbar. Die zusätzliche
+USB-Upstream-Verbindung beziehungsweise KVM-Zuordnung muss geklärt werden;
+ein NIWOE-Inputfehler ist anhand dieses Befunds noch nicht nachgewiesen.
+Der Nutzer nennt USB-C beziehungsweise KVM als Verbindung; genaue Verkabelung
+und Monitormodell sind noch zu klären.

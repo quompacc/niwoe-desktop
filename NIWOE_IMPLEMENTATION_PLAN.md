@@ -1,5 +1,10 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-HDMI-Live-Nachweis vom 26.09.2026:** Mit `8c1d874c…` bestätigt der Nutzer
+funktionierendes Hotplug; das Sitzungslog belegt Entfernen/Wiederhinzufügen des
+HDMI-Connectors. Monitor-USB-Hub separat offen: bislang keine Kernel-/USB-Erkennung,
+Upstream-Verbindung zu klären. Vollständige Zweimonitor-Matrix bleibt offen.
+
 **P06-HDMI-Fortsetzung vom 26.09.2026:** Beide Monitore beim Start vom Nutzer
 bestätigt; Hotplug schlägt weiterhin fehl. Logs belegen funktionierende
 udev-Erkennung und einen Fehler bei erneuter DRM-Geräteinitialisierung.
