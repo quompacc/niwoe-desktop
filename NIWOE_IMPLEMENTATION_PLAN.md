@@ -5,7 +5,9 @@ Preferred/Dedicated implementiert und installiert: reine Policy,
 Native-/XWayland-Lifecycle, Elternpriorität, spätes App-ID/Class und Schutz
 manueller Moves. Echte isolierte Protokoll-/Eingabetests, Lock- und
 Migrations-/Persistenzregression grün. Dedicated-Hinweis nativ geprüft.
-Reguläre Aktivierung/Nachtest warten auf den angefragten Neulogin;
+Nach Nutzer-Neulogin laufende Buildidentitäten bestätigt und regulärer DRM-
+Nachtest bestanden: Preferred/Native/X11, Dialoge, Dedicated ohne Sperre und
+echter Tastatur-Move. Aktuell nur interner Output aktiv; Zweimonitor-Nachtest,
 explizite Startkorrelation, Maus-Verschieben und vollständiger Fensterzugang
 bleiben offen. Details: [P07-App-Zuordnung](docs/phase-reports/P07_APP_ASSIGNMENT.md).
 

@@ -1,8 +1,8 @@
 # P07 – App-Zuordnung, zweiter Block
 
-26.09.2026. Implementiert, geprüft und auf Fedora installiert. Aktivierung
-im regulären DRM-Compositor und dessen Zweimonitor-Nachtest warten noch auf
-den angefragten Neulogin. **P07 bleibt in-progress, nicht accepted.**
+26.09.2026. Implementiert, geprüft und auf Fedora installiert. Nach Nutzer-
+Neulogin im regulären DRM-Compositor aktiv und auf dem internen Display live
+geprüft. Zweimonitor-Nachtest noch offen. **P07 bleibt in-progress, nicht accepted.**
 
 ## Geänderte Dateien und Verhalten
 
@@ -81,6 +81,31 @@ KDE-/GTK-Dateien unverändert. Bei Installation liefen noch Compositor PID
 109259 und Shell PID 124711 mit den alten Dateien. Neulogin angefragt;
 laufende Sitzung nicht automatisch beendet.
 
+### DRM-Nachtest nach Nutzer-Neulogin
+
+Compositor PID 143457 und Shell PID 143474 verwenden nachweislich exakt die
+oben angegebenen installierten SHA-256. Vor dem Test: neutrale Loge, keine
+Fenster, neun unveränderte Räume, Revision 49, next_id 19.
+
+Fedora meldete nur `drm-0`, 1920×1080 bei 60 Hz. Der externe Monitor war nicht
+aktiv; deshalb ist dieser Nachweis ausdrücklich **kein Zweimonitortest**.
+
+Eigene native GTK- und X11-Testfenster auf dem echten DRM-Backend bestanden:
+Preferred-Zuordnung nach Raum 3 ohne Raumwechsel/Fokusdiebstahl, Hintergrund-
+Dialoge im Elternraum, Dedicated akzeptiert eine nicht zugeordnete native App,
+echter `Super+Shift+4`-Move mit erhaltenem Fensterinhalt. Der erste Anlauf wurde
+wegen des noch exklusiven Hubs abgebrochen und vollständig bereinigt; nach
+Schließen über Escape bestand der gesamte Ablauf.
+
+Evidenz auf Fedora: `target/p07-drm.log` und
+`target/p07-drm-1790440976626235615/{before,tested,after}.json`; Testhelfer
+`target/p07-drm.py`, `target/p07-drm-client.py`. Die temporären Regeln wurden
+über reguläres IPC gesetzt und im Finally-Pfad zurückgesetzt. Alle ursprünglichen
+Raumdefinitionen einschließlich IDs, Reihenfolge und Präferenzen exakt bestätigt;
+Revision durch Testmutationen auf 58 erhöht, next_id unverändert 19. Keine
+Testfenster verbleiben, abschließend Raum 1 aktiv. Keine Rust-Änderung in diesem
+Nachtest; erneuter Build oder erneute Installation nicht erforderlich.
+
 LaunchApp-IPC hat bisher kein explizites Raumziel. Programm-/Argumentpfad
 unverändert; normale App-Regeln gelten für entstehende Fenster. Eindeutige
 Korrelation eines zukünftigen raumbezogenen Startvorhabens über Aktivierungs-/
@@ -88,6 +113,6 @@ Launch-Metadaten ist **noch nicht implementiert**; App-ID wird dafür nicht
 als individuelle Fensteridentität ausgegeben. Der App-Auswahleditor gehört
 zur späteren Einstellungsphase und bleibt sichtbar als nicht verfügbar markiert.
 
-Weiter offen: reguläre DRM-/Zweimonitor-Endabnahme, explizite Startkorrelation,
+Weiter offen: Zweimonitor-Endabnahme, explizite Startkorrelation,
 Mausaktionen zum Verschieben, vollständiger Fensterzugang und visuelle
 64-Räume-Abnahme. Ältere README-/Login-/Settings-Dokumentationsreste bleiben offen.
