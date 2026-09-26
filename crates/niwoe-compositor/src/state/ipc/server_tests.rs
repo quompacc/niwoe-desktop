@@ -92,7 +92,7 @@ fn unauthenticated_control_command_is_ignored() {
         write_command(&mut client, &ShellCommand::Quit);
 
         let poll = server.poll();
-        assert_eq!(poll.accepted_clients, 1);
+        assert_eq!(poll.authenticated_clients, 0);
         assert!(poll.commands.is_empty());
     });
     let _ = fs::remove_dir_all(&dir);
@@ -116,6 +116,26 @@ fn authenticated_shell_control_command_is_accepted() {
 
         let poll = server.poll();
         assert_eq!(poll.commands, vec![ShellCommand::Quit]);
+    });
+    let _ = fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn delayed_authentication_requests_initial_snapshots_once() {
+    let dir = temp_runtime_dir("delayed-auth");
+    with_runtime_dir(&dir, || {
+        let mut server = IpcServer::new();
+        let mut client = connect_client();
+        assert_eq!(server.poll().authenticated_clients, 0);
+        let authentication = ShellCommand::Authenticate {
+            role: "shell".into(),
+            token: server.auth_token().to_owned(),
+        };
+        write_command(&mut client, &authentication);
+        assert_eq!(server.poll().authenticated_clients, 1);
+        assert_eq!(server.poll().authenticated_clients, 0);
+        write_command(&mut client, &authentication);
+        assert_eq!(server.poll().authenticated_clients, 0);
     });
     let _ = fs::remove_dir_all(&dir);
 }

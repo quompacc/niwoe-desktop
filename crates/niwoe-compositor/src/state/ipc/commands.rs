@@ -15,8 +15,11 @@ impl NiwoeState {
     pub fn poll_ipc(&mut self) {
         let poll = self.ipc.poll();
 
-        if poll.accepted_clients > 0 {
-            tracing::info!("accepted {} shell IPC client(s)", poll.accepted_clients);
+        if poll.authenticated_clients > 0 {
+            tracing::info!(
+                "authenticated {} shell IPC client(s)",
+                poll.authenticated_clients
+            );
             self.broadcast_rooms();
             self.broadcast_workspace();
             self.broadcast_window_snapshot();

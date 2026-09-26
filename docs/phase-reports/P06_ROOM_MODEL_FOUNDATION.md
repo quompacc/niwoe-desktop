@@ -64,3 +64,61 @@ Polling-Schleife oder pro-Frame-Dekodierung.
   vorgetäuschte Funktion.
 - Zuordnungsregeln, Start-Apps und Restore bleiben die ausdrücklich späteren
   P07–P10-Arbeiten des aktiven Plans.
+
+## Fortsetzung 26.09.2026: Live-Grundlage und Reconnect
+
+Ausgangsstand: `190c896`, Branch `codex/niwoe-p00`, sauberer lokaler
+Arbeitsbaum. Fedora enthält eine synchronisierte Quellkopie ohne `.git`.
+Die Sitzung wurde inzwischen neu gestartet: Compositor PID 1357 und Shell
+PID 1371 laufen seit 08:03:42 Uhr. Die SHA-256-Werte von `/proc/1357/exe`
+und `/proc/1371/exe` entsprechen den oben dokumentierten installierten
+P06-Releases. Der zuvor offene Neulogin für die Grundlage ist damit erledigt.
+
+Live auf diesem DRM-Compositor geprüft: zwei temporäre Räume erzeugen,
+Name/Beschreibung/Zuordnung ändern, Reihenfolge ändern, veraltete Revision
+abweisen, Raum wechseln, ein natives Zenity-Fenster im Quellraum öffnen,
+Quellraum mit explizitem Ziel löschen. Fenster-ID und Inhalt bleiben erhalten;
+der Snapshot meldet das Fenster und den aktiven Raum im verdichteten Zielslot.
+Ein neuer IPC-Client erhält den Raumzustand; IDs, Reihenfolge und Revision
+stimmen mit `rooms.toml` überein. Eigene Testfenster und Testräume wurden
+anschließend entfernt. Die ursprünglichen neun Raumdefinitionen einschließlich
+„Entwicklung“ sind unverändert. Revision und monotoner ID-Zähler wurden durch
+die Tests erwartungsgemäß erhöht. Kein Sitzungsende und keine Änderung an
+KDE-/GTK-Konfigurationen. Testskript: lokales `target/p06-live-probe.py`.
+
+Dabei festgestellt: `IpcServer::poll` meldete neue Socketverbindungen als
+Auslöser der Anfangssnapshots. Trifft die Authentifizierung erst im nächsten
+Poll ein, werden die Snapshots zuvor nur an bereits authentifizierte Clients
+gesendet; dem neuen Client fehlen Fenster-/Outputdaten. Der Test benötigte
+auf dem alten Release deshalb einen zusätzlichen Verbindungsimpuls.
+
+Korrektur in `state/ipc/server.rs` und `commands.rs`: Anfangssnapshots werden
+beim erstmaligen erfolgreichen Übergang zur authentifizierten Shell gesendet.
+Öffentliche Verbindungen lösen sie nicht mehr aus; wiederholte Authentifizierung
+erzeugt keine zusätzlichen Snapshots. `server_tests.rs` prüft ausdrücklich
+Verbindungsannahme und Authentifizierung in getrennten Polls.
+Keine Wire-Änderung, kein neuer Timer und keine zusätzlichen Idle-Abfragen.
+
+Fedora: `cargo check --workspace`, `cargo test --workspace -q`,
+`cargo clippy --workspace --all-targets -- -D warnings`,
+`cargo fmt --all -- --check` und
+`cargo build --release -p niwoe --locked` bestanden. Workspace-Tests enthalten
+den neuen Reconnect-Test sowie Design-, Source-Size- und Centralization-Guards.
+Logs: `target/p06-reconnect-{check,test,clippy,build}.log` auf Fedora.
+Der neue Release bestand außerdem den isolierten Nested-Smoke mit nativer
+Shell und Zenity sowie Rename/Reorder, Konflikt, Persistenz und Reconnect:
+`target/p06-reconnect-nested.log`, Detailbeleg
+`target/p01-evidence/nested.ykBowb`. Die geprüften Elternkonfigurationen blieben
+bytegleich. Die isolierte Umgebung meldete fehlende AT-SPI-/PipeWire-Anbindung;
+Audio und Barrierefreiheit sind durch diesen Smoke nicht abgenommen.
+
+Neuer Compositor-Release SHA-256:
+`dd250a551741878b0914e6b90fb6d6436a4a118a2cc09e6ba7cccfd59890d52a`.
+Installation dieses Fixes steht noch aus: nach dem Neulogin fordert sudo
+erneut Authentifizierung. Nach Installation benötigt dieser Compositor-Fix
+einen geplanten NIWOE-Neulogin; die laufende Sitzung wird nicht beendet.
+
+P06 bleibt **in-progress**. Nicht geprüft: minimierte/Floating-/Tiling-Fälle,
+Dialogvererbung, XWayland, zwei Outputs/Hotplug, vollständiger Neustartnachweis
+der mutierten Persistenz und vollständige Fehler-/Grenzfallmatrix im Livebetrieb.
+Die sichtbaren Create/Delete-/Metadatenabläufe sind weiterhin offen.

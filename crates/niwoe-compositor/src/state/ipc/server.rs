@@ -27,7 +27,8 @@ pub struct IpcServer {
 }
 
 pub struct IpcPoll {
-    pub accepted_clients: usize,
+    /// Clients that became authenticated during this poll and need snapshots.
+    pub authenticated_clients: usize,
     pub commands: Vec<ShellCommand>,
     pub screenshot_requests: Vec<ScreenshotBridgeRequestEnvelope>,
 }
@@ -112,7 +113,7 @@ impl IpcServer {
     }
 
     pub fn poll(&mut self) -> IpcPoll {
-        let mut accepted_clients = 0;
+        let mut authenticated_clients = 0;
         let mut commands = Vec::new();
         let mut screenshot_requests = Vec::new();
 
@@ -136,7 +137,6 @@ impl IpcServer {
                             alive: true,
                             role: IpcClientRole::Public,
                         });
-                        accepted_clients += 1;
                     }
                     Err(err) if err.kind() == io::ErrorKind::WouldBlock => break,
                     Err(err) => {
@@ -190,6 +190,9 @@ impl IpcServer {
                 match niwoe_ipc::decode_command(line) {
                     Ok(ShellCommand::Authenticate { role, token }) => {
                         if role == "shell" && token == self.auth_token {
+                            if client.role != IpcClientRole::Shell {
+                                authenticated_clients += 1;
+                            }
                             client.role = IpcClientRole::Shell;
                             tracing::info!(
                                 client_id = client.id,
@@ -238,7 +241,7 @@ impl IpcServer {
         self.retain_alive();
 
         IpcPoll {
-            accepted_clients,
+            authenticated_clients,
             commands,
             screenshot_requests,
         }
