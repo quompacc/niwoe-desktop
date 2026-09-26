@@ -1,8 +1,8 @@
-fn scan_drm_connectors_for_h5b(state: &mut NiwoeState, source: &str) {
+fn scan_drm_connectors_for_h5b(state: &mut NiwoeState, source: &str, force: bool) {
     tracing::trace!("drm connector scan triggered: source={}", source);
     let (should_scan, device_fd, known_connectors, known_output_names) =
         if let Some(drm) = state.drm_backend.as_mut() {
-            let should_scan = drm.last_connector_scan.elapsed() >= Duration::from_millis(750);
+            let should_scan = force || drm.last_connector_scan.elapsed() >= Duration::from_millis(750);
             if should_scan {
                 drm.last_connector_scan = std::time::Instant::now();
             } else {

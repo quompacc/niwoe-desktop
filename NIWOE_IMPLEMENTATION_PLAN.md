@@ -1,10 +1,16 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-HDMI-Befund vom 26.09.2026:** HDMI ist inzwischen angeschlossen und wird
+von Linux erkannt, vom laufenden NIWOE aber noch nicht als Ausgang übernommen.
+Direkter Linux-Hotplug-Ereignispfad und nutzbare Sitzungsdiagnosen ergänzt;
+Zweimonitor-/Hotplug-Abnahme bleibt offen. Details und Aktivierungsstand:
+[HDMI-Hotplug](docs/phase-reports/P06_HDMI_HOTPLUG.md).
+
 **P06-XWayland-Prüfung vom 26.09.2026:** Schließen eines X11-Fensters im
 inaktiven Raum auf dem DRM-Compositor bestanden, einschließlich Raumrückkehr,
 Erhalt des anderen Fensters und unveränderter Raumkonfiguration. Wiederholbarer
-Test: `scripts/test-room-xwayland.py`. Nur eDP ist angeschlossen; zwei physische
-Outputs und Hotplug bleiben offen. P06 ist weiterhin in Arbeit.
+Test: `scripts/test-room-xwayland.py`. Zum Prüfzeitpunkt war nur eDP angeschlossen;
+zwei physische Outputs und Hotplug blieben offen. P06 ist weiterhin in Arbeit.
 
 **P06-Live-Runde vom 26.09.2026:** Nativer Create/Edit/Reorder/Delete-Ablauf,
 Migration normaler/schwebender/minimierter Fenster, Wiederherstellen und

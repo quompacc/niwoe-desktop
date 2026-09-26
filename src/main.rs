@@ -178,7 +178,10 @@ fn env_flag_enabled(name: &str) -> bool {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tracing_subscriber::fmt::init();
+    // Session managers may discard stdout; stderr retains backend diagnostics.
+    tracing_subscriber::fmt()
+        .with_writer(std::io::stderr)
+        .init();
 
     let mut event_loop: EventLoop<'static, NiwoeState> = EventLoop::try_new()?;
     let display: Display<NiwoeState> = Display::new()?;

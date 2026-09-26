@@ -119,6 +119,8 @@ pub(crate) struct DrmCompositorBuildParams<'a> {
 include!("init/build.rs");
 include!("init/layout.rs");
 include!("init/hotplug.rs");
+#[cfg(target_os = "linux")]
+include!("init/hotplug_events.rs");
 include!("init/event_sources.rs");
 #[allow(clippy::items_after_test_module)] // Split test submodule precedes this entry point.
 pub fn init_drm(
@@ -164,6 +166,8 @@ pub fn init_drm(
     register_session_event_source(event_loop, session_notifier)?;
 
     let gpu_path = select_gpu(&mut session, &seat_name)?;
+    #[cfg(target_os = "linux")]
+    register_hotplug_event_source(event_loop, &seat_name, &gpu_path)?;
     let is_primary_node = gpu_path
         .file_name()
         .and_then(|name| name.to_str())

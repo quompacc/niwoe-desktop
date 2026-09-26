@@ -94,11 +94,11 @@ where
                     render_output_after_vblank(state, crtc);
                 }
                 tracing::trace!("drm vblank event received: crtc={:?}", crtc);
-                scan_drm_connectors_for_h5b(state, "vblank");
+                scan_drm_connectors_for_h5b(state, "vblank", false);
             }
             DrmEvent::Error(err) => {
                 tracing::warn!("drm device error event received: err={}", err);
-                scan_drm_connectors_for_h5b(state, "error");
+                scan_drm_connectors_for_h5b(state, "error", false);
             }
         })?;
     Ok(())
