@@ -147,7 +147,44 @@ sind Live-Prüfungen und keine vollständige P06-Abnahme.
 
 ## Offene Gates
 
-- Zwei physische Outputs/Hotplug, XWayland-Schließen im inaktiven Raum sowie
-  weitere Fehler-/Grenzfälle der gesamten P06-Matrix.
+- Zwei physische Outputs/Hotplug sowie weitere Fehler-/Grenzfälle der gesamten
+  P06-Matrix. XWayland-Schließen ist inzwischen wie unten beschrieben geprüft.
 - P07-Navigation für mehr als neun Räume; kein Vorziehen weiterer P07-Features.
 - Alte README-/Login-/Settings-Dokumentationsreste des allgemeinen Audits.
+
+## XWayland-Sonderfall auf DRM
+
+Fortsetzung am 26.09.2026 auf demselben Compositor PID 56919 und XWayland
+PID 56936: `scripts/test-room-xwayland.py` startet eine eigene GTK3-Anwendung
+mit erzwungenem und im Client geprüftem X11-Backend. Voraussetzungen sind ein
+leerer Testdesktop, mindestens zwei Räume und ein bereits ausgewählter Raum.
+Der Test verändert keine Raumdefinitionen und stellt den aktiven Raum wieder her.
+
+Nachgewiesen: Quellfenster in Raum 2, zweites Fenster in Raum 1; Schließen des
+Quellfensters durch GTK `destroy()` bei aktivem Raum 1 entfernt es vollständig.
+Der aktive Raum wechselt nicht; ID, Zuordnung und Eingabefeldinhalt des zweiten
+Fensters bleiben erhalten. Rückkehr in den Quellraum und erneuter Wechsel zeigen
+kein verwaistes Fenster. Nach Beenden ausschließlich des eigenen Clients sind
+keine Testfenster übrig, Raum-Snapshot und TOML-Datei sind unverändert.
+
+Verifikation:
+
+- `python3 scripts/test-room-xwayland.py 56919 target/p06-xwayland-evidence-3`:
+  Exitcode 0; Snapshots und Clientinhalt in `result.json`, Bereinigung in `final.json`.
+- `cargo test --workspace -q`: Exitcode 0, Log `target/p06-special-tests.log`.
+- Call-Flow geprüft: XWayland-Unmap/Destroy sucht über alle Spaces und entfernt
+  Runtime-Zustände; der neue Test bestätigt das Verhalten auf dem laufenden Release.
+
+Der erste Testhelfer schloss seine IPC-Verbindung unmittelbar nach dem Senden;
+ein Raumwechsel wurde dabei nicht beobachtet. Der endgültige Helfer wartet auf
+den passenden Workspace-Snapshot, statt eine feste Verzögerung vorauszusetzen.
+Die fehlgeschlagene Probe wurde vollständig bereinigt; keine Produktkorrektur
+oder Änderung der laufenden Binärdateien war für diesen Prüfschritt erforderlich.
+Geändert: neuer Python-Test, aktiver Plan und dieser Bericht. Kein zusätzlicher
+Laufzeitdienst, Timer oder Renderingaufwand im Produkt.
+
+Hardwareinventar: `card2-eDP-1` verbunden, `card2-DP-1` und `card2-HDMI-A-1`
+nicht verbunden; Snapshot: ein Output 1920×1080 bei Skalierung 100 %. Damit ist
+keine echte Zweimonitor-/Hotplug-Abnahme möglich. Beschädigte Dateien, unbekannte
+Schemas und Validierungsgrenzen sind durch vorhandene Store-Tests abgedeckt;
+das ersetzt weiterhin keine vollständige Startup-/IPC-Abnahme dieser Fehlerfälle.

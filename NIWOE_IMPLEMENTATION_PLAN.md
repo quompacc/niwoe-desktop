@@ -1,5 +1,11 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-XWayland-Prüfung vom 26.09.2026:** Schließen eines X11-Fensters im
+inaktiven Raum auf dem DRM-Compositor bestanden, einschließlich Raumrückkehr,
+Erhalt des anderen Fensters und unveränderter Raumkonfiguration. Wiederholbarer
+Test: `scripts/test-room-xwayland.py`. Nur eDP ist angeschlossen; zwei physische
+Outputs und Hotplug bleiben offen. P06 ist weiterhin in Arbeit.
+
 **P06-Live-Runde vom 26.09.2026:** Nativer Create/Edit/Reorder/Delete-Ablauf,
 Migration normaler/schwebender/minimierter Fenster, Wiederherstellen und
 Bereinigung erfolgreich. Ein live nachgewiesener Fehler der Dialog-Raumvererbung
