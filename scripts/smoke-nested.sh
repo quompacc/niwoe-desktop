@@ -42,6 +42,9 @@ if [[ "${1:-}" == --inside ]]; then
     cat "$evidence/lock-focus.log"
   fi
   kill -0 "$compositor_pid"
+  if [[ "${NIWOE_ROOM_SMOKE:-0}" == 1 ]]; then
+    python3 "$repo/scripts/test-room-lifecycle.py" "$compositor_pid"
+  fi
   echo 'PASS: nested compositor, authenticated shell, Wayland globals, configured client buffer'
   exit 0
 fi

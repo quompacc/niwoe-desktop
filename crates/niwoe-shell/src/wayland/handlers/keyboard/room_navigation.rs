@@ -75,14 +75,19 @@ impl NiwoeShell {
                 | Keysym::Up
                 | Keysym::Down
         ) {
-            self.room_keyboard_focus = next_focus(self.room_keyboard_focus, room_count, backwards);
+            let count = room_count + usize::from(room_count < niwoe_config::rooms::MAX_ROOMS);
+            self.room_keyboard_focus = next_focus(self.room_keyboard_focus, count, backwards);
             if let Some(index) = self.room_keyboard_focus {
-                self.room_management_page = index
+                self.room_management_page = index.min(room_count.saturating_sub(1))
                     / (niwoe_tokens::ControlCenter::DEFAULT.room_columns as usize
                         * niwoe_tokens::ControlCenter::DEFAULT.room_page_rows as usize);
             }
             self.draw_launcher(qh, RepaintReason::Keyboard);
         } else if matches!(key, Keysym::Return | Keysym::KP_Enter) {
+            if self.room_keyboard_focus == Some(room_count) {
+                self.open_new_room(qh);
+                return;
+            }
             if let Some(id) = self
                 .room_keyboard_focus
                 .and_then(|index| self.workspace_state.rooms.snapshot.rooms.get(index))

@@ -5,6 +5,11 @@ pub(crate) struct Edit {
     pub id: u64,
     pub revision: u64,
     pub name: String,
+    pub description: String,
+    pub assignment: niwoe_ipc::RoomAssignment,
+    pub delete_target: Option<u64>,
+    pub confirm_delete: bool,
+    pub creation_uncertain: bool,
     pub replace: bool,
     pub focus: usize,
 }
@@ -51,12 +56,25 @@ impl RoomUi {
         let Some(edit) = &self.edit else {
             return false;
         };
+        if edit.id == 0 {
+            if action == RoomEditAction::Save && edit.creation_uncertain {
+                return false;
+            }
+            return !matches!(
+                action,
+                RoomEditAction::Left
+                    | RoomEditAction::Right
+                    | RoomEditAction::Delete
+                    | RoomEditAction::Target
+            );
+        }
         let Some(position) = self.snapshot.rooms.iter().position(|r| r.id == edit.id) else {
             return false;
         };
         match action {
             RoomEditAction::Left => position > 0,
             RoomEditAction::Right => position + 1 < self.snapshot.rooms.len(),
+            RoomEditAction::Delete | RoomEditAction::Target => self.snapshot.rooms.len() > 1,
             _ => true,
         }
     }
@@ -100,11 +118,38 @@ impl RoomUi {
                 id: room.id,
                 revision: self.snapshot.revision,
                 name: room.name.clone(),
+                description: room.description.clone(),
+                assignment: room.assignment,
+                delete_target: None,
+                confirm_delete: false,
+                creation_uncertain: false,
                 replace: true,
                 focus: 0,
             });
             self.message.clear();
         }
+    }
+    pub fn begin_create(&mut self) -> bool {
+        if !self.ready
+            || self.pending.is_some()
+            || self.snapshot.rooms.len() >= niwoe_config::rooms::MAX_ROOMS
+        {
+            return false;
+        }
+        self.edit = Some(Edit {
+            id: 0,
+            revision: self.snapshot.revision,
+            name: String::new(),
+            description: String::new(),
+            assignment: niwoe_ipc::RoomAssignment::Free,
+            delete_target: None,
+            confirm_delete: false,
+            creation_uncertain: false,
+            replace: true,
+            focus: 0,
+        });
+        self.message.clear();
+        true
     }
     pub fn request(
         &mut self,
@@ -120,19 +165,78 @@ impl RoomUi {
             return None;
         }
         let edit = self.edit.as_mut()?;
+        if action == RoomEditAction::Save && edit.creation_uncertain {
+            return None;
+        }
         if action == RoomEditAction::Name {
             edit.focus = 0;
             return None;
         }
         let change = match action {
+            RoomEditAction::Delete => {
+                let Some(target_id) = edit.delete_target else {
+                    self.message = "Bitte zuerst einen Zielraum wählen.".into();
+                    return None;
+                };
+                if !edit.confirm_delete {
+                    edit.confirm_delete = true;
+                    self.message =
+                        "Erneut Löschen wählen: Fenster werden in den Zielraum verschoben.".into();
+                    return None;
+                }
+                RoomChange::Delete {
+                    id: edit.id,
+                    target_id,
+                }
+            }
+            RoomEditAction::Target => {
+                let targets: Vec<_> = self
+                    .snapshot
+                    .rooms
+                    .iter()
+                    .filter(|r| r.id != edit.id)
+                    .map(|r| r.id)
+                    .collect();
+                if targets.is_empty() {
+                    return None;
+                }
+                let next = edit
+                    .delete_target
+                    .and_then(|id| targets.iter().position(|r| *r == id))
+                    .map_or(0, |i| (i + 1) % targets.len());
+                edit.delete_target = targets.get(next).copied();
+                edit.confirm_delete = false;
+                return None;
+            }
+            RoomEditAction::Save if edit.id == 0 => RoomChange::CreateDetails {
+                name: edit.name.trim().to_owned(),
+                description: edit.description.clone(),
+                assignment: edit.assignment,
+            },
+            RoomEditAction::Save
+                if self
+                    .snapshot
+                    .rooms
+                    .iter()
+                    .find(|r| r.id == edit.id)
+                    .is_some_and(|r| r.description != edit.description) =>
+            {
+                RoomChange::UpdateDetails {
+                    id: edit.id,
+                    name: edit.name.trim().to_owned(),
+                    description: edit.description.clone(),
+                }
+            }
             RoomEditAction::Save => RoomChange::Rename {
                 id: edit.id,
                 name: edit.name.trim().to_owned(),
             },
             RoomEditAction::Left | RoomEditAction::Right => {
                 let position = self.snapshot.rooms.iter().position(|r| r.id == edit.id)?;
-                if self.snapshot.rooms[position].name != edit.name.trim() {
-                    self.message = "Namen bitte zuerst speichern.".into();
+                if self.snapshot.rooms[position].name != edit.name.trim()
+                    || self.snapshot.rooms[position].description != edit.description
+                {
+                    self.message = "Änderungen bitte zuerst speichern.".into();
                     return None;
                 }
                 let next = if action == RoomEditAction::Left {
@@ -176,13 +280,19 @@ impl RoomUi {
         self.pending = None;
         if let Some(edit) = &mut self.edit {
             edit.revision = self.snapshot.revision;
+            edit.confirm_delete = false;
+            if edit.id == 0 && error == Some(niwoe_ipc::RoomMutationError::Durability) {
+                edit.creation_uncertain = true;
+            }
         }
         self.message = match error {
             None => "Gespeichert",
             Some(niwoe_ipc::RoomMutationError::Conflict) => {
                 "Zwischenzeitlich geändert. Erneut versuchen."
             }
-            Some(niwoe_ipc::RoomMutationError::Invalid) => "Bitte einen gültigen Namen eingeben.",
+            Some(niwoe_ipc::RoomMutationError::Invalid) => {
+                "Ungültige Raumdaten oder Zielraum nicht verfügbar."
+            }
             Some(niwoe_ipc::RoomMutationError::Storage) => {
                 "Speichern fehlgeschlagen. Erneut versuchen."
             }
@@ -200,6 +310,11 @@ impl RoomUi {
         {
             self.pending = None;
             self.message = "Keine Bestätigung. Stand wird neu geladen.".into();
+            if let Some(edit) = self.edit.as_mut().filter(|edit| edit.id == 0) {
+                edit.creation_uncertain = true;
+                self.message =
+                    "Keine Bestätigung. Zurück zur Raumliste und Ergebnis prüfen.".into();
+            }
             return true;
         }
         false

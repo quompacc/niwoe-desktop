@@ -1,5 +1,14 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-Fortsetzung vom 26.09.2026:** Die installierte Grundlage läuft inzwischen
+nach Neulogin mit bestätigten Buildidentitäten. Create/Delete, Metadaten,
+Raumwechsel, native Fenstermigration und Persistenz wurden auf dem DRM-Host
+geprüft. Ein dabei gefundener IPC-Reconnect-Race ist behoben. Die vollständige
+Konfigurationsseite erhält nun Neuer-Raum-Entwurf, Beschreibung und explizite
+Zielwahl mit Löschbestätigung. P06 bleibt in Arbeit; die neue UI benötigt ihren
+eigenen Live-Bediennachweis. Details und offene Gates stehen im
+[Bericht der sichtbaren P06-Abläufe](docs/phase-reports/P06_VISIBLE_FLOWS.md).
+
 **Verbindliche Präzisierung vom 24.09.2026:** Der
 [Mockup- und Workflowplan](docs/MOCKUP_WORKFLOW_PLAN.md) konkretisiert die vier
 verbindlichen letzten Bildvorlagen und die End-to-End-Wege Desktop → Hub → Räume verwalten → Raum

@@ -114,11 +114,16 @@ Audio und Barrierefreiheit sind durch diesen Smoke nicht abgenommen.
 
 Neuer Compositor-Release SHA-256:
 `dd250a551741878b0914e6b90fb6d6436a4a118a2cc09e6ba7cccfd59890d52a`.
-Installation dieses Fixes steht noch aus: nach dem Neulogin fordert sudo
-erneut Authentifizierung. Nach Installation benötigt dieser Compositor-Fix
-einen geplanten NIWOE-Neulogin; die laufende Sitzung wird nicht beendet.
+Die erste Installationsprüfung verlangte nach dem Neulogin erneut sudo-
+Authentifizierung. Nach anschließender Nutzer-Authentifizierung wurde
+der Fix installiert und bytegleich geprüft; die laufende Sitzung blieb erhalten.
+Dieser Zwischenrelease wird durch den folgenden gemeinsamen P06-Stand ersetzt.
 
 P06 bleibt **in-progress**. Nicht geprüft: minimierte/Floating-/Tiling-Fälle,
 Dialogvererbung, XWayland, zwei Outputs/Hotplug, vollständiger Neustartnachweis
 der mutierten Persistenz und vollständige Fehler-/Grenzfallmatrix im Livebetrieb.
 Die sichtbaren Create/Delete-/Metadatenabläufe sind weiterhin offen.
+
+Die anschließende Implementierung dieser sichtbaren Abläufe wird separat in
+[P06_VISIBLE_FLOWS.md](P06_VISIBLE_FLOWS.md) dokumentiert. Der vorstehende
+Grundlagenstand ist ein historischer Checkpoint, keine vollständige Abnahme.

@@ -5,6 +5,7 @@ fn draw_body(
     edit: &Edit,
     order: usize,
     room_count: usize,
+    target_name: &str,
     windows: &[WindowInfo],
     scroll_y: i32,
     config: &niwoe_config::ThemeConfig,
@@ -47,13 +48,7 @@ fn draw_body(
         Typography::DEFAULT.body_size as f32,
         p.text,
     );
-    let description = Rect {
-        x: name.x + name.width + C.card_gap,
-        y: name.y,
-        width: (details.x + details.width - C.card_pad - name.x - name.width - C.card_gap)
-            .max(S.xxl),
-        height: C.config_field_height,
-    };
+    let description = description_rect(pm.width(), scroll_y);
     paint_text(
         pm,
         "Beschreibung (optional)",
@@ -65,34 +60,34 @@ fn draw_body(
     fill(
         pm,
         description,
-        alpha(p.surface_alt, C.disabled_alpha),
+        p.surface_alt,
         Radius::DEFAULT.sm,
     );
-    outline(pm, description, p.border, Controls::BORDER);
+    outline(pm, description, if edit.focus == 5 { p.accent } else { p.border }, Controls::BORDER);
     paint_text_left_centered(
         pm,
-        "Noch nicht verfügbar",
+        &truncate_to_fit(&edit.description.replace('\n', " "), description.width - S.md * 2, Typography::DEFAULT.caption_size as f32),
         description.x + S.md,
         description,
         Typography::DEFAULT.caption_size as f32,
-        p.text_dim,
+        p.text,
     );
     paint_text(
         pm,
-        &format!(
+        &if edit.id == 0 { "Neuer Raum · noch nicht gespeichert".to_owned() } else { format!(
             "Raum {} · Position {} von {}",
             room.workspace,
             order + 1,
             room_count
-        ),
+        ) },
         details.x + C.card_pad,
         details.y + details.height - C.card_pad - S.md,
         Typography::DEFAULT.caption_size as f32,
         p.text_dim,
     );
     for (later, label, allowed) in [
-        (false, "← Früher", order > 0),
-        (true, "Später →", order + 1 < room_count),
+        (false, "← Früher", edit.id != 0 && order > 0),
+        (true, "Später →", edit.id != 0 && order + 1 < room_count),
     ] {
         let action = order_rect(pm.width(), scroll_y, later);
         fill(
@@ -296,7 +291,7 @@ fn draw_body(
     section(pm, note, "DEIN KONTEXT BLEIBT BEI DIR", p);
     paint_centered_card_lines(
         pm,
-        note,
+        Rect { height: note.height - C.config_field_height - C.card_gap, ..note },
         &[
         "NIWOE organisiert Räume und Fenster.",
         "Apps und Dateien bleiben in ihren Anwendungen.",
@@ -304,6 +299,7 @@ fn draw_body(
         ],
         p,
     );
+    draw_deletion(pm, edit, room_count, target_name, scroll_y, p);
 }
 
 fn paint_centered_card_lines(

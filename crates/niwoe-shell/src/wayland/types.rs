@@ -27,6 +27,8 @@ pub enum RoomEditAction {
     Cancel,
     Left,
     Right,
+    Delete,
+    Target,
 }
 
 #[derive(Debug, Clone)]

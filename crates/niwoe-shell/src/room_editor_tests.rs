@@ -2,6 +2,78 @@ use super::*;
 use crate::wayland::RoomEditAction;
 
 #[test]
+fn uncertain_creation_cannot_be_retried_and_duplicated() {
+    let mut ui = RoomUi::default();
+    ui.accept(ui.snapshot.clone());
+    ui.begin_create();
+    ui.edit.as_mut().unwrap().name = "Test".into();
+    ui.request(RoomEditAction::Save).unwrap();
+    ui.pending.as_mut().unwrap().1 = Instant::now() - Duration::from_secs(11);
+    assert!(ui.expire());
+    assert!(!ui.enabled(RoomEditAction::Save));
+    assert!(ui.request(RoomEditAction::Save).is_none());
+    assert!(ui.enabled(RoomEditAction::Cancel));
+}
+
+#[test]
+fn create_is_a_draft_until_explicit_save_and_cancel_has_no_mutation() {
+    let mut ui = RoomUi::default();
+    assert!(!ui.begin_create());
+    ui.accept(ui.snapshot.clone());
+    let before = ui.snapshot.clone();
+    assert!(ui.begin_create());
+    assert!(!ui.enabled(RoomEditAction::Delete));
+    ui.edit.as_mut().unwrap().name = "Neuer Kontext".into();
+    ui.edit.as_mut().unwrap().description = "Beschreibung".into();
+    assert!(
+        matches!(ui.request(RoomEditAction::Save), Some(niwoe_ipc::ShellCommand::MutateRoom {
+        change: RoomChange::CreateDetails { name, description, .. }, ..
+    }) if name == "Neuer Kontext" && description == "Beschreibung")
+    );
+    assert_eq!(ui.snapshot, before);
+    assert!(ui.request(RoomEditAction::Cancel).is_none());
+    assert!(ui.edit.is_some(), "pending creation cannot be cancelled");
+    let request = ui.pending.as_ref().unwrap().0.clone();
+    ui.result(&request, Some(niwoe_ipc::RoomMutationError::Storage));
+    ui.request(RoomEditAction::Cancel);
+    assert!(ui.edit.is_none());
+    assert_eq!(ui.snapshot, before);
+}
+
+#[test]
+fn description_and_name_use_one_revision_and_delete_requires_target_and_confirmation() {
+    let mut ui = RoomUi::default();
+    ui.accept(ui.snapshot.clone());
+    ui.begin(1);
+    ui.edit.as_mut().unwrap().description = "Arbeit".into();
+    assert!(
+        matches!(ui.request(RoomEditAction::Save), Some(niwoe_ipc::ShellCommand::MutateRoom {
+        expected_revision: 0, change: RoomChange::UpdateDetails { id: 1, description, .. }, ..
+    }) if description == "Arbeit")
+    );
+    let request = ui.pending.as_ref().unwrap().0.clone();
+    ui.result(&request, None);
+    assert!(ui.request(RoomEditAction::Delete).is_none());
+    assert!(ui.request(RoomEditAction::Target).is_none());
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, Some(2));
+    assert!(ui.request(RoomEditAction::Delete).is_none());
+    assert!(ui.edit.as_ref().unwrap().confirm_delete);
+    ui.request(RoomEditAction::Target);
+    assert!(!ui.edit.as_ref().unwrap().confirm_delete);
+    assert!(ui.request(RoomEditAction::Delete).is_none());
+    assert!(matches!(
+        ui.request(RoomEditAction::Delete),
+        Some(niwoe_ipc::ShellCommand::MutateRoom {
+            change: RoomChange::Delete {
+                id: 1,
+                target_id: 3
+            },
+            ..
+        })
+    ));
+}
+
+#[test]
 fn editing_waits_for_snapshot_and_ack_and_never_optimistically_changes_panel() {
     let mut ui = RoomUi::default();
     ui.begin(1);

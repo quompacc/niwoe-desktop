@@ -366,6 +366,10 @@ macro_rules! handle_launcher_pointer {
                             }
                             continue;
                         } else {
+                            if crate::room_management_view::hit_new_room(cx, cy, content_width) {
+                                $shell.open_new_room($qh);
+                                continue;
+                            }
                             if crate::room_management_view::hit_back(cx, cy, content_height) {
                                 $shell.return_to_hub($qh);
                                 continue;

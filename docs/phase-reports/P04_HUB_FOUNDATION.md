@@ -1,5 +1,11 @@
 # P04 Hub- und Control-Center-Zwischenstand
 
+**Fortsetzung 26.09.2026:** Die historischen Fähigkeitsgrenzen für „Neuer Raum“
+und Beschreibung in diesem Bericht werden durch die
+[sichtbaren P06-Abläufe](P06_VISIBLE_FLOWS.md) erweitert. Die vorhandene
+Seitenstruktur bleibt erhalten; deren neue Bedienung ist noch gesondert live
+abzunehmen. Import/Export/Vorlagen, Start-Apps und Restore bleiben offen.
+
 Stand: 25.09.2026
 
 Status: **in Arbeit**. Hub, „Räume verwalten“ und „Raum konfigurieren“ sind auf

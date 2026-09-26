@@ -114,9 +114,11 @@ impl NiwoeShell {
             });
             if self.room_management_open {
                 let rooms = &self.workspace_state.rooms.snapshot.rooms;
+                let draft = niwoe_ipc::RoomEntry { id: 0, workspace: 0, name: "Neuer Raum".into(), description: String::new(), assignment: niwoe_ipc::RoomAssignment::Free };
                 if let Some((room, edit, order)) = self.room_configuration_id.and_then(|id| {
-                    let order = rooms.iter().position(|room| room.id == id)?;
                     let edit = self.workspace_state.rooms.edit.as_ref().filter(|edit| edit.id == id)?;
+                    if id == 0 { return Some((&draft, edit, rooms.len())); }
+                    let order = rooms.iter().position(|room| room.id == id)?;
                     Some((&rooms[order], edit, order))
                 }) {
                     crate::room_management_view::draw_room_configuration(
@@ -127,6 +129,7 @@ impl NiwoeShell {
                         edit,
                         order,
                         rooms.len(),
+                        &edit.delete_target.and_then(|id| rooms.iter().find(|r| r.id == id)).map_or_else(|| "Bitte wählen".to_owned(), |r| format!("{} · {}", r.workspace, r.name)),
                         &self.windows,
                         &self.workspace_state.rooms.message,
                         self.workspace_state.rooms.pending.is_some(),
