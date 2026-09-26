@@ -1,5 +1,17 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**Aktueller P06-Abschlussabgleich, 26.09.2026: `in-progress`, nicht `accepted`.**
+Die ausdrücklich aufgeführten Live-/Fehlerfälle sind inzwischen mit Nachweisen
+belegt; zusätzlich besteht die echte IPC-Kapazitätsprüfung 1–64/Abweisung von 65.
+§4.2/P06-01 ist dennoch unvollständig: Raum-Icon, App-Präferenzen und
+Layout-/Restore-Einstellungen fehlen in Definition und IPC. Außerdem ist der
+manuelle Fenster-Move unabhängig von Delete-Migration separat live zu belegen.
+Die verbindliche aktuelle Matrix und Restreihenfolge stehen im
+[P06-Abschlussabgleich](docs/phase-reports/P06_ACCEPTANCE_REVIEW.md).
+P07 beginnt erst nach tatsächlichem P06-Abschluss. Nachfolgende Checkpoints
+bleiben historische Nachweise; ihre damaligen offenen Punkte sind gegen diese
+aktuelle Matrix zu lesen.
+
 **P06-Monitorentfernung live bestanden, 26.09.2026:** Nach Neulogin läuft
 `e1953fc4…`. Gezielte Raumauswahl bei gleichem globalem Index und der gesamte
 physische HDMI-Ab-/Anstecktest mit vier Testfenstern erfolgreich: IDs/Inhalte

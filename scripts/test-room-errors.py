@@ -128,6 +128,28 @@ try:
     (profile / 'result.json').write_text(json.dumps(dict(
         last=rejected, writers=results, reconnect=reconnect.initial), indent=2))
     print('PASS two writers with same revision: one commit, one conflict; reconnect/persistence agree', flush=True)
+    revision = reconnect.initial['revision']
+    for number in range(2, 65):
+        request = 'capacity-' + str(number)
+        reconnect.mutate(request, revision, dict(operation='create', name='Room ' + str(number)))
+        result = reconnect.until('room-mutation-result', request)
+        assert result['error'] is None, result
+        revision += 1
+    maximum = rooms_file.read_bytes()
+    reconnect.mutate('overflow', revision, dict(operation='create', name='Room 65'))
+    overflow = reconnect.until('room-mutation-result', 'overflow')
+    assert overflow['error'] == 'invalid', overflow
+    assert rooms_file.read_bytes() == maximum
+    capacity = Connection(token)
+    connections.append(capacity)
+    entries = capacity.initial['rooms']
+    assert len(entries) == 64
+    assert len({r['id'] for r in entries}) == 64
+    assert len({r['workspace'] for r in entries}) == 64
+    assert capacity.initial['revision'] == revision
+    (profile / 'capacity.json').write_text(json.dumps(dict(
+        snapshot=capacity.initial, rejected=overflow), indent=2))
+    print('PASS IPC capacity: 64 distinct rooms/slots, room 65 rejected without file mutation', flush=True)
 finally:
     for connection in connections:
         connection.close()
