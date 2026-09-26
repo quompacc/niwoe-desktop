@@ -129,7 +129,7 @@ impl NiwoeShell {
                         edit,
                         order,
                         rooms.len(),
-                        &edit.delete_target.and_then(|id| rooms.iter().find(|r| r.id == id)).map_or_else(|| "Bitte wählen".to_owned(), |r| format!("{} · {}", r.workspace, r.name)),
+                        rooms,
                         &self.windows,
                         &self.workspace_state.rooms.message,
                         self.workspace_state.rooms.pending.is_some(),

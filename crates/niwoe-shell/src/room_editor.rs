@@ -8,6 +8,7 @@ pub(crate) struct Edit {
     pub description: String,
     pub assignment: niwoe_ipc::RoomAssignment,
     pub delete_target: Option<u64>,
+    pub target_menu: Option<u64>,
     pub confirm_delete: bool,
     pub creation_uncertain: bool,
     pub replace: bool,
@@ -101,6 +102,15 @@ impl RoomUi {
             return false;
         }
         self.ready = true;
+        if let Some(edit) = &mut self.edit {
+            if edit.delete_target.is_some_and(|id| !ids.contains(&id)) {
+                edit.delete_target = None;
+                edit.confirm_delete = false;
+            }
+            if edit.target_menu.is_some_and(|id| !ids.contains(&id)) {
+                edit.target_menu = None;
+            }
+        }
         self.snapshot = snapshot;
         true
     }
@@ -121,6 +131,7 @@ impl RoomUi {
                 description: room.description.clone(),
                 assignment: room.assignment,
                 delete_target: None,
+                target_menu: None,
                 confirm_delete: false,
                 creation_uncertain: false,
                 replace: true,
@@ -143,6 +154,7 @@ impl RoomUi {
             description: String::new(),
             assignment: niwoe_ipc::RoomAssignment::Free,
             delete_target: None,
+            target_menu: None,
             confirm_delete: false,
             creation_uncertain: false,
             replace: true,
@@ -175,13 +187,21 @@ impl RoomUi {
         let change = match action {
             RoomEditAction::Delete => {
                 let Some(target_id) = edit.delete_target else {
-                    self.message = "Bitte zuerst einen Zielraum wählen.".into();
+                    self.message =
+                        "Bitte wählen, in welchen Raum die offenen Fenster wechseln sollen.".into();
                     return None;
                 };
                 if !edit.confirm_delete {
                     edit.confirm_delete = true;
-                    self.message =
-                        "Erneut Löschen wählen: Fenster werden in den Zielraum verschoben.".into();
+                    let target = self
+                        .snapshot
+                        .rooms
+                        .iter()
+                        .find(|room| room.id == target_id)?;
+                    self.message = format!(
+                        "Raum löschen bestätigen: Offene Fenster wechseln nach „{}“.",
+                        target.name
+                    );
                     return None;
                 }
                 RoomChange::Delete {
@@ -190,22 +210,19 @@ impl RoomUi {
                 }
             }
             RoomEditAction::Target => {
-                let targets: Vec<_> = self
-                    .snapshot
-                    .rooms
-                    .iter()
-                    .filter(|r| r.id != edit.id)
-                    .map(|r| r.id)
-                    .collect();
-                if targets.is_empty() {
-                    return None;
-                }
-                let next = edit
-                    .delete_target
-                    .and_then(|id| targets.iter().position(|r| *r == id))
-                    .map_or(0, |i| (i + 1) % targets.len());
-                edit.delete_target = targets.get(next).copied();
+                edit.target_menu = if edit.target_menu.is_some() {
+                    None
+                } else {
+                    edit.delete_target.or_else(|| {
+                        self.snapshot
+                            .rooms
+                            .iter()
+                            .find(|r| r.id != edit.id)
+                            .map(|r| r.id)
+                    })
+                };
                 edit.confirm_delete = false;
+                self.message.clear();
                 return None;
             }
             RoomEditAction::Save if edit.id == 0 => RoomChange::CreateDetails {
@@ -318,6 +335,50 @@ impl RoomUi {
             return true;
         }
         false
+    }
+}
+
+impl RoomUi {
+    pub fn move_target_selection(&mut self, delta: isize) {
+        if self.pending.is_some() {
+            return;
+        }
+        let Some(edit) = &mut self.edit else {
+            return;
+        };
+        let Some(selected) = edit.target_menu else {
+            return;
+        };
+        let targets: Vec<_> = self
+            .snapshot
+            .rooms
+            .iter()
+            .filter(|r| r.id != edit.id)
+            .collect();
+        let Some(index) = targets.iter().position(|r| r.id == selected) else {
+            return;
+        };
+        let next = index.saturating_add_signed(delta).min(targets.len() - 1);
+        edit.target_menu = Some(targets[next].id);
+    }
+
+    pub fn choose_target(&mut self, id: u64) {
+        if self.pending.is_some() {
+            return;
+        }
+        let Some(edit) = &mut self.edit else {
+            return;
+        };
+        if edit.target_menu.is_none()
+            || id == edit.id
+            || !self.snapshot.rooms.iter().any(|r| r.id == id)
+        {
+            return;
+        }
+        edit.delete_target = Some(id);
+        edit.target_menu = None;
+        edit.confirm_delete = false;
+        self.message.clear();
     }
 }
 

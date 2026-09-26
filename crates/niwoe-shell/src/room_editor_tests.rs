@@ -55,11 +55,15 @@ fn description_and_name_use_one_revision_and_delete_requires_target_and_confirma
     ui.result(&request, None);
     assert!(ui.request(RoomEditAction::Delete).is_none());
     assert!(ui.request(RoomEditAction::Target).is_none());
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, None);
+    ui.choose_target(2);
     assert_eq!(ui.edit.as_ref().unwrap().delete_target, Some(2));
     assert!(ui.request(RoomEditAction::Delete).is_none());
     assert!(ui.edit.as_ref().unwrap().confirm_delete);
     ui.request(RoomEditAction::Target);
     assert!(!ui.edit.as_ref().unwrap().confirm_delete);
+    ui.move_target_selection(1);
+    ui.choose_target(ui.edit.as_ref().unwrap().target_menu.unwrap());
     assert!(ui.request(RoomEditAction::Delete).is_none());
     assert!(matches!(
         ui.request(RoomEditAction::Delete),
@@ -71,6 +75,41 @@ fn description_and_name_use_one_revision_and_delete_requires_target_and_confirma
             ..
         })
     ));
+}
+
+#[test]
+fn target_menu_does_not_change_destination_until_selection_and_survives_reordering() {
+    let mut ui = RoomUi::default();
+    ui.accept(ui.snapshot.clone());
+    ui.begin(1);
+    ui.request(RoomEditAction::Target);
+    ui.move_target_selection(isize::MAX);
+    assert_eq!(ui.edit.as_ref().unwrap().target_menu, Some(9));
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, None);
+    ui.choose_target(1);
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, None);
+    ui.choose_target(9);
+    ui.request(RoomEditAction::Target);
+    ui.move_target_selection(isize::MIN);
+    assert_eq!(ui.edit.as_ref().unwrap().target_menu, Some(2));
+    ui.request(RoomEditAction::Target); // Close without choosing.
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, Some(9));
+    let mut snapshot = ui.snapshot.clone();
+    snapshot.rooms.swap(1, 8);
+    snapshot.revision += 1;
+    assert!(ui.accept(snapshot.clone()));
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, Some(9));
+    snapshot.rooms.retain(|r| r.id != 9);
+    for (index, room) in snapshot.rooms.iter_mut().enumerate() {
+        room.workspace = index as u8 + 1;
+    }
+    snapshot.revision += 1;
+    ui.request(RoomEditAction::Target);
+    assert!(ui.accept(snapshot));
+    assert_eq!(ui.edit.as_ref().unwrap().delete_target, None);
+    assert_eq!(ui.edit.as_ref().unwrap().target_menu, None);
+    assert!(!ui.edit.as_ref().unwrap().confirm_delete);
+    assert!(ui.request(RoomEditAction::Delete).is_none());
 }
 
 #[test]

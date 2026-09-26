@@ -32,15 +32,31 @@ pub(super) fn draw_deletion(
     pm: &mut tiny_skia::PixmapMut<'_>,
     edit: &Edit,
     room_count: usize,
-    target_name: &str,
+    rooms: &[RoomEntry],
     scroll_y: i32,
     p: niwoe_tokens::Palette,
 ) {
     if edit.id == 0 {
         return;
     }
+    let target_rect = deletion_rect(pm.width(), pm.height(), scroll_y, true);
+    paint_text(
+        pm,
+        "Fenster verschieben nach …",
+        target_rect.x,
+        target_rect.y - S.sm,
+        Typography::DEFAULT.caption_size as f32,
+        p.text_dim,
+    );
+    let target_name = edit
+        .delete_target
+        .and_then(|id| rooms.iter().find(|r| r.id == id))
+        .map_or_else(
+            || "Raum auswählen".to_owned(),
+            |r| format!("{} · {}", r.workspace, r.name),
+        );
     for (target, label, focus) in [
-        (true, format!("Ziel: {target_name}"), 6),
+        (true, target_name, 6),
         (
             false,
             if edit.confirm_delete {
@@ -72,12 +88,24 @@ pub(super) fn draw_deletion(
             pm,
             &truncate_to_fit(
                 &label,
-                rect.width - S.sm * 2,
+                rect.width - if target { S.xxl * 2 } else { S.sm * 2 },
                 Typography::DEFAULT.caption_size as f32,
             ),
             rect,
             Typography::DEFAULT.caption_size as f32,
             if room_count > 1 { p.text } else { p.text_dim },
         );
+        if target {
+            let x = rect.x + rect.width - S.lg;
+            let y = rect.y + rect.height / 2;
+            let direction = if edit.target_menu.is_some() { -1 } else { 1 };
+            let mut path = tiny_skia::PathBuilder::new();
+            path.move_to((x - S.xs) as f32, (y - direction * S.xs / 2) as f32);
+            path.line_to(x as f32, (y + direction * S.xs / 2) as f32);
+            path.line_to((x + S.xs) as f32, (y - direction * S.xs / 2) as f32);
+            if let Some(path) = path.finish() {
+                paint_border(pm, &path, p.text_dim, Controls::BORDER as f32);
+            }
+        }
     }
 }

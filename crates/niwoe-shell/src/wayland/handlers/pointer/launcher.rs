@@ -295,6 +295,7 @@ macro_rules! handle_launcher_pointer {
                         } else {
                             (-vertical.absolute * 4.0) as i32
                         };
+                        if $shell.room_target_menu_scroll($qh, delta) { continue; }
                         let max = crate::room_management_view::max_configuration_scroll(content_height);
                         let next = ($shell.room_configuration_scroll_y + delta).clamp(0, max);
                         if next != $shell.room_configuration_scroll_y {
@@ -358,6 +359,7 @@ macro_rules! handle_launcher_pointer {
                         let cx = local_pos.0 as i32;
                         let cy = local_pos.1 as i32;
                         if $shell.room_configuration_id.is_some() {
+                            if $shell.room_target_menu_click($qh, cx, cy, content_width, content_height) { continue; }
                             if let Some(action) = crate::room_management_view::hit_configuration(
                                 cx, cy, content_width, content_height,
                                 $shell.room_configuration_scroll_y,

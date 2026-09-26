@@ -451,7 +451,8 @@ struct RoomRenderContext<'a> {
 include!("room_management_view/cards.rs");
 mod configuration;
 pub(crate) use configuration::{
-    draw_room_configuration, hit_configuration, max_configuration_scroll, ConfigurationAction,
+    draw_room_configuration, hit_configuration, hit_target_menu, max_configuration_scroll,
+    ConfigurationAction,
 };
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn draw_room_management(

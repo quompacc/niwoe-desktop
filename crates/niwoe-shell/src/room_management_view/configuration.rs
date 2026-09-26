@@ -52,6 +52,8 @@ pub(crate) enum ConfigurationAction {
 
 mod actions;
 use actions::{deletion_rect, description_rect, draw_deletion};
+mod target_menu;
+pub(crate) use target_menu::hit_target_menu;
 
 fn content_bounds(width: u32) -> (i32, i32, i32, i32) {
     let left = C.sidebar_width + C.outer_pad;
@@ -419,7 +421,7 @@ pub(crate) fn draw_room_configuration(
     edit: &Edit,
     order: usize,
     room_count: usize,
-    target_name: &str,
+    rooms: &[RoomEntry],
     windows: &[WindowInfo],
     message: &str,
     pending: bool,
@@ -446,16 +448,9 @@ pub(crate) fn draw_room_configuration(
         Radius::DEFAULT.none,
     );
     draw_body(
-        &mut pm,
-        room,
-        edit,
-        order,
-        room_count,
-        target_name,
-        windows,
-        scroll_y,
-        config,
+        &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, config,
     );
+    target_menu::draw(&mut pm, edit, rooms, scroll_y, p);
     draw_chrome(
         &mut pm,
         room,

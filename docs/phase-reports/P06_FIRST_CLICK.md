@@ -61,7 +61,11 @@ blieben unverändert. Prozess 20918 verwendet bis zum nächsten Login weiterhin
 den vorherigen Release `77ebffb8…`.
 
 Der oben dokumentierte Fehler wurde auf dem alten Release real reproduziert.
-Die korrigierte Erstklickfolge benötigt noch einen Live-Rundlauf mit dem neuen
-Compositor. Ein alleiniger Shell-Neustart aktiviert den Fix nicht; die laufende
-Sitzung wird deshalb nicht automatisch beendet. P06 bleibt bis zur weiteren
-Abnahme in Arbeit.
+Der anschließende Nutzer-Neulogin vom 26.09.2026 um 08:52:27 aktivierte den
+korrigierten Compositor (PID 25333, `/proc/25333/exe` stimmt mit obigem Hash
+überein). Der erneute DRM-Lauf schloss die Oberflächen, positionierte den
+Zeiger bei 1420/170, öffnete den Hub mit Super+Space und klickte ohne weitere
+Zeigerbewegung: „Räume verwalten“ öffnete beim ersten Klick.
+Beleg: `target/p06-click-first-fixed.png`. Damit ist diese konkrete
+Regression live nachgeprüft. Weitere Erstklickkonstellationen wie Hotplug und
+Multioutput sind dadurch nicht pauschal abgenommen. P06 bleibt in Arbeit.

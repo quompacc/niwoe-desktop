@@ -140,6 +140,23 @@ impl NiwoeShell {
         if self.workspace_state.rooms.pending.is_some() {
             return;
         }
+        if let Some(edit) = &mut self.workspace_state.rooms.edit {
+            if let Some(selected) = edit.target_menu {
+                match key {
+                    Keysym::Escape | Keysym::Tab | Keysym::ISO_Left_Tab => edit.target_menu = None,
+                    Keysym::Up => self.workspace_state.rooms.move_target_selection(-1),
+                    Keysym::Down => self.workspace_state.rooms.move_target_selection(1),
+                    Keysym::Home => self.workspace_state.rooms.move_target_selection(isize::MIN),
+                    Keysym::End => self.workspace_state.rooms.move_target_selection(isize::MAX),
+                    Keysym::Return | Keysym::KP_Enter => self.workspace_state.rooms.choose_target(selected),
+                    _ => {},
+                }
+                if key != Keysym::Tab && key != Keysym::ISO_Left_Tab {
+                    self.draw_launcher(qh, RepaintReason::Keyboard);
+                    return;
+                }
+            }
+        }
         if key == Keysym::Escape {
             self.return_to_room_management(qh);
             return;
@@ -228,6 +245,27 @@ impl NiwoeShell {
         }
         self.workspace_state.rooms.begin(workspace);
         self.draw_workspace_popup(qh, RepaintReason::Pointer);
+    }
+
+    pub(crate) fn room_target_menu_scroll(&mut self, qh: &QueueHandle<Self>, delta: i32) -> bool {
+        if !self.workspace_state.rooms.edit.as_ref().is_some_and(|e| e.target_menu.is_some()) { return false; }
+        if delta != 0 {
+            self.workspace_state.rooms.move_target_selection(delta.signum() as isize);
+            self.draw_launcher(qh, RepaintReason::Pointer);
+        }
+        true
+    }
+
+    pub(crate) fn room_target_menu_click(&mut self, qh: &QueueHandle<Self>, x: i32, y: i32, width: u32, height: u32) -> bool {
+        let Some(edit) = self.workspace_state.rooms.edit.as_ref().filter(|e| e.target_menu.is_some()) else { return false; };
+        let selected = crate::room_management_view::hit_target_menu(x, y, width, height, self.room_configuration_scroll_y, edit, &self.workspace_state.rooms.snapshot.rooms);
+        if let Some(id) = selected {
+            self.workspace_state.rooms.choose_target(id);
+        } else {
+            self.workspace_state.rooms.edit.as_mut().unwrap().target_menu = None;
+        }
+        self.draw_launcher(qh, RepaintReason::Pointer);
+        true
     }
 
     pub(crate) fn room_edit_action(

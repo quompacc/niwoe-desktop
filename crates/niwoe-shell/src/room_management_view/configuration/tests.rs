@@ -114,6 +114,9 @@ fn configuration_renders_selected_room() {
         description: room.description.clone(),
         assignment: room.assignment,
         delete_target: None,
+        target_menu: std::env::var("NIWOE_PREVIEW_TARGET_MENU")
+            .ok()
+            .and_then(|s| s.parse().ok()),
         confirm_delete: false,
         creation_uncertain: false,
         replace: true,
@@ -140,7 +143,7 @@ fn configuration_renders_selected_room() {
         &edit,
         1,
         9,
-        "Bitte wählen",
+        &crate::room_editor::RoomUi::default().snapshot.rooms,
         &[],
         "",
         false,

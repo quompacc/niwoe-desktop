@@ -5,7 +5,7 @@ fn draw_body(
     edit: &Edit,
     order: usize,
     room_count: usize,
-    target_name: &str,
+    rooms: &[RoomEntry],
     windows: &[WindowInfo],
     scroll_y: i32,
     config: &niwoe_config::ThemeConfig,
@@ -288,18 +288,24 @@ fn draw_body(
         width: right_width,
         height: note_height(pm.height()),
     };
-    section(pm, note, "DEIN KONTEXT BLEIBT BEI DIR", p);
+    section(pm, note, if edit.id == 0 { "DEIN KONTEXT BLEIBT BEI DIR" } else { "RAUM LÖSCHEN" }, p);
     paint_centered_card_lines(
         pm,
-        Rect { height: note.height - C.config_field_height - C.card_gap, ..note },
-        &[
+        Rect { height: note.height - C.config_field_height - C.card_gap - if edit.id == 0 { 0 } else { S.xxl }, ..note },
+        if edit.id == 0 { &[
         "NIWOE organisiert Räume und Fenster.",
         "Apps und Dateien bleiben in ihren Anwendungen.",
         "Weitere Restore-Funktionen folgen mit Backend.",
-        ],
+        ] } else if room_count == 1 { &[
+            "Der letzte Raum kann nicht gelöscht werden.",
+            "Erstelle zuerst einen weiteren Raum.",
+        ] } else { &[
+            "Offene Fenster wechseln in den gewählten Raum.",
+            "Anwendungen bleiben geöffnet.",
+        ] },
         p,
     );
-    draw_deletion(pm, edit, room_count, target_name, scroll_y, p);
+    draw_deletion(pm, edit, room_count, rooms, scroll_y, p);
 }
 
 fn paint_centered_card_lines(

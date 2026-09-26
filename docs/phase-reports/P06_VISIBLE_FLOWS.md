@@ -17,12 +17,17 @@ Raum ist die Beschreibung jetzt bearbeitbar; verborgene Zuordnungsmetadaten
 werden durch die Formularänderung nicht überschrieben. Die Zuordnungsregel-UI,
 Start-Apps und Restore bleiben den späteren Planphasen vorbehalten.
 
-Löschen befindet sich in der rechten Informationskarte der Konfiguration:
+Löschen befindet sich im rechten Bereich „Raum löschen“ der Konfiguration:
 Zielraum ausdrücklich auswählen, „Raum löschen“, anschließend „Löschen
-bestätigen“. Die Zielaktion durchläuft die anderen Räume in Listenreihenfolge;
+bestätigen“. Auf Nutzerwunsch ersetzt eine aufklappbare Raumliste die frühere
+zyklische Zielaktion; die Beschriftung lautet „Fenster verschieben nach …“.
 Slotnummer und Name unterscheiden auch gleichnamige Ziele. Der letzte Raum ist
 nicht löschbar. Der Compositor verschiebt vorhandene Fenster über den bestehenden
 P06-Pfad. Keine Anwendung wird durch die Shell geschlossen.
+
+Aktueller Installations- und Bedienstand: [Raumwahl beim Löschen](P06_DELETE_TARGET_MENU.md).
+Die folgenden ursprünglichen Installationshashes und Live-Gates beschreiben
+den Stand vor dieser Bedienpräzisierung; der verlinkte Bericht führt sie fort.
 
 Pending sperrt weitere Mutationen und Abbrechen. Konflikte und Speicherfehler
 bleiben im Formular sichtbar. Nach unklarer Erzeugungsbestätigung (Timeout oder

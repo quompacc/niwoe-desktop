@@ -1,5 +1,12 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-Bedienpräzisierung vom 26.09.2026:** Auf Nutzerwunsch ersetzt ein eigener
+Bereich „Raum löschen“ mit „Fenster verschieben nach …“ und einer aufklappbaren
+Raumliste die unklare zyklische Zielwahl. Der Erstklick-Fix läuft inzwischen im
+neuen Compositor und wurde mit stationärem Zeiger live nachgeprüft.
+Prüfungen, installierte Buildidentität und verbleibende Gates:
+[Raumwahl beim Löschen](docs/phase-reports/P06_DELETE_TARGET_MENU.md).
+
 **P06-Fortsetzung vom 26.09.2026:** Die installierte Grundlage läuft inzwischen
 nach Neulogin mit bestätigten Buildidentitäten. Create/Delete, Metadaten,
 Raumwechsel, native Fenstermigration und Persistenz wurden auf dem DRM-Host
