@@ -50,6 +50,20 @@ pub fn handle_pointer_button<I: InputBackend>(
         {
             state.update_focused_output_from_point(location, "pointer-button", true);
         }
+        let under = state.surface_under(location);
+        // Mapping/unmapping a layer can change the target under a stationary
+        // cursor without a hardware motion event. Refresh focus before the
+        // press installs its implicit grab, so the first click reaches the
+        // currently visible surface. Existing grabs never enter this branch.
+        pointer.motion(
+            state,
+            under.clone(),
+            &MotionEvent {
+                location,
+                serial,
+                time: event.time_msec(),
+            },
+        );
         let (selected_output_info, fallback_reason) =
             select_pointer_button_output_info(state.output_registry.list(), Some(location));
         if let Some(info) = selected_output_info {
@@ -63,7 +77,6 @@ pub fn handle_pointer_button<I: InputBackend>(
                 location.x, location.y, fallback_reason
             );
         }
-        let under = state.surface_under(location);
         let under_is_layer_surface = under
             .as_ref()
             .map(|(surface, _)| surface_belongs_to_layer(state, surface))

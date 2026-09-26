@@ -3,6 +3,11 @@
 Status: **in-progress**, keine vollständige P06-Live-Abnahme.
 Basis: `bc92b45` (Reconnect-Fix), davor `190c896`.
 
+Nach dem Neulogin meldete der Nutzer einen verlorenen Erstklick. Der Fehler
+wurde auf dem installierten Release reproduziert und im gemeinsamen
+Compositor-Eingabepfad korrigiert. Belege und Aktivierungsstatus stehen im
+[Erstklick-Bericht](P06_FIRST_CLICK.md).
+
 ## Ergebnis
 
 „Neuer Raum“ öffnet einen Entwurf in der vollständigen bestehenden
