@@ -3,8 +3,9 @@
 **P06-Live-Runde vom 26.09.2026:** Nativer Create/Edit/Reorder/Delete-Ablauf,
 Migration normaler/schwebender/minimierter Fenster, Wiederherstellen und
 Bereinigung erfolgreich. Ein live nachgewiesener Fehler der Dialog-Raumvererbung
-ist korrigiert, isoliert mit Gegenprobe getestet und installiert. Vollständiger
-DRM-Neulogin für den neuen Compositor steht noch aus; P06 bleibt in Arbeit.
+ist korrigiert, isoliert mit Gegenprobe getestet und installiert. Nach dem
+Nutzer-Neulogin sind Buildidentität, neutrale Loge, persistente Raumdaten und
+Dialogzuordnung auch auf DRM bestätigt; P06 bleibt wegen weiterer Prüfgates in Arbeit.
 Die Neun-Räume-Grenze der alten Überlaufliste ist als P07-Lücke bestätigt.
 Details: [Live-Lebenszyklus](docs/phase-reports/P06_LIVE_LIFECYCLE.md).
 

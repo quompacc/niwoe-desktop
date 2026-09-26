@@ -107,13 +107,46 @@ Nested-Smoke bytegleich.
 Compositor atomar installiert, per `cmp` gegen den Release und SHA-256 geprüft:
 `47a77cd257b3817e0a73123e0addc89412fad6d13d32ffa00f503ff3e642b62e`.
 Shell unverändert: `5636d59c57dd4c9508ce57fdb75614532c8b52ff27f18485c2d70bb065c7cf18`.
-Die laufende Sitzung verwendet bis zum Neulogin den alten Compositor
+Die damalige Sitzung verwendete bis zum Neulogin den alten Compositor
 `eb48aa3d4675d3eda0985fd95da17e72b8cbd6e533b47f420bdbb8377b6bf283`.
+
+## Nachprüfung nach Nutzer-Neulogin
+
+Am 26.09.2026 um 11:54:42 gestartete DRM-Sitzung: Compositor PID 56919,
+Shell PID 56937. Die SHA-256 der tatsächlich laufenden Binärdateien stimmen
+mit den oben angegebenen installierten Releases überein; der Dialog-Fix ist aktiv.
+Der erste Snapshot zeigt die neutrale Loge (aktiver Workspace 0), neun Räume
+und keine Fenster. IDs, Reihenfolge, Metadaten und Revision 49 entsprechen
+exakt dem bereinigten Zustand vor dem Login. Auch die gespeicherte
+Raumkonfiguration wurde verglichen.
+
+`python3 target/p06-postlogin.py` erfolgreich (Exitcode 0), auf dem echten
+DRM-Compositor mit einer eigenen temporären GTK3-Anwendung:
+
+- Dialog zu einem Elternfenster im inaktiven Raum bleibt in dessen Raum;
+  der aktive Raum wechselt nicht.
+- Ein weiterer Dialog zu demselben, inzwischen minimierten Elternfenster
+  bleibt ebenfalls im Elternraum.
+- Wiederherstellen des Elternfensters gelingt; beide Dialoge werden gezeichnet,
+  der Eingabefeldinhalt bleibt erhalten.
+- Nur die Testanwendung beendet; keine Fenster übrig. Raum-Snapshot und
+  Konfigurationsdatei bleiben unverändert. Zum Abschluss ist Raum 2 aktiv.
+
+Belege: `target/p06-live-ui/post-login.json` und
+`target/p06-postlogin-evidence/{inactive-parent,minimized-parent,client-state,final}.json`.
+Der neue Sitzungsmarker `first-login-hub-shown-178` wurde um 11:54:45 angelegt.
+Die erste eigene Aufnahme zeigt bereits „Räume verwalten“; sie beweist daher
+nicht die ursprüngliche Willkommensansicht. In dieser Runde wurde kein
+zusätzlicher Shell-Neustart zur Prüfung des einmaligen Hubs ausgelöst.
+Der isolierte Neustarttest oben deckt zusätzlich eigens erzeugte Metadaten ab;
+die echte Loginprüfung vergleicht die neun beibehaltenen Nutzerräume.
+
+In dieser Nachprüfung nur Plan und Bericht geändert, kein Rust-Code.
+Die vorherigen Build-/Testnachweise gelten unverändert; die neuen Nachweise
+sind Live-Prüfungen und keine vollständige P06-Abnahme.
 
 ## Offene Gates
 
-- Dialog-Fix und Persistenz nach tatsächlichem DRM-Neulogin. Die Zustimmung
-  zur eigenständigen Ab-/Anmeldung wurde wegen der Sitzungsregel angefragt.
 - Zwei physische Outputs/Hotplug, XWayland-Schließen im inaktiven Raum sowie
   weitere Fehler-/Grenzfälle der gesamten P06-Matrix.
 - P07-Navigation für mehr als neun Räume; kein Vorziehen weiterer P07-Features.
