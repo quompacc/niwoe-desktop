@@ -239,9 +239,11 @@ impl NiwoeState {
 
         let leaving_lobby = std::mem::replace(&mut self.lobby_active, false);
         if idx == old {
-            if leaving_lobby {
+            // The compatibility global can still name the removed output's
+            // room while the surviving focused output shows another room.
+            if leaving_lobby || self.current_workspace_index() != idx {
                 self.set_active_workspace_for_output(self.focused_output(), idx);
-                self.mark_all_outputs_dirty("lobby-room-selection");
+                self.mark_all_outputs_dirty("focused-output-room-selection");
                 self.broadcast_workspace();
                 self.broadcast_window_snapshot();
                 return;
@@ -305,6 +307,7 @@ impl NiwoeState {
             focused_output_name
         );
 
+        let previous_output_workspace = self.active_workspace_for_output(focused_output);
         let leaving_lobby = std::mem::replace(&mut self.lobby_active, false);
         self.set_active_workspace_for_output(focused_output, idx);
         if let Some(output_id) = focused_output {
@@ -312,8 +315,8 @@ impl NiwoeState {
         }
 
         if idx == old {
-            if leaving_lobby {
-                self.mark_all_outputs_dirty("lobby-room-selection");
+            if leaving_lobby || previous_output_workspace != idx {
+                self.mark_all_outputs_dirty("focused-output-room-selection");
                 self.broadcast_workspace();
                 self.broadcast_window_snapshot();
                 return;

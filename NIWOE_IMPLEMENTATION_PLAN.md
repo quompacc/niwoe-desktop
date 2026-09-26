@@ -1,5 +1,12 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-Monitorentfernung vom 26.09.2026:** Physischer Test mit normalem,
+schwebendem, minimiertem Fenster und Dialog erhält Fenster und Inhalte, deckt
+aber eine veraltete Output-Raumauswahl auf. Wiederherstellung des minimierten
+Fensters dadurch blockiert. Raumauswahl auch bei gleichem globalem Index
+korrigiert; kompletter Live-Nachtest offen. Details:
+[Monitorentfernung mit Fenstern](docs/phase-reports/P06_OUTPUT_REMOVAL_WINDOWS.md).
+
 **P06-DRM-Nachtest vom 26.09.2026:** Nach Nutzer-Neulogin läuft `e1e21670…`.
 Native Fensterbereinigung im Hintergrundraum mit Dialog und minimiertem
 Elternfenster auf dem Zweimonitor-DRM-System bestanden; keine verwaisten
