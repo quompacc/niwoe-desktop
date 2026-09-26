@@ -549,6 +549,7 @@ pub fn init_drm(
     );
 
     state.drm_backend = Some(DrmBackend {
+        device: drm,
         device_fd: device_fd.clone(),
         kms_node_path: std::sync::Arc::from(gpu_path.display().to_string()),
         kms_is_primary_node: is_primary_node,

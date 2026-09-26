@@ -302,8 +302,7 @@ impl NiwoeState {
             .output_config_entries
             .iter()
             .find(|candidate| candidate.name == pending.name);
-        let mut drm = DrmDevice::new(device_fd.clone(), false)?.0;
-        let connector_info = drm.get_connector(pending.connector, false)?;
+        let connector_info = device_fd.get_connector(pending.connector, false)?;
         if connector_info.state() != smithay::reexports::drm::control::connector::State::Connected {
             return Err(Error::other(format!(
                 "connector for output {} is not connected",
@@ -377,7 +376,7 @@ impl NiwoeState {
             crate::backend::drm::init::DrmCompositorBuildParams {
                 state_display_handle: &self.display_handle,
                 device_fd: device_fd.clone(),
-                drm: &mut drm,
+                drm: &mut self.drm_backend.as_mut().ok_or_else(missing_backend_err)?.device,
                 crtc: pending.crtc,
                 connector: pending.connector,
                 mode,

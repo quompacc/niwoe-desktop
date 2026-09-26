@@ -192,19 +192,7 @@ fn add_drm_output_via_hotplug_pipeline(
         )
     };
 
-    let (mut drm, _notifier) = match DrmDevice::new(device_fd.clone(), false) {
-        Ok(pair) => pair,
-        Err(err) => {
-            tracing::warn!(
-                "drm output add skipped reason=device-open-failed connector={:?} err={}",
-                connector,
-                err
-            );
-            return false;
-        }
-    };
-
-    let resources = match drm.resource_handles() {
+    let resources = match device_fd.resource_handles() {
         Ok(resources) => resources,
         Err(err) => {
             tracing::warn!(
@@ -216,7 +204,7 @@ fn add_drm_output_via_hotplug_pipeline(
         }
     };
 
-    let conn = match drm.get_connector(connector, false) {
+    let conn = match device_fd.get_connector(connector, false) {
         Ok(conn) => conn,
         Err(err) => {
             tracing::warn!(
@@ -276,7 +264,10 @@ fn add_drm_output_via_hotplug_pipeline(
         mode_reason
     );
 
-    let Some(crtc_handle) = super::gpu::pick_crtc(&drm, &resources, &conn, &occupied_crtcs) else {
+    let Some(backend) = state.drm_backend.as_ref() else {
+        return false;
+    };
+    let Some(crtc_handle) = super::gpu::pick_crtc(&backend.device, &resources, &conn, &occupied_crtcs) else {
         tracing::warn!(
             "drm output add skipped reason=no-free-crtc connector={:?}",
             connector
@@ -380,10 +371,13 @@ fn add_drm_output_via_hotplug_pipeline(
     );
     output.set_preferred(out_mode);
 
+    let Some(backend) = state.drm_backend.as_mut() else {
+        return false;
+    };
     let compositor = match build_drm_compositor(DrmCompositorBuildParams {
         state_display_handle: &state.display_handle,
         device_fd: device_fd.clone(),
-        drm: &mut drm,
+        drm: &mut backend.device,
         crtc: crtc_handle,
         connector,
         mode,

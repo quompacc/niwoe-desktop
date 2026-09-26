@@ -1,5 +1,11 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-HDMI-Fortsetzung vom 26.09.2026:** Beide Monitore beim Start vom Nutzer
+bestätigt; Hotplug schlägt weiterhin fehl. Logs belegen funktionierende
+udev-Erkennung und einen Fehler bei erneuter DRM-Geräteinitialisierung.
+Add/Reaktivierung verwenden nun das bestehende Gerät; Hardware-Nachtest offen.
+Details: [HDMI-Hotplug](docs/phase-reports/P06_HDMI_HOTPLUG.md).
+
 **P06-HDMI-Befund vom 26.09.2026:** HDMI ist inzwischen angeschlossen und wird
 von Linux erkannt, vom laufenden NIWOE aber noch nicht als Ausgang übernommen.
 Direkter Linux-Hotplug-Ereignispfad und nutzbare Sitzungsdiagnosen ergänzt;

@@ -9,7 +9,7 @@ use std::{
 use niwoe_config::{NiwoeConfig, OutputEntry, ThemeManager};
 use niwoe_wm::WmWorkspace;
 use smithay::{
-    backend::{allocator::Format, drm::DrmDevice},
+    backend::allocator::Format,
     desktop::{layer_map_for_output, PopupManager},
     input::SeatState,
     output::{Mode as OutputMode, Output, PhysicalProperties, Scale, Subpixel},

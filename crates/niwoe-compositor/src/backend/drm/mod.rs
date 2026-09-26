@@ -7,7 +7,10 @@ use niwoe_config::OutputModeConfig;
 use smithay::{
     backend::{
         allocator::gbm::GbmAllocator,
-        drm::{compositor::DrmCompositor, exporter::gbm::GbmFramebufferExporter, DrmDeviceFd},
+        drm::{
+            compositor::DrmCompositor, exporter::gbm::GbmFramebufferExporter, DrmDevice,
+            DrmDeviceFd,
+        },
         renderer::{element::memory::MemoryRenderBuffer, gles::GlesRenderer},
     },
     desktop::Window,
@@ -113,6 +116,8 @@ pub enum DrmCursorIcon {
 }
 
 pub struct DrmBackend {
+    // One device owns plane claims and surface tracking for the whole session.
+    pub device: DrmDevice,
     pub device_fd: DrmDeviceFd,
     pub kms_node_path: std::sync::Arc<str>,
     pub kms_is_primary_node: bool,

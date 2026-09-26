@@ -1,6 +1,8 @@
 # P06 – HDMI-Hotplug, 26.09.2026
 
-Status: **in-progress**. Kein Nachweis einer funktionierenden Zweimonitor-Sitzung.
+Status: **in-progress**. Der Nutzer bestätigt Bild auf beiden Monitoren nach
+Neulogin, meldet jedoch fehlschlagendes Hotplug. Die vollständige
+Zweimonitor-Abnahme bleibt offen.
 
 ## Live-Befund
 
@@ -69,3 +71,50 @@ Neuen Compositor per regulärem Nutzer-Neulogin aktivieren; danach tatsächliche
 Ausgänge/Modi und Logs prüfen. Erst bei zwei aktiven Ausgängen Raumwahl/Fokus,
 Fensterzuordnung und anschließend Entfernen/Wiederanschließen prüfen.
 Die laufende Nutzersitzung wird nicht automatisch beendet. P06 bleibt offen.
+
+## Fortsetzung: Wiederanschließen scheitert an zweitem DRM-Gerät
+
+Compositor PID 74773 läuft nachweislich mit `7cb65e3f…`. Der Nutzer bestätigt
+beide Displays beim Start, aber kein funktionierendes Hotplug. Linux meldet
+HDMI verbunden, NIWOE nur `drm-0`; keine Fenster, Raumdaten unverändert bei
+Revision 49. Beleg: `target/p06-live-ui/hotplug-failure.json`.
+
+Das nun verfügbare Sitzungslog zeigt `Device changed`, danach
+`drm output add detected` und `device-open-failed`: Lesen der DRM-Properties
+schlägt mit `Invalid argument (os error 22)` fehl. Der udev-Pfad funktioniert;
+der Fehler liegt danach im Add-Pfad. Auszug gesichert unter
+`target/p06-device-hotplug-before.log`.
+
+Der Add-Pfad erzeugte mit `DrmDevice::new` ein zweites Smithay-Geräteobjekt
+auf demselben Descriptor. Die Änderung hält das beim Start erzeugte Gerät
+für die gesamte Backend-Lebensdauer und verwendet es erneut. Das erhält auch
+Smithays gemeinsame Plane-Claims, Surface-Verwaltung und Notifier-Zuordnung.
+Der identische Fehlerpfad beim Reaktivieren deaktivierter Outputs ist mit korrigiert.
+
+Geänderte Dateien:
+
+- `backend/drm/mod.rs`: Backend besitzt das gemeinsame `DrmDevice`.
+- `backend/drm/init.rs`: Übergabe des initialisierten Geräts an das Backend.
+- `backend/drm/init/hotplug.rs`: Abfragen über bestehenden Descriptor;
+  CRTC-Auswahl und Surface-Erzeugung über das vorhandene Gerät.
+- `state/setup/layout.rs` und `state/setup.rs`: dieselbe Wiederverwendung im
+  Reaktivierungspfad, nicht mehr benötigten Import entfernt.
+- Plan und Bericht: Nutzerbefund und konkreten Fehler nachgeführt.
+
+Keine neue Dependency, API-/Konfigurationsänderung oder zusätzlicher Timer.
+Die erneute vollständige Geräteinitialisierung entfällt bei Add/Reaktivierung;
+Renderreihenfolge und Idle-Verhalten bleiben unverändert. Im Compositor gibt
+es jetzt nur noch den einen `DrmDevice::new`-Aufruf beim Backend-Start.
+Call-Flow gegen Smithays `create_surface`, Plane-Claims und Notifier geprüft.
+Ein erfolgreicher Build ersetzt den noch ausstehenden echten Hotplug-Nachtest nicht.
+
+Verifikation der Fortsetzung auf Fedora, jeweils Exitcode 0:
+`cargo check --workspace`, `cargo test --workspace -q`,
+`cargo clippy --workspace --all-targets -- -D warnings`,
+`cargo fmt --all -- --check`, `cargo build --release -p niwoe --locked`.
+Logs: `target/p06-device-{check,test,clippy,build}.log`.
+
+Atomar installierter und per `cmp`/SHA-256 geprüfter Compositor:
+`8c1d874cd054bc5994530619f9870b7af257dd477ef2203d6892b72bc1711a56`.
+Shell unverändert. PID 74773 läuft weiterhin mit `7cb65e3f…`; regulärer Neulogin
+ist für die Aktivierung erforderlich. Keine Sitzung automatisch beendet.
