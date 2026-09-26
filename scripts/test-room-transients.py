@@ -161,3 +161,28 @@ finally:
     process.terminate()
     process.wait(timeout=5)
     log.close()
+
+# A disconnected native client must leave no snapshot entries in another room.
+remaining = snapshot()['room-snapshot']['snapshot']['rooms']
+source, target = (r['workspace'] for r in remaining[:2])
+send(type='switch-workspace', workspace=source)
+close_directory = directory / 'background-close'
+close_directory.mkdir()
+with (close_directory / 'client.log').open('w') as log:
+    process = subprocess.Popen([sys.executable, __file__, '--client', str(close_directory)],
+                               env=client_env, stdout=log, stderr=log)
+try:
+    opened = wait_for(lambda d: 'P06 Parent' in windows(d))
+    parent_id = windows(opened)['P06 Parent']['id']
+    send(type='switch-workspace', workspace=target)
+    process.terminate()
+    process.wait(timeout=5)
+    closed = wait_for(lambda d: not d['window-snapshot']['windows'])
+    assert closed['window-snapshot']['active_workspace'] == target
+    (close_directory / 'result.json').write_text(json.dumps(
+        {'closed_id': parent_id, 'snapshot': closed}, indent=2))
+    print('PASS native client exit in background room: no stale window, active room unchanged')
+finally:
+    if process.poll() is None:
+        process.terminate()
+        process.wait(timeout=5)

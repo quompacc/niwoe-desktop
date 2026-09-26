@@ -1,5 +1,13 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-Zweimonitor-/Fehlerrunde vom 26.09.2026:** Unabhängige Raumwahl und
+Fensterzuordnung auf eDP/HDMI live geprüft. Defekte/unbekannte Raumdateien,
+letzter Raum, konkurrierende IPC-Mutation und Reconnect isoliert bestanden.
+Dabei gefundene verwaiste native Fenster im Hintergrundraum werden nun direkt
+beim Destroy entfernt; DRM-Nachprüfung des Fixes steht aus. USB-Hub auf
+Nutzerwunsch abgeschlossen (Verkabelung erklärt den Befund). Details:
+[Zweimonitor- und Fehlerfälle](docs/phase-reports/P06_DUAL_OUTPUT_ERRORS.md).
+
 **P06-HDMI-Live-Nachweis vom 26.09.2026:** Mit `8c1d874c…` bestätigt der Nutzer
 funktionierendes Hotplug; das Sitzungslog belegt Entfernen/Wiederhinzufügen des
 HDMI-Connectors. Monitor-USB-Hub separat offen: bislang keine Kernel-/USB-Erkennung,

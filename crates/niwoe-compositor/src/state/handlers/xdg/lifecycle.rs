@@ -2,7 +2,10 @@ use smithay::{
     desktop::{PopupKind, Window},
     reexports::wayland_protocols::xdg::shell::server::xdg_toplevel,
     utils::{Logical, Point, SERIAL_COUNTER},
-    wayland::shell::xdg::{PopupSurface, PositionerState, ToplevelSurface},
+    wayland::{
+        seat::WaylandFocus,
+        shell::xdg::{PopupSurface, PositionerState, ToplevelSurface},
+    },
 };
 
 use niwoe_wm::WorkspaceMode;
@@ -111,12 +114,32 @@ pub(super) fn handle_new_popup(
 
 pub(super) fn handle_toplevel_destroyed(state: &mut NiwoeState, surface: ToplevelSurface) {
     let id = window_id(surface.wl_surface());
+    // Rendering refreshes the focused Space only. Remove the destroyed
+    // toplevel explicitly even when another room/output currently has focus.
+    for workspace in 0..state.workspaces.count() {
+        let window = state
+            .workspaces
+            .space_at(workspace)
+            .elements()
+            .find(|window| {
+                window
+                    .wl_surface()
+                    .is_some_and(|wl| wl.as_ref() == surface.wl_surface())
+            })
+            .cloned();
+        if let Some(window) = window {
+            state.workspaces.space_at_mut(workspace).unmap_elem(&window);
+            state.wm_workspaces[workspace].remove_window(&window);
+            state.tile_workspace(workspace);
+        }
+    }
     state.clear_window_runtime_state(&id);
     state
         .maximize_restore_locations
         .remove(&format!("keyboard-fullscreen:{id}"));
     state.decoration_manager.remove(surface.wl_surface());
     state.broadcast_toplevel_closed(&surface);
+    state.broadcast_window_snapshot();
     state.mark_all_outputs_dirty("xdg-toplevel-destroyed");
 }
 
