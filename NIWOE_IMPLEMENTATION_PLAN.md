@@ -1,5 +1,13 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P06-Live-Runde vom 26.09.2026:** Nativer Create/Edit/Reorder/Delete-Ablauf,
+Migration normaler/schwebender/minimierter Fenster, Wiederherstellen und
+Bereinigung erfolgreich. Ein live nachgewiesener Fehler der Dialog-Raumvererbung
+ist korrigiert, isoliert mit Gegenprobe getestet und installiert. Vollständiger
+DRM-Neulogin für den neuen Compositor steht noch aus; P06 bleibt in Arbeit.
+Die Neun-Räume-Grenze der alten Überlaufliste ist als P07-Lücke bestätigt.
+Details: [Live-Lebenszyklus](docs/phase-reports/P06_LIVE_LIFECYCLE.md).
+
 **P06-Bedienpräzisierung vom 26.09.2026:** Auf Nutzerwunsch ersetzt ein eigener
 Bereich „Raum löschen“ mit „Fenster verschieben nach …“ und einer aufklappbaren
 Raumliste die unklare zyklische Zielwahl. Der Erstklick-Fix läuft inzwischen im

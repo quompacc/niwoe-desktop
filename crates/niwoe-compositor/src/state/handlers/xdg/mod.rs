@@ -18,6 +18,7 @@ use crate::state::{normal_window_workarea_from_output_geometry, NiwoeState};
 
 mod lifecycle;
 pub(crate) mod requests;
+mod transient;
 
 fn popup_parent_window_loc_and_size(
     state: &NiwoeState,
@@ -95,6 +96,10 @@ impl XdgShellHandler for NiwoeState {
 
     fn new_toplevel(&mut self, surface: ToplevelSurface) {
         lifecycle::handle_new_toplevel(self, surface);
+    }
+
+    fn parent_changed(&mut self, surface: ToplevelSurface) {
+        transient::inherit_parent_workspace(self, &surface);
     }
 
     fn new_popup(&mut self, surface: PopupSurface, positioner: PositionerState) {

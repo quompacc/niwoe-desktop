@@ -63,17 +63,26 @@ impl CompositorHandler for NiwoeState {
         self.mark_all_outputs_dirty("surface-commit");
 
         let mut committed_toplevel_root = None;
+        let mut committed_workspace = self.workspaces.active;
         if !is_sync_subsurface(surface) {
             let mut root = surface.clone();
             while let Some(parent) = get_parent(&root) {
                 root = parent;
             }
-            if let Some(window) = self.workspaces.active_space().elements().find(|window| {
-                window
-                    .wl_surface()
-                    .is_some_and(|wl_surface| *wl_surface == root)
+            if let Some((index, window)) = (0..self.workspaces.count()).find_map(|index| {
+                self.workspaces
+                    .space_at(index)
+                    .elements()
+                    .find(|window| {
+                        window
+                            .wl_surface()
+                            .is_some_and(|wl_surface| *wl_surface == root)
+                    })
+                    .cloned()
+                    .map(|window| (index, window))
             }) {
                 window.on_commit();
+                committed_workspace = index;
                 committed_toplevel_root = Some(root);
             }
         }
@@ -82,7 +91,11 @@ impl CompositorHandler for NiwoeState {
             self.center_pending_xdg_toplevel(&root);
         }
 
-        handle_commit(&mut self.popups, self.workspaces.active_space(), surface);
+        handle_commit(
+            &mut self.popups,
+            self.workspaces.space_at(committed_workspace),
+            surface,
+        );
         crate::grabs::resize_grab::handle_commit(self.workspaces.active_space_mut(), surface);
 
         if let Some(output) = self

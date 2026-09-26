@@ -7,6 +7,7 @@ if [[ "${1:-}" == --inside ]]; then
   repo="$2"
   evidence="$3"
   cd "$repo"
+  parent_display="$WAYLAND_DISPLAY"
   RUST_LOG=info "${NIWOE_SMOKE_COMPOSITOR:-target/${NIWOE_SMOKE_PROFILE:-release}/niwoe}" > "$evidence/compositor.log" 2>&1 &
   compositor_pid=$!
   cleanup_inner() {
@@ -44,6 +45,23 @@ if [[ "${1:-}" == --inside ]]; then
   kill -0 "$compositor_pid"
   if [[ "${NIWOE_ROOM_SMOKE:-0}" == 1 ]]; then
     python3 "$repo/scripts/test-room-lifecycle.py" "$compositor_pid"
+  fi
+  if [[ "${NIWOE_ROOM_TRANSIENT_SMOKE:-0}" == 1 ]]; then
+    python3 "$repo/scripts/test-room-transients.py" "$compositor_pid"
+  fi
+  if [[ "${NIWOE_ROOM_RESTART_SMOKE:-0}" == 1 ]]; then
+    python3 "$repo/scripts/test-room-persistence.py" "$compositor_pid" prepare
+    kill "$compositor_pid"
+    wait "$compositor_pid" || true
+    WAYLAND_DISPLAY="$parent_display" RUST_LOG=info "${NIWOE_SMOKE_COMPOSITOR:-target/${NIWOE_SMOKE_PROFILE:-release}/niwoe}" > "$evidence/restarted-compositor.log" 2>&1 &
+    compositor_pid=$!
+    for ((attempt=0; attempt<100; attempt++)); do
+      kill -0 "$compositor_pid" || { echo 'FAIL: restarted compositor exited'; exit 1; }
+      if grep -q 'IPC client authenticated as shell' "$evidence/restarted-compositor.log"; then break; fi
+      sleep 0.2
+    done
+    grep -q 'IPC client authenticated as shell' "$evidence/restarted-compositor.log"
+    python3 "$repo/scripts/test-room-persistence.py" "$compositor_pid" verify
   fi
   echo 'PASS: nested compositor, authenticated shell, Wayland globals, configured client buffer'
   exit 0
