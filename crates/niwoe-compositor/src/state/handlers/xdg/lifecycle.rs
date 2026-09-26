@@ -1,7 +1,7 @@
 use smithay::{
     desktop::{PopupKind, Window},
     reexports::wayland_protocols::xdg::shell::server::xdg_toplevel,
-    utils::{Logical, Point, SERIAL_COUNTER},
+    utils::{Logical, Point},
     wayland::{
         seat::WaylandFocus,
         shell::xdg::{PopupSurface, PositionerState, ToplevelSurface},
@@ -94,12 +94,8 @@ pub(super) fn handle_new_toplevel(state: &mut NiwoeState, surface: ToplevelSurfa
         }
     }
 
-    let serial = SERIAL_COUNTER.next_serial();
-    if !state.lobby_active && state.seat.get_keyboard().is_some() {
-        state.set_keyboard_focus_with_decorations(Some(wl_surface.clone()), serial);
-        state.update_focused_output_from_surface(&wl_surface, "keyboard-focus-new-toplevel");
-        state.broadcast_toplevel_focused(&wl_surface);
-    }
+    // App identity and parent arrive after new_toplevel. Focus is decided on
+    // the first buffer, once assignment has resolved those requests.
     state.mark_all_outputs_dirty("xdg-new-toplevel");
 }
 

@@ -106,7 +106,11 @@ fn configuration_renders_selected_room() {
         }
         .into(),
         description: String::new(),
-        assignment: niwoe_ipc::RoomAssignment::Free,
+        assignment: if std::env::var_os("NIWOE_PREVIEW_DEDICATED").is_some() {
+            niwoe_ipc::RoomAssignment::Dedicated
+        } else {
+            niwoe_ipc::RoomAssignment::Free
+        },
     };
     let edit = Edit {
         id: if creating { 0 } else { 2 },

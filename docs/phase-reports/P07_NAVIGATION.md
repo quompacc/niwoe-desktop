@@ -1,5 +1,9 @@
 # P07 – Raumleiste und vollständige Raumauswahl
 
+Fortsetzung: [App-Zuordnung, zweiter Block](P07_APP_ASSIGNMENT.md). Die hier
+noch als offen beschriebene App-Policy ist inzwischen implementiert; die
+Gesamtphase bleibt offen. Nachstehend der historische erste Navigationsblock.
+
 26.09.2026. **P07: in-progress, nicht accepted.** Erster geprüfter und
 installierter Baustein: Raumdarstellung, Overflow und Tastaturnavigation.
 P06 bleibt abgeschlossen. App-Regeln und der vollständige Fensterzugang werden

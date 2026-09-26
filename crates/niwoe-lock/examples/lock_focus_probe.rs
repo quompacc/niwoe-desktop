@@ -1,9 +1,12 @@
 //! Protocol regression probe. Run ONLY against the isolated smoke compositor.
 //! Owns a synthetic lock; never authenticates or connects to the desktop socket.
-use std::{thread, time::Duration};
+use std::{fs::File, io::Write, os::fd::AsFd, thread, time::Duration};
 use wayland_client::{
     delegate_noop,
-    protocol::{wl_compositor, wl_keyboard, wl_output, wl_registry, wl_seat, wl_surface},
+    protocol::{
+        wl_buffer, wl_compositor, wl_keyboard, wl_output, wl_registry, wl_seat, wl_shm,
+        wl_shm_pool, wl_surface,
+    },
     Connection, Dispatch, QueueHandle,
 };
 use wayland_protocols::{
@@ -17,6 +20,7 @@ use wayland_protocols::{
 #[derive(Default)]
 struct Probe {
     compositor: Option<wl_compositor::WlCompositor>,
+    shm: Option<wl_shm::WlShm>,
     output: Option<wl_output::WlOutput>,
     manager: Option<manager::ExtSessionLockManagerV1>,
     wm: Option<xdg_wm_base::XdgWmBase>,
@@ -46,6 +50,7 @@ impl Dispatch<wl_registry::WlRegistry, ()> for Probe {
         } = e
         {
             match interface.as_str() {
+                "wl_shm" => s.shm = Some(r.bind(name, 1, q, ())),
                 "wl_compositor" => s.compositor = Some(r.bind(name, version.min(4), q, ())),
                 "wl_output" if s.output.is_none() => s.output = Some(r.bind(name, 1, q, ())),
                 "wl_seat" => s.seat = Some(r.bind(name, version.min(5), q, ())),
@@ -171,6 +176,9 @@ impl Dispatch<xdg_popup::XdgPopup, ()> for Probe {
     }
 }
 delegate_noop!(Probe: ignore wl_compositor::WlCompositor);
+delegate_noop!(Probe: ignore wl_shm::WlShm);
+delegate_noop!(Probe: ignore wl_shm_pool::WlShmPool);
+delegate_noop!(Probe: ignore wl_buffer::WlBuffer);
 delegate_noop!(Probe: ignore wl_output::WlOutput);
 delegate_noop!(Probe: ignore wl_surface::WlSurface);
 delegate_noop!(Probe: ignore manager::ExtSessionLockManagerV1);
@@ -178,17 +186,36 @@ delegate_noop!(Probe: ignore xdg_toplevel::XdgToplevel);
 delegate_noop!(Probe: ignore xdg_positioner::XdgPositioner);
 
 fn window(
-    s: &Probe,
-    q: &QueueHandle<Probe>,
+    s: &mut Probe,
+    queue: &mut wayland_client::EventQueue<Probe>,
 ) -> (
     wl_surface::WlSurface,
     xdg_surface::XdgSurface,
     xdg_toplevel::XdgToplevel,
 ) {
-    let surface = s.compositor.as_ref().unwrap().create_surface(q, ());
-    let xdg = s.wm.as_ref().unwrap().get_xdg_surface(&surface, q, ());
-    let top = xdg.get_toplevel(q, ());
+    let q = queue.handle();
+    let surface = s.compositor.as_ref().unwrap().create_surface(&q, ());
+    let xdg = s.wm.as_ref().unwrap().get_xdg_surface(&surface, &q, ());
+    let top = xdg.get_toplevel(&q, ());
     top.set_title("NIWOE isolated lock regression".into());
+    surface.commit();
+    queue.roundtrip(s).unwrap();
+    let path = std::path::PathBuf::from(std::env::var("XDG_RUNTIME_DIR").unwrap())
+        .join("lock-probe-buffer");
+    let mut file = File::create(&path).unwrap();
+    file.write_all(&vec![0; 64 * 64 * 4]).unwrap();
+    let file = std::fs::OpenOptions::new()
+        .read(true)
+        .write(true)
+        .open(path)
+        .unwrap();
+    let pool = s
+        .shm
+        .as_ref()
+        .unwrap()
+        .create_pool(file.as_fd(), 64 * 64 * 4, &q, ());
+    let buffer = pool.create_buffer(0, 64, 64, 64 * 4, wl_shm::Format::Xrgb8888, &q, ());
+    surface.attach(Some(&buffer), 0, 0);
     surface.commit();
     (surface, xdg, top)
 }
@@ -208,7 +235,7 @@ fn lock_cycle() {
     for _ in 0..3 {
         queue.roundtrip(&mut s).unwrap();
     }
-    let first = window(&s, &q);
+    let first = window(&mut s, &mut queue);
     queue.roundtrip(&mut s).unwrap();
     assert_eq!(
         s.focus.as_ref(),
@@ -220,7 +247,7 @@ fn lock_cycle() {
     // The request after lock is in the same dispatch batch: acquisition must
     // revoke application focus even before the first cleared frame confirms it.
     s.enforce = true;
-    let pending_window = window(&s, &q);
+    let pending_window = window(&mut s, &mut queue);
     queue.roundtrip(&mut s).unwrap();
     assert!(
         s.focus.is_none(),
@@ -239,7 +266,7 @@ fn lock_cycle() {
     }
     assert!(s.locked);
     assert_eq!(s.focus.as_ref(), Some(&surface));
-    let dialog = window(&s, &q);
+    let dialog = window(&mut s, &mut queue);
     queue.roundtrip(&mut s).unwrap();
     assert_eq!(s.focus.as_ref(), Some(&surface), "dialog stole lock focus");
     dialog.2.destroy();
@@ -281,7 +308,7 @@ fn lock_cycle() {
     assert!(s.focus.is_none(), "unlock must clear the lock focus");
     lock_surface.destroy();
     surface.destroy();
-    let after = window(&s, &q);
+    let after = window(&mut s, &mut queue);
     queue.roundtrip(&mut s).unwrap();
     assert_eq!(
         s.focus.as_ref(),
@@ -320,7 +347,7 @@ fn main() {
     for _ in 0..3 {
         queue.roundtrip(&mut s).unwrap();
     }
-    let _background = window(&s, &q);
+    let _background = window(&mut s, &mut queue);
     let _replacement = s.manager.as_ref().unwrap().lock(&q, ());
     for _ in 0..3 {
         queue.roundtrip(&mut s).unwrap();

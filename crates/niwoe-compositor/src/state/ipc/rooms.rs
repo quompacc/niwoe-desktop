@@ -90,6 +90,7 @@ impl NiwoeState {
             .collect();
         let destination = target - usize::from(target > source);
         for window in &windows {
+            super::super::assignment::preserve_manual(window);
             let floating = self.wm_workspaces[source].mode == niwoe_wm::WorkspaceMode::Floating
                 || self.wm_workspaces[source].is_floating(window);
             self.wm_workspaces[source].remove_window(window);
@@ -100,6 +101,9 @@ impl NiwoeState {
             }
         }
         for minimized in self.minimized_windows.values_mut() {
+            if minimized.workspace == source {
+                super::super::assignment::preserve_manual(&minimized.window);
+            }
             minimized.workspace = if minimized.workspace == source {
                 destination
             } else {

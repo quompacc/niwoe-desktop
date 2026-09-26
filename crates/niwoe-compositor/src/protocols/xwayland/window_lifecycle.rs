@@ -167,7 +167,8 @@ macro_rules! xwm_window_lifecycle_methods {
         let opened = window_list_entry(&win);
         self.workspaces
             .space_at_mut(active)
-            .map_element(win, resolved_loc, true);
+            .map_element(win.clone(), resolved_loc, true);
+        self.assign_window(&win);
         apply_initial_x11_maximized_geometry(self, &window);
         if let Some(wl_surface) = window.wl_surface() {
             let window_type = window.window_type();

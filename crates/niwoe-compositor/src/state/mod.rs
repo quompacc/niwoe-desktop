@@ -54,6 +54,7 @@ use crate::{
     workspace::WorkspaceManager,
 };
 
+mod assignment;
 mod client;
 mod handlers;
 mod idle;

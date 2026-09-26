@@ -8,6 +8,12 @@ if [[ "${1:-}" == --inside ]]; then
   evidence="$3"
   cd "$repo"
   parent_display="$WAYLAND_DISPLAY"
+  if [[ "${NIWOE_ASSIGNMENT_MANUAL:-0}" == 1 ]]; then
+    # Avoid the parent compositor consuming Super+Shift+4. This private
+    # profile routes an ordinary z through the same MoveToWorkspace action.
+    mkdir -p "$XDG_CONFIG_HOME/niwoe"
+    printf '[keybinds]\n"z" = "move-to-workspace 4"\n' > "$XDG_CONFIG_HOME/niwoe/config.toml"
+  fi
   RUST_LOG=info "${NIWOE_SMOKE_COMPOSITOR:-target/${NIWOE_SMOKE_PROFILE:-release}/niwoe}" > "$evidence/compositor.log" 2>&1 &
   compositor_pid=$!
   cleanup_inner() {
@@ -39,6 +45,7 @@ if [[ "${1:-}" == --inside ]]; then
   grep -Eq 'xdg_surface.*configure\(' "$evidence/client.log"
   grep -Eq 'wl_surface.*attach\(wl_buffer' "$evidence/client.log"
   if [[ "${NIWOE_LOCK_FOCUS_SMOKE:-0}" == 1 ]]; then
+    python3 "$repo/scripts/test-room-assignment.py" "$compositor_pid" --focus-setup
     timeout 15s "target/${NIWOE_SMOKE_PROFILE:-release}/examples/lock_focus_probe" > "$evidence/lock-focus.log" 2>&1
     cat "$evidence/lock-focus.log"
   fi
@@ -48,6 +55,9 @@ if [[ "${1:-}" == --inside ]]; then
   fi
   if [[ "${NIWOE_ROOM_TRANSIENT_SMOKE:-0}" == 1 ]]; then
     python3 "$repo/scripts/test-room-transients.py" "$compositor_pid"
+  fi
+  if [[ "${NIWOE_ROOM_ASSIGNMENT_SMOKE:-0}" == 1 ]]; then
+    python3 "$repo/scripts/test-room-assignment.py" "$compositor_pid"
   fi
   if [[ "${NIWOE_ROOM_RESTART_SMOKE:-0}" == 1 ]]; then
     python3 "$repo/scripts/test-room-persistence.py" "$compositor_pid" prepare

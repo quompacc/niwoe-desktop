@@ -1,6 +1,9 @@
 macro_rules! xwm_input_selection_methods {
     () => {
-    fn property_notify(&mut self, _xwm: XwmId, _window: X11Surface, property: WmWindowProperty) {
+    fn property_notify(&mut self, _xwm: XwmId, window: X11Surface, property: WmWindowProperty) {
+        if matches!(property, WmWindowProperty::Class | WmWindowProperty::TransientFor) {
+            self.assign_x11_surface(&window);
+        }
         if matches!(property, WmWindowProperty::Title | WmWindowProperty::Class) {
             self.broadcast_window_snapshot();
         }

@@ -179,11 +179,16 @@ fn draw_body(
     };
     section(pm, apps, "START-APPS", p);
     section(pm, rules, "AUTOMATISIERUNGSREGELN", p);
+    let assignment_note = match room.assignment {
+        niwoe_ipc::RoomAssignment::Free => "Freie Zuordnung: alle Apps willkommen.",
+        niwoe_ipc::RoomAssignment::Preferred => "Zugeordnete Apps bevorzugen diesen Raum.",
+        niwoe_ipc::RoomAssignment::Dedicated => "Aufgabenraum: andere Apps bleiben erlaubt.",
+    };
     for (rect, lines) in [
         (
             apps,
             [
-                "App-Zuordnung folgt mit Raumdaten.",
+                assignment_note,
                 "Noch keine Start-Apps konfigurierbar.",
             ],
         ),

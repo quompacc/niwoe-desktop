@@ -1,5 +1,14 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P07 zweiter Block, 26.09.2026: `in-progress`.** App-Zuordnung für
+Preferred/Dedicated implementiert und installiert: reine Policy,
+Native-/XWayland-Lifecycle, Elternpriorität, spätes App-ID/Class und Schutz
+manueller Moves. Echte isolierte Protokoll-/Eingabetests, Lock- und
+Migrations-/Persistenzregression grün. Dedicated-Hinweis nativ geprüft.
+Reguläre Aktivierung/Nachtest warten auf den angefragten Neulogin;
+explizite Startkorrelation, Maus-Verschieben und vollständiger Fensterzugang
+bleiben offen. Details: [P07-App-Zuordnung](docs/phase-reports/P07_APP_ASSIGNMENT.md).
+
 **P07 begonnen, 26.09.2026: `in-progress`.** Der erste Navigationsbaustein ist
 geprüft, installiert und ohne Neulogin aktiv: echte Raumanzahl bis 64 in Panel
 und Trefferprüfung, feste Seiten mit sichtbarem aktivem Raum, neutrale Belegung,

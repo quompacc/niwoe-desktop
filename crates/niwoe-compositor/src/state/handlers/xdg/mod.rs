@@ -18,7 +18,6 @@ use crate::state::{normal_window_workarea_from_output_geometry, NiwoeState};
 
 mod lifecycle;
 pub(crate) mod requests;
-mod transient;
 
 fn popup_parent_window_loc_and_size(
     state: &NiwoeState,
@@ -99,7 +98,7 @@ impl XdgShellHandler for NiwoeState {
     }
 
     fn parent_changed(&mut self, surface: ToplevelSurface) {
-        transient::inherit_parent_workspace(self, &surface);
+        self.assign_xdg_surface(surface.wl_surface());
     }
 
     fn new_popup(&mut self, surface: PopupSurface, positioner: PositionerState) {
@@ -111,6 +110,7 @@ impl XdgShellHandler for NiwoeState {
     }
 
     fn app_id_changed(&mut self, surface: ToplevelSurface) {
+        self.assign_xdg_surface(surface.wl_surface());
         lifecycle::handle_surface_metadata_changed(self, surface);
     }
 
