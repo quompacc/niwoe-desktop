@@ -6,6 +6,55 @@ use std::{
 };
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
+
+#[test]
+fn complete_form_is_validated_and_persisted_atomically() {
+    use niwoe_ipc::{RoomAssignment, RoomChange, RoomMutationError};
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    let original = registry.definitions().clone();
+    assert_eq!(
+        registry.apply(
+            0,
+            RoomChange::UpdateDetails {
+                id: 1,
+                name: "Nicht teilweise speichern".into(),
+                description: "x".repeat(201),
+            }
+        ),
+        Err(RoomMutationError::Invalid)
+    );
+    assert_eq!(registry.definitions(), &original);
+    registry
+        .apply(
+            0,
+            RoomChange::CreateDetails {
+                name: "Kontext".into(),
+                description: "Beschreibung".into(),
+                assignment: RoomAssignment::Preferred,
+            },
+        )
+        .unwrap();
+    assert_eq!(registry.slot_for_room(RoomId(10)), Some(9));
+    registry
+        .apply(
+            1,
+            RoomChange::UpdateDetails {
+                id: 10,
+                name: "Neu".into(),
+                description: "Zusammen gespeichert".into(),
+            },
+        )
+        .unwrap();
+    let expected = registry.definitions().clone();
+    assert_eq!(expected.revision, 2);
+    assert_eq!(
+        expected.rooms.last().unwrap().assignment,
+        AssignmentMode::Preferred
+    );
+    drop(registry);
+    assert_eq!(RoomRegistry::open(&f.0).unwrap().definitions(), &expected);
+}
 struct Fixture(PathBuf);
 impl Fixture {
     fn new() -> Self {

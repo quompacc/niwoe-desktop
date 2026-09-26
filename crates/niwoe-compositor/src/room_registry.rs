@@ -25,8 +25,9 @@ impl RoomRegistry {
             return Err(Error::Conflict);
         }
         let index = match &change {
-            RoomChange::Create { .. } => None,
+            RoomChange::Create { .. } | RoomChange::CreateDetails { .. } => None,
             RoomChange::Rename { id, .. }
+            | RoomChange::UpdateDetails { id, .. }
             | RoomChange::SetDescription { id, .. }
             | RoomChange::SetAssignment { id, .. }
             | RoomChange::Move { id, .. }
@@ -49,8 +50,10 @@ impl RoomRegistry {
                 return Err(Error::Invalid);
             }
         }
-        if matches!(&change, RoomChange::Create { .. })
-            && (self.slots.len() >= MAX_ROOMS || self.definitions.next_id == u64::MAX)
+        if matches!(
+            &change,
+            RoomChange::Create { .. } | RoomChange::CreateDetails { .. }
+        ) && (self.slots.len() >= MAX_ROOMS || self.definitions.next_id == u64::MAX)
         {
             return Err(Error::Invalid);
         }
@@ -66,6 +69,26 @@ impl RoomRegistry {
                         assignment: AssignmentMode::Free,
                     });
                     rooms.next_id += 1;
+                }
+                RoomChange::CreateDetails {
+                    name,
+                    description,
+                    assignment,
+                } => {
+                    rooms.rooms.push(Room {
+                        id: RoomId(created_id),
+                        name,
+                        description,
+                        assignment: assignment_mode(assignment),
+                    });
+                    rooms.next_id += 1;
+                }
+                RoomChange::UpdateDetails {
+                    name, description, ..
+                } => {
+                    let room = &mut rooms.rooms[index.expect("validated room")];
+                    room.name = name;
+                    room.description = description;
                 }
                 RoomChange::Rename { name, .. } => {
                     rooms.rooms[index.expect("validated room")].name = name
@@ -172,6 +195,14 @@ impl RoomRegistry {
             .rooms
             .get(position)
             .and_then(|room| self.slot_for_room(room.id))
+    }
+}
+
+fn assignment_mode(value: niwoe_ipc::RoomAssignment) -> AssignmentMode {
+    match value {
+        niwoe_ipc::RoomAssignment::Free => AssignmentMode::Free,
+        niwoe_ipc::RoomAssignment::Preferred => AssignmentMode::Preferred,
+        niwoe_ipc::RoomAssignment::Dedicated => AssignmentMode::Dedicated,
     }
 }
 

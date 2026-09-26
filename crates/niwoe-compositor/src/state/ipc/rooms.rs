@@ -42,7 +42,7 @@ impl NiwoeState {
         change: niwoe_ipc::RoomChange,
     ) {
         let change_effect = match &change {
-            RoomChange::Create { .. } => Some((None, None)),
+            RoomChange::Create { .. } | RoomChange::CreateDetails { .. } => Some((None, None)),
             RoomChange::Delete { id, target_id } => {
                 let registry = self.workspaces.rooms();
                 Some((

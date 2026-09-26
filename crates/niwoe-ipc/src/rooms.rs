@@ -31,12 +31,39 @@ pub struct RoomSnapshot {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case")]
 pub enum RoomChange {
-    Create { name: String },
-    Rename { id: u64, name: String },
-    SetDescription { id: u64, description: String },
-    SetAssignment { id: u64, assignment: RoomAssignment },
-    Move { id: u64, position: usize },
-    Delete { id: u64, target_id: u64 },
+    Create {
+        name: String,
+    },
+    CreateDetails {
+        name: String,
+        description: String,
+        assignment: RoomAssignment,
+    },
+    UpdateDetails {
+        id: u64,
+        name: String,
+        description: String,
+    },
+    Rename {
+        id: u64,
+        name: String,
+    },
+    SetDescription {
+        id: u64,
+        description: String,
+    },
+    SetAssignment {
+        id: u64,
+        assignment: RoomAssignment,
+    },
+    Move {
+        id: u64,
+        position: usize,
+    },
+    Delete {
+        id: u64,
+        target_id: u64,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
