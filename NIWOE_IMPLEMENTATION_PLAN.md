@@ -1,14 +1,17 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
-**Aktueller P06-Abschlussabgleich, 26.09.2026: `in-progress`, nicht `accepted`.**
-Die ausdrücklich aufgeführten Live-/Fehlerfälle sind inzwischen mit Nachweisen
-belegt; zusätzlich besteht die echte IPC-Kapazitätsprüfung 1–64/Abweisung von 65.
-§4.2/P06-01 ist dennoch unvollständig: Raum-Icon, App-Präferenzen und
-Layout-/Restore-Einstellungen fehlen in Definition und IPC. Außerdem ist der
-manuelle Fenster-Move unabhängig von Delete-Migration separat live zu belegen.
-Die verbindliche aktuelle Matrix und Restreihenfolge stehen im
+**P06-Abschluss, 26.09.2026: `accepted` für den dokumentierten Fedora-Aufbau.**
+Der vollständige Datenvertrag nach §4.2 einschließlich Icon, App-Referenzen und
+Layout-/Restore-Präferenzen ist implementiert. Schema-2-Migration mit privater
+Sicherung, IPC, Reconnect und echte Prozess-Neustart-Persistenz sind geprüft.
+Nach Nutzer-Neulogin laufen die geprüften Releases; die tatsächlichen neun Räume
+behalten IDs, Reihenfolge, Revision 49 und Zähler 19. Neutrale Loge bestätigt.
+Manuelle native Floating-/Tiling-Moves und XWayland-Move sind live belegt;
+die dabei gefundene WM-Mitgliedschaftslücke ist korrigiert und nachgeprüft.
+Details: [P06-Endstand](docs/phase-reports/P06_SCHEMA_COMPLETION.md).
+Die verbindliche aktuelle Matrix steht im
 [P06-Abschlussabgleich](docs/phase-reports/P06_ACCEPTANCE_REVIEW.md).
-P07 beginnt erst nach tatsächlichem P06-Abschluss. Nachfolgende Checkpoints
+P07 ist die nächste Phase und wurde noch nicht begonnen. Nachfolgende Checkpoints
 bleiben historische Nachweise; ihre damaligen offenen Punkte sind gegen diese
 aktuelle Matrix zu lesen.
 

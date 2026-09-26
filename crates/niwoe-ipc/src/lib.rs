@@ -4,6 +4,8 @@ use serde::{Deserialize, Serialize};
 
 mod appearance;
 pub use appearance::{AppearanceSnapshot, AppearanceTheme, AppearanceWallpaperMode};
+mod room_preferences;
+pub use room_preferences::{AppReference, RoomLayout, RoomPreferences, RoomRestore};
 mod rooms;
 pub use rooms::{RoomAssignment, RoomChange, RoomEntry, RoomMutationError, RoomSnapshot};
 mod settings;

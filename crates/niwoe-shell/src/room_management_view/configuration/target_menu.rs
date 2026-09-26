@@ -137,6 +137,7 @@ mod tests {
         let mut ui = crate::room_editor::RoomUi::default();
         ui.snapshot.rooms = (1..=64)
             .map(|id| RoomEntry {
+                preferences: Default::default(),
                 id,
                 workspace: id as u8,
                 name: format!("Raum {id}"),

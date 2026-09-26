@@ -1,8 +1,10 @@
 # P06 – Abschlussabgleich, 26.09.2026
 
-Ergebnis: **in-progress, nicht accepted**. Die geprüften Fehlerkorrekturen und
-Live-Abläufe bleiben gültig. Der Abgleich findet zusätzliche Modellpflichten,
-die noch nicht implementiert sind; der Phasenabschluss wird nicht vorgezogen.
+Ergebnis nach Umsetzung und finalem Nutzer-Neulogin: **accepted am 26.09.2026
+für den dokumentierten Fedora-Aufbau**. Die zunächst gefundenen Modelllücken
+sind geschlossen; Migration und korrigierter manueller Move sind live bestätigt.
+Der [Endstandsbericht](P06_SCHEMA_COMPLETION.md) enthält Dateien, Tests,
+installierte/laufende Hashes und Grenzen der Abnahme.
 Maßgeblich sind der aktive Plan §4.2 und P06-01 bis P06-06. Dieser Bericht
 fasst die chronologischen Zwischenberichte zusammen und ersetzt deren jeweils
 damalige offene Punkte als aktuelle Übersicht.
@@ -11,14 +13,14 @@ damalige offene Punkte als aktuelle Übersicht.
 
 | Paket | Ergebnis | Beleg / verbleibende Arbeit |
 | --- | --- | --- |
-| P06-01 Typen, Validierung, Schema nach §4 | Teilweise | `niwoe-config/src/rooms.rs`: ID, Name, Beschreibung, Assignment, Reihenfolge/Zähler vorhanden. Icon, App-Präferenzen und Layout-/Restore-Einstellungen fehlen. |
-| P06-02 Migration und atomare Speicherung | Für vorhandenes Schema belegt | Store-Tests, persistente stabile IDs, echte Loginprüfung; keine Wiederverwendung gelöschter IDs. Erweiterungsmigration für fehlende Felder noch nötig. |
+| P06-01 Typen, Validierung, Schema nach §4 | Belegt | Vollständige Definition einschließlich Icon, Native-/XWayland-Referenzen, Layout und Restore; Defaults und zentrale Validierung geprüft. |
+| P06-02 Migration und atomare Speicherung | Belegt | Schema 1 → 2 mit privater Sicherung isoliert und beim echten Neulogin geprüft; IDs, Revision, Zähler und Reihenfolge erhalten. |
 | P06-03 Räume und konsistente Runtime-Slots | Vorhandene Abläufe belegt | Create/Edit/Reorder/Delete live, Fensterzustände und Slotverdichtung; zusätzliche IPC-Kapazitätsprüfung 1–64 bestanden. |
-| P06-04 Commands, Snapshots, Acks, Revision | Für vorhandene Felder belegt | `niwoe-ipc/src/rooms.rs`, Registry und IPC; Konflikt/Reconnect getestet. Fehlende Modellfelder besitzen auch noch keinen Wire-Vertrag. |
-| P06-05 Raum-/Fensterzuordnung | Wesentliche Fälle belegt, separater Nachweis offen | Raumwechsel, Delete-Migration, Dialoge, minimiert/Floating, zwei Outputs/Hotplug geprüft. Manuellen Raum-Move unabhängig vom Löschen nochmals gezielt live belegen. |
-| P06-06 Shell als Snapshot-Consumer | Für vorhandenen Umfang belegt | Authentifizierungs-/Reconnect-Korrektur, vollständige aktuelle Snapshots und Revisionskonflikte. Erweiterte Felder müssen in denselben Pfad aufgenommen werden. |
+| P06-04 Commands, Snapshots, Acks, Revision | Belegt | Vollständiger Wire-Vertrag, SetPreferences, atomare Fehlerbehandlung, Konflikt/Reconnect/Persistenz geprüft. |
+| P06-05 Raum-/Fensterzuordnung | Belegt | Bisherige Fälle plus manuelle native Floating-/Tiling-Moves mit Ziel-WM-/Eingabeprüfung und XWayland-Move auf dem neuen DRM-Build. |
+| P06-06 Shell als Snapshot-Consumer | Belegt | Vollständige Snapshots einschließlich zentral validierter Präferenzen; Defaults bei alten Snapshots und Reconnect geprüft. |
 
-Die fehlenden Modellfelder sind keine neu erfundenen Anforderungen:
+Die inzwischen ergänzten Modellfelder sind keine neu erfundenen Anforderungen:
 §4.2 nennt sie ausdrücklich, P06-01 verweist auf §4. Bereits der historische
 [P06-Bericht](P06.md) nennt sie als noch fehlende Voraussetzung. P07 implementiert
 die App-Zuordnungspolitik, P09 das tatsächliche Layout/Restore-Verhalten; diese
@@ -46,7 +48,7 @@ Die Fälle sind auf dem dokumentierten eDP-/HDMI-Aufbau beziehungsweise im
 jeweils ausdrücklich bezeichneten isolierten Profil belegt. Daraus folgt keine
 allgemeine Abnahme anderer GPUs, beliebiger Skalierungen oder aller Restore-Fälle.
 
-## Zusätzliche Prüfung dieser Runde
+## Historischer Kapazitätsnachweis vor der Schemaergänzung
 
 `scripts/test-room-errors.py` erweitert: aus dem Ein-Raum-Profil 63 weitere
 Räume über authentifizierte IPC anlegen, 65. Raum zurückweisen, gespeicherte
@@ -65,17 +67,17 @@ Kein Rust-/Produktcode geändert, keine neue Binärinstallation erforderlich.
 Das neue Testskript liegt auch auf Fedora. Installierter Produktstand bleibt
 Compositor `e1953fc4…`, Shell `5636d59c…`; keine Sitzung beendet.
 
-## Konkrete verbleibende Reihenfolge
+## Abschlussbewertung
 
-1. Fehlende Raumdefinitionen für vorhandenes Icon, App-Präferenzen und
-   Layout-/Restore-Einstellungen typisieren, validieren und bestehende Dateien
-   ohne Datenverlust übernehmen. Kein Prozess-/Fensterhandle persistieren.
-2. Daten konsistent durch Registry, IPC-Snapshot und Shell-Consumer führen;
-   Roundtrip-, Kompatibilitäts- und Fehlerfälle prüfen. Keine zweite Shell-Policy.
-3. Manuellen Fensterverschiebepfad separat mit ID-/Inhalts-/Fokusprüfung live
-   belegen; anschließend betroffene Integrationsfälle auf dem Endstand wiederholen.
-4. Erst dann P06-Diff und Nachweise abschließend bewerten und gegebenenfalls
-   `accepted` setzen. P07 hat in dieser Runde nicht begonnen.
+Die damalige Restreihenfolge ist abgearbeitet: vollständige Definitionen und
+kompatible Übernahme, Registry/IPC/Shell-Anbindung, isolierte Wiederholungsprüfungen,
+Installation und echte Login-/Move-Nachprüfung. Der anfängliche manuelle Move
+erhielt zwar Space-Zuordnung und Inhalt, führte aber die WM-Mitgliedschaft nicht
+mit. Die Korrektur wurde auf dem neuen DRM-Build mit Floating → Tiling → Floating
+im Zielraum, separatem Tiling-Move sowie XWayland-Move nachgeprüft.
+Alle Testfenster sind entfernt; die echte Raumdatei bleibt nach Migration
+bei Revision 49 und Zähler 19. Einzelheiten im [Endstandsbericht](P06_SCHEMA_COMPLETION.md).
+P07 hat in dieser Runde nicht begonnen.
 
 P07-Overflow über neun Räume und App-Zuordnungslogik, P09-Layoutwiederherstellung
 sowie alte README-/Login-/Settings-Dokumentationsreste bleiben ausdrücklich

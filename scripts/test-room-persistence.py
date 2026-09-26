@@ -42,6 +42,9 @@ def mutate(change):
 if sys.argv[2] == 'prepare':
     mutate(dict(operation='create-details', name='P06 Restart', description='persisted-description', assignment='preferred'))
     new = next(r for r in snapshot()['rooms'] if r['name'] == 'P06 Restart')
+    mutate(dict(operation='set-preferences', id=new['id'], preferences=dict(
+        icon='applications-development', apps=[dict(kind='native', id='org.example.Editor'),
+        dict(kind='xwayland', id='Editor')], layout='floating', restore='relaunch-apps')))
     mutate(dict(operation='move', id=new['id'], position=0))
     expected.write_text(json.dumps(tomllib.loads(config.read_text())))
     print('PASS prepared persisted metadata, stable ID and changed room order')
@@ -50,7 +53,10 @@ else:
     actual = snapshot()
     assert tomllib.loads(config.read_text()) == saved
     assert actual['revision'] == saved['revision']
+    # TOML omits an absent Option; the JSON snapshot explicitly sends null.
+    for room in saved['rooms']:
+        room['preferences'].setdefault('icon', None)
     assert [{k:v for k,v in r.items() if k != 'workspace'} for r in actual['rooms']] == saved['rooms']
     assert initial['active_workspace'] == 0, initial
     assert not initial['windows'], initial
-    print('PASS new compositor reloads IDs/order/description/assignment/revision and starts in neutral foyer')
+    print('PASS new compositor reloads IDs/order/all preferences/revision and starts in neutral foyer')

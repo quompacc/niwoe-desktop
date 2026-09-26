@@ -53,6 +53,7 @@ name = "Only Room"
 description = ""
 assignment = "free"
 ''')
+legacy_bytes = rooms_file.read_bytes()
 
 
 class Connection:
@@ -103,6 +104,11 @@ try:
         raise AssertionError('Shell startup timeout')
     first = Connection(token)
     connections.append(first)
+    assert rooms_file.with_suffix('.toml.v1.bak').read_bytes() == legacy_bytes
+    assert tomllib.loads(rooms_file.read_text())['schema_version'] == 2
+    assert first.initial['rooms'][0]['preferences'] == dict(
+        icon=None, apps=[], layout='tiling', restore='disabled')
+    print('PASS schema 1 migrated with exact backup and inert defaults', flush=True)
     before = rooms_file.read_bytes()
     first.mutate('last', 0, dict(operation='delete', id=1, target_id=1))
     rejected = first.until('room-mutation-result', 'last')
@@ -150,6 +156,31 @@ try:
     (profile / 'capacity.json').write_text(json.dumps(dict(
         snapshot=capacity.initial, rejected=overflow), indent=2))
     print('PASS IPC capacity: 64 distinct rooms/slots, room 65 rejected without file mutation', flush=True)
+    preferences = dict(icon='applications-development', apps=[
+        dict(kind='native', id='org.example.Editor'),
+        dict(kind='xwayland', id='Editor')], layout='floating', restore='layout-only')
+    capacity.mutate('preferences', revision, dict(
+        operation='set-preferences', id=1, preferences=preferences))
+    assert capacity.until('room-mutation-result', 'preferences')['error'] is None
+    revision += 1
+    valid_bytes = rooms_file.read_bytes()
+    invalid = preferences | dict(apps=preferences['apps'] * 2)
+    capacity.mutate('invalid-preferences', revision, dict(
+        operation='set-preferences', id=1, preferences=invalid))
+    assert capacity.until('room-mutation-result', 'invalid-preferences')['error'] == 'invalid'
+    assert rooms_file.read_bytes() == valid_bytes
+    capacity.mutate('preserve-preferences', revision, dict(
+        operation='update-details', id=1, name='Metadata preserved', description='P06'))
+    revision += 1
+    assert capacity.until('room-mutation-result', 'preserve-preferences')['error'] is None
+    final = Connection(token)
+    connections.append(final)
+    assert final.initial['revision'] == revision
+    assert final.initial['rooms'][0]['preferences'] == preferences
+    assert tomllib.loads(rooms_file.read_text())['rooms'][0]['preferences'] == preferences
+    assert rooms_file.with_suffix('.toml.v1.bak').read_bytes() == legacy_bytes
+    (profile / 'preferences.json').write_text(json.dumps(final.initial, indent=2))
+    print('PASS preferences through IPC/storage/reconnect; invalid update atomic; name edit preserves metadata', flush=True)
 finally:
     for connection in connections:
         connection.close()

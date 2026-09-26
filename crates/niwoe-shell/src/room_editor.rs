@@ -31,6 +31,7 @@ impl Default for RoomUi {
                 revision: 0,
                 rooms: (1..=9)
                     .map(|workspace| RoomEntry {
+                        preferences: Default::default(),
                         id: workspace as u64,
                         workspace,
                         name: format!("Raum {workspace}"),
@@ -96,6 +97,7 @@ impl RoomUi {
                     || r.name.chars().any(char::is_control)
                     || r.description.chars().count() > niwoe_config::rooms::MAX_DESCRIPTION_CHARS
                     || r.description.chars().any(|c| c.is_control() && c != '\n')
+                    || !valid_preferences(&r.preferences)
             })
             || self.ready && snapshot.revision < self.snapshot.revision
         {
@@ -336,6 +338,14 @@ impl RoomUi {
         }
         false
     }
+}
+
+/// Reuse config validation at the snapshot boundary; no second shell policy.
+/// This conversion runs on room events only, never on the rendering path.
+fn valid_preferences(preferences: &niwoe_ipc::RoomPreferences) -> bool {
+    serde_json::to_value(preferences)
+        .and_then(serde_json::from_value::<niwoe_config::rooms::RoomPreferences>)
+        .is_ok_and(|preferences| preferences.validate().is_ok())
 }
 
 impl RoomUi {

@@ -114,7 +114,7 @@ impl NiwoeShell {
             });
             if self.room_management_open {
                 let rooms = &self.workspace_state.rooms.snapshot.rooms;
-                let draft = niwoe_ipc::RoomEntry { id: 0, workspace: 0, name: "Neuer Raum".into(), description: String::new(), assignment: niwoe_ipc::RoomAssignment::Free };
+                let draft = niwoe_ipc::RoomEntry { preferences: Default::default(), id: 0, workspace: 0, name: "Neuer Raum".into(), description: String::new(), assignment: niwoe_ipc::RoomAssignment::Free };
                 if let Some((room, edit, order)) = self.room_configuration_id.and_then(|id| {
                     let edit = self.workspace_state.rooms.edit.as_ref().filter(|edit| edit.id == id)?;
                     if id == 0 { return Some((&draft, edit, rooms.len())); }

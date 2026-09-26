@@ -13,6 +13,7 @@ impl NiwoeState {
                 .rooms
                 .iter()
                 .map(|room| niwoe_ipc::RoomEntry {
+                    preferences: crate::room_registry::preferences_to_wire(&room.preferences),
                     id: room.id.0,
                     workspace: (registry.slot_for_room(room.id).expect("registered room") + 1)
                         as u8,

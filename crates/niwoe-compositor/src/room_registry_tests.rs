@@ -8,6 +8,68 @@ use std::{
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 #[test]
+fn preferences_survive_edits_reorder_restart_and_invalid_update() {
+    use niwoe_ipc::{
+        AppReference, RoomChange, RoomLayout, RoomMutationError, RoomPreferences, RoomRestore,
+    };
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    let prefs = RoomPreferences {
+        icon: Some("applications-development".into()),
+        apps: vec![
+            AppReference::Native("org.example.Editor".into()),
+            AppReference::Xwayland("Editor".into()),
+        ],
+        layout: RoomLayout::Floating,
+        restore: RoomRestore::RelaunchApps,
+    };
+    registry
+        .apply(
+            0,
+            RoomChange::SetPreferences {
+                id: 1,
+                preferences: prefs.clone(),
+            },
+        )
+        .unwrap();
+    let before = fs::read(f.0.join("rooms.toml")).unwrap();
+    let mut invalid = prefs.clone();
+    invalid.apps.push(invalid.apps[0].clone());
+    assert_eq!(
+        registry.apply(
+            1,
+            RoomChange::SetPreferences {
+                id: 1,
+                preferences: invalid
+            }
+        ),
+        Err(RoomMutationError::Invalid)
+    );
+    assert_eq!(fs::read(f.0.join("rooms.toml")).unwrap(), before);
+    registry
+        .apply(
+            1,
+            RoomChange::UpdateDetails {
+                id: 1,
+                name: "Umbenannt".into(),
+                description: "Erhalten".into(),
+            },
+        )
+        .unwrap();
+    registry
+        .apply(2, RoomChange::Move { id: 1, position: 8 })
+        .unwrap();
+    assert_eq!(registry.slot_for_room(RoomId(1)), Some(0));
+    drop(registry);
+    let registry = RoomRegistry::open(&f.0).unwrap();
+    assert_eq!(registry.definitions().revision, 3);
+    let room = registry.definitions().rooms.last().unwrap();
+    assert_eq!(room.name, "Umbenannt");
+    assert_eq!(preferences_to_wire(&room.preferences), prefs);
+    assert_eq!(registry.slot_for_room(RoomId(1)), Some(0));
+}
+
+#[test]
 fn complete_form_is_validated_and_persisted_atomically() {
     use niwoe_ipc::{RoomAssignment, RoomChange, RoomMutationError};
     let f = Fixture::new();

@@ -29,6 +29,7 @@ impl RoomRegistry {
             RoomChange::Rename { id, .. }
             | RoomChange::UpdateDetails { id, .. }
             | RoomChange::SetDescription { id, .. }
+            | RoomChange::SetPreferences { id, .. }
             | RoomChange::SetAssignment { id, .. }
             | RoomChange::Move { id, .. }
             | RoomChange::Delete { id, .. } => Some(
@@ -63,6 +64,7 @@ impl RoomRegistry {
             .revised(expected, |rooms| match change {
                 RoomChange::Create { name } => {
                     rooms.rooms.push(Room {
+                        preferences: Default::default(),
                         id: RoomId(created_id),
                         name,
                         description: String::new(),
@@ -76,6 +78,7 @@ impl RoomRegistry {
                     assignment,
                 } => {
                     rooms.rooms.push(Room {
+                        preferences: Default::default(),
                         id: RoomId(created_id),
                         name,
                         description,
@@ -95,6 +98,10 @@ impl RoomRegistry {
                 }
                 RoomChange::SetDescription { description, .. } => {
                     rooms.rooms[index.expect("validated room")].description = description;
+                }
+                RoomChange::SetPreferences { preferences, .. } => {
+                    rooms.rooms[index.expect("validated room")].preferences =
+                        preferences_from_wire(preferences);
                 }
                 RoomChange::SetAssignment { assignment, .. } => {
                     rooms.rooms[index.expect("validated room")].assignment = match assignment {
@@ -209,3 +216,8 @@ fn assignment_mode(value: niwoe_ipc::RoomAssignment) -> AssignmentMode {
 #[cfg(test)]
 #[path = "room_registry_tests.rs"]
 mod tests;
+
+#[path = "room_preferences.rs"]
+mod preferences;
+use preferences::preferences_from_wire;
+pub(crate) use preferences::preferences_to_wire;

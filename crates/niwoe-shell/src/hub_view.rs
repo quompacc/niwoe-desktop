@@ -458,6 +458,7 @@ mod tests {
             .into_iter()
             .enumerate()
             .map(|(index, name)| RoomEntry {
+                preferences: Default::default(),
                 id: index as u64 + 1,
                 workspace: index as u8 + 1,
                 name: name.into(),

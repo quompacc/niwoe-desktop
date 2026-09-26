@@ -1,6 +1,7 @@
 use smithay::{
     reexports::wayland_server::protocol::wl_surface::WlSurface,
     utils::{Logical, Point, SERIAL_COUNTER},
+    wayland::seat::WaylandFocus,
 };
 
 use crate::state::{toplevel_title, window_id, NiwoeState, OutputId};
@@ -384,8 +385,8 @@ impl NiwoeState {
                 .elements()
                 .find(|window| {
                     window
-                        .toplevel()
-                        .is_some_and(|toplevel| toplevel.wl_surface() == &focus_surface)
+                        .wl_surface()
+                        .is_some_and(|surface| surface.as_ref() == &focus_surface)
                 })
                 .cloned()
                 .map(|window| (idx, window))
@@ -448,10 +449,21 @@ impl NiwoeState {
         self.workspaces
             .space_at_mut(source_workspace)
             .unmap_elem(&window);
+        let floating = self.wm_workspaces[source_workspace].mode
+            == niwoe_wm::WorkspaceMode::Floating
+            || self.wm_workspaces[source_workspace].is_floating(&window);
+        self.wm_workspaces[source_workspace].remove_window(&window);
+        if floating {
+            self.wm_workspaces[target].set_floating(&window, true);
+        } else {
+            self.wm_workspaces[target].add_tiled(window.clone(), None);
+        }
         self.workspaces
             .space_at_mut(target)
             .map_element(window, loc, false);
 
+        self.tile_workspace(source_workspace);
+        self.tile_workspace(target);
         self.workspaces.space_at_mut(source_workspace).refresh();
         self.workspaces.space_at_mut(target).refresh();
 

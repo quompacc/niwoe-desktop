@@ -96,6 +96,7 @@ fn configuration_footer_and_context_have_readable_geometry() {
 fn configuration_renders_selected_room() {
     let creating = std::env::var_os("NIWOE_PREVIEW_CREATE").is_some();
     let room = RoomEntry {
+        preferences: Default::default(),
         id: 2,
         workspace: 2,
         name: if creating {

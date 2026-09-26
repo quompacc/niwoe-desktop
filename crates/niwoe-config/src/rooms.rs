@@ -2,10 +2,12 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
+mod preferences;
 pub mod store;
+pub use preferences::{AppReference, RoomLayout, RoomPreferences, RoomRestore};
 
 pub const MAX_ROOMS: usize = 64;
-pub const SCHEMA_VERSION: u32 = 1;
+pub const SCHEMA_VERSION: u32 = 2;
 pub const LEGACY_ROOMS: usize = 9;
 pub const MAX_NAME_CHARS: usize = 64;
 pub const MAX_DESCRIPTION_CHARS: usize = 200;
@@ -26,6 +28,8 @@ pub enum AssignmentMode {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Room {
+    #[serde(default)]
+    pub preferences: RoomPreferences,
     pub id: RoomId,
     pub name: String,
     pub description: String,
@@ -72,6 +76,7 @@ impl Rooms {
             next_id: LEGACY_ROOMS as u64 + 1,
             rooms: (1..=LEGACY_ROOMS as u64)
                 .map(|id| Room {
+                    preferences: RoomPreferences::default(),
                     id: RoomId(id),
                     name: format!("Raum {id}"),
                     description: String::new(),
@@ -91,6 +96,7 @@ impl Rooms {
         }
         let mut ids = BTreeSet::new();
         for room in &self.rooms {
+            room.preferences.validate()?;
             if room.id.0 == 0 || room.id.0 >= self.next_id || !ids.insert(room.id) {
                 return Err(invalid("doppelte oder ungültige Raum-ID/Zähler"));
             }

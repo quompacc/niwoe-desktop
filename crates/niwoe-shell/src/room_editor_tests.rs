@@ -2,6 +2,28 @@ use super::*;
 use crate::wayland::RoomEditAction;
 
 #[test]
+fn snapshot_retains_preferences_and_rejects_invalid_replacement() {
+    let mut ui = RoomUi::default();
+    let mut snapshot = ui.snapshot.clone();
+    snapshot.rooms[0].preferences = niwoe_ipc::RoomPreferences {
+        icon: Some("applications-development".into()),
+        apps: vec![
+            niwoe_ipc::AppReference::Native("org.example.Editor".into()),
+            niwoe_ipc::AppReference::Xwayland("Editor".into()),
+        ],
+        layout: niwoe_ipc::RoomLayout::Floating,
+        restore: niwoe_ipc::RoomRestore::RelaunchApps,
+    };
+    assert!(ui.accept(snapshot.clone()));
+    assert_eq!(ui.snapshot, snapshot);
+    let mut invalid = snapshot.clone();
+    invalid.revision += 1;
+    invalid.rooms[0].preferences.icon = Some("../invalid".into());
+    assert!(!ui.accept(invalid));
+    assert_eq!(ui.snapshot, snapshot);
+}
+
+#[test]
 fn uncertain_creation_cannot_be_retried_and_duplicated() {
     let mut ui = RoomUi::default();
     ui.accept(ui.snapshot.clone());
@@ -187,6 +209,7 @@ fn accepts_compact_dynamic_slots_and_rejects_gaps() {
     let mut ui = RoomUi::default();
     let mut snapshot = ui.snapshot.clone();
     snapshot.rooms.push(RoomEntry {
+        preferences: Default::default(),
         id: 10,
         workspace: 10,
         name: "Raum 10".into(),

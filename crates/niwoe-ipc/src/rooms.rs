@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RoomEntry {
+    #[serde(default)]
+    pub preferences: crate::RoomPreferences,
     pub id: u64,
     /// Stable one-based Space slot for legacy window/output consumers.
     pub workspace: u8,
@@ -52,6 +54,10 @@ pub enum RoomChange {
         id: u64,
         description: String,
     },
+    SetPreferences {
+        id: u64,
+        preferences: crate::RoomPreferences,
+    },
     SetAssignment {
         id: u64,
         assignment: RoomAssignment,
@@ -99,6 +105,7 @@ mod tests {
             snapshot: RoomSnapshot {
                 revision: 8,
                 rooms: vec![RoomEntry {
+                    preferences: Default::default(),
                     id: 42,
                     workspace: 1,
                     name: "Büro".into(),
@@ -119,6 +126,18 @@ mod tests {
     #[test]
     fn create_and_delete_wire_roundtrip() {
         for change in [
+            RoomChange::SetPreferences {
+                id: 1,
+                preferences: crate::RoomPreferences {
+                    icon: Some("applications-development".into()),
+                    apps: vec![
+                        crate::AppReference::Native("Editor".into()),
+                        crate::AppReference::Xwayland("Editor".into()),
+                    ],
+                    layout: crate::RoomLayout::Floating,
+                    restore: crate::RoomRestore::LayoutOnly,
+                },
+            },
             RoomChange::Create {
                 name: "Neuer Raum".into(),
             },

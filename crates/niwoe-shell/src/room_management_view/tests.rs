@@ -3,6 +3,7 @@ use super::*;
 fn rooms() -> Vec<RoomEntry> {
     (1..=9)
         .map(|workspace| RoomEntry {
+            preferences: Default::default(),
             id: workspace as u64,
             workspace,
             name: format!("Raum {workspace}"),

@@ -102,11 +102,14 @@ fn unicode_limits_empty_names_counts_and_schema_are_checked() {
     assert!(old
         .revised(0, |r| r.rooms[0].description = "ä".repeat(201))
         .is_err());
-    assert!(old.revised(0, |r| r.schema_version = 2).is_err());
+    assert!(old
+        .revised(0, |r| r.schema_version = SCHEMA_VERSION + 1)
+        .is_err());
     let maximum = old
         .revised(0, |r| {
             for id in 10..=64 {
                 r.rooms.push(Room {
+                    preferences: Default::default(),
                     id: RoomId(id),
                     name: format!("Room {id}"),
                     description: String::new(),
@@ -166,6 +169,98 @@ fn oversized_file_is_preserved() {
     fs::write(f.path(), &bytes).unwrap();
     assert!(store::load_or_initialize(&f.path()).is_err());
     assert_eq!(fs::read(f.path()).unwrap(), bytes);
+}
+
+fn legacy_document() -> String {
+    "schema_version = 1\nrevision = 49\nnext_id = 19\n\
+    [[rooms]]\nid = 2\nname = 'Arbeit'\ndescription = 'Erhalten'\nassignment = 'preferred'\n\
+    [[rooms]]\nid = 1\nname = 'Privat'\ndescription = ''\nassignment = 'free'\n"
+        .into()
+}
+
+#[test]
+fn schema_upgrade_preserves_identity_revision_and_exact_backup() {
+    let f = Fixture::new();
+    let original = legacy_document();
+    fs::write(f.path(), &original).unwrap();
+    let rooms = store::load_or_initialize(&f.path()).unwrap();
+    assert_eq!(rooms.schema_version, SCHEMA_VERSION);
+    assert_eq!((rooms.revision, rooms.next_id), (49, 19));
+    assert_eq!(
+        rooms.rooms.iter().map(|r| r.id.0).collect::<Vec<_>>(),
+        [2, 1]
+    );
+    assert_eq!(rooms.rooms[0].name, "Arbeit");
+    assert_eq!(rooms.rooms[0].description, "Erhalten");
+    assert_eq!(rooms.rooms[0].assignment, AssignmentMode::Preferred);
+    assert!(rooms
+        .rooms
+        .iter()
+        .all(|r| r.preferences == RoomPreferences::default()));
+    let backup = f.path().with_extension("toml.v1.bak");
+    assert_eq!(fs::read_to_string(&backup).unwrap(), original);
+    let bytes = fs::read(f.path()).unwrap();
+    assert_eq!(store::load_or_initialize(&f.path()).unwrap(), rooms);
+    assert_eq!(fs::read(f.path()).unwrap(), bytes);
+    assert_eq!(fs::read_to_string(&backup).unwrap(), original);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        assert_eq!(
+            fs::metadata(backup).unwrap().permissions().mode() & 0o777,
+            0o600
+        );
+    }
+}
+
+#[test]
+fn migration_retry_reuses_exact_backup_but_never_overwrites_another() {
+    let f = Fixture::new();
+    let original = legacy_document();
+    let backup = f.path().with_extension("toml.v1.bak");
+    fs::write(f.path(), &original).unwrap();
+    fs::write(&backup, "existing backup").unwrap();
+    assert!(store::load_or_initialize(&f.path()).is_err());
+    assert_eq!(fs::read_to_string(f.path()).unwrap(), original);
+    assert_eq!(fs::read_to_string(&backup).unwrap(), "existing backup");
+    fs::write(&backup, &original).unwrap();
+    assert!(store::load_or_initialize(&f.path()).is_ok());
+}
+
+#[test]
+fn preferences_preserve_order_and_separate_native_from_xwayland() {
+    let f = Fixture::new();
+    let original = store::load_or_initialize(&f.path()).unwrap();
+    let prefs = RoomPreferences {
+        icon: Some("applications-development".into()),
+        apps: vec![
+            AppReference::Native("org.example.Editor".into()),
+            AppReference::Xwayland("org.example.Editor".into()),
+        ],
+        layout: RoomLayout::Floating,
+        restore: RoomRestore::LayoutOnly,
+    };
+    let next = original
+        .revised(0, |r| r.rooms[0].preferences = prefs.clone())
+        .unwrap();
+    store::save(&f.path(), &original, &next).unwrap();
+    assert_eq!(store::load(&f.path()).unwrap(), next);
+    let mut invalid = prefs.clone();
+    invalid.apps.push(prefs.apps[0].clone());
+    assert!(invalid.validate().is_err());
+    for id in ["", " padded", "line\nbreak"] {
+        invalid = prefs.clone();
+        invalid.apps = vec![AppReference::Native(id.into())];
+        assert!(invalid.validate().is_err());
+    }
+    for icon in ["", "../icon", "/usr/share/icon", "has space"] {
+        invalid = prefs.clone();
+        invalid.icon = Some(icon.into());
+        assert!(invalid.validate().is_err());
+    }
+    for json in ["layout = 'future'", "restore = 'future'", "surprise = 1"] {
+        assert!(toml::from_str::<RoomPreferences>(json).is_err());
+    }
 }
 
 #[cfg(unix)]
