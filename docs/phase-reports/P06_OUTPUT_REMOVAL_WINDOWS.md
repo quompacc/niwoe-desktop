@@ -1,6 +1,7 @@
 # P06 – Monitorentfernung mit Fenstern, 26.09.2026
 
-Status: **in-progress**, physischer Test hat einen Fehler gefunden.
+Status: **dieser Live-Abnahmefall bestanden** nach Korrektur und physischer
+Wiederholung. Keine pauschale vollständige P06-Abnahme.
 
 ## Durchführung und tatsächliches Ergebnis
 
@@ -51,12 +52,37 @@ Logs: `target/p06-output-selection-{check,test,clippy,build}.log`.
 
 Compositor atomar installiert und mit Release per `cmp`/SHA-256 verglichen:
 `e1953fc4f7fa45c1ec6ad61b3f77e4a659ab8315deb33980e823ef9b3874a893`.
-Shell unverändert (`5636d59c…`). PID 87272 läuft weiter mit `e1e21670…`;
-ein regulärer Nutzer-Neulogin ist für die Korrektur erforderlich.
+Shell unverändert (`5636d59c…`). Zum Installationszeitpunkt lief PID 87272
+weiter mit `e1e21670…`; der erforderliche Nutzer-Neulogin ist inzwischen erfolgt.
 
-## Verbleibende Live-Abnahme
+## Erfolgreiche Live-Wiederholung
 
-Korrigierten Compositor aktivieren und denselben Raum auf einem anderen
-fokussierten Output auswählen; danach minimiertes Fenster wiederherstellen.
-Der gesamte physische Ab-/Anstecktest mit belegten Fenstern bleibt bis zur
-erfolgreichen Wiederholung offen. Keine Erfolgsbehauptung allein aus Cargo-Tests.
+Neuer Compositor PID 94758, gestartet am 26.09.2026 um 16:47:50, tatsächlicher
+Hash entspricht `e1953fc4…` oben. Zunächst ohne Kabelziehen geprüft: links
+Raum 1, rechts Raum 3/global Raum 3; anschließend links ebenfalls Raum 3
+auswählen und minimiertes Fenster wiederherstellen. Beide Output-Zuordnungen
+melden Raum 3, das Fenster ist nicht mehr minimiert. Belege:
+`target/p06-live-ui/selection-{before,after}.json`.
+
+Anschließend frische Testfenster, links Raum 1/rechts Raum 3, mit dem Nutzer
+den physischen HDMI-Ab-/Ansteckzyklus wiederholt. Automatischer Helfer
+`target/p06-unplug-retry.py` meldet sämtliche Prüfungen erfolgreich:
+
+- Nach Entfernen: genau ein Output; alle vier Fenster-IDs, Raumzuordnungen,
+  Minimierungszustände und drei Eingabefeldinhalte unverändert.
+- Raum 3 auf dem verbleibenden Output erfolgreich ausgewählt; minimiertes
+  Fenster wiederhergestellt, während weiterhin nur ein Output vorhanden ist.
+- Nach Wiederanschließen: zwei Outputs; dieselben Fenster-IDs, Raumzuordnungen
+  und Eingabefeldinhalte. Raum-Snapshot und Konfigurationsdatei unverändert.
+- Eigene Testanwendung beendet; keine Testfenster übrig, Konfiguration bytegleich.
+
+Belege: `target/p06-unplug-retry.log`,
+`target/p06-unplug-retry-evidence/{before,removed,restored-single-output,
+reconnected,client-before,client-after,cleanup}.json` und abschließender
+Snapshot `target/p06-live-ui/unplug-retry-final.json`. Der begrenzte Helfer
+ist beendet. In dieser Nachprüfung nur Dokumentation geändert; die bisherigen
+Cargo-Prüfungen gelten weiterhin für den identischen installierten Build.
+
+Dieser Test deckt den vorhandenen eDP-/HDMI-Aufbau ab. Er ist keine Abnahme
+aller Skalierungen, anderer GPUs/Anschlusskombinationen oder der gesamten
+P06-Matrix. Der dokumentierte Wiederherstellungsfehler ist live nachgeprüft.
