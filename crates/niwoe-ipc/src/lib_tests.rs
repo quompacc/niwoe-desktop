@@ -349,6 +349,7 @@ fn launch_app_command_roundtrip_uses_argv() {
             "foot".to_string(),
         ],
         terminal: false,
+        room_id: Some(42),
     };
 
     let bytes = encode_command(&command).expect("encode");
@@ -366,6 +367,7 @@ fn launch_app_command_accepts_legacy_command_field() {
             program: "foot".to_string(),
             args: Vec::new(),
             terminal: false,
+            room_id: None,
         }
     );
 }

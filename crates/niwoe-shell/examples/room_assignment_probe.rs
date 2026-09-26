@@ -9,6 +9,7 @@ use wayland_client::{
     },
     Connection, Dispatch, QueueHandle,
 };
+use wayland_protocols::xdg::activation::v1::client::xdg_activation_v1;
 use wayland_protocols::xdg::shell::client::{xdg_surface, xdg_toplevel, xdg_wm_base};
 
 #[derive(Default)]
@@ -18,6 +19,7 @@ struct Probe {
     shm: Option<wl_shm::WlShm>,
     enters: u32,
     focused: bool,
+    activation: Option<xdg_activation_v1::XdgActivationV1>,
 }
 impl Dispatch<wl_registry::WlRegistry, ()> for Probe {
     fn event(
@@ -37,6 +39,7 @@ impl Dispatch<wl_registry::WlRegistry, ()> for Probe {
             match interface.as_str() {
                 "wl_compositor" => s.compositor = Some(r.bind(name, version.min(4), q, ())),
                 "xdg_wm_base" => s.wm = Some(r.bind(name, 1, q, ())),
+                "xdg_activation_v1" => s.activation = Some(r.bind(name, 1, q, ())),
                 "wl_shm" => s.shm = Some(r.bind(name, 1, q, ())),
                 "wl_seat" => {
                     let seat: wl_seat::WlSeat = r.bind(name, version.min(5), q, ());
@@ -101,6 +104,7 @@ delegate_noop!(Probe: ignore wl_shm::WlShm);
 delegate_noop!(Probe: ignore wl_shm_pool::WlShmPool);
 delegate_noop!(Probe: ignore wl_buffer::WlBuffer);
 delegate_noop!(Probe: ignore xdg_toplevel::XdgToplevel);
+delegate_noop!(Probe: ignore xdg_activation_v1::XdgActivationV1);
 
 fn main() {
     let runtime = std::env::var("XDG_RUNTIME_DIR").unwrap();
@@ -110,6 +114,8 @@ fn main() {
     );
     let args: Vec<_> = std::env::args().collect();
     let directory = PathBuf::from(&args[1]);
+    std::fs::write(directory.join("pid"), std::process::id().to_string()).unwrap();
+    let launch_token = std::env::var("XDG_ACTIVATION_TOKEN").ok();
     let c = Connection::connect_to_env().unwrap();
     let mut queue = c.new_event_queue();
     let q = queue.handle();
@@ -117,6 +123,12 @@ fn main() {
     let mut s = Probe::default();
     queue.roundtrip(&mut s).unwrap();
     let surface = s.compositor.as_ref().unwrap().create_surface(&q, ());
+    if args.get(4).is_some_and(|mode| mode == "activate") {
+        s.activation
+            .as_ref()
+            .unwrap()
+            .activate(launch_token.clone().unwrap(), &surface);
+    }
     let xdg = s.wm.as_ref().unwrap().get_xdg_surface(&surface, &q, ());
     let top = xdg.get_toplevel(&q, ());
     top.set_title(args[2].clone());
@@ -146,19 +158,44 @@ fn main() {
     loop {
         let command = std::fs::read_to_string(directory.join("command")).unwrap_or_default();
         if command != previous {
+            if command == "quit" {
+                break;
+            }
+            if command == "activate" {
+                s.activation
+                    .as_ref()
+                    .unwrap()
+                    .activate(launch_token.clone().unwrap(), &surface);
+            }
             if let Some(id) = command.strip_prefix("app ") {
                 top.set_app_id(id.into());
             }
             if command == "minimize" {
                 top.set_minimized();
             }
-            if let Some(id) = command.strip_prefix("dialog ") {
+            if let Some(id) = command
+                .strip_prefix("dialog ")
+                .or_else(|| command.strip_prefix("replay "))
+            {
                 let child = s.compositor.as_ref().unwrap().create_surface(&q, ());
                 let xdg = s.wm.as_ref().unwrap().get_xdg_surface(&child, &q, ());
                 let dialog = xdg.get_toplevel(&q, ());
-                dialog.set_title(format!("{} Dialog", args[2]));
+                let transient = command.starts_with("dialog ");
+                dialog.set_title(format!(
+                    "{} {}",
+                    args[2],
+                    if transient { "Dialog" } else { "Replay" }
+                ));
                 dialog.set_app_id(id.into());
-                dialog.set_parent(Some(&top));
+                if transient {
+                    dialog.set_parent(Some(&top));
+                }
+                if let Some(token) = &launch_token {
+                    s.activation
+                        .as_ref()
+                        .unwrap()
+                        .activate(token.clone(), &child);
+                }
                 child.commit();
                 queue.roundtrip(&mut s).unwrap();
                 child.attach(Some(&buffer), 0, 0);

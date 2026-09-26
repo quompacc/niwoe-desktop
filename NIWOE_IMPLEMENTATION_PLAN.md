@@ -1,5 +1,11 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P07 vierter Block, 26.09.2026: `in-progress`.** Einmalige Startkorrelation
+über native Aktivierungskennungen und X11-Startup-ID implementiert, vollständig
+geprüft und installiert. Eltern-/Move-Priorität, verspätete Metadaten,
+minimiertes Restore und Replay getestet. DRM-Aktivierung und Gesamtabschluss
+folgen. Details: [P07-Startkorrelation](docs/phase-reports/P07_LAUNCH_CORRELATION.md).
+
 **P07 dritter Block, 26.09.2026: `in-progress`.** Vollständige native Fensterliste
 im Hub einschließlich minimierter Fenster, seitenweiser Navigation und
 Maus-Verschieben nach stabiler Raum-ID implementiert, geprüft und installiert.

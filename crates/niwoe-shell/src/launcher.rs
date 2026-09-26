@@ -53,6 +53,7 @@ impl LauncherState {
             program: app.program.clone(),
             args: app.args.clone(),
             terminal: app.terminal,
+            room_id: None,
         };
         if !ipc.send(&command) {
             warn!(

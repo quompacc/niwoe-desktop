@@ -44,6 +44,7 @@ impl NiwoeShell {
                         program: app.program,
                         args: app.args,
                         terminal: app.terminal,
+                        room_id: None,
                     };
                     if !self.ipc.send(&command) {
                         tracing::warn!("IPC unavailable, pinned app launch skipped: {}", idx);

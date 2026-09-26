@@ -381,6 +381,9 @@ pub enum ShellCommand {
         args: Vec<String>,
         #[serde(default)]
         terminal: bool,
+        /// Explicit launch destination. Omitted starts use normal app policy.
+        #[serde(default)]
+        room_id: Option<u64>,
     },
     LockSession,
     PowerPrepareSleep,

@@ -59,6 +59,7 @@ mod client;
 mod handlers;
 mod idle;
 mod ipc;
+mod launch_intent;
 mod layout;
 mod lock;
 #[cfg(test)]

@@ -1,7 +1,7 @@
 macro_rules! xwm_input_selection_methods {
     () => {
     fn property_notify(&mut self, _xwm: XwmId, window: X11Surface, property: WmWindowProperty) {
-        if matches!(property, WmWindowProperty::Class | WmWindowProperty::TransientFor) {
+        if matches!(property, WmWindowProperty::Class | WmWindowProperty::TransientFor | WmWindowProperty::StartupId) {
             self.assign_x11_surface(&window);
         }
         if matches!(property, WmWindowProperty::Title | WmWindowProperty::Class) {

@@ -23,16 +23,16 @@ impl XdgActivationHandler for NiwoeState {
             data.client_id,
             data.surface.is_some()
         );
-        true
+        self.prune_launch_tokens()
     }
 
     fn request_activation(
         &mut self,
-        _token: XdgActivationToken,
+        token: XdgActivationToken,
         _token_data: XdgActivationTokenData,
-        _surface: WlSurface,
+        surface: WlSurface,
     ) {
-        tracing::debug!("xdg-activation: activation requested");
+        self.apply_launch_activation(token.as_str(), &surface);
     }
 }
 

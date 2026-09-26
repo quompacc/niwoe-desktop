@@ -173,6 +173,7 @@ impl NiwoeShell {
                     program: "sh".to_string(),
                     args: Vec::new(),
                     terminal: true,
+                    room_id: None,
                 };
                 if !self.ipc.send(&command) {
                     tracing::warn!("IPC unavailable, desktop terminal launch skipped");
@@ -194,6 +195,7 @@ impl NiwoeShell {
                     program,
                     args,
                     terminal: false,
+                    room_id: None,
                 };
                 if !self.ipc.send(&command) {
                     tracing::warn!("IPC unavailable, desktop file manager launch skipped");

@@ -18,6 +18,7 @@ struct Assignment {
     settled: bool,
     manual: bool,
     presented: bool,
+    launch_room: Option<niwoe_config::rooms::RoomId>,
 }
 
 fn tracking(window: &Window) -> &Mutex<Assignment> {
@@ -73,6 +74,14 @@ impl NiwoeState {
         let Some((source, _)) = self.assignment_window(|candidate| candidate == window) else {
             return;
         };
+        let launch_room = if let Some(toplevel) = window.toplevel() {
+            super::launch_intent::surface_room(toplevel.wl_surface())
+        } else {
+            window
+                .x11_surface()
+                .and_then(|surface| surface.startup_id())
+                .and_then(|token| self.consume_launch_room(&token))
+        };
         let (app, parent) = if let Some(toplevel) = window.toplevel() {
             let app = with_states(toplevel.wl_surface(), |states| {
                 states
@@ -99,7 +108,14 @@ impl NiwoeState {
         let registry = self.workspaces.rooms();
         let current = registry.room_at_slot(source).expect("mapped room");
         let mut assignment = tracking(window).lock().unwrap();
-        let explicit = (assignment.manual || assignment.settled).then_some(current);
+        assignment.launch_room = launch_room.or(assignment.launch_room);
+        let explicit = if assignment.manual {
+            Some(current)
+        } else {
+            assignment
+                .launch_room
+                .or(assignment.settled.then_some(current))
+        };
         let target = choose_room(
             registry.definitions(),
             parent.and_then(|(slot, _)| registry.room_at_slot(slot)),
@@ -120,6 +136,14 @@ impl NiwoeState {
             .values_mut()
             .find(|entry| &entry.window == window)
         {
+            let floating = self.wm_workspaces[source].mode == WorkspaceMode::Floating
+                || self.wm_workspaces[source].is_floating(window);
+            self.wm_workspaces[source].remove_window(window);
+            if floating {
+                self.wm_workspaces[target].set_floating(window, true);
+            } else {
+                self.wm_workspaces[target].add_tiled(window.clone(), None);
+            }
             entry.workspace = target;
             self.broadcast_window_snapshot();
             return;

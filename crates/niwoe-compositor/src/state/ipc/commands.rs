@@ -183,7 +183,20 @@ impl NiwoeState {
                 program,
                 args,
                 terminal,
+                room_id,
             } => {
+                let intent = if let Some(room) = room_id {
+                    let Some(token) = self.launch_room_token(niwoe_config::rooms::RoomId(room))
+                    else {
+                        tracing::warn!(
+                            "launch destination missing or pending launch limit reached"
+                        );
+                        return;
+                    };
+                    Some(token)
+                } else {
+                    None
+                };
                 let Some(spec) = super::launch::prepare_launch(&program, &args, terminal) else {
                     tracing::warn!(
                         "cannot launch app {:?} with args {:?}: invalid command or no terminal emulator found",
@@ -210,6 +223,15 @@ impl NiwoeState {
                 });
 
                 let mut launch = Command::new(&spec.program);
+                // Never inherit another process's one-shot launch identity.
+                launch
+                    .env_remove("XDG_ACTIVATION_TOKEN")
+                    .env_remove("DESKTOP_STARTUP_ID");
+                if let Some(token) = intent {
+                    launch
+                        .env("XDG_ACTIVATION_TOKEN", &token)
+                        .env("DESKTOP_STARTUP_ID", token);
+                }
                 launch
                     .args(&spec.args)
                     .env(
