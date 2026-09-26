@@ -14,8 +14,9 @@ macro_rules! handle_panel_and_popups_pointer {
                     &$shell.battery_snapshot,
                     $shell.power_profile,
                     $shell.panel_active_workspace(),
-                    9,
+                    $shell.workspace_state.rooms.snapshot.rooms.len() as u8,
                     &$shell.workspace_state.rooms.snapshot.rooms,
+                    &$shell.occupied_workspaces,
                     &$shell.last_clock,
                     &$shell.icon_cache,
                     None, // screenshot_icon — nur für Hover-Layout, Icon irrelevant

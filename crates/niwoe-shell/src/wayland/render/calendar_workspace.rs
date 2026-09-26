@@ -250,7 +250,6 @@ impl NiwoeShell {
                 &self.theme,
                 workspaces::WorkspacePopupInput {
                     active_workspace,
-                    total_workspaces: 9,
                     occupied: self.occupied_workspaces,
                     hovered_idx: self.workspace_hover_idx,
                 },

@@ -27,6 +27,7 @@ pub(crate) fn build_panel_widget_tree(
     active_workspace: u8,
     total_workspaces: u8,
     room_entries: &[niwoe_ipc::RoomEntry],
+    occupied: &[bool; niwoe_config::rooms::MAX_ROOMS],
     clock: &str,
     icon_cache: &IconCache,
     screenshot_icon: Option<Pixmap>,
@@ -103,21 +104,23 @@ pub(crate) fn build_panel_widget_tree(
         .position(|r| r.workspace == active_workspace)
         .map(|position| position as u8 + 1)
         .unwrap_or(active_workspace);
-    let rooms = visible_rooms(total_workspaces, capacity);
+    let rooms = visible_rooms(total_workspaces, capacity, active_position);
+    let visible_count = rooms.clone().count();
     for position in rooms {
         let room = room_entries.get(position as usize-1);
         let workspace = room.map(|r| r.workspace).unwrap_or(position);
         left_children.push(Box::new(RoomTab {
             workspace,
+            occupied: occupied[workspace.saturating_sub(1) as usize],
             label: room.map(|r| r.name.clone()).unwrap_or_else(|| format!("Raum {workspace}")),
             active: workspace == active_workspace,
         }));
     }
-    let hidden_count = total_rooms.saturating_sub(capacity) as u8;
+    let hidden_count = total_rooms.saturating_sub(visible_count) as u8;
     if hidden_count > 0 {
         left_children.push(Box::new(PanelWorkspaceChip {
             hidden_count,
-            active_hidden: active_position as usize > capacity,
+            active_hidden: false,
         }));
     }
     let left_cluster = Container::new(

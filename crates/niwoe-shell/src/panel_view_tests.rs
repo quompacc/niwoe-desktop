@@ -93,6 +93,7 @@ fn build_panel_widget_tree_root_has_three_children() {
         1,
         9,
         &[],
+        &[false; niwoe_config::rooms::MAX_ROOMS],
         "12:34",
         &icon_cache,
         None,
@@ -140,6 +141,7 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
         1,
         9,
         &[],
+        &[false; niwoe_config::rooms::MAX_ROOMS],
         "12:34",
         &icon_cache,
         None,
@@ -215,7 +217,7 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
 }
 
 #[test]
-fn panel_room_rail_keeps_the_same_prefix_when_active_room_changes() {
+fn panel_room_rail_uses_fixed_pages_and_keeps_active_room_visible() {
     let icons = IconCache::new();
     let audio = AudioSnapshot::unavailable();
     let room_ids = |active_workspace| {
@@ -233,6 +235,7 @@ fn panel_room_rail_keeps_the_same_prefix_when_active_room_changes() {
             active_workspace,
             9,
             &[],
+            &[false; niwoe_config::rooms::MAX_ROOMS],
             "12:34",
             &icons,
             None,
@@ -254,7 +257,8 @@ fn panel_room_rail_keeps_the_same_prefix_when_active_room_changes() {
             .collect::<Vec<_>>()
     };
 
-    assert_eq!(room_ids(1), room_ids(9));
+    assert_eq!(room_ids(1), room_ids(4));
+    assert!(room_ids(9).contains(&"panel-room-9".to_string()));
     assert_eq!(
         room_ids(1),
         vec![
@@ -283,6 +287,7 @@ fn panel_omits_room_overflow_when_every_room_fits() {
         4,
         4,
         &[],
+        &[false; niwoe_config::rooms::MAX_ROOMS],
         "12:34",
         &icons,
         None,
@@ -339,6 +344,7 @@ fn panel_layout_keeps_clock_centered_and_controls_separate_across_viewports() {
                     active,
                     9,
                     &[],
+                    &[false; niwoe_config::rooms::MAX_ROOMS],
                     "19:18  Mi, 23. Sep",
                     &icons,
                     None,

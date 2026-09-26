@@ -33,6 +33,7 @@ pub enum RoomEditAction {
 
 #[derive(Debug, Clone)]
 pub enum ClickAction {
+    WorkspacePage(i8),
     EditRoom(RoomEditAction),
     SwitchWorkspace(u8),
     FocusWindow(String),
@@ -55,6 +56,7 @@ pub enum ClickAction {
 impl ClickAction {
     pub(crate) fn test_name(&self) -> String {
         match self {
+            ClickAction::WorkspacePage(step) => format!("workspace-page-{step}"),
             ClickAction::EditRoom(action) => format!("room-edit-{action:?}"),
             ClickAction::SwitchWorkspace(workspace) => format!("switch-workspace-{workspace}"),
             ClickAction::FocusWindow(id) => format!("focus-window-{id}"),

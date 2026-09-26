@@ -13,6 +13,7 @@ use crate::wayland::{CommitReason, RepaintReason, SurfaceKind};
 use super::NiwoeShell;
 
 mod room_navigation;
+mod workspace_navigation;
 
 impl KeyboardHandler for NiwoeShell {
     fn enter(
@@ -356,13 +357,8 @@ impl KeyboardHandler for NiwoeShell {
             self.room_edit_key(qh, event.keysym);
             return;
         }
-        if self.workspace_popup_open && event.keysym == Keysym::F2 {
-            self.open_room_editor(qh, self.panel_active_workspace());
-            return;
-        }
-        if self.workspace_popup_open && is_escape {
-            self.close_workspace_popup(CommitReason::Input);
-            self.draw_panel(qh, RepaintReason::Keyboard);
+        if self.workspace_popup_open {
+            self.workspace_navigation_key(qh, event.keysym);
             return;
         }
         if self.calendar_popup_open && is_escape {

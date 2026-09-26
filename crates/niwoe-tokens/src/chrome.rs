@@ -136,6 +136,9 @@ impl Default for Calendar {
 /// Geometry for the compact 3x3 workspace switcher popup.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct WorkspaceSwitcher {
+    pub footer_height: i32,
+    pub line_height: i32,
+    pub navigation_height: i32,
     pub width: i32,
     pub height: i32,
     pub columns: i32,
@@ -147,8 +150,11 @@ pub struct WorkspaceSwitcher {
 
 impl WorkspaceSwitcher {
     pub const DEFAULT: WorkspaceSwitcher = WorkspaceSwitcher {
+        footer_height: 144,
+        line_height: 18,
+        navigation_height: 32,
         width: 320,
-        height: 248,
+        height: 392,
         columns: 3,
         rows: 3,
         tile_gap: 10,
@@ -535,7 +541,7 @@ mod tests {
         assert_eq!(Calendar::DEFAULT.columns, 7);
         assert_eq!(Calendar::DEFAULT.rows, 6);
         assert_eq!(WorkspaceSwitcher::DEFAULT.width, 320);
-        assert_eq!(WorkspaceSwitcher::DEFAULT.height, 248);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.height, 392);
         assert_eq!(WorkspaceSwitcher::DEFAULT.columns, 3);
         assert_eq!(WorkspaceSwitcher::DEFAULT.rows, 3);
         assert_eq!(WorkspaceSwitcher::DEFAULT.tile_pad, 10);

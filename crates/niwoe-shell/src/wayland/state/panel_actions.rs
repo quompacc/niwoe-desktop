@@ -14,6 +14,7 @@ impl NiwoeShell {
         }
 
         match action {
+            ClickAction::WorkspacePage(_) => {}
             ClickAction::EditRoom(action) => self.room_edit_action(qh, action),
             ClickAction::SwitchWorkspace(workspace) => {
                 if self.active_workspace != workspace {
@@ -155,6 +156,12 @@ impl NiwoeShell {
     }
 
     pub(crate) fn handle_workspace_click(&mut self, qh: &QueueHandle<Self>, action: ClickAction) {
+        if let ClickAction::WorkspacePage(step) = action {
+            self.workspace_state.select_relative(step as isize * crate::workspaces::page_size() as isize);
+            self.workspace_hover_idx = None;
+            self.draw_workspace_popup(qh, RepaintReason::Pointer);
+            return;
+        }
         if let ClickAction::EditRoom(action) = action {
             self.room_edit_action(qh, action);
             return;
@@ -232,6 +239,7 @@ impl NiwoeShell {
 
     pub(crate) fn handle_launcher_click(&mut self, qh: &QueueHandle<Self>, action: ClickAction) {
         match action {
+            ClickAction::WorkspacePage(_) => {}
             ClickAction::EditRoom(action) => self.room_edit_action(qh, action),
             ClickAction::LaunchPinnedApp(_) => {}
             ClickAction::FocusWindow(_) => {}

@@ -294,6 +294,7 @@ impl NiwoeShell {
             self.close_network_popup(reason);
         }
 
+        self.workspace_state.select_active(self.panel_active_workspace());
         self.workspace_popup_open = true;
         self.workspace_hover_idx = None;
         self.workspace_layer

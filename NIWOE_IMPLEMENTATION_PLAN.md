@@ -1,5 +1,15 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P07 begonnen, 26.09.2026: `in-progress`.** Der erste Navigationsbaustein ist
+geprüft, installiert und ohne Neulogin aktiv: echte Raumanzahl bis 64 in Panel
+und Trefferprüfung, feste Seiten mit sichtbarem aktivem Raum, neutrale Belegung,
+vollständiger Name und Maus-/Tastaturblättern in der Raumauswahl. Native
+Neun-Räume-Darstellung sowie isolierte 64-Räume-Eingabe geprüft; der isolierte
+Winit-Renderpfad liefert noch keinen visuellen 64-Räume-Abnahmenachweis.
+App-Regeln, gleichwertige Mausaktionen fürs Verschieben und vollständiger
+Fensterzugang bleiben offen. Details und nächste Pakete:
+[P07-Raumnavigation](docs/phase-reports/P07_NAVIGATION.md).
+
 **P06-Abschluss, 26.09.2026: `accepted` für den dokumentierten Fedora-Aufbau.**
 Der vollständige Datenvertrag nach §4.2 einschließlich Icon, App-Referenzen und
 Layout-/Restore-Präferenzen ist implementiert. Schema-2-Migration mit privater
@@ -11,7 +21,7 @@ die dabei gefundene WM-Mitgliedschaftslücke ist korrigiert und nachgeprüft.
 Details: [P06-Endstand](docs/phase-reports/P06_SCHEMA_COMPLETION.md).
 Die verbindliche aktuelle Matrix steht im
 [P06-Abschlussabgleich](docs/phase-reports/P06_ACCEPTANCE_REVIEW.md).
-P07 ist die nächste Phase und wurde noch nicht begonnen. Nachfolgende Checkpoints
+P07 ist die aktuelle Folgephase; siehe den jüngsten Checkpoint oben. Nachfolgende Checkpoints
 bleiben historische Nachweise; ihre damaligen offenen Punkte sind gegen diese
 aktuelle Matrix zu lesen.
 

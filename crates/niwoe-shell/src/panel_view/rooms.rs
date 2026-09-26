@@ -65,15 +65,17 @@ const ROOM_IDS: [&str; niwoe_config::rooms::MAX_ROOMS] = [
     "panel-room-64",
 ];
 
-/// Keep the panel rail stable: activation must never reorder or scroll room tabs.
+/// Fixed pages in saved room order keep the active room visible without MRU sorting.
 /// Rooms beyond the available width remain reachable through the overflow control.
-fn visible_rooms(total: u8, capacity: usize) -> std::ops::RangeInclusive<u8> {
+fn visible_rooms(total: u8, capacity: usize, active: u8) -> std::ops::RangeInclusive<u8> {
     let total = total.clamp(1, ROOM_IDS.len() as u8);
     let count = capacity.clamp(1, total as usize) as u8;
-    1..=count
+    let start = active.clamp(1, total).saturating_sub(1) / count * count + 1;
+    start..=start.saturating_add(count - 1).min(total)
 }
 
 struct RoomTab {
+    occupied: bool,
     workspace: u8,
     label: String,
     active: bool,
@@ -142,6 +144,14 @@ impl Widget for RoomTab {
                 niwoe_tokens::Controls::BORDER as f32,
             );
         }
+        if self.occupied {
+            let size = niwoe_tokens::WorkspaceSwitcher::DEFAULT.occupied_dot_size;
+            let dot = Rect { x: symbol.x + (symbol.width - size) / 2,
+                y: symbol.y + (symbol.height - size) / 2, width: size, height: size };
+            if let Some(path) = rounded_rect_path(dot, niwoe_tokens::Radius::DEFAULT.sm) {
+                paint_fill(canvas, &path, theme.palette.text_dim);
+            }
+        }
         paint_text(
             canvas,
             &label,
@@ -181,6 +191,7 @@ mod room_tests {
         for workspace in 1..=9 {
             let mut image = Pixmap::new(area.width as u32, area.height as u32).unwrap();
             RoomTab {
+                occupied: false,
                 workspace,
                 label: format!("Raum {workspace}"),
                 active: false,
@@ -210,10 +221,24 @@ mod room_tests {
     #[test]
     fn visible_room_sequence_is_stable_and_bounded() {
         for capacity in [0, 1, 3, 9, 20] {
-            let rooms = visible_rooms(9, capacity);
+            let rooms = visible_rooms(9, capacity, 1);
             assert_eq!(*rooms.start(), 1);
             assert!(*rooms.end() <= 9);
             assert_eq!(rooms.count(), capacity.clamp(1, 9));
+        }
+    }
+
+    #[test]
+    fn every_active_room_is_visible_on_a_bounded_ordered_page() {
+        for total in [1, 9, 64] {
+            for capacity in [1, 4, 9] {
+                for active in 1..=total {
+                    let page = visible_rooms(total, capacity, active);
+                    assert!(page.contains(&active));
+                    assert!(page.clone().count() <= capacity);
+                    for peer in page.clone() { assert_eq!(visible_rooms(total, capacity, peer), page); }
+                }
+            }
         }
     }
 }
