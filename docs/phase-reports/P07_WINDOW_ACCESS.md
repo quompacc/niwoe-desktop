@@ -52,3 +52,24 @@ Der Nutzer hat automatische Ab-/Anmeldungen für den P07-Abschluss autorisiert.
 
 DRM-Fensterzugang, abschließende Zweimonitor-/1/9/64-Matrix und Startkorrelation.
 Kein abgeschlossener Gesamt-P07-Status aus Unit-Tests abgeleitet.
+
+## DRM-Nachprüfung desselben Builds
+
+Automatische Ab-/Anmeldung über den vorhandenen Plasma-Loginmanager erfolgreich;
+laufende `/proc/164784/exe` und `/proc/164798/exe` entsprechen den oben genannten
+Hashes. Keine Änderung an Loginmanager/PAM. Beide Outputs aktiv: 1920×1080 und
+3840×2160, gemeinsam 5760×2160.
+
+Preferred, native/X11-Transients, Dedicated und echter Super+Shift+4 erneut
+bestanden (`target/p07-drm-1790443051825500269`). Vollständige Raumdefinitionen
+nach temporären Testregeln wiederhergestellt, keine Testfenster zurückgelassen.
+DRM-Mausablauf mit gespeicherter Reihenfolge Raum 2 vor Entwicklung bestanden
+(`target/p07-window-drm-fixed.log`). Neun Fenster derselben App, zweite Seite und
+Wiederherstellen des minimierten neunten Fensters bestanden
+(`target/p07-window-drm-pages-fixed.log`); nativen Screenshot visuell geprüft
+(`target/p06-click-p07-windows-page-live.png`). Ein anfängliches 25-Sekunden-Limit
+des isolierten Tests war für Fernsteuerung plus Screenshot zu kurz; DRM-Test mit
+90-Sekunden-Eingabefenster wiederholt, kein Produktfix daraus abgeleitet.
+
+Diese Prüfung erfolgt auf dem Zweimonitorsystem; unterschiedliche Raumwahl je
+Output und die abschließende 1/9/64-Matrix werden separat abgeschlossen.
