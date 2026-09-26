@@ -1,5 +1,17 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P07-Abschluss, 26.09.2026: `accepted` für den dokumentierten Fedora-Aufbau.**
+P07-01 bis P07-05 sind abgeschlossen: echte Raumleiste, vollständige Navigation
+für 1–64 Räume, gleichwertiges Maus-/Tastaturverschieben, Preferred/Dedicated-
+Policy mit Startkorrelation und vollständiger Fensterzugang einschließlich
+minimierter Fenster. Live-Prüfungen mit 1/9/64 Räumen und zwei physischen Outputs,
+nativen/X11-Fenstern sowie Tray-/Benachrichtigungszugang dokumentiert.
+Geprüfte Releases sind installiert und nach automatischem Neulogin aktiv.
+Keine ausstehende Aktivierung oder P07-Live-Abnahme. Genaue Matrix und Grenzen:
+[P07-Abschlussabgleich](docs/phase-reports/P07_ACCEPTANCE_REVIEW.md).
+Nächste Phase ist P08; sie wurde noch nicht begonnen. Die folgenden Checkpoints
+bleiben historische Evidenz und sind gegen diese Abschlussmatrix zu lesen.
+
 **P07 vierter Block, 26.09.2026: `in-progress`.** Einmalige Startkorrelation
 über native Aktivierungskennungen und X11-Startup-ID implementiert, vollständig
 geprüft und installiert. Eltern-/Move-Priorität, verspätete Metadaten,
@@ -694,6 +706,9 @@ Datei; neues unbekanntes Schema; Reconnect und konkurrierende Mutation.
 keine ungeprüfte IPC-Eingabe oder still überschriebenen Konfigurationen.
 
 ### P07 — Raumleiste, Navigation und Preferred/Dedicated
+
+**Status: `accepted`, 26.09.2026.** Nachweise und ausdrücklich begrenzter
+Abnahmeumfang: [P07-Abschlussabgleich](docs/phase-reports/P07_ACCEPTANCE_REVIEW.md).
 
 **Betroffen:** Shell `panel_view/`, `workspaces.rs`, Config-Raumregeln,
 Compositor-Fenster-Lifecycle und `state/ipc/launch.rs`, App-Katalog.

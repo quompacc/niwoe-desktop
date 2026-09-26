@@ -1,5 +1,10 @@
 # P07 – App-Zuordnung, zweiter Block
 
+**Aktueller Abschluss:** P07 einschließlich Startkorrelation und Zweimonitor-
+Nachprüfung ist abgeschlossen. Maßgeblich ist der
+[P07-Abschlussabgleich](P07_ACCEPTANCE_REVIEW.md). Nachfolgend der historische
+Nachweis dieses Teilblocks.
+
 26.09.2026. Implementiert, geprüft und auf Fedora installiert. Nach Nutzer-
 Neulogin im regulären DRM-Compositor aktiv und auf dem internen Display live
 geprüft. Zweimonitor-Nachtest noch offen. **P07 bleibt in-progress, nicht accepted.**

@@ -1,5 +1,20 @@
 # Allgemeiner NIWOE-Audit – 25.09.2026
 
+## Nachtrag vom 26.09.2026: P07 und erhaltene Bestandsgrenzen
+
+P07 ist gemäß [Abschlussmatrix](phase-reports/P07_ACCEPTANCE_REVIEW.md) geprüft,
+committed, installiert und live aktiv. Frühere Reproduzierbarkeits-/Raummodell-
+Befunde unten beschreiben ihren damaligen Stand, nicht den P07-Endstand.
+Die älteren Theme-/WebKit-Dokumentationsreste bleiben offen.
+
+Bei der erhaltenen Tray-/Notifications-Funktionalität bestätigt: SNI-Aktivierung
+mit Busnamen und native Notification-Anzeige funktionieren. Der bestehende
+Watcher behandelt Objektpfad-Registrierungen noch nicht als Sender+Pfad und
+entfernt verschwundene Dienste noch nicht zuverlässig. Notifications bieten
+weiter keine Inline-Aktionen/History; die DBus-Capabilities behaupten diese auch
+nicht. Diese Bestandsgrenzen wurden in P07 nicht um neue Funktionen erweitert
+und bleiben gesonderte Kompatibilitäts-/Funktionsarbeit.
+
 ## Geltungsbereich und Maßstab
 
 Read-only-Sichtung des aktuellen Arbeitsbaums: Produktplan, Designmanifest,

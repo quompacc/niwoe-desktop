@@ -1,5 +1,9 @@
 # P07: Fensterzugang und Maus-Verschieben
 
+**Abschlussnachtrag:** P07 ist für die dokumentierte Fedora-Matrix abgeschlossen.
+Die nachstehenden offenen Punkte sind historische Checkpoints; aktueller Stand:
+[P07-Abschlussabgleich](P07_ACCEPTANCE_REVIEW.md).
+
 Stand 26.09.2026: Teilblock implementiert, geprüft und installiert. P07 insgesamt
 bleibt in Arbeit; die DRM-Nachprüfung dieses Builds steht noch aus.
 

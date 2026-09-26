@@ -1,5 +1,10 @@
 # P07 – Raumleiste und vollständige Raumauswahl
 
+**Aktueller Abschluss:** P07 einschließlich visueller DRM-Prüfung mit 1/9/64
+Räumen und zwei Outputs ist abgeschlossen. Siehe
+[P07-Abschlussabgleich](P07_ACCEPTANCE_REVIEW.md). Der folgende Bericht bleibt
+historischer Nachweis des ersten Teilblocks.
+
 Fortsetzung: [App-Zuordnung, zweiter Block](P07_APP_ASSIGNMENT.md). Die hier
 noch als offen beschriebene App-Policy ist inzwischen implementiert; die
 Gesamtphase bleibt offen. Nachstehend der historische erste Navigationsblock.

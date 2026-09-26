@@ -1,5 +1,11 @@
 # P07: Explizite Startkorrelation
 
+**Abschlussnachtrag:** Der dokumentierte Build ist nach automatischem Neulogin
+auf DRM aktiv; sämtliche Startfälle auch dort bestanden
+(`target/p07-launch-drm-fixed.log`). Zwei Outputs, Originalraumdefinitionen
+wiederhergestellt, keine Testfenster. Gesamtmatrix:
+[P07-Abschlussabgleich](P07_ACCEPTANCE_REVIEW.md).
+
 26.09.2026, implementiert, geprüft und installiert. DRM-Aktivierung/Nachprüfung
 folgen; P07-Abschlussmatrix separat.
 
