@@ -56,6 +56,7 @@ mod wayland;
 mod widget_action;
 mod widget_traversal;
 mod wifi_password_modal;
+mod window_picker;
 mod workspaces;
 
 use panel::PinnedApp;

@@ -138,6 +138,7 @@ impl NiwoeShell {
             return;
         }
         self.launcher_state.close();
+        self.window_picker = None;
         self.launcher_settings_open = false;
         self.room_management_open = false;
         self.room_configuration_id = None;

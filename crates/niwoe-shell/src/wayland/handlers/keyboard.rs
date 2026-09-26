@@ -412,6 +412,9 @@ impl KeyboardHandler for NiwoeShell {
         }
 
         // ── Command palette keyboard input ────────────────────────────────────
+        if self.window_picker_key(qh, event.keysym) {
+            return;
+        }
         let is_backspace = event.keysym == Keysym::BackSpace;
         let grid_direction = match event.keysym {
             Keysym::Left => Some(crate::app_view::GridDirection::Left),

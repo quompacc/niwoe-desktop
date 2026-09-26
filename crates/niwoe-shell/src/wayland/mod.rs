@@ -8,6 +8,7 @@ mod shell;
 mod state;
 mod time;
 mod types;
+mod window_picker;
 
 pub use ipc::IpcClient;
 pub use types::{ClickAction, ClickZone, Rect, RoomEditAction};

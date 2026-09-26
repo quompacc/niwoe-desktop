@@ -23,6 +23,7 @@ macro_rules! handle_launcher_pointer {
                     $event.position
                 };
 
+                if $shell.window_picker_pointer($qh, &$event.kind, local_pos, content_width, content_height) { continue; }
                 // ── Step 0: Context-menu left-click — before the widget tree so clicking
                 //    a menu item does not also fire the underlying tile.
                 if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {

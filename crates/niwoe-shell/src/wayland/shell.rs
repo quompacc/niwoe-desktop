@@ -469,6 +469,7 @@ pub(crate) struct NiwoeShell {
     pub(crate) hidden_execs: std::collections::HashSet<String>,
     pub(crate) search_query: String,
     pub(crate) hub_search_active: bool,
+    pub(crate) window_picker: Option<crate::window_picker::Picker>,
     pub(crate) settings_search: String,
     pub(crate) calendar_dirty: bool,
     pub(crate) workspace_dirty: bool,

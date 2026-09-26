@@ -19,6 +19,7 @@ pub mod interaction;
 pub mod radius;
 pub mod spacing;
 pub mod typography;
+pub mod window_picker;
 
 pub use chrome::{
     Calendar, Greeter, Launcher, Mask, Panel, QuickSettings, Scrollbar, Settings, WindowChrome,

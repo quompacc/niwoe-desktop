@@ -6,6 +6,7 @@ impl NiwoeShell {
     }
 
     pub(crate) fn open_room_management(&mut self, qh: &QueueHandle<Self>) {
+        self.window_picker = None;
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
@@ -59,6 +60,7 @@ impl NiwoeShell {
     }
 
     fn toggle_launcher(&mut self) {
+        self.window_picker = None;
         let open_before = self.launcher_state.open;
         if !open_before && self.calendar_popup_open {
             self.close_calendar_popup(CommitReason::Input);

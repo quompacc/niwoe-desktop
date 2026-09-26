@@ -1,5 +1,14 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P07 dritter Block, 26.09.2026: `in-progress`.** Vollständige native Fensterliste
+im Hub einschließlich minimierter Fenster, seitenweiser Navigation und
+Maus-Verschieben nach stabiler Raum-ID implementiert, geprüft und installiert.
+Native-/X11-Move und Wiederherstellung sowie echter Mausablauf bestanden;
+Klickdurchgriff beim Aktivieren korrigiert. Aktivierung durch Neulogin und
+DRM-Nachprüfung folgen. Beide physischen Outputs sind wieder erkannt.
+Startkorrelation und abschließende P07-Matrix bleiben offen. Details:
+[P07-Fensterzugang](docs/phase-reports/P07_WINDOW_ACCESS.md).
+
 **P07 zweiter Block, 26.09.2026: `in-progress`.** App-Zuordnung für
 Preferred/Dedicated implementiert und installiert: reine Policy,
 Native-/XWayland-Lifecycle, Elternpriorität, spätes App-ID/Class und Schutz

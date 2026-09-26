@@ -9,5 +9,7 @@ mod rooms;
 mod screenshot;
 mod screenshot_policy;
 mod server;
+mod window_focus;
+mod window_move;
 
 pub(crate) use server::IpcServer;

@@ -241,6 +241,9 @@ impl NiwoeShell {
                 );
             }
 
+            if let Some(picker) = &self.window_picker {
+                crate::window_picker::draw(&mut content,content_width,content_height,picker,&self.windows,&self.workspace_state.rooms.snapshot.rooms,&self.theme);
+            }
             let launcher_radius = crate::ui::tokens::surface_radius_from_config(
                 &self.theme,
                 niwoe_config::ThemeSurface::Launcher,

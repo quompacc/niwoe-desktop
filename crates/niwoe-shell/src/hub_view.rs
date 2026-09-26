@@ -287,7 +287,7 @@ fn draw_recent(
     windows: &[WindowInfo],
     config: &niwoe_config::ThemeConfig,
 ) {
-    section_card(pm, rect, "ZULETZT AKTIV", config);
+    section_card(pm, rect, "FENSTER · ALLE ANZEIGEN ›", config);
     let p = crate::ui::tokens::theme_from_config(config).palette;
     let caption = Typography::DEFAULT.caption_size as f32;
     let rows = windows

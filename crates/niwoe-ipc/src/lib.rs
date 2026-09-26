@@ -369,6 +369,11 @@ pub enum ShellCommand {
     FocusWindow {
         id: String,
     },
+    /// Explicit window identity and stable room ID; never infer from app ID.
+    MoveWindowToRoom {
+        id: String,
+        room_id: u64,
+    },
     LaunchApp {
         #[serde(default, alias = "command")]
         program: String,
@@ -424,6 +429,7 @@ impl ShellCommand {
             Self::AudioMuteToggle => "audio-mute-toggle",
             Self::PowerProfileSet { .. } => "power-profile-set",
             Self::FocusWindow { .. } => "focus-window",
+            Self::MoveWindowToRoom { .. } => "move-window-to-room",
             Self::LaunchApp { .. } => "launch-app",
             Self::LockSession => "lock-session",
             Self::PowerPrepareSleep => "power-prepare-sleep",

@@ -59,6 +59,9 @@ if [[ "${1:-}" == --inside ]]; then
   if [[ "${NIWOE_ROOM_ASSIGNMENT_SMOKE:-0}" == 1 ]]; then
     python3 "$repo/scripts/test-room-assignment.py" "$compositor_pid"
   fi
+  if [[ "${NIWOE_WINDOW_MOVE_SMOKE:-0}" == 1 ]]; then
+    python3 "$repo/scripts/test-window-move.py" "$compositor_pid"
+  fi
   if [[ "${NIWOE_ROOM_RESTART_SMOKE:-0}" == 1 ]]; then
     python3 "$repo/scripts/test-room-persistence.py" "$compositor_pid" prepare
     kill "$compositor_pid"
