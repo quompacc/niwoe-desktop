@@ -1,5 +1,19 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P09-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
+P09-01 bis P09-06 umgesetzt: versionierte private Layout-Snapshots, ausdrückliche
+und entprellte Speicherung, eindeutiges LayoutOnly, begrenztes manuelles
+RelaunchApps mit Deadline/Abbruch sowie native Bedienung und Einzelergebnisse.
+1199 unterschiedliche Tests bestanden, Release installiert und laufende
+Buildidentitäten geprüft. Echte native/XWayland-Fenster, Reboot, Mehrdeutigkeit,
+Single-Instance-Weiterleitung, Fehlerfälle, Monitor-/Scale-Wechsel und 60
+IPC-bestätigte Öffnungszyklen geprüft. Neutrale Loge/einmaliger Hub erhalten;
+temporäre Zugänge und Testrechte entfernt. Drei neue Vorher-/Nachher-Idle-Proben
+mit gleichen Display-Modi; Messbuild, spätere reine Textänderungen und fehlende
+optische Latenz-/Repaint-Nachweise ausdrücklich dokumentiert.
+Details: [P09-Bericht](docs/phase-reports/P09.md).
+Nächste Implementierungsphase ist P10; sie wurde nicht begonnen.
+
 **P08-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
 P08-01 bis P08-05 umgesetzt: persistente Raum-/Fensterdaten, Navigation und
 Suche, isolierte statische native/X11-Vorschauen sowie begrenzte,
@@ -11,7 +25,7 @@ Drei fünfminütige Idle-Proben dokumentiert; geänderte Monitor-Modi begrenzen
 den strengen Vorher-/Nachher-Vergleich, eine optische Latenzbaseline fehlt.
 Diese Messgrenzen sind keine behaupteten bestandenen quantitativen Gates.
 Details und Dateimatrix: [P08-Bericht](docs/phase-reports/P08.md).
-Nächste Implementierungsphase ist P09; sie wurde nicht begonnen.
+P09 ist inzwischen im oben dokumentierten Umfang abgeschlossen.
 
 
 **P07-Abschluss, 26.09.2026: `accepted` für den dokumentierten Fedora-Aufbau.**
@@ -796,6 +810,10 @@ Tasks-, Datei-, Synchronisations- oder Prozesszahlen aus Mockups.
 **Reviewfokus:** Orientierung, Tastatur, Grenzen der Bildaufnahme und Cache-Lebensdauer.
 
 ### P09 — Layout speichern und best effort wieder öffnen
+
+**Status: accepted, 27.09.2026.** P09-01 bis P09-06 implementiert, getestet,
+auf Fedora installiert und praktisch geprüft; Nachweise und Messgrenzen im
+[P09-Bericht](docs/phase-reports/P09.md). Kein automatischer Login-/Raumwechsel-Restore.
 
 **Betroffen:** Config-/State-Persistenz, Compositor-Layout, vorhandener Launchpfad,
 Raum-IPC und kleine Restore-Module; keine allgemeine Prozess-Checkpoint-Engine.

@@ -1,0 +1,19 @@
+27.09.2026, final verified cleanup (tool transcript summary)
+
+PASS all owned test rooms/layouts/desktop files absent.
+PASS controlled target/p09-live runtime data removed after exporting evidence.
+PASS neutral original nine-room session retained; no windows.
+PASS /etc/plasmalogin.conf.d/99-niwoe-p09-once.conf absent.
+PASS original /dev/uinput ACL restored:
+  owner: root, group: root
+  user::rw-
+  group::---
+  other::---
+PASS only exact niwoe-p09-temporary authorized_keys entry removed.
+PASS subsequent BatchMode + IdentitiesOnly SSH using that key rejected:
+  Permission denied (publickey,gssapi-keyex,gssapi-with-mic,password).
+PASS local target/p09-access/id_ed25519, id_ed25519.pub and fedora_key removed.
+PASS sudo timestamp invalidated with sudo -k; interactive SSH session closed.
+
+Existing KDE/GTK configuration was not modified. Display-config reload tests
+restored exact prior bytes; every room cleanup asserted original definitions.

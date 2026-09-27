@@ -1,0 +1,15 @@
+CAPTURE p09-final-clean-welcome
+PASS keyboard ['escape']
+CAPTURE p09-final-watchdog
+PASS keyboard ['hub']
+SOURCE_FILES_MATCH 37
+WORKSPACE_TESTS [1198, 0, 1]
+GUARD_INCLUDED design_guard
+GUARD_INCLUDED centralization_guard
+GUARD_INCLUDED source_size_guard
+RELEASE_INSTALLED_RUNNING niwoe 10878 79c949bbf69d766c9dfaa38ee5e40eb2d7deeb2d37c93b8517d6d22a2ecd8d86
+RELEASE_INSTALLED_RUNNING niwoe-shell 14622 a57f9a10fa5acc540257807e094ef0d8239ee9ee29f66f3dc144f4b0c4df80c1
+BOOT_ID d0639429-9627-4ba6-a908-0c7a29cc8410
+NO_TEMP_AUTOLOGIN
+PASS neutral empty nine-room login; shell watchdog restarted 14206 -> 14622
+Inspect watchdog screenshot: welcome must remain closed in the same session
