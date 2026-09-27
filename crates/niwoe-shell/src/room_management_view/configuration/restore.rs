@@ -75,6 +75,17 @@ fn file_rect(width: u32, height: u32) -> Rect {
     }
 }
 
+pub(crate) fn enabled(state: &RestoreUi, control: usize, width: u32, height: u32) -> bool {
+    match control {
+        0..=2 => !state.running,
+        3 => state.running,
+        4 => state.page > 0,
+        5 => (state.page + 1) * page_size(width, height) < state.results.len(),
+        7 => state.file_key.is_some() && !state.running,
+        _ => true,
+    }
+}
+
 pub(crate) fn hit(x: i32, y: i32, width: u32, height: u32) -> Option<usize> {
     if let Some(i) = (0..BUTTONS.len()).find(|i| contains(control(width, *i), x, y)) {
         return Some(i);
@@ -107,7 +118,13 @@ pub(crate) fn draw(pm: &mut tiny_skia::PixmapMut<'_>, state: &RestoreUi, p: niwo
     let size = Typography::DEFAULT.body_size as f32;
     for (i, label) in BUTTONS.iter().enumerate() {
         let rect = control(pm.width(), i);
-        fill(pm, rect, p.surface_alt, Radius::DEFAULT.sm);
+        let available = enabled(state, i, pm.width(), pm.height());
+        fill(
+            pm,
+            rect,
+            if available { p.surface_alt } else { p.surface },
+            Radius::DEFAULT.sm,
+        );
         outline(
             pm,
             rect,
@@ -118,7 +135,13 @@ pub(crate) fn draw(pm: &mut tiny_skia::PixmapMut<'_>, state: &RestoreUi, p: niwo
                 Controls::BORDER
             },
         );
-        paint_text_centered(pm, label, rect, size, p.text);
+        paint_text_centered(
+            pm,
+            label,
+            rect,
+            size,
+            if available { p.text } else { p.text_dim },
+        );
     }
     let left = C.sidebar_width + C.outer_pad;
     let width = pm.width() as i32 - left - C.outer_pad;
@@ -208,7 +231,13 @@ pub(crate) fn draw(pm: &mut tiny_skia::PixmapMut<'_>, state: &RestoreUi, p: niwo
             "Datei speichern",
         ),
     ] {
-        fill(pm, rect, p.surface_alt, Radius::DEFAULT.sm);
+        let available = enabled(state, index, pm.width(), pm.height());
+        fill(
+            pm,
+            rect,
+            if available { p.surface_alt } else { p.surface },
+            Radius::DEFAULT.sm,
+        );
         outline(
             pm,
             rect,
@@ -229,7 +258,7 @@ pub(crate) fn draw(pm: &mut tiny_skia::PixmapMut<'_>, state: &RestoreUi, p: niwo
             rect.x + S.sm,
             rect,
             size,
-            p.text,
+            if available { p.text } else { p.text_dim },
         );
     }
 }
@@ -237,6 +266,21 @@ pub(crate) fn draw(pm: &mut tiny_skia::PixmapMut<'_>, state: &RestoreUi, p: niwo
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unavailable_restore_actions_are_disabled() {
+        let mut state = RestoreUi::default();
+        for control in [3, 4, 5, 7] {
+            assert!(!enabled(&state, control, 1366, 768));
+        }
+        state.file_key = Some(1);
+        assert!(enabled(&state, 7, 1366, 768));
+        state.running = true;
+        assert!(enabled(&state, 3, 1366, 768));
+        for control in [0, 1, 2, 7] {
+            assert!(!enabled(&state, control, 1366, 768));
+        }
+    }
 
     #[test]
     fn restore_controls_and_paged_results_fit_supported_canvases() {

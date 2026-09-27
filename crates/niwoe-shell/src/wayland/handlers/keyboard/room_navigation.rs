@@ -64,7 +64,26 @@ impl NiwoeShell {
     }
 
     pub(super) fn room_management_navigation_key(&mut self, qh: &QueueHandle<Self>, key: Keysym) {
-        let room_count = self.workspace_state.rooms.snapshot.rooms.len();
+        let rooms = self.visible_rooms();
+        let room_count = rooms.len();
+        if self.workspace_state.rooms.list.search_focus
+            && !matches!(key, Keysym::Tab | Keysym::ISO_Left_Tab)
+        {
+            let list = &mut self.workspace_state.rooms.list;
+            if key == Keysym::BackSpace {
+                list.query.pop();
+            } else if key == Keysym::Return {
+                list.search_focus = false;
+                self.room_keyboard_focus = None;
+            } else if let Some(ch) = key.key_char().filter(|ch| !ch.is_control()) {
+                if list.query.chars().count() < 128 {
+                    list.query.push(ch);
+                }
+            }
+            self.room_management_page = 0;
+            self.draw_launcher(qh, RepaintReason::Keyboard);
+            return;
+        }
         let backwards = matches!(key, Keysym::ISO_Left_Tab | Keysym::Left | Keysym::Up);
         if matches!(
             key,
@@ -75,26 +94,37 @@ impl NiwoeShell {
                 | Keysym::Up
                 | Keysym::Down
         ) {
-            let count = room_count + usize::from(room_count < niwoe_config::rooms::MAX_ROOMS);
-            self.room_keyboard_focus = next_focus(self.room_keyboard_focus, count, backwards);
-            if let Some(index) = self.room_keyboard_focus {
-                self.room_management_page = index.min(room_count.saturating_sub(1))
-                    / (niwoe_tokens::ControlCenter::DEFAULT.room_columns as usize
-                        * niwoe_tokens::ControlCenter::DEFAULT.room_page_rows as usize);
-            }
+            self.room_keyboard_focus =
+                next_focus(self.room_keyboard_focus, room_count + 6, backwards);
+            let focus = self.room_keyboard_focus.unwrap_or(0);
+            self.workspace_state.rooms.list.search_focus = focus == room_count + 1;
+            self.workspace_state.rooms.list.focus = if focus >= room_count + 2 {
+                Some(focus - room_count - 2)
+            } else {
+                None
+            };
+            self.room_management_page = focus.min(room_count.saturating_sub(1))
+                / (niwoe_tokens::ControlCenter::DEFAULT.room_columns as usize
+                    * niwoe_tokens::ControlCenter::DEFAULT.room_page_rows as usize);
             self.draw_launcher(qh, RepaintReason::Keyboard);
         } else if matches!(key, Keysym::Return | Keysym::KP_Enter) {
-            if self.room_keyboard_focus == Some(room_count) {
-                self.open_new_room(qh);
-                return;
+            match self.room_keyboard_focus {
+                Some(index) if index == room_count => self.open_new_room(qh),
+                Some(index) if index > room_count + 1 => {
+                    self.room_list_action(qh, index - room_count - 2);
+                    self.room_keyboard_focus =
+                        Some(self.visible_rooms().len() + index - room_count);
+                }
+                Some(index) if index < room_count => {
+                    self.open_room_configuration(qh, rooms[index].id)
+                }
+                _ => {}
             }
-            if let Some(id) = self
-                .room_keyboard_focus
-                .and_then(|index| self.workspace_state.rooms.snapshot.rooms.get(index))
-                .map(|room| room.id)
-            {
-                self.open_room_configuration(qh, id);
-            }
+        } else if let Some(ch) = key.key_char().filter(|ch| !ch.is_control()) {
+            self.workspace_state.rooms.list.search_focus = true;
+            self.workspace_state.rooms.list.query = ch.into();
+            self.room_management_page = 0;
+            self.draw_launcher(qh, RepaintReason::Keyboard);
         }
     }
 }

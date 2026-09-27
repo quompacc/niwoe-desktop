@@ -18,9 +18,9 @@ impl NiwoeShell {
     fn needs_fast_tick(&self) -> bool {
         self.deck_mutation.pending()
             || self.network_popup_open
-                && self.settings_refresh_inflight.contains(
-                    &crate::settings_view::SettingsCategory::Network,
-                )
+                && self
+                    .settings_refresh_inflight
+                    .contains(&crate::settings_view::SettingsCategory::Network)
             || self.armed_power.is_some()
             || self.thumbnail_dirty && self.thumbnail_popup_open
             || !self.thumbnail_popup_open
@@ -90,7 +90,7 @@ impl NiwoeShell {
         self.poll_deck_mutations(qh);
         if self.workspace_state.rooms.expire() {
             self.ipc.send(&niwoe_ipc::ShellCommand::RequestRoomSnapshot);
-            if self.room_configuration_id.is_some() {
+            if self.room_configuration_id.is_some() || self.workspace_state.rooms.panel.open {
                 self.room_configuration_save_pending = false;
                 self.draw_launcher(qh, RepaintReason::Clock);
             } else {

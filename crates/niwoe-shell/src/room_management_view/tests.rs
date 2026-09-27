@@ -77,6 +77,8 @@ fn management_view_renders_real_room_surface() {
         None,
         None,
         0,
+        &Default::default(),
+        &crate::icons::IconCache::new(),
         &niwoe_config::ThemeConfig::default(),
     );
     assert!(canvas.as_chunks::<4>().0.iter().any(|pixel| pixel[3] != 0));

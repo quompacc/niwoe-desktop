@@ -3,11 +3,12 @@ fn draw_body(
     pm: &mut tiny_skia::PixmapMut<'_>,
     room: &RoomEntry,
     edit: &Edit,
-    order: usize,
+    _order: usize,
     room_count: usize,
     rooms: &[RoomEntry],
     windows: &[WindowInfo],
     scroll_y: i32,
+    icons: &crate::icons::IconCache,
     config: &niwoe_config::ThemeConfig,
 ) {
     let p = crate::ui::tokens::theme_from_config(config).palette;
@@ -57,16 +58,20 @@ fn draw_body(
         Typography::DEFAULT.caption_size as f32,
         p.text_dim,
     );
-    fill(
+    fill(pm, description, p.surface_alt, Radius::DEFAULT.sm);
+    outline(
         pm,
         description,
-        p.surface_alt,
-        Radius::DEFAULT.sm,
+        if edit.focus == 5 { p.accent } else { p.border },
+        Controls::BORDER,
     );
-    outline(pm, description, if edit.focus == 5 { p.accent } else { p.border }, Controls::BORDER);
     paint_text_left_centered(
         pm,
-        &truncate_to_fit(&edit.description.replace('\n', " "), description.width - S.md * 2, Typography::DEFAULT.caption_size as f32),
+        &truncate_to_fit(
+            &edit.description.replace('\n', " "),
+            description.width - S.md * 2,
+            Typography::DEFAULT.caption_size as f32,
+        ),
         description.x + S.md,
         description,
         Typography::DEFAULT.caption_size as f32,
@@ -74,20 +79,28 @@ fn draw_body(
     );
     paint_text(
         pm,
-        &if edit.id == 0 { "Neuer Raum · noch nicht gespeichert".to_owned() } else { format!(
-            "Raum {} · Position {} von {}",
-            room.workspace,
-            order + 1,
-            room_count
-        ) },
+        &if edit.id == 0 {
+            "Neuer Raum · noch nicht gespeichert".to_owned()
+        } else {
+            format!(
+                "Raum {} · Position {} von {}",
+                room.workspace,
+                edit.position + 1,
+                room_count
+            )
+        },
         details.x + C.card_pad,
         details.y + details.height - C.card_pad - S.md,
         Typography::DEFAULT.caption_size as f32,
         p.text_dim,
     );
     for (later, label, allowed) in [
-        (false, "← Früher", edit.id != 0 && order > 0),
-        (true, "Später →", edit.id != 0 && order + 1 < room_count),
+        (false, "← Früher", edit.id != 0 && edit.position > 0),
+        (
+            true,
+            "Später →",
+            edit.id != 0 && edit.position + 1 < room_count,
+        ),
     ] {
         let action = order_rect(pm.width(), scroll_y, later);
         fill(
@@ -130,39 +143,6 @@ fn draw_body(
         height: C.config_context_height,
     };
     section(pm, context, "KONTEXT & WIEDERHERSTELLUNG", p);
-    let rows_top = context.y + S.xxl;
-    let row_height = (context.height - S.xxl - C.card_pad * 2 - C.card_gap * 2) / 3;
-    for (index, (title, note)) in [
-        (
-            "Fensterlayout merken",
-            "Manuell im Tab Wiederherstellung · kein automatischer Login-Restore",
-        ),
-        (
-            "Dateien wiederherstellen",
-            "Explizite Dateiverweise im Tab Wiederherstellung · unterstützte Apps nötig",
-        ),
-        (
-            "Terminal-Sitzungen fortsetzen",
-            "Noch nicht verfügbar · keine Sitzungswiederherstellung",
-        ),
-    ]
-    .into_iter()
-    .enumerate()
-    {
-        row(
-            pm,
-            Rect {
-                x: context.x + C.card_pad,
-                y: rows_top + index as i32 * (row_height + C.card_gap),
-                width: context.width - C.card_pad * 2,
-                height: row_height,
-            },
-            title,
-            note,
-            p,
-        );
-    }
-
     let lower_top = context.y + context.height + C.card_gap;
     let lower_width = (left_width - C.card_gap) / 2;
     let apps = Rect {
@@ -177,137 +157,118 @@ fn draw_body(
         width: left_width - lower_width - C.card_gap,
         height: lower_height(pm.height()),
     };
-    section(pm, apps, "START-APPS", p);
-    section(pm, rules, "AUTOMATISIERUNGSREGELN", p);
-    let assignment_note = match room.assignment {
-        niwoe_ipc::RoomAssignment::Free => "Freie Zuordnung: alle Apps willkommen.",
-        niwoe_ipc::RoomAssignment::Preferred => "Zugeordnete Apps bevorzugen diesen Raum.",
-        niwoe_ipc::RoomAssignment::Dedicated => "Aufgabenraum: andere Apps bleiben erlaubt.",
-    };
+    section(pm, apps, "APPS", p);
+    section(pm, rules, "DATEIVERWEISE", p);
     for (rect, lines) in [
         (
             apps,
             [
-                assignment_note,
-                "Noch keine Start-Apps konfigurierbar.",
+                "Kein Autostart beim Login oder Raumwechsel.",
+                "App-Präferenzen steuern die Fensterzuordnung.",
             ],
         ),
         (
             rules,
             [
-                "Regeln folgen mit dem Automatisierungsdienst.",
-                "Beim Raumwechsel läuft keine Regel.",
+                "Nur ausdrücklich gespeicherte lokale Dateien.",
+                "Keine Browser-/Terminal-Sitzungen.",
             ],
         ),
     ] {
-        paint_centered_card_lines(pm, rect, &lines, p);
+        paint_centered_card_lines(
+            pm,
+            Rect {
+                y: rect.y + S.xxl,
+                height: rect.height - S.xxl,
+                ..rect
+            },
+            &lines,
+            p,
+        );
     }
-
     let preview = Rect {
         x: right,
         y: top,
         width: right_width,
         height: preview_height(pm.height()),
     };
-    section(pm, preview, "VORSCHAU", p);
+    section(pm, preview, "VORSCHAU · RAUMKARTE", p);
     let viewport = Rect {
         x: preview.x + C.card_pad,
         y: preview.y + S.xxl,
         width: preview.width - C.card_pad * 2,
         height: preview.height - S.xxl - C.card_pad,
     };
-    fill(pm, viewport, p.background, Radius::DEFAULT.sm);
-    draw_landscape(pm, viewport);
-    fill(
-        pm,
-        viewport,
-        alpha(p.background, C.header_tint_alpha),
-        Radius::DEFAULT.sm,
-    );
-    outline(pm, viewport, p.border, Controls::BORDER);
-    paint_text(
-        pm,
-        &truncate_to_fit(
-            &edit.name,
-            viewport.width - S.xl * 2,
-            Typography::DEFAULT.title_size as f32,
-        ),
-        viewport.x + S.xl,
-        viewport.y + S.xxl,
-        Typography::DEFAULT.title_size as f32,
-        p.text,
-    );
-    paint_text(
-        pm,
-        "Aktuell offene Fenster in diesem Raum",
-        viewport.x + S.xl,
-        viewport.y + S.xxl * 2,
-        Typography::DEFAULT.caption_size as f32,
-        p.text_dim,
-    );
-    let mut titles = windows
-        .iter()
-        .filter(|window| window.workspace == room.workspace && !window.title.trim().is_empty())
-        .take(C.card_window_rows)
-        .peekable();
-    if titles.peek().is_none() {
-        paint_text(
-            pm,
-            "Noch keine offenen Fenster",
-            viewport.x + S.xl,
-            viewport.y + S.xxl * 3 + S.lg,
-            Typography::DEFAULT.body_size as f32,
-            p.text_dim,
-        );
+    let draft = RoomEntry {
+        name: edit.name.clone(),
+        description: edit.description.clone(),
+        assignment: edit.assignment,
+        preferences: edit.preferences.clone(),
+        ..room.clone()
+    };
+    let mut counts = [0; niwoe_config::rooms::MAX_ROOMS];
+    if room.workspace > 0 {
+        counts[room.workspace as usize - 1] = windows
+            .iter()
+            .filter(|w| w.workspace == room.workspace)
+            .count()
+            .min(u16::MAX as usize) as u16;
     }
-    for (index, window) in titles.enumerate() {
-        let window_rect = Rect {
-            x: viewport.x + S.xl,
-            y: viewport.y + S.xxl * 3 + index as i32 * (S.xxl + S.lg),
-            width: viewport.width - S.xl * 2,
-            height: S.xxl + S.sm,
-        };
-        fill(
-            pm,
-            window_rect,
-            alpha(p.surface, C.card_alpha),
-            Radius::DEFAULT.sm,
-        );
-        outline(pm, window_rect, p.border, Controls::BORDER);
-        paint_text_left_centered(
-            pm,
-            &truncate_to_fit(
-                &window.title,
-                window_rect.width - S.md * 2,
-                Typography::DEFAULT.caption_size as f32,
-            ),
-            window_rect.x + S.md,
-            window_rect,
-            Typography::DEFAULT.caption_size as f32,
-            p.text,
-        );
-    }
+    let context = RoomRenderContext {
+        preview: true,
+        rooms: std::slice::from_ref(&draft),
+        icons,
+        active_workspace: room.workspace,
+        window_counts: &counts,
+        windows,
+        hovered_room: None,
+        keyboard_focus: None,
+        page: 0,
+        config,
+    };
+    draw_room_card(pm, viewport, &draft, &context, 0);
     let note = Rect {
         x: right,
         y: preview.y + preview.height + C.card_gap,
         width: right_width,
         height: note_height(pm.height()),
     };
-    section(pm, note, if edit.id == 0 { "DEIN KONTEXT BLEIBT BEI DIR" } else { "RAUM LÖSCHEN" }, p);
+    section(
+        pm,
+        note,
+        if edit.id == 0 {
+            "DEIN KONTEXT BLEIBT BEI DIR"
+        } else {
+            "RAUM LÖSCHEN"
+        },
+        p,
+    );
     paint_centered_card_lines(
         pm,
-        Rect { height: note.height - C.config_field_height - C.card_gap - if edit.id == 0 { 0 } else { S.xxl }, ..note },
-        if edit.id == 0 { &[
-        "NIWOE organisiert Räume und Fenster.",
-        "Apps und Dateien bleiben in ihren Anwendungen.",
-        "Weitere Restore-Funktionen folgen mit Backend.",
-        ] } else if room_count == 1 { &[
-            "Der letzte Raum kann nicht gelöscht werden.",
-            "Erstelle zuerst einen weiteren Raum.",
-        ] } else { &[
-            "Offene Fenster wechseln in den gewählten Raum.",
-            "Anwendungen bleiben geöffnet.",
-        ] },
+        Rect {
+            height: note.height
+                - C.config_field_height
+                - C.card_gap
+                - if edit.id == 0 { 0 } else { S.xxl },
+            ..note
+        },
+        if edit.id == 0 {
+            &[
+                "NIWOE organisiert Räume und Fenster.",
+                "Apps und Dateien bleiben in ihren Anwendungen.",
+                "Wiederherstellung wird ausdrücklich ausgelöst.",
+            ]
+        } else if room_count == 1 {
+            &[
+                "Der letzte Raum kann nicht gelöscht werden.",
+                "Erstelle zuerst einen weiteren Raum.",
+            ]
+        } else {
+            &[
+                "Offene Fenster wechseln in den gewählten Raum.",
+                "Anwendungen bleiben geöffnet.",
+            ]
+        },
         p,
     );
     draw_deletion(pm, edit, room_count, rooms, scroll_y, p);
@@ -324,17 +285,12 @@ fn paint_centered_card_lines(
     let content_top = rect.y + S.xxl;
     let content_bottom = rect.y + rect.height - C.card_pad;
     let group_height = ascent + descent + S.xxl as f32 * lines.len().saturating_sub(1) as f32;
-    let first_baseline = content_top as f32
-        + ((content_bottom - content_top) as f32 - group_height) / 2.0
-        + ascent;
+    let first_baseline =
+        content_top as f32 + ((content_bottom - content_top) as f32 - group_height) / 2.0 + ascent;
     for (index, line) in lines.iter().enumerate() {
         paint_text(
             pm,
-            &truncate_to_fit(
-                line,
-                rect.width - C.card_pad * 2,
-                size,
-            ),
+            &truncate_to_fit(line, rect.width - C.card_pad * 2, size),
             rect.x + C.card_pad,
             (first_baseline + index as f32 * S.xxl as f32).round() as i32,
             size,

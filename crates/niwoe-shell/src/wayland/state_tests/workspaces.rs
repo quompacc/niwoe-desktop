@@ -263,7 +263,7 @@ fn stale_focused_window_id_is_cleared_when_no_window_matches() {
 fn resolve_shell_theme_from_config_applies_cursor_and_wallpaper_overrides() {
     let config = NiwoeConfig {
         general: GeneralConfig {
-            theme: "dark".to_string(),
+            theme: "light".to_string(),
             idle_timeout_secs: None,
         },
         cursor: Some(niwoe_config::CursorConfig {
@@ -277,8 +277,10 @@ fn resolve_shell_theme_from_config_applies_cursor_and_wallpaper_overrides() {
         ..Default::default()
     };
 
-    let (_name, theme, _available) =
+    let (name, theme, _available) =
         resolve_shell_theme_from_config(&config).expect("resolve theme");
+    assert_eq!(name, "dark");
+    assert_eq!(config.general.theme, "light");
     assert_eq!(theme.cursor.size, 30);
     assert_eq!(theme.cursor.theme, "niwoe");
     assert_eq!(
@@ -288,7 +290,7 @@ fn resolve_shell_theme_from_config_applies_cursor_and_wallpaper_overrides() {
 }
 
 #[test]
-fn resolve_shell_theme_from_config_fails_for_unknown_theme() {
+fn resolve_shell_theme_from_config_preserves_unused_legacy_theme() {
     let config = NiwoeConfig {
         general: GeneralConfig {
             theme: "definitely-not-a-theme".to_string(),
@@ -296,7 +298,9 @@ fn resolve_shell_theme_from_config_fails_for_unknown_theme() {
         },
         ..Default::default()
     };
-    assert!(resolve_shell_theme_from_config(&config).is_err());
+    let (name, _, _) = resolve_shell_theme_from_config(&config).expect("alpha theme");
+    assert_eq!(name, "dark");
+    assert_eq!(config.general.theme, "definitely-not-a-theme");
 }
 
 #[test]

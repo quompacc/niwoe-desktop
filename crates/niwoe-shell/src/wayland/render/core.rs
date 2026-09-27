@@ -275,6 +275,7 @@ impl NiwoeShell {
                 &clock,
                 &self.icon_cache,
                 screenshot_icon,
+                self.workspace_state.rooms.panel.effective(),
                 &self.theme,
                 &state_fn,
                 &mut self.panel_state.clicks,
@@ -312,5 +313,4 @@ impl NiwoeShell {
             return;
         }
     }
-
 }

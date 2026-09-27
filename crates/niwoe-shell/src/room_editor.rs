@@ -2,6 +2,10 @@ use niwoe_ipc::{RoomChange, RoomEntry, RoomSnapshot};
 use std::time::{Duration, Instant};
 
 pub(crate) struct Edit {
+    pub form: form::FormUi,
+    pub preferences: niwoe_ipc::RoomPreferences,
+    pub position: usize,
+    pub name_error: String,
     pub restore: RestoreUi,
     pub id: u64,
     pub revision: u64,
@@ -30,6 +34,8 @@ pub(crate) struct RestoreUi {
 }
 
 pub(crate) struct RoomUi {
+    pub panel: panel::PanelUi,
+    pub list: list::ListUi,
     pub layouts: std::collections::BTreeMap<u64, niwoe_ipc::LayoutNotice>,
     pub snapshot: RoomSnapshot,
     pub ready: bool,
@@ -42,6 +48,8 @@ pub(crate) struct RoomUi {
 impl Default for RoomUi {
     fn default() -> Self {
         Self {
+            panel: Default::default(),
+            list: Default::default(),
             layouts: Default::default(),
             snapshot: RoomSnapshot {
                 revision: 0,
@@ -74,6 +82,9 @@ impl RoomUi {
         let Some(edit) = &self.edit else {
             return false;
         };
+        if action == RoomEditAction::Cancel {
+            return true;
+        }
         if edit.id == 0 {
             if action == RoomEditAction::Save && edit.creation_uncertain {
                 return false;
@@ -86,12 +97,12 @@ impl RoomUi {
                     | RoomEditAction::Target
             );
         }
-        let Some(position) = self.snapshot.rooms.iter().position(|r| r.id == edit.id) else {
+        let Some(_) = self.snapshot.rooms.iter().position(|r| r.id == edit.id) else {
             return false;
         };
         match action {
-            RoomEditAction::Left => position > 0,
-            RoomEditAction::Right => position + 1 < self.snapshot.rooms.len(),
+            RoomEditAction::Left => edit.position > 0,
+            RoomEditAction::Right => edit.position + 1 < self.snapshot.rooms.len(),
             RoomEditAction::Delete | RoomEditAction::Target => self.snapshot.rooms.len() > 1,
             _ => true,
         }
@@ -121,6 +132,10 @@ impl RoomUi {
         }
         self.ready = true;
         if let Some(edit) = &mut self.edit {
+            if edit.id != 0 && !ids.contains(&edit.id) {
+                self.message =
+                    "Raum wurde entfernt. Entwurf bleibt sichtbar; bitte abbrechen.".into();
+            }
             if edit.delete_target.is_some_and(|id| !ids.contains(&id)) {
                 edit.delete_target = None;
                 edit.confirm_delete = false;
@@ -143,7 +158,16 @@ impl RoomUi {
             .find(|r| r.workspace == workspace)
         {
             self.edit = Some(Edit {
+                form: Default::default(),
                 restore: Default::default(),
+                preferences: room.preferences.clone(),
+                position: self
+                    .snapshot
+                    .rooms
+                    .iter()
+                    .position(|r| r.id == room.id)
+                    .unwrap(),
+                name_error: String::new(),
                 id: room.id,
                 revision: self.snapshot.revision,
                 name: room.name.clone(),
@@ -167,7 +191,11 @@ impl RoomUi {
             return false;
         }
         self.edit = Some(Edit {
+            form: Default::default(),
             restore: Default::default(),
+            preferences: Default::default(),
+            position: self.snapshot.rooms.len(),
+            name_error: String::new(),
             id: 0,
             revision: self.snapshot.revision,
             name: String::new(),
@@ -245,46 +273,42 @@ impl RoomUi {
                 self.message.clear();
                 return None;
             }
-            RoomEditAction::Save if edit.id == 0 => RoomChange::CreateDetails {
-                name: edit.name.trim().to_owned(),
-                description: edit.description.clone(),
-                assignment: edit.assignment,
-            },
-            RoomEditAction::Save
-                if self
-                    .snapshot
-                    .rooms
-                    .iter()
-                    .find(|r| r.id == edit.id)
-                    .is_some_and(|r| r.description != edit.description) =>
-            {
-                RoomChange::UpdateDetails {
-                    id: edit.id,
-                    name: edit.name.trim().to_owned(),
-                    description: edit.description.clone(),
-                }
-            }
-            RoomEditAction::Save => RoomChange::Rename {
-                id: edit.id,
-                name: edit.name.trim().to_owned(),
-            },
-            RoomEditAction::Left | RoomEditAction::Right => {
-                let position = self.snapshot.rooms.iter().position(|r| r.id == edit.id)?;
-                if self.snapshot.rooms[position].name != edit.name.trim()
-                    || self.snapshot.rooms[position].description != edit.description
+            RoomEditAction::Save => {
+                edit.name_error = if edit.name.trim().is_empty() {
+                    "Bitte einen Namen eingeben."
+                } else if edit.name.trim().chars().count() > niwoe_config::rooms::MAX_NAME_CHARS
+                    || edit.name.chars().any(char::is_control)
                 {
-                    self.message = "Änderungen bitte zuerst speichern.".into();
+                    "Maximal 64 Zeichen, keine Steuerzeichen."
+                } else {
+                    ""
+                }
+                .into();
+                if !edit.name_error.is_empty() {
+                    edit.focus = 0;
+                    self.message = "Bitte das markierte Feld korrigieren.".into();
                     return None;
                 }
-                let next = if action == RoomEditAction::Left {
-                    position.checked_sub(1)?
-                } else {
-                    (position + 1 < self.snapshot.rooms.len()).then_some(position + 1)?
-                };
-                RoomChange::Move {
-                    id: edit.id,
-                    position: next,
+                RoomChange::Configure {
+                    id: (edit.id != 0).then_some(edit.id),
+                    name: edit.name.trim().to_owned(),
+                    description: edit.description.clone(),
+                    assignment: edit.assignment,
+                    preferences: edit.preferences.clone(),
+                    position: edit.position,
                 }
+            }
+            RoomEditAction::Left | RoomEditAction::Right => {
+                if edit.id == 0 {
+                    return None;
+                }
+                edit.position = if action == RoomEditAction::Left {
+                    edit.position.saturating_sub(1)
+                } else {
+                    (edit.position + 1).min(self.snapshot.rooms.len() - 1)
+                };
+                self.message = "Reihenfolge im Entwurf · zum Übernehmen speichern.".into();
+                return None;
             }
             _ => return None,
         };
@@ -325,7 +349,7 @@ impl RoomUi {
         self.message = match error {
             None => "Gespeichert",
             Some(niwoe_ipc::RoomMutationError::Conflict) => {
-                "Zwischenzeitlich geändert. Erneut versuchen."
+                "Konflikt: Entwurf erhalten. Speichern überschreibt; Abbrechen lädt neu."
             }
             Some(niwoe_ipc::RoomMutationError::Invalid) => {
                 "Ungültige Raumdaten oder Zielraum nicht verfügbar."
@@ -334,12 +358,22 @@ impl RoomUi {
                 "Speichern fehlgeschlagen. Erneut versuchen."
             }
             Some(niwoe_ipc::RoomMutationError::Durability) => {
-                "Gespeichert; Datenträgerprüfung fehlgeschlagen."
+                "Speicherung nicht dauerhaft bestätigt: Datenträgerprüfung fehlgeschlagen."
             }
         }
         .into();
     }
     pub fn expire(&mut self) -> bool {
+        if self
+            .panel
+            .pending
+            .as_ref()
+            .is_some_and(|(_, at)| at.elapsed() >= Duration::from_secs(10))
+        {
+            self.panel.pending = None;
+            self.panel.message = "Keine Bestätigung; gespeicherter Stand wird neu geladen.".into();
+            return true;
+        }
         if self
             .pending
             .as_ref()
@@ -417,3 +451,10 @@ pub(crate) use draw::draw;
 #[cfg(test)]
 #[path = "room_editor_tests.rs"]
 mod tests;
+
+#[path = "room_editor_form.rs"]
+pub(crate) mod form;
+#[path = "room_editor_list.rs"]
+pub(crate) mod list;
+#[path = "room_editor_panel.rs"]
+pub(crate) mod panel;

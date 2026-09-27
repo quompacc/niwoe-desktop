@@ -276,13 +276,10 @@ fn resolve_shell_theme_from_config(
     config: &NiwoeConfig,
 ) -> Result<(String, ThemeConfig, Vec<String>), String> {
     let mut theme_manager = ThemeManager::new();
-    let requested_theme = if config.general.theme.trim().is_empty() {
-        "dark"
-    } else {
-        config.general.theme.trim()
-    };
+    // Alpha uses one product theme, including config reloads. Preserve legacy
+    // preferences on disk and apply independent cursor/wallpaper overrides below.
     theme_manager
-        .set_theme(requested_theme)
+        .set_theme("dark")
         .map_err(|err| format!("theme load failed: {}", err))?;
 
     if let Some(cursor) = &config.cursor {
@@ -441,3 +438,5 @@ mod tests;
 
 include!("state/deck_actions.rs");
 include!("state/rooms.rs");
+include!("state/room_form.rs");
+include!("state/panel_form.rs");

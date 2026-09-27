@@ -40,6 +40,8 @@ fn draw_landscape(pm: &mut tiny_skia::PixmapMut<'_>, rect: Rect) {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ConfigurationAction {
     Restore,
+    Tab(usize),
+    Form(usize),
     Back,
     Name,
     MoveEarlier,
@@ -52,6 +54,7 @@ pub(crate) enum ConfigurationAction {
 }
 
 mod actions;
+pub(crate) mod form;
 pub(crate) mod restore;
 use actions::{deletion_rect, description_rect, draw_deletion};
 mod target_menu;
@@ -150,6 +153,9 @@ pub(crate) fn hit_configuration(
     height: u32,
     scroll_y: i32,
 ) -> Option<ConfigurationAction> {
+    if let Some(tab) = form::hit_tab(x, y) {
+        return Some(ConfigurationAction::Tab(tab));
+    }
     if restore::hit_tab(x, y) {
         return Some(ConfigurationAction::Restore);
     }
@@ -177,6 +183,11 @@ pub(crate) fn hit_configuration(
         || y >= height as i32 - C.config_footer_height
     {
         return None;
+    }
+    for index in [9, 10, 11, 8, 12, 13] {
+        if contains(form::rect(width, scroll_y, index), x, y) {
+            return Some(ConfigurationAction::Form(index));
+        }
     }
     if contains(name_rect(width, scroll_y), x, y) {
         return Some(ConfigurationAction::Name);
@@ -211,44 +222,6 @@ fn section(pm: &mut tiny_skia::PixmapMut<'_>, rect: Rect, title: &str, p: niwoe_
         rect.y + S.xl,
         Typography::DEFAULT.caption_size as f32,
         p.accent,
-    );
-}
-
-fn row(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    rect: Rect,
-    title: &str,
-    description: &str,
-    p: niwoe_tokens::Palette,
-) {
-    fill(
-        pm,
-        rect,
-        alpha(p.surface_alt, C.disabled_alpha),
-        Radius::DEFAULT.sm,
-    );
-    outline(pm, rect, p.border, Controls::BORDER);
-    let title_size = Typography::DEFAULT.body_size as f32;
-    let note_size = Typography::DEFAULT.caption_size as f32;
-    let (title_ascent, title_descent) = ui_line_metrics(title_size);
-    let (note_ascent, note_descent) = ui_line_metrics(note_size);
-    let text_height = title_ascent + title_descent + S.sm as f32 + note_ascent + note_descent;
-    let text_top = rect.y as f32 + (rect.height as f32 - text_height) / 2.0;
-    paint_text(
-        pm,
-        title,
-        rect.x + S.md,
-        (text_top + title_ascent).round() as i32,
-        title_size,
-        p.text_dim,
-    );
-    paint_text(
-        pm,
-        description,
-        rect.x + S.md,
-        (text_top + title_ascent + title_descent + S.sm as f32 + note_ascent).round() as i32,
-        note_size,
-        p.text_dim,
     );
 }
 
@@ -322,41 +295,20 @@ fn draw_chrome(
         height: C.config_tabs_height,
     };
     fill(pm, tabs, p.background, Radius::DEFAULT.none);
-    let mut tab_x = tabs.x + C.outer_pad;
-    for (label, selected) in [
-        ("Allgemein", !edit.restore.open),
-        ("Apps", false),
-        ("Dateien", false),
-        ("Wiederherstellung", edit.restore.open),
-        ("Automatisierung", false),
-        ("Benachrichtigungen", false),
-    ] {
-        let width = measure_text(label, Typography::DEFAULT.caption_size as f32).0 + S.xxl;
-        let tab = Rect {
-            x: tab_x,
-            y: tabs.y + S.sm,
-            width,
-            height: tabs.height - S.sm * 2,
-        };
-        fill(
-            pm,
-            tab,
-            alpha(
-                p.surface,
-                if selected {
-                    C.card_alpha
-                } else {
-                    C.disabled_alpha
-                },
-            ),
-            Radius::DEFAULT.sm,
-        );
-        if selected || (label == "Wiederherstellung" && edit.focus == 8) {
+    for (index, label) in form::TABS.iter().enumerate() {
+        let tab = form::tab_rect(index);
+        let selected = edit.form.tab == index;
+        if index < 4 {
+            fill(pm, tab, p.surface, Radius::DEFAULT.sm);
             outline(
                 pm,
                 tab,
-                p.accent,
-                if edit.focus == 8 && label == "Wiederherstellung" {
+                if selected || edit.focus == 30 + index {
+                    p.accent
+                } else {
+                    p.border
+                },
+                if edit.focus == 30 + index {
                     Controls::FOCUS_WIDTH
                 } else {
                     Controls::BORDER
@@ -370,7 +322,6 @@ fn draw_chrome(
             Typography::DEFAULT.caption_size as f32,
             if selected { p.text } else { p.text_dim },
         );
-        tab_x += width + C.card_gap;
     }
     let footer = Rect {
         x: C.sidebar_width,
@@ -384,7 +335,7 @@ fn draw_chrome(
         if edit.restore.open {
             "Esc: Allgemein · Tab/Enter: Bedienung · Kein automatischer Login-Restore"
         } else if message.is_empty() {
-            "Name und Beschreibung werden gemeinsam gespeichert."
+            "Lokaler Entwurf · Änderungen gemeinsam speichern."
         } else {
             message
         },
@@ -445,6 +396,7 @@ pub(crate) fn draw_room_configuration(
     message: &str,
     pending: bool,
     scroll_y: i32,
+    icons: &crate::icons::IconCache,
     config: &niwoe_config::ThemeConfig,
 ) {
     if canvas.len() != width as usize * height as usize * 4 {
@@ -468,10 +420,13 @@ pub(crate) fn draw_room_configuration(
     );
     if edit.restore.open {
         restore::draw(&mut pm, &edit.restore, p);
+    } else if edit.form.tab == 1 {
+        form::draw_apps(&mut pm, edit, p);
     } else {
         draw_body(
-            &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, config,
+            &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, icons, config,
         );
+        form::draw_general(&mut pm, edit, scroll_y, p);
         target_menu::draw(&mut pm, edit, rooms, scroll_y, p);
     }
     draw_chrome(

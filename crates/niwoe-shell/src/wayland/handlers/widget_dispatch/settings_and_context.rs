@@ -202,7 +202,7 @@ impl NiwoeShell {
                 }
             }
             DesktopContextMenuAction::Settings => {
-                self.open_settings_category(qh, crate::settings_view::SettingsCategory::Theme);
+                self.open_settings_category(qh, crate::settings_view::SettingsCategory::Cursor);
             }
             DesktopContextMenuAction::LockScreen => {
                 if !self.ipc.send(&niwoe_ipc::ShellCommand::LockSession) {
@@ -221,7 +221,7 @@ impl NiwoeShell {
         let cat = match action {
             SettingsSubAction::Display => crate::settings_view::SettingsCategory::Display,
             SettingsSubAction::Wallpaper => crate::settings_view::SettingsCategory::Wallpaper,
-            SettingsSubAction::Theme => crate::settings_view::SettingsCategory::Theme,
+            SettingsSubAction::Theme => crate::settings_view::SettingsCategory::Cursor,
             SettingsSubAction::Sound => crate::settings_view::SettingsCategory::Sound,
             SettingsSubAction::Network => crate::settings_view::SettingsCategory::Network,
             SettingsSubAction::Power => crate::settings_view::SettingsCategory::Power,

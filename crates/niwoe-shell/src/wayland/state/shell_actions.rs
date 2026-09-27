@@ -30,7 +30,7 @@ impl NiwoeShell {
         // the user an outdated preview which looks like a crop bug.
         for id in window_ids.iter().take(crate::THUMBNAIL_MAX_WINDOWS) {
             let cmd = niwoe_ipc::ShellCommand::CaptureWindowThumbnail {
- request_id: None,
+                request_id: None,
                 id: id.clone(),
                 max_width: crate::THUMBNAIL_THUMB_W,
                 max_height: crate::THUMBNAIL_THUMB_H,
@@ -141,6 +141,9 @@ impl NiwoeShell {
         self.launcher_state.close();
         self.window_picker = None;
         self.launcher_settings_open = false;
+        self.workspace_state.rooms.panel.open = false;
+        self.panel_last_signature = None;
+        self.panel_dirty = true;
         self.room_management_open = false;
         self.room_configuration_id = None;
         self.room_configuration_save_pending = false;

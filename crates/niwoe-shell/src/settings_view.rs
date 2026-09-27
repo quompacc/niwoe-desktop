@@ -35,8 +35,8 @@ const MONITOR_PREVIEW_MIX: f32 = 0.18;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub enum SettingsCategory {
-    #[default]
     Theme,
+    #[default]
     Cursor,
     Display,
     Wallpaper,
@@ -53,11 +53,8 @@ pub enum SettingsCategory {
 }
 
 impl SettingsCategory {
-    pub const APPEARANCE: &'static [SettingsCategory] = &[
-        SettingsCategory::Theme,
-        SettingsCategory::Wallpaper,
-        SettingsCategory::Cursor,
-    ];
+    pub const APPEARANCE: &'static [SettingsCategory] =
+        &[SettingsCategory::Wallpaper, SettingsCategory::Cursor];
 
     pub const DESKTOP_APPS: &'static [SettingsCategory] =
         &[SettingsCategory::PinnedApps, SettingsCategory::DefaultApps];
@@ -472,7 +469,10 @@ mod tests {
             .collect();
         let unique: std::collections::HashSet<_> = categories.iter().copied().collect();
 
-        assert_eq!(categories.len(), 14);
+        assert_eq!(categories.len(), 13);
+        assert!(!categories.contains(&SettingsCategory::Theme));
+        assert!(categories.contains(&SettingsCategory::Cursor));
+        assert!(categories.contains(&SettingsCategory::Wallpaper));
         assert_eq!(unique.len(), categories.len());
     }
 

@@ -8,6 +8,57 @@ use std::{
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 #[test]
+fn configuration_transaction_keeps_slots_and_rejects_partial_or_stale_forms() {
+    use niwoe_ipc::{RoomAssignment, RoomChange, RoomMutationError, RoomPreferences};
+    let f = Fixture::new();
+    let mut registry = RoomRegistry::open(&f.0).unwrap();
+    let change = RoomChange::Configure {
+        id: Some(1),
+        name: "Kontext".into(),
+        description: "Entwurf".into(),
+        assignment: RoomAssignment::Dedicated,
+        preferences: RoomPreferences {
+            icon: Some("folder".into()),
+            ..Default::default()
+        },
+        position: 8,
+    };
+    registry.apply(0, change.clone()).unwrap();
+    let saved = fs::read(f.0.join("rooms.toml")).unwrap();
+    assert_eq!(registry.definitions().revision, 1);
+    assert_eq!(registry.slot_for_room(RoomId(1)), Some(0));
+    assert_eq!(registry.definitions().rooms[8].name, "Kontext");
+    assert_eq!(
+        registry.apply(0, change.clone()),
+        Err(RoomMutationError::Conflict)
+    );
+    for bad_id in [Some(0), Some(999)] {
+        let mut invalid = change.clone();
+        if let RoomChange::Configure { id, .. } = &mut invalid {
+            *id = bad_id;
+        }
+        assert_eq!(registry.apply(1, invalid), Err(RoomMutationError::Invalid));
+    }
+    let mut invalid = change.clone();
+    if let RoomChange::Configure { preferences, .. } = &mut invalid {
+        preferences.icon = Some("../bad".into());
+    }
+    assert_eq!(registry.apply(1, invalid), Err(RoomMutationError::Invalid));
+    assert_eq!(fs::read(f.0.join("rooms.toml")).unwrap(), saved);
+    let mut create = change;
+    if let RoomChange::Configure { id, position, .. } = &mut create {
+        *id = None;
+        *position = 0;
+    }
+    registry.apply(1, create).unwrap();
+    assert_eq!(registry.definitions().rooms[0].id, RoomId(10));
+    assert_eq!(registry.slot_for_room(RoomId(10)), Some(9));
+    let expected = registry.definitions().clone();
+    drop(registry);
+    assert_eq!(RoomRegistry::open(&f.0).unwrap().definitions(), &expected);
+}
+
+#[test]
 fn preferences_survive_edits_reorder_restart_and_invalid_update() {
     use niwoe_ipc::{
         AppReference, RoomChange, RoomLayout, RoomMutationError, RoomPreferences, RoomRestore,

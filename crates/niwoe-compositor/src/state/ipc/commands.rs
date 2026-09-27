@@ -102,7 +102,11 @@ impl NiwoeState {
     pub(crate) fn handle_shell_command(&mut self, command: ShellCommand) {
         match command {
             ShellCommand::Layout { request_id, action } => self.layout_action(request_id, action),
+            ShellCommand::PanelPreferences { request_id, action } => {
+                self.panel_preferences(request_id, action)
+            }
             ShellCommand::RequestRoomSnapshot => {
+                self.panel_preferences(String::new(), niwoe_ipc::PanelAction::Get);
                 self.broadcast_rooms();
                 if self.lock_manager.is_locked_or_pending() {
                     self.ipc.broadcast(&ShellEvent::SessionLocked);

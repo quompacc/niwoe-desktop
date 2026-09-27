@@ -146,117 +146,9 @@ pub(crate) fn hit_room(
         .map(|index| start + index)
 }
 
-fn sidebar_item(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    y: i32,
-    label: &str,
-    active: bool,
-    config: &niwoe_config::ThemeConfig,
-) {
-    let p = crate::ui::tokens::theme_from_config(config).palette;
-    let rect = Rect {
-        x: C.outer_pad / 2,
-        y,
-        width: C.sidebar_width - C.outer_pad,
-        height: C.sidebar_item_height,
-    };
-    if active {
-        fill(
-            pm,
-            rect,
-            Interaction::DEFAULT.selection(p.surface, p.accent, Interaction::SELECTION_ACTIVE),
-            Radius::DEFAULT.sm,
-        );
-        fill(
-            pm,
-            Rect {
-                x: rect.x,
-                y: rect.y,
-                width: Controls::FOCUS_WIDTH,
-                height: rect.height,
-            },
-            p.accent,
-            Radius::DEFAULT.none,
-        );
-    }
-    paint_text_left_centered(
-        pm,
-        label,
-        rect.x + S.xl,
-        rect,
-        Typography::DEFAULT.body_size as f32,
-        if active { p.text } else { p.text_dim },
-    );
-}
-
-fn draw_sidebar(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    height: u32,
-    configuring: bool,
-    config: &niwoe_config::ThemeConfig,
-) {
-    let p = crate::ui::tokens::theme_from_config(config).palette;
-    fill(
-        pm,
-        Rect {
-            x: 0,
-            y: 0,
-            width: C.sidebar_width,
-            height: height as i32,
-        },
-        alpha(p.background, C.sidebar_alpha),
-        Radius::DEFAULT.none,
-    );
-    paint_text(
-        pm,
-        "CONTROL CENTER",
-        C.outer_pad,
-        C.outer_pad + S.lg,
-        Typography::DEFAULT.caption_size as f32,
-        p.text_dim,
-    );
-    let mut y = C.outer_pad + S.xxl * 2;
-    for (label, active) in [
-        ("Übersicht", false),
-        ("Räume", true),
-        ("Apps", false),
-        ("Dateien", false),
-        ("Automatisierung", false),
-        ("Benutzer", false),
-        ("System", false),
-    ] {
-        sidebar_item(pm, y, label, active, config);
-        y += C.sidebar_item_height;
-    }
-    y += C.sidebar_section_gap;
-    paint_text(
-        pm,
-        "WARTUNG",
-        C.outer_pad,
-        y,
-        Typography::DEFAULT.caption_size as f32,
-        p.text_dim,
-    );
-    y += S.xxl;
-    for label in ["Updates", "Backups", "Protokolle", "Einstellungen"] {
-        sidebar_item(pm, y, label, false, config);
-        y += C.sidebar_item_height;
-    }
-    let back = back_rect(height);
-    outline(pm, back, p.border, Controls::BORDER);
-    paint_text_centered(
-        pm,
-        if configuring {
-            "‹  Zurück zu Räumen"
-        } else {
-            "‹  Zurück zur Übersicht"
-        },
-        back,
-        Typography::DEFAULT.caption_size as f32,
-        p.text,
-    );
-}
-
+include!("room_management_view/sidebar.rs");
+pub(crate) mod list;
+pub(crate) mod panel;
 fn draw_header(pm: &mut tiny_skia::PixmapMut<'_>, width: u32, config: &niwoe_config::ThemeConfig) {
     let p = crate::ui::tokens::theme_from_config(config).palette;
     fill(
@@ -438,6 +330,8 @@ fn draw_toolbar(
 }
 
 struct RoomRenderContext<'a> {
+    preview: bool,
+    icons: &'a crate::icons::IconCache,
     rooms: &'a [RoomEntry],
     active_workspace: u8,
     window_counts: &'a [u16; niwoe_config::rooms::MAX_ROOMS],
@@ -450,11 +344,11 @@ struct RoomRenderContext<'a> {
 
 include!("room_management_view/cards.rs");
 mod configuration;
-pub(crate) use configuration::restore;
 pub(crate) use configuration::{
     draw_room_configuration, hit_configuration, hit_target_menu, max_configuration_scroll,
     ConfigurationAction,
 };
+pub(crate) use configuration::{form, restore};
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn draw_room_management(
     canvas: &mut [u8],
@@ -467,6 +361,8 @@ pub(crate) fn draw_room_management(
     hovered_room: Option<usize>,
     keyboard_focus: Option<usize>,
     page: usize,
+    list: &crate::room_editor::list::ListUi,
+    icons: &crate::icons::IconCache,
     config: &niwoe_config::ThemeConfig,
 ) {
     if canvas.len() != width as usize * height as usize * 4 {
@@ -500,7 +396,10 @@ pub(crate) fn draw_room_management(
         keyboard_focus == Some(rooms.len()),
         config,
     );
+    list::draw_list_controls(&mut pm, list, config);
     let context = RoomRenderContext {
+        preview: false,
+        icons,
         rooms,
         active_workspace,
         window_counts,

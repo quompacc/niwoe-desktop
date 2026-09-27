@@ -33,6 +33,16 @@ pub struct RoomSnapshot {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "operation", rename_all = "kebab-case")]
 pub enum RoomChange {
+    /// One revision and one durable write for the complete local form draft.
+    Configure {
+        /// None allocates a new stable ID at the sole compositor writer.
+        id: Option<u64>,
+        name: String,
+        description: String,
+        assignment: RoomAssignment,
+        preferences: crate::RoomPreferences,
+        position: usize,
+    },
     Create {
         name: String,
     },

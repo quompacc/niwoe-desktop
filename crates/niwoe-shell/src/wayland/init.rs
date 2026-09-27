@@ -303,17 +303,9 @@ pub(crate) fn initialize(
 
     let niwoe_config = NiwoeConfig::load();
     let mut theme_manager = ThemeManager::new();
-    if !niwoe_config.general.theme.trim().is_empty()
-        && niwoe_config.general.theme != theme_manager.current().name
-    {
-        if let Err(err) = theme_manager.set_theme(&niwoe_config.general.theme) {
-            warn!(
-                "Failed to load theme {:?} from config: {} — using current theme {:?}",
-                niwoe_config.general.theme,
-                err,
-                theme_manager.current().name
-            );
-        }
+    // Alpha selects its one theme at runtime; stored user/foreign preferences remain untouched.
+    if let Err(err) = theme_manager.set_theme("dark") {
+        warn!("Alpha theme could not be loaded: {}", err);
     }
     let available_themes = theme_manager.available_themes();
     let theme = theme_manager.current().config.clone();

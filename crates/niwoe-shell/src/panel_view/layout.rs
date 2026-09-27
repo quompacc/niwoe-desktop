@@ -31,6 +31,7 @@ pub(crate) fn build_panel_widget_tree(
     clock: &str,
     icon_cache: &IconCache,
     screenshot_icon: Option<Pixmap>,
+    modules: &[niwoe_ipc::PanelModule],
     theme: &Theme,
 ) -> Box<dyn Widget> {
     use status_symbols::{icon, Symbol};
@@ -76,13 +77,9 @@ pub(crate) fn build_panel_widget_tree(
         / 2.0;
     let status_width =
         TRAY_W * if battery.present { 3 } else { 2 } + if battery.present { LAUNCHER_W } else { 0 };
-    let tray_capacity = ((side_width as i32
-        - status_width
-        - SCREENSHOT_W * 2
-        - DIVIDER_W
-        - GAP * 4)
-        .max(0)
-        / (SNI_W + GAP)) as usize;
+    let tray_capacity =
+        ((side_width as i32 - status_width - SCREENSHOT_W * 2 - DIVIDER_W - GAP * 4).max(0)
+            / (SNI_W + GAP)) as usize;
     let tray_count = status_notifier_items
         .len()
         .min(SNI_PANEL_IDS.len())
@@ -107,12 +104,14 @@ pub(crate) fn build_panel_widget_tree(
     let rooms = visible_rooms(total_workspaces, capacity, active_position);
     let visible_count = rooms.clone().count();
     for position in rooms {
-        let room = room_entries.get(position as usize-1);
+        let room = room_entries.get(position as usize - 1);
         let workspace = room.map(|r| r.workspace).unwrap_or(position);
         left_children.push(Box::new(RoomTab {
             workspace,
             occupied: occupied[workspace.saturating_sub(1) as usize],
-            label: room.map(|r| r.name.clone()).unwrap_or_else(|| format!("Raum {workspace}")),
+            label: room
+                .map(|r| r.name.clone())
+                .unwrap_or_else(|| format!("Raum {workspace}")),
             active: workspace == active_workspace,
         }));
     }
@@ -231,6 +230,14 @@ pub(crate) fn build_panel_widget_tree(
         active: network_popup_open || audio_popup_open,
         children: status_children,
     }));
+    let group = |widget: &dyn Widget| match widget.id() {
+        Some("panel-screenshot") => niwoe_ipc::PanelModule::Screenshot,
+        Some("panel-search") => niwoe_ipc::PanelModule::Search,
+        Some("panel-status") => niwoe_ipc::PanelModule::Status,
+        _ => niwoe_ipc::PanelModule::Tray,
+    };
+    right_children.retain(|widget| modules.contains(&group(&**widget)));
+    right_children.sort_by_key(|widget| modules.iter().position(|m| *m == group(&**widget)));
     let right_cluster = Container::new(
         WidgetStyle {
             size: UiSize {

@@ -4,6 +4,63 @@ use niwoe_ipc::{RoomChange, RoomMutationError, RoomSnapshot, ShellEvent};
 use smithay::{reexports::wayland_server::protocol::wl_surface::WlSurface, utils::SERIAL_COUNTER};
 
 impl NiwoeState {
+    pub(super) fn panel_preferences(&mut self, request_id: String, action: niwoe_ipc::PanelAction) {
+        use niwoe_config::panel_preferences::PanelPreferences;
+        let path = niwoe_config::config_directory().join("panel.toml");
+        let result = (|| -> Result<(), String> {
+            if request_id.len() > 128 {
+                return Err("Ungültige Anfrage".into());
+            }
+            if let niwoe_ipc::PanelAction::Save {
+                expected_revision,
+                modules,
+            } = action
+            {
+                use niwoe_config::panel_preferences::PanelModule as C;
+                use niwoe_ipc::PanelModule as W;
+                let modules = modules
+                    .into_iter()
+                    .map(|m| match m {
+                        W::Tray => C::Tray,
+                        W::Screenshot => C::Screenshot,
+                        W::Search => C::Search,
+                        W::Status => C::Status,
+                    })
+                    .collect();
+                let revision = expected_revision
+                    .checked_add(1)
+                    .ok_or("Revision erschöpft")?;
+                PanelPreferences {
+                    schema_version: 1,
+                    revision,
+                    modules,
+                }
+                .save(&path, expected_revision)?;
+            }
+            Ok(())
+        })();
+        let loaded = PanelPreferences::load(&path);
+        let error = result.err().or_else(|| loaded.as_ref().err().cloned());
+        let loaded = loaded.unwrap_or_default();
+        use niwoe_config::panel_preferences::PanelModule as C;
+        use niwoe_ipc::PanelModule as W;
+        let modules = loaded
+            .modules
+            .into_iter()
+            .map(|m| match m {
+                C::Tray => W::Tray,
+                C::Screenshot => W::Screenshot,
+                C::Search => W::Search,
+                C::Status => W::Status,
+            })
+            .collect();
+        self.ipc.broadcast(&ShellEvent::PanelPreferences {
+            request_id,
+            revision: loaded.revision,
+            modules,
+            error,
+        });
+    }
     pub fn broadcast_rooms(&mut self) {
         let registry = self.workspaces.rooms();
         let snapshot = RoomSnapshot {
@@ -43,7 +100,9 @@ impl NiwoeState {
         change: niwoe_ipc::RoomChange,
     ) {
         let change_effect = match &change {
-            RoomChange::Create { .. } | RoomChange::CreateDetails { .. } => Some((None, None)),
+            RoomChange::Create { .. }
+            | RoomChange::CreateDetails { .. }
+            | RoomChange::Configure { id: None, .. } => Some((None, None)),
             RoomChange::Delete { id, target_id } => {
                 let registry = self.workspaces.rooms();
                 Some((

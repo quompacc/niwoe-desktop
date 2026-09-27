@@ -5,8 +5,7 @@ impl NiwoeShell {
 
     pub(crate) fn launcher_content_size(&self) -> (u32, u32) {
         let (width, height) = self.launcher_fitted_size();
-        if (!self.room_management_open && !self.launcher_settings_open)
-            || (self.room_management_open && self.workspace_state.rooms.edit.as_ref().is_some_and(|edit| edit.restore.open)) {
+        if !self.launcher_settings_open {
             niwoe_tokens::Hub::DEFAULT.canvas_size(width, height)
         } else {
             (width, height)
@@ -17,7 +16,8 @@ impl NiwoeShell {
         if self.room_management_open {
             (self.launcher_width, self.launcher_height)
         } else if self.launcher_is_fullscreen {
-            let (_, _, width, height) = self.launcher_geometry()
+            let (_, _, width, height) = self
+                .launcher_geometry()
                 .fitted_rect(self.launcher_width, self.launcher_height);
             (width, height)
         } else {
@@ -31,7 +31,9 @@ impl NiwoeShell {
             self.launcher_visual_x = 0;
             self.launcher_visual_y = 0;
         } else if self.launcher_is_fullscreen {
-            let (x, y, _, _) = self.launcher_geometry().fitted_rect(self.launcher_width, self.launcher_height);
+            let (x, y, _, _) = self
+                .launcher_geometry()
+                .fitted_rect(self.launcher_width, self.launcher_height);
             self.launcher_visual_x = x;
             self.launcher_visual_y = y;
         }
@@ -80,7 +82,16 @@ impl NiwoeShell {
         let (content_width, content_height) = self.launcher_content_size();
         let (fitted_width, fitted_height) = self.launcher_fitted_size();
         let hub_active_workspace = self.panel_active_workspace();
-        let hub_results = if self.hub_search_active { self.hub_results() } else { Vec::new() };
+        let hub_results = if self.hub_search_active {
+            self.hub_results()
+        } else {
+            Vec::new()
+        };
+        let panel_preview = if self.workspace_state.rooms.panel.open {
+            self.panel_form_preview(content_width)
+        } else {
+            None
+        };
         for attempt in 0..CANVAS_RETRY_ATTEMPTS {
             let buf = buffer::buffer_for(
                 &mut self.pool,
@@ -127,13 +138,40 @@ impl NiwoeShell {
             });
             if self.room_management_open {
                 let rooms = &self.workspace_state.rooms.snapshot.rooms;
-                let draft = niwoe_ipc::RoomEntry { preferences: Default::default(), id: 0, workspace: 0, name: "Neuer Raum".into(), description: String::new(), assignment: niwoe_ipc::RoomAssignment::Free };
-                if let Some((room, edit, order)) = self.room_configuration_id.and_then(|id| {
-                    let edit = self.workspace_state.rooms.edit.as_ref().filter(|edit| edit.id == id)?;
-                    if id == 0 { return Some((&draft, edit, rooms.len())); }
-                    let order = rooms.iter().position(|room| room.id == id)?;
-                    Some((&rooms[order], edit, order))
-                }) {
+                let draft = niwoe_ipc::RoomEntry {
+                    preferences: Default::default(),
+                    id: 0,
+                    workspace: 0,
+                    name: "Neuer Raum".into(),
+                    description: String::new(),
+                    assignment: niwoe_ipc::RoomAssignment::Free,
+                };
+                if self.workspace_state.rooms.panel.open {
+                    crate::room_management_view::panel::draw(
+                        &mut content,
+                        content_width,
+                        content_height,
+                        &self.workspace_state.rooms.panel,
+                        panel_preview.as_ref(),
+                        &self.theme,
+                    );
+                } else if let Some((room, edit, order)) =
+                    self.room_configuration_id.and_then(|id| {
+                        let edit = self
+                            .workspace_state
+                            .rooms
+                            .edit
+                            .as_ref()
+                            .filter(|edit| edit.id == id)?;
+                        if id == 0 {
+                            return Some((&draft, edit, rooms.len()));
+                        }
+                        let Some(order) = rooms.iter().position(|room| room.id == id) else {
+                            return Some((&draft, edit, edit.position));
+                        };
+                        Some((&rooms[order], edit, order))
+                    })
+                {
                     crate::room_management_view::draw_room_configuration(
                         &mut content,
                         content_width,
@@ -145,22 +183,31 @@ impl NiwoeShell {
                         rooms,
                         &self.windows,
                         &self.workspace_state.rooms.message,
-                        self.workspace_state.rooms.pending.is_some(),
+                        self.workspace_state.rooms.pending.is_some()
+                            || (edit.id != 0 && !rooms.iter().any(|room| room.id == edit.id)),
                         self.room_configuration_scroll_y,
+                        &self.icon_cache,
                         &self.theme,
                     );
                 } else {
+                    let visible_rooms = self
+                        .workspace_state
+                        .rooms
+                        .list
+                        .visible(rooms, &self.workspace_window_counts);
                     crate::room_management_view::draw_room_management(
                         &mut content,
                         content_width,
                         content_height,
-                        rooms,
+                        &visible_rooms,
                         hub_active_workspace,
                         &self.workspace_window_counts,
                         &self.windows,
                         self.hovered_bento_idx,
                         self.room_keyboard_focus,
                         self.room_management_page,
+                        &self.workspace_state.rooms.list,
+                        &self.icon_cache,
                         &self.theme,
                     );
                 }
@@ -202,7 +249,15 @@ impl NiwoeShell {
                     &state_fn,
                 );
             } else if self.hub_search_active {
-                crate::hub_view::draw_search(&mut content, content_width, content_height, &self.search_query, &hub_results, self.hub.selected.unwrap_or(0), &self.theme);
+                crate::hub_view::draw_search(
+                    &mut content,
+                    content_width,
+                    content_height,
+                    &self.search_query,
+                    &hub_results,
+                    self.hub.selected.unwrap_or(0),
+                    &self.theme,
+                );
             } else if !self.hub_search_active {
                 crate::hub_view::draw_hub(
                     &mut content,
@@ -260,15 +315,30 @@ impl NiwoeShell {
             }
 
             if let Some(picker) = &self.window_picker {
-                crate::window_picker::draw(&mut content,content_width,content_height,picker,&self.windows,&self.workspace_state.rooms.snapshot.rooms,&self.theme);
+                crate::window_picker::draw(
+                    &mut content,
+                    content_width,
+                    content_height,
+                    picker,
+                    &self.windows,
+                    &self.workspace_state.rooms.snapshot.rooms,
+                    &self.theme,
+                );
             }
             // Event-driven resize only: no animation, extra capture or idle work.
             // The pointer path applies the exact inverse canvas/fitted ratio.
             let (lw, lh) = (fitted_width as usize, fitted_height as usize);
             if (content_width, content_height) != (fitted_width, fitted_height) {
-                if let Some(source) = image::RgbaImage::from_raw(content_width, content_height, content) {
-                    content = image::imageops::resize(&source, fitted_width, fitted_height,
-                        image::imageops::FilterType::Triangle).into_raw();
+                if let Some(source) =
+                    image::RgbaImage::from_raw(content_width, content_height, content)
+                {
+                    content = image::imageops::resize(
+                        &source,
+                        fitted_width,
+                        fitted_height,
+                        image::imageops::FilterType::Triangle,
+                    )
+                    .into_raw();
                 } else {
                     return;
                 }
@@ -285,51 +355,51 @@ impl NiwoeShell {
                 if self.room_management_open {
                     canvas.copy_from_slice(&content);
                 } else {
-                // Blit fitted card content into the full-screen canvas at visual offset.
-                let fw = width as usize;
-                let vx = self.launcher_visual_x.max(0) as usize;
-                let vy = self.launcher_visual_y.max(0) as usize;
-                canvas.fill(0);
-                // Soft drop shadow around the rounded glass launcher. Keep the
-                // card interior clear so its transparent body cannot reveal a
-                // dark shadow veil over the compositor-owned glass backdrop.
-                crate::soft_shadow::draw_soft_shadow(
-                    canvas,
-                    width as i32,
-                    height as i32,
-                    vx as i32,
-                    vy as i32,
-                    lw as i32,
-                    lh as i32,
-                    launcher_radius as f32,
-                    niwoe_tokens::Elevation::LAUNCHER.blur,
-                    niwoe_tokens::Elevation::LAUNCHER.alpha,
-                    niwoe_tokens::Elevation::LAUNCHER.offset_y,
-                    true,
-                );
-                // Composite the (premultiplied) content over the shadow so the
-                // transparent rounded corners reveal the shadow underneath.
-                for y in 0..lh {
-                    let src = &content[y * lw * 4..(y + 1) * lw * 4];
-                    let dst_off = (vy + y) * fw * 4 + vx * 4;
-                    if dst_off + lw * 4 > canvas.len() {
-                        continue;
-                    }
-                    let dst = &mut canvas[dst_off..dst_off + lw * 4];
-                    for x in 0..lw {
-                        let s = &src[x * 4..x * 4 + 4];
-                        let sa = s[3] as u32;
-                        if sa == 255 {
-                            dst[x * 4..x * 4 + 4].copy_from_slice(s);
-                        } else if sa != 0 {
-                            let inv = 255 - sa;
-                            for k in 0..4 {
-                                dst[x * 4 + k] =
-                                    (s[k] as u32 + dst[x * 4 + k] as u32 * inv / 255) as u8;
+                    // Blit fitted card content into the full-screen canvas at visual offset.
+                    let fw = width as usize;
+                    let vx = self.launcher_visual_x.max(0) as usize;
+                    let vy = self.launcher_visual_y.max(0) as usize;
+                    canvas.fill(0);
+                    // Soft drop shadow around the rounded glass launcher. Keep the
+                    // card interior clear so its transparent body cannot reveal a
+                    // dark shadow veil over the compositor-owned glass backdrop.
+                    crate::soft_shadow::draw_soft_shadow(
+                        canvas,
+                        width as i32,
+                        height as i32,
+                        vx as i32,
+                        vy as i32,
+                        lw as i32,
+                        lh as i32,
+                        launcher_radius as f32,
+                        niwoe_tokens::Elevation::LAUNCHER.blur,
+                        niwoe_tokens::Elevation::LAUNCHER.alpha,
+                        niwoe_tokens::Elevation::LAUNCHER.offset_y,
+                        true,
+                    );
+                    // Composite the (premultiplied) content over the shadow so the
+                    // transparent rounded corners reveal the shadow underneath.
+                    for y in 0..lh {
+                        let src = &content[y * lw * 4..(y + 1) * lw * 4];
+                        let dst_off = (vy + y) * fw * 4 + vx * 4;
+                        if dst_off + lw * 4 > canvas.len() {
+                            continue;
+                        }
+                        let dst = &mut canvas[dst_off..dst_off + lw * 4];
+                        for x in 0..lw {
+                            let s = &src[x * 4..x * 4 + 4];
+                            let sa = s[3] as u32;
+                            if sa == 255 {
+                                dst[x * 4..x * 4 + 4].copy_from_slice(s);
+                            } else if sa != 0 {
+                                let inv = 255 - sa;
+                                for k in 0..4 {
+                                    dst[x * 4 + k] =
+                                        (s[k] as u32 + dst[x * 4 + k] as u32 * inv / 255) as u8;
+                                }
                             }
                         }
                     }
-                }
                 }
             } else {
                 canvas[..lw * lh * 4].copy_from_slice(&content);

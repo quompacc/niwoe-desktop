@@ -15,7 +15,11 @@ impl NiwoeShell {
             return;
         };
         edit.restore.open = true;
-        edit.restore.focus = 0;
+        edit.restore.focus = match edit.preferences.restore {
+            niwoe_ipc::RoomRestore::Disabled => 0,
+            niwoe_ipc::RoomRestore::LayoutOnly => 1,
+            niwoe_ipc::RoomRestore::RelaunchApps => 2,
+        };
         if let Some(LayoutNotice::Status {
             revision,
             running,
@@ -41,6 +45,9 @@ impl NiwoeShell {
         };
         let room_id = edit.id;
         let state = &mut edit.restore;
+        if !crate::room_management_view::restore::enabled(state, control, width, height) {
+            return;
+        }
         state.focus = control;
         let count = crate::room_management_view::restore::page_size(width, height);
         let action = match control {
@@ -95,7 +102,7 @@ impl NiwoeShell {
 
     pub(crate) fn layout_key(&mut self, qh: &QueueHandle<Self>, key: Keysym) -> bool {
         if key == Keysym::F6 {
-            self.open_layout_panel();
+            self.room_form_tab(3);
             self.draw_launcher(qh, RepaintReason::Keyboard);
             return true;
         }
@@ -117,7 +124,10 @@ impl NiwoeShell {
             .saturating_sub(state.page * count)
             .min(count);
         match key {
-            Keysym::Escape => state.open = false,
+            Keysym::Escape => {
+                state.open = false;
+                edit.form.tab = 0;
+            }
             Keysym::Tab | Keysym::ISO_Left_Tab => {
                 state.focus =
                     (state.focus + if key == Keysym::Tab { 1 } else { controls - 1 }) % controls
@@ -164,14 +174,6 @@ impl NiwoeShell {
             || y < c.config_header_height + c.config_tabs_height
             || y >= height as i32 - c.config_footer_height
         {
-            self.workspace_state
-                .rooms
-                .edit
-                .as_mut()
-                .unwrap()
-                .restore
-                .open = false;
-            self.draw_launcher(qh, RepaintReason::Pointer);
             return true;
         }
         if let Some(control) = crate::room_management_view::restore::hit(x, y, width, height) {

@@ -82,11 +82,8 @@ pub(crate) fn apply_config_overrides(
         .as_ref()
         .map(|w| (w.path.clone(), w.mode));
 
-    let requested_theme = if niwoe_config.general.theme.trim().is_empty() {
-        "default"
-    } else {
-        niwoe_config.general.theme.trim()
-    };
+    // The alpha has one active theme; do not rewrite the user's stored preference.
+    let requested_theme = "dark";
     if let Err(err) = theme_manager.set_theme(requested_theme) {
         tracing::warn!(
             "Failed to load theme {:?} from config: {} — keeping current theme {:?}",

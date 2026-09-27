@@ -97,6 +97,7 @@ fn build_panel_widget_tree_root_has_three_children() {
         "12:34",
         &icon_cache,
         None,
+        &crate::room_editor::panel::MODULES,
         &Theme::TOKYO_NIGHT_METRO,
     );
     // Floating-Island-Struktur: Root umschliesst die bar, die bar haelt die 3 Cluster.
@@ -145,6 +146,7 @@ fn draw_panel_ui_modifies_canvas_and_fills_clicks() {
         "12:34",
         &icon_cache,
         None,
+        &crate::room_editor::panel::MODULES,
         &niwoe_config::ThemeConfig::default(),
         &state_fn,
         &mut clicks,
@@ -239,6 +241,7 @@ fn panel_room_rail_uses_fixed_pages_and_keeps_active_room_visible() {
             "12:34",
             &icons,
             None,
+            &crate::room_editor::panel::MODULES,
             &Theme::TOKYO_NIGHT_METRO,
         );
         let layout = compute_layout(
@@ -291,6 +294,7 @@ fn panel_omits_room_overflow_when_every_room_fits() {
         "12:34",
         &icons,
         None,
+        &crate::room_editor::panel::MODULES,
         &Theme::TOKYO_NIGHT_METRO,
     );
     let layout = compute_layout(
@@ -317,6 +321,76 @@ fn panel_omits_room_overflow_when_every_room_fits() {
             .count(),
         4
     );
+}
+
+#[test]
+fn module_visibility_and_order_keep_required_access_and_centered_clock() {
+    use niwoe_ipc::PanelModule;
+    let icons = IconCache::new();
+    for width in [1366, 1920] {
+        for modules in [
+            vec![],
+            vec![PanelModule::Status, PanelModule::Search],
+            vec![PanelModule::Search, PanelModule::Status],
+        ] {
+            let tree = build_panel_widget_tree(
+                width,
+                &[],
+                &[],
+                &NetworkState::Disconnected,
+                &AudioSnapshot::unavailable(),
+                &[],
+                false,
+                false,
+                &crate::battery::BatterySnapshot::default(),
+                None,
+                1,
+                9,
+                &[],
+                &[false; niwoe_config::rooms::MAX_ROOMS],
+                "12:34",
+                &icons,
+                None,
+                &modules,
+                &Theme::TOKYO_NIGHT_METRO,
+            );
+            let layout = compute_layout(
+                &*tree,
+                PixelSize {
+                    width,
+                    height: PANEL_HEIGHT,
+                },
+            )
+            .unwrap();
+            let mut zones = Vec::new();
+            collect_click_zones(&*tree, &layout.root, 0, 0, &mut zones);
+            for id in ["panel-launcher", "panel-clock", "panel-workspace"] {
+                assert!(zones.iter().any(|z| z.id.as_deref() == Some(id)), "{id}");
+            }
+            let clock = zones
+                .iter()
+                .find(|z| z.id.as_deref() == Some("panel-clock"))
+                .unwrap();
+            assert!((clock.rect.x * 2 + clock.rect.w - width as i32).abs() <= 1);
+            assert!(!zones
+                .iter()
+                .any(|z| z.id.as_deref() == Some("panel-screenshot")));
+            if !modules.is_empty() {
+                let search = zones
+                    .iter()
+                    .find(|z| z.id.as_deref() == Some("panel-search"))
+                    .unwrap();
+                let status = zones
+                    .iter()
+                    .find(|z| z.id.as_deref() == Some("panel-status"))
+                    .unwrap();
+                assert_eq!(
+                    search.rect.x < status.rect.x,
+                    modules[0] == PanelModule::Search
+                );
+            }
+        }
+    }
 }
 
 #[test]
@@ -348,6 +422,7 @@ fn panel_layout_keeps_clock_centered_and_controls_separate_across_viewports() {
                     "19:18  Mi, 23. Sep",
                     &icons,
                     None,
+                    &crate::room_editor::panel::MODULES,
                     &theme,
                 );
                 let layout = compute_layout(

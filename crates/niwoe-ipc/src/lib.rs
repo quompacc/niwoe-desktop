@@ -4,8 +4,10 @@ use serde::{Deserialize, Serialize};
 
 mod appearance;
 mod layouts;
+mod panel_preferences;
 pub use appearance::{AppearanceSnapshot, AppearanceTheme, AppearanceWallpaperMode};
 pub use layouts::{LayoutAction, LayoutLaunch, LayoutNotice, LayoutResult};
+pub use panel_preferences::{PanelAction, PanelModule};
 mod room_preferences;
 pub use room_preferences::{AppReference, RoomLayout, RoomPreferences, RoomRestore};
 mod rooms;
@@ -213,6 +215,12 @@ pub enum ScreenshotBridgeMessage {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellEvent {
+    PanelPreferences {
+        request_id: String,
+        revision: u64,
+        modules: Vec<PanelModule>,
+        error: Option<String>,
+    },
     Layout {
         #[serde(default)]
         request_id: String,
@@ -336,6 +344,10 @@ pub enum ShellEvent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellCommand {
+    PanelPreferences {
+        request_id: String,
+        action: PanelAction,
+    },
     Layout {
         #[serde(default)]
         request_id: String,

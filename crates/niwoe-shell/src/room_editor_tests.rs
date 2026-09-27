@@ -2,6 +2,24 @@ use super::*;
 use crate::wayland::RoomEditAction;
 
 #[test]
+fn removed_room_retains_draft_but_only_cancel_can_finish_it() {
+    let mut ui = RoomUi::default();
+    ui.accept(ui.snapshot.clone());
+    ui.begin(9);
+    ui.edit.as_mut().unwrap().name = "Ungespeicherter Entwurf".into();
+    let mut snapshot = ui.snapshot.clone();
+    snapshot.rooms.pop();
+    snapshot.revision += 1;
+    assert!(ui.accept(snapshot));
+    assert!(ui.message.contains("entfernt"));
+    assert_eq!(ui.edit.as_ref().unwrap().name, "Ungespeicherter Entwurf");
+    assert!(!ui.enabled(RoomEditAction::Save));
+    assert!(ui.enabled(RoomEditAction::Cancel));
+    ui.request(RoomEditAction::Cancel);
+    assert!(ui.edit.is_none());
+}
+
+#[test]
 fn snapshot_retains_preferences_and_rejects_invalid_replacement() {
     let mut ui = RoomUi::default();
     let mut snapshot = ui.snapshot.clone();
@@ -49,7 +67,7 @@ fn create_is_a_draft_until_explicit_save_and_cancel_has_no_mutation() {
     ui.edit.as_mut().unwrap().description = "Beschreibung".into();
     assert!(
         matches!(ui.request(RoomEditAction::Save), Some(niwoe_ipc::ShellCommand::MutateRoom {
-        change: RoomChange::CreateDetails { name, description, .. }, ..
+        change: RoomChange::Configure { id: None, name, description, .. }, ..
     }) if name == "Neuer Kontext" && description == "Beschreibung")
     );
     assert_eq!(ui.snapshot, before);
@@ -70,7 +88,7 @@ fn description_and_name_use_one_revision_and_delete_requires_target_and_confirma
     ui.edit.as_mut().unwrap().description = "Arbeit".into();
     assert!(
         matches!(ui.request(RoomEditAction::Save), Some(niwoe_ipc::ShellCommand::MutateRoom {
-        expected_revision: 0, change: RoomChange::UpdateDetails { id: 1, description, .. }, ..
+        expected_revision: 0, change: RoomChange::Configure { id: Some(1), description, .. }, ..
     }) if description == "Arbeit")
     );
     let request = ui.pending.as_ref().unwrap().0.clone();
@@ -154,9 +172,13 @@ fn editing_waits_for_snapshot_and_ack_and_never_optimistically_changes_panel() {
     assert_eq!(expected_revision, 0);
     assert_eq!(
         change,
-        RoomChange::Rename {
-            id: 1,
-            name: "Arbeit".into()
+        RoomChange::Configure {
+            id: Some(1),
+            name: "Arbeit".into(),
+            description: String::new(),
+            assignment: niwoe_ipc::RoomAssignment::Free,
+            preferences: Default::default(),
+            position: 0,
         }
     );
     assert_eq!(ui.snapshot.rooms[0].name, "Raum 1");
@@ -229,11 +251,18 @@ fn moves_preserve_id_and_timeout_requests_refresh_instead_of_retrying() {
     ui.accept(ui.snapshot.clone());
     ui.begin(1);
     assert!(ui.request(RoomEditAction::Left).is_none());
-    let command = ui.request(RoomEditAction::Right).unwrap();
+    assert!(ui.request(RoomEditAction::Right).is_none());
+    assert!(ui.pending.is_none());
+    assert_eq!(ui.snapshot.rooms[0].id, 1);
+    let command = ui.request(RoomEditAction::Save).unwrap();
     assert!(matches!(
         command,
         niwoe_ipc::ShellCommand::MutateRoom {
-            change: RoomChange::Move { id: 1, position: 1 },
+            change: RoomChange::Configure {
+                id: Some(1),
+                position: 1,
+                ..
+            },
             ..
         }
     ));
@@ -241,6 +270,25 @@ fn moves_preserve_id_and_timeout_requests_refresh_instead_of_retrying() {
     assert!(ui.expire());
     assert!(ui.pending.is_none());
     assert!(!ui.expire());
+}
+
+#[test]
+fn cancelled_order_and_preferences_never_change_snapshot() {
+    let mut ui = RoomUi::default();
+    ui.accept(ui.snapshot.clone());
+    let before = ui.snapshot.clone();
+    ui.begin(1);
+    ui.request(RoomEditAction::Right);
+    ui.edit.as_mut().unwrap().preferences.icon = Some("folder".into());
+    ui.request(RoomEditAction::Cancel);
+    assert_eq!(ui.snapshot, before);
+    ui.begin(1);
+    assert_eq!(ui.edit.as_ref().unwrap().position, 0);
+    assert_eq!(ui.edit.as_ref().unwrap().preferences.icon, None);
+    ui.edit.as_mut().unwrap().name = "  ".into();
+    assert!(ui.request(RoomEditAction::Save).is_none());
+    assert!(!ui.edit.as_ref().unwrap().name_error.is_empty());
+    assert!(ui.pending.is_none());
 }
 
 #[test]

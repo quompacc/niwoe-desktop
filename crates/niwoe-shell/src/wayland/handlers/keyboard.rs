@@ -378,6 +378,9 @@ impl KeyboardHandler for NiwoeShell {
 
         // ── Settings view: type-to-search; Escape clears then exits ───────────
         if self.room_management_open {
+            if self.panel_form_key(qh, event.keysym) {
+                return;
+            }
             if self.room_configuration_id.is_some() {
                 self.room_configuration_key(qh, event.keysym);
             } else if is_escape {

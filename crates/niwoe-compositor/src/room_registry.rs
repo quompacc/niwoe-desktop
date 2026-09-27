@@ -25,7 +25,16 @@ impl RoomRegistry {
             return Err(Error::Conflict);
         }
         let index = match &change {
-            RoomChange::Create { .. } | RoomChange::CreateDetails { .. } => None,
+            RoomChange::Create { .. }
+            | RoomChange::CreateDetails { .. }
+            | RoomChange::Configure { id: None, .. } => None,
+            RoomChange::Configure { id: Some(id), .. } => Some(
+                self.definitions
+                    .rooms
+                    .iter()
+                    .position(|r| r.id.0 == *id)
+                    .ok_or(Error::Invalid)?,
+            ),
             RoomChange::Rename { id, .. }
             | RoomChange::UpdateDetails { id, .. }
             | RoomChange::SetDescription { id, .. }
@@ -43,6 +52,11 @@ impl RoomRegistry {
         if matches!(&change, RoomChange::Move { position, .. } if *position >= self.slots.len()) {
             return Err(Error::Invalid);
         }
+        if matches!(&change, RoomChange::Configure { id, position, .. }
+            if *position >= self.slots.len() + usize::from(id.is_none()))
+        {
+            return Err(Error::Invalid);
+        }
         if let RoomChange::Delete { id, target_id } = &change {
             if id == target_id
                 || self.slots.len() <= 1
@@ -53,7 +67,9 @@ impl RoomRegistry {
         }
         if matches!(
             &change,
-            RoomChange::Create { .. } | RoomChange::CreateDetails { .. }
+            RoomChange::Create { .. }
+                | RoomChange::CreateDetails { .. }
+                | RoomChange::Configure { id: None, .. }
         ) && (self.slots.len() >= MAX_ROOMS || self.definitions.next_id == u64::MAX)
         {
             return Err(Error::Invalid);
@@ -62,6 +78,28 @@ impl RoomRegistry {
         let next = self
             .definitions
             .revised(expected, |rooms| match change {
+                RoomChange::Configure {
+                    id,
+                    name,
+                    description,
+                    assignment,
+                    preferences,
+                    position,
+                } => {
+                    let room = Room {
+                        id: RoomId(id.unwrap_or(created_id)),
+                        name,
+                        description,
+                        assignment: assignment_mode(assignment),
+                        preferences: preferences_from_wire(preferences),
+                    };
+                    if let Some(index) = index {
+                        rooms.rooms.remove(index);
+                    } else {
+                        rooms.next_id += 1;
+                    }
+                    rooms.rooms.insert(position, room);
+                }
                 RoomChange::Create { name } => {
                     rooms.rooms.push(Room {
                         preferences: Default::default(),

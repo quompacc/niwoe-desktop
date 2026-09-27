@@ -76,6 +76,7 @@ pub(crate) fn draw_panel_ui(
     clock: &str,
     icon_cache: &IconCache,
     screenshot_icon: Option<Pixmap>,
+    modules: &[niwoe_ipc::PanelModule],
     theme_config: &niwoe_config::ThemeConfig,
     state_fn: &dyn Fn(&[usize]) -> WidgetState,
     clicks_out: &mut Vec<ClickZone>,
@@ -115,6 +116,7 @@ pub(crate) fn draw_panel_ui(
         clock,
         icon_cache,
         screenshot_icon,
+        modules,
         &theme,
     );
 

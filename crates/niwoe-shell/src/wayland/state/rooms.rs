@@ -55,8 +55,18 @@ impl NiwoeShell {
             return;
         }
         match action {
+            ConfigurationAction::Tab(tab) => self.room_form_tab(tab),
+            ConfigurationAction::Form(index) => {
+                if index == 8 || index == 13 {
+                    self.room_form_tab(if index == 13 { 2 } else { 3 });
+                } else if index == 12 {
+                    self.room_form_tab(1);
+                } else if let Some(edit) = &mut self.workspace_state.rooms.edit {
+                    edit.form_action(index);
+                }
+            }
             ConfigurationAction::Restore => {
-                self.open_layout_panel();
+                self.room_form_tab(3);
             }
             ConfigurationAction::Back | ConfigurationAction::Cancel => {
                 self.return_to_room_management(qh);
@@ -64,23 +74,38 @@ impl NiwoeShell {
             }
             ConfigurationAction::Name | ConfigurationAction::Description => {
                 if let Some(edit) = &mut self.workspace_state.rooms.edit {
-                    edit.focus = if action == ConfigurationAction::Name { 0 } else { 5 };
+                    edit.focus = if action == ConfigurationAction::Name {
+                        0
+                    } else {
+                        5
+                    };
                     edit.replace = true;
                     edit.confirm_delete = false;
                 }
             }
             ConfigurationAction::Target | ConfigurationAction::Delete => {
-                let edit_action = if action == ConfigurationAction::Target { RoomEditAction::Target } else { RoomEditAction::Delete };
-                if !self.workspace_state.rooms.enabled(edit_action) { return; }
+                let edit_action = if action == ConfigurationAction::Target {
+                    RoomEditAction::Target
+                } else {
+                    RoomEditAction::Delete
+                };
+                if !self.workspace_state.rooms.enabled(edit_action) {
+                    return;
+                }
                 if let Some(edit) = &mut self.workspace_state.rooms.edit {
-                    edit.focus = if action == ConfigurationAction::Target { 6 } else { 7 };
+                    edit.focus = if action == ConfigurationAction::Target {
+                        6
+                    } else {
+                        7
+                    };
                 }
                 if let Some(command) = self.workspace_state.rooms.request(edit_action) {
                     self.room_configuration_save_pending = true;
                     if !self.ipc.send(&command) {
                         self.workspace_state.rooms.pending = None;
                         self.room_configuration_save_pending = false;
-                        self.workspace_state.rooms.message = "Keine Verbindung. Erneut versuchen.".into();
+                        self.workspace_state.rooms.message =
+                            "Keine Verbindung. Erneut versuchen.".into();
                     }
                 }
             }
@@ -98,26 +123,6 @@ impl NiwoeShell {
                 if !self.workspace_state.rooms.enabled(edit_action) {
                     self.draw_launcher(qh, RepaintReason::Pointer);
                     return;
-                }
-                if action == ConfigurationAction::Save {
-                    let unchanged = self
-                        .workspace_state
-                        .rooms
-                        .edit
-                        .as_ref()
-                        .is_some_and(|edit| {
-                            self.workspace_state
-                                .rooms
-                                .snapshot
-                                .rooms
-                                .iter()
-                                .find(|room| room.id == edit.id)
-                                .is_some_and(|room| room.name == edit.name.trim() && room.description == edit.description)
-                        });
-                    if unchanged {
-                        self.return_to_room_management(qh);
-                        return;
-                    }
                 }
                 if let Some(command) = self.workspace_state.rooms.request(edit_action) {
                     self.room_configuration_save_pending = action == ConfigurationAction::Save;
@@ -140,7 +145,12 @@ impl NiwoeShell {
     ) {
         use crate::room_management_view::ConfigurationAction;
         use smithay_client_toolkit::seat::keyboard::Keysym;
-        if self.layout_key(qh, key) { return; }
+        if self.workspace_state.rooms.pending.is_none() && self.room_form_key(qh, key) {
+            return;
+        }
+        if self.layout_key(qh, key) {
+            return;
+        }
         if self.workspace_state.rooms.pending.is_some() {
             return;
         }
@@ -152,8 +162,10 @@ impl NiwoeShell {
                     Keysym::Down => self.workspace_state.rooms.move_target_selection(1),
                     Keysym::Home => self.workspace_state.rooms.move_target_selection(isize::MIN),
                     Keysym::End => self.workspace_state.rooms.move_target_selection(isize::MAX),
-                    Keysym::Return | Keysym::KP_Enter => self.workspace_state.rooms.choose_target(selected),
-                    _ => {},
+                    Keysym::Return | Keysym::KP_Enter => {
+                        self.workspace_state.rooms.choose_target(selected)
+                    }
+                    _ => {}
                 }
                 if key != Keysym::Tab && key != Keysym::ISO_Left_Tab {
                     self.draw_launcher(qh, RepaintReason::Keyboard);
@@ -180,7 +192,11 @@ impl NiwoeShell {
             ];
             if let Some(edit) = self.workspace_state.rooms.edit.as_ref() {
                 let order = [0, 5, 1, 2, 6, 7, 8, 3, 4];
-                let step = if key == Keysym::Tab { 1 } else { order.len() - 1 };
+                let step = if key == Keysym::Tab {
+                    1
+                } else {
+                    order.len() - 1
+                };
                 let mut position = order.iter().position(|i| *i == edit.focus).unwrap_or(0);
                 let mut focus = edit.focus;
                 for _ in 0..actions.len() {
@@ -194,7 +210,8 @@ impl NiwoeShell {
                 self.workspace_state.rooms.edit.as_mut().unwrap().replace = true;
                 if focus == 6 || focus == 7 {
                     let (_, height) = self.launcher_content_size();
-                    self.room_configuration_scroll_y = crate::room_management_view::max_configuration_scroll(height);
+                    self.room_configuration_scroll_y =
+                        crate::room_management_view::max_configuration_scroll(height);
                 } else if focus == 0 || focus == 5 {
                     self.room_configuration_scroll_y = 0;
                 }
@@ -219,8 +236,16 @@ impl NiwoeShell {
             return;
         } else if let Some(edit) = &mut self.workspace_state.rooms.edit {
             if edit.focus == 0 || edit.focus == 5 {
-                let limit = if edit.focus == 0 { niwoe_config::rooms::MAX_NAME_CHARS } else { niwoe_config::rooms::MAX_DESCRIPTION_CHARS };
-                let text = if edit.focus == 0 { &mut edit.name } else { &mut edit.description };
+                let limit = if edit.focus == 0 {
+                    niwoe_config::rooms::MAX_NAME_CHARS
+                } else {
+                    niwoe_config::rooms::MAX_DESCRIPTION_CHARS
+                };
+                let text = if edit.focus == 0 {
+                    &mut edit.name
+                } else {
+                    &mut edit.description
+                };
                 if key == Keysym::BackSpace {
                     if edit.replace {
                         text.clear();
@@ -254,21 +279,59 @@ impl NiwoeShell {
     }
 
     pub(crate) fn room_target_menu_scroll(&mut self, qh: &QueueHandle<Self>, delta: i32) -> bool {
-        if !self.workspace_state.rooms.edit.as_ref().is_some_and(|e| e.target_menu.is_some()) { return false; }
+        if !self
+            .workspace_state
+            .rooms
+            .edit
+            .as_ref()
+            .is_some_and(|e| e.target_menu.is_some())
+        {
+            return false;
+        }
         if delta != 0 {
-            self.workspace_state.rooms.move_target_selection(delta.signum() as isize);
+            self.workspace_state
+                .rooms
+                .move_target_selection(delta.signum() as isize);
             self.draw_launcher(qh, RepaintReason::Pointer);
         }
         true
     }
 
-    pub(crate) fn room_target_menu_click(&mut self, qh: &QueueHandle<Self>, x: i32, y: i32, width: u32, height: u32) -> bool {
-        let Some(edit) = self.workspace_state.rooms.edit.as_ref().filter(|e| e.target_menu.is_some()) else { return false; };
-        let selected = crate::room_management_view::hit_target_menu(x, y, width, height, self.room_configuration_scroll_y, edit, &self.workspace_state.rooms.snapshot.rooms);
+    pub(crate) fn room_target_menu_click(
+        &mut self,
+        qh: &QueueHandle<Self>,
+        x: i32,
+        y: i32,
+        width: u32,
+        height: u32,
+    ) -> bool {
+        let Some(edit) = self
+            .workspace_state
+            .rooms
+            .edit
+            .as_ref()
+            .filter(|e| e.target_menu.is_some())
+        else {
+            return false;
+        };
+        let selected = crate::room_management_view::hit_target_menu(
+            x,
+            y,
+            width,
+            height,
+            self.room_configuration_scroll_y,
+            edit,
+            &self.workspace_state.rooms.snapshot.rooms,
+        );
         if let Some(id) = selected {
             self.workspace_state.rooms.choose_target(id);
         } else {
-            self.workspace_state.rooms.edit.as_mut().unwrap().target_menu = None;
+            self.workspace_state
+                .rooms
+                .edit
+                .as_mut()
+                .unwrap()
+                .target_menu = None;
         }
         self.draw_launcher(qh, RepaintReason::Pointer);
         true

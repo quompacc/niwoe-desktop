@@ -31,6 +31,9 @@ impl NiwoeShell {
     }
 
     pub(crate) fn return_to_hub(&mut self, qh: &QueueHandle<Self>) {
+        self.workspace_state.rooms.panel.open = false;
+        self.panel_last_signature = None;
+        self.panel_dirty = true;
         self.room_management_open = false;
         self.room_configuration_id = None;
         self.room_configuration_save_pending = false;
@@ -112,6 +115,9 @@ impl NiwoeShell {
         } else {
             self.launcher_is_fullscreen = false;
             self.launcher_settings_open = false;
+            self.workspace_state.rooms.panel.open = false;
+            self.panel_last_signature = None;
+            self.panel_dirty = true;
             self.room_management_open = false;
             self.room_configuration_id = None;
             self.room_configuration_save_pending = false;
@@ -162,6 +168,11 @@ impl NiwoeShell {
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
+        self.room_management_open = false;
+        self.room_configuration_id = None;
+        self.workspace_state.rooms.edit = None;
+        self.workspace_state.rooms.panel.open = false;
+        self.panel_last_signature = None;
         self.launcher_settings_open = true;
         self.settings_category = category;
         self.display_mode_dropdown_open = None;
@@ -239,9 +250,13 @@ impl NiwoeShell {
         }
 
         self.calendar_popup_open = true;
-        self.calendar_layer
-            .set_anchor(Anchor::TOP | Anchor::RIGHT);
-        self.calendar_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::CALENDAR_POPUP_RIGHT_MARGIN, 0, 0);
+        self.calendar_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.calendar_layer.set_margin(
+            crate::PANEL_POPUP_TOP_MARGIN,
+            crate::CALENDAR_POPUP_RIGHT_MARGIN,
+            0,
+            0,
+        );
         self.calendar_layer.set_exclusive_zone(0);
         self.calendar_layer.set_size(
             crate::popup_surface_w(crate::CALENDAR_POPUP_WIDTH),
@@ -299,12 +314,17 @@ impl NiwoeShell {
             self.close_network_popup(reason);
         }
 
-        self.workspace_state.select_active(self.panel_active_workspace());
+        self.workspace_state
+            .select_active(self.panel_active_workspace());
         self.workspace_popup_open = true;
         self.workspace_hover_idx = None;
-        self.workspace_layer
-            .set_anchor(Anchor::TOP | Anchor::LEFT);
-        self.workspace_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, crate::WORKSPACE_POPUP_LEFT_MARGIN);
+        self.workspace_layer.set_anchor(Anchor::TOP | Anchor::LEFT);
+        self.workspace_layer.set_margin(
+            crate::PANEL_POPUP_TOP_MARGIN,
+            0,
+            0,
+            crate::WORKSPACE_POPUP_LEFT_MARGIN,
+        );
         self.workspace_layer.set_exclusive_zone(0);
         self.workspace_layer.set_size(
             crate::popup_surface_w(crate::WORKSPACE_POPUP_WIDTH),
@@ -384,9 +404,13 @@ impl NiwoeShell {
             );
         }
         self.request_settings_refresh(crate::settings_view::SettingsCategory::Bluetooth);
-        self.network_layer
-            .set_anchor(Anchor::TOP | Anchor::RIGHT);
-        self.network_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, crate::NETWORK_POPUP_RIGHT_MARGIN, 0, 0);
+        self.network_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
+        self.network_layer.set_margin(
+            crate::PANEL_POPUP_TOP_MARGIN,
+            crate::NETWORK_POPUP_RIGHT_MARGIN,
+            0,
+            0,
+        );
         self.network_layer.set_exclusive_zone(0);
         self.network_layer.set_size(
             crate::popup_surface_w(crate::NETWORK_POPUP_WIDTH),

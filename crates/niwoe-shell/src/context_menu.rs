@@ -174,7 +174,7 @@ pub(crate) fn submenu_items() -> Vec<(&'static str, SettingsSubAction)> {
     vec![
         ("Anzeige", SettingsSubAction::Display),
         ("Hintergrund", SettingsSubAction::Wallpaper),
-        ("Design", SettingsSubAction::Theme),
+        ("Mauszeiger", SettingsSubAction::Theme),
         ("Sound", SettingsSubAction::Sound),
         ("Netzwerk", SettingsSubAction::Network),
         ("Energie", SettingsSubAction::Power),

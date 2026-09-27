@@ -2,23 +2,47 @@ impl NiwoeShell {
     fn apply_ipc_event(&mut self, event: ShellEvent) {
         let hub_target = self.hub_selection_target();
         match event {
+            ShellEvent::PanelPreferences {
+                request_id,
+                revision,
+                modules,
+                error,
+            } => {
+                self.workspace_state
+                    .rooms
+                    .panel
+                    .accept(&request_id, revision, modules, error);
+                self.panel_dirty = true;
+                self.panel_last_signature = None;
+                self.launcher_dirty |= self.launcher_state.open;
+            }
             ShellEvent::Layout { notice, .. } => self.apply_layout_notice(notice),
             ShellEvent::RoomSnapshot { snapshot } => {
-                self.workspace_state.rooms.layouts.retain(|id, _| snapshot.rooms.iter().any(|room| room.id == *id));
+                self.workspace_state
+                    .rooms
+                    .layouts
+                    .retain(|id, _| snapshot.rooms.iter().any(|room| room.id == *id));
                 if self.workspace_state.rooms.accept(snapshot) {
                     self.panel_last_signature = None;
                     self.panel_dirty = true;
                     self.workspace_dirty = true;
                     self.launcher_dirty |= self.launcher_state.open;
                     self.launcher_icons_warmed = false;
-                    if self.launcher_state.open { self.warm_launcher_icons(); }
+                    if self.launcher_state.open {
+                        self.warm_launcher_icons();
+                    }
                 }
             }
             ShellEvent::RoomMutationResult {
                 request_id, error, ..
             } => {
                 let configuration_request = self.room_configuration_id.is_some()
-                    && self.workspace_state.rooms.pending.as_ref().is_some_and(|(id, _)| id == &request_id);
+                    && self
+                        .workspace_state
+                        .rooms
+                        .pending
+                        .as_ref()
+                        .is_some_and(|(id, _)| id == &request_id);
                 self.workspace_state.rooms.result(&request_id, error);
                 if configuration_request {
                     if error.is_none() && self.room_configuration_save_pending {
@@ -325,7 +349,13 @@ impl NiwoeShell {
                 self.open_desktop_context_menu_from_ipc(x, y);
             }
             ShellEvent::SessionLocked => self.discard_hub_on_lock(),
-            ShellEvent::WindowThumbnail { request_id, id, path, width, height } => {
+            ShellEvent::WindowThumbnail {
+                request_id,
+                id,
+                path,
+                width,
+                height,
+            } => {
                 self.receive_hub_thumbnail(request_id, id, path, width, height);
             }
             ShellEvent::ScreenshotConsentRequest { request_id, app_id } => {
@@ -456,9 +486,23 @@ impl NiwoeShell {
             .filter_map(|app| app.icon_name.clone())
             .filter(|name| !name.is_empty())
             .collect();
-        names.extend(self.workspace_state.rooms.snapshot.rooms.iter().filter_map(|r|r.preferences.icon.clone()));
-        names.extend(self.windows.iter().filter_map(|w|w.app_id.clone()));
-        names.sort(); names.dedup();
+        names.extend(
+            self.workspace_state
+                .rooms
+                .snapshot
+                .rooms
+                .iter()
+                .filter_map(|r| r.preferences.icon.clone()),
+        );
+        names.extend(
+            crate::room_editor::form::ICONS
+                .iter()
+                .filter(|(id, _)| !id.is_empty())
+                .map(|(id, _)| id.to_string()),
+        );
+        names.extend(self.windows.iter().filter_map(|w| w.app_id.clone()));
+        names.sort();
+        names.dedup();
         if names.is_empty() {
             self.launcher_icons_warmed = true;
             return;

@@ -20,6 +20,7 @@ macro_rules! handle_panel_and_popups_pointer {
                     &$shell.last_clock,
                     &$shell.icon_cache,
                     None, // screenshot_icon — nur für Hover-Layout, Icon irrelevant
+                    $shell.workspace_state.rooms.panel.effective(),
                     &crate::ui::tokens::theme_from_config(&$shell.theme),
                 );
                 let pixel_size = niwoe_ui::PixelSize {
@@ -102,7 +103,7 @@ macro_rules! handle_panel_and_popups_pointer {
                             );
                             for id in window_ids.iter().take(crate::THUMBNAIL_MAX_WINDOWS) {
                                 let cmd = niwoe_ipc::ShellCommand::CaptureWindowThumbnail {
- request_id: None,
+                                    request_id: None,
                                     id: id.clone(),
                                     max_width: crate::THUMBNAIL_THUMB_W,
                                     max_height: crate::THUMBNAIL_THUMB_H,
@@ -133,13 +134,28 @@ macro_rules! handle_panel_and_popups_pointer {
         }
 
         if let PointerEventKind::Press { button: 0x111, .. } = $event.kind {
-            let pad = if $shell.pointer_surface == SurfaceKind::WorkspacePopup { crate::POPUP_SHADOW_PAD as f64 } else { 0.0 };
+            let pad = if $shell.pointer_surface == SurfaceKind::WorkspacePopup {
+                crate::POPUP_SHADOW_PAD as f64
+            } else {
+                0.0
+            };
             let zones = match $shell.pointer_surface {
                 SurfaceKind::Panel => Some(&$shell.panel_state.clicks),
                 SurfaceKind::WorkspacePopup => Some(&$shell.workspace_state.clicks),
                 _ => None,
             };
-            if let Some(workspace) = zones.and_then(|zones| zones.iter().find(|z| z.rect.contains($event.position.0-pad, $event.position.1-pad))).and_then(|z| match z.action { crate::ClickAction::SwitchWorkspace(w) => Some(w), _ => None }) {
+            if let Some(workspace) = zones
+                .and_then(|zones| {
+                    zones.iter().find(|z| {
+                        z.rect
+                            .contains($event.position.0 - pad, $event.position.1 - pad)
+                    })
+                })
+                .and_then(|z| match z.action {
+                    crate::ClickAction::SwitchWorkspace(w) => Some(w),
+                    _ => None,
+                })
+            {
                 $shell.open_room_editor($qh, workspace);
                 continue;
             }
@@ -267,8 +283,7 @@ macro_rules! handle_panel_and_popups_pointer {
             continue;
         }
 
-        if $shell.pointer_surface == SurfaceKind::Panel
-            && workspace_click_activation(&$event.kind)
+        if $shell.pointer_surface == SurfaceKind::Panel && workspace_click_activation(&$event.kind)
         {
             let action = $shell
                 .panel_state

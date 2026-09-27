@@ -4,6 +4,7 @@ pub mod keybind;
 pub mod layouts;
 pub mod migration;
 pub mod output;
+pub mod panel_preferences;
 pub mod rooms;
 pub mod theme;
 

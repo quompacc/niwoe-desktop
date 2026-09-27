@@ -1,6 +1,40 @@
 use super::*;
 
 #[test]
+fn complete_form_controls_have_visible_hits_with_shared_small_canvas() {
+    for (physical_w, physical_h) in [(1920, 1032), (1366, 720), (1280, 672), (960, 492)] {
+        let (width, height) = niwoe_tokens::Hub::DEFAULT.canvas_size(physical_w, physical_h);
+        for index in [9, 10, 11, 8, 12, 13] {
+            let initial = form::rect(width, 0, index);
+            let scroll = (initial.y + initial.height
+                - (height as i32 - C.config_footer_height - C.card_gap))
+                .max(0)
+                .min(max_configuration_scroll(height));
+            let r = form::rect(width, scroll, index);
+            assert!(r.y >= C.config_header_height + C.config_tabs_height);
+            assert!(r.y + r.height < height as i32 - C.config_footer_height);
+            assert_eq!(
+                hit_configuration(r.x + r.width / 2, r.y + r.height / 2, width, height, scroll),
+                Some(ConfigurationAction::Form(index))
+            );
+        }
+        for index in 0..4 {
+            let r = form::tab_rect(index);
+            assert!(r.x + r.width < width as i32);
+            assert_eq!(
+                form::hit_tab(r.x + r.width / 2, r.y + r.height / 2),
+                Some(index)
+            );
+        }
+        for index in [14, 15, 16, 20, 21, 22, 23, 24, 25] {
+            let r = form::app_rect(width, index);
+            assert!(r.y + r.height < height as i32 - C.config_footer_height);
+            assert!(r.x >= C.sidebar_width && r.x + r.width < width as i32);
+        }
+    }
+}
+
+#[test]
 fn new_form_fields_and_deletion_actions_remain_reachable_at_both_sizes() {
     for (width, height) in [(1920, 1032), (1366, 720)] {
         for scroll in [0, max_configuration_scroll(height)] {
@@ -113,6 +147,10 @@ fn configuration_renders_selected_room() {
         },
     };
     let edit = Edit {
+        form: Default::default(),
+        preferences: room.preferences.clone(),
+        position: 1,
+        name_error: String::new(),
         restore: crate::room_editor::RestoreUi {
             open: std::env::var_os("NIWOE_PREVIEW_RESTORE").is_some(),
             message: "Beendet: 1 angeordnet, 1 nicht wiederhergestellt".into(),
@@ -172,6 +210,7 @@ fn configuration_renders_selected_room() {
         "",
         false,
         scroll_y,
+        &crate::icons::IconCache::new(),
         &niwoe_config::ThemeConfig::default(),
     );
     assert!(canvas.as_chunks::<4>().0.iter().any(|pixel| pixel[3] != 0));
