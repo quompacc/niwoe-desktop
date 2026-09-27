@@ -26,7 +26,9 @@ from typing import Iterable
 
 EV_SYN = 0
 EV_KEY = 1
+EV_REL = 2
 EV_ABS = 3
+REL_WHEEL = 8
 SYN_REPORT = 0
 ABS_X = 0
 ABS_Y = 1
@@ -35,6 +37,7 @@ BTN_RIGHT = 0x111
 BTN_MIDDLE = 0x112
 UI_SET_EVBIT = 0x40045564
 UI_SET_KEYBIT = 0x40045565
+UI_SET_RELBIT = 0x40045566
 UI_SET_ABSBIT = 0x40045567
 UI_DEV_CREATE = 0x5501
 UI_DEV_DESTROY = 0x5502
@@ -246,6 +249,8 @@ class VirtualPointer:
         self._file = Path("/dev/uinput").open("wb", buffering=0)
         fcntl.ioctl(self._file, UI_SET_EVBIT, EV_KEY)
         fcntl.ioctl(self._file, UI_SET_EVBIT, EV_ABS)
+        fcntl.ioctl(self._file, UI_SET_EVBIT, EV_REL)
+        fcntl.ioctl(self._file, UI_SET_RELBIT, REL_WHEEL)
         fcntl.ioctl(self._file, UI_SET_EVBIT, EV_SYN)
         fcntl.ioctl(self._file, UI_SET_KEYBIT, BTN_LEFT)
         fcntl.ioctl(self._file, UI_SET_KEYBIT, BTN_RIGHT)
@@ -295,6 +300,11 @@ class VirtualPointer:
         self.emit(EV_SYN, SYN_REPORT, 0)
         time.sleep(0.05)
         self.emit(EV_KEY, button, 0)
+        self.emit(EV_SYN, SYN_REPORT, 0)
+        time.sleep(0.2)
+
+    def scroll(self, steps: int) -> None:
+        self.emit(EV_REL, REL_WHEEL, steps)
         self.emit(EV_SYN, SYN_REPORT, 0)
         time.sleep(0.2)
 

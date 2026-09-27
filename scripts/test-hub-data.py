@@ -92,10 +92,11 @@ def keyboard():
 
 def capture_once(label):
     request_id = 'p08-shot-' + str(time.time_ns())
+    output = next(o['output_name'] for o in snapshot()['output-workspace-snapshot']['outputs'] if o['primary'])
     with socket.socket(socket.AF_UNIX) as sock, connection() as control:
         sock.connect(str(runtime / 'niwoe.sock'))
         sock.settimeout(15)
-        request = dict(type='screenshot-request', request=dict(request_id=request_id,kind='full-output',output=None,include_cursor=False,region=None,metadata=dict(origin='portal-dbus',requester='NIWOE P08 verification',identity_trusted=False,interactive=False)))
+        request = dict(type='screenshot-request', request=dict(request_id=request_id,kind='full-output',output=output,include_cursor=False,region=None,metadata=dict(origin='portal-dbus',requester='NIWOE P08 verification',identity_trusted=False,interactive=False)))
         sock.sendall((json.dumps(request) + '\n').encode())
         with control.makefile() as reader:
             for line in reader:
@@ -186,7 +187,10 @@ elif mode=='input':
     print('PASS keyboard',sys.argv[2:])
 elif mode=='click':
     lib=keyboard()
-    with lib['VirtualPointer'](5760,2160) as pointer:
+    outputs=snapshot()['output-workspace-snapshot']['outputs']
+    width=max(o['x']+o['width'] for o in outputs)
+    height=max(o['y']+o['height'] for o in outputs)
+    with lib['VirtualPointer'](width,height) as pointer:
         pointer.click(int(sys.argv[2]),int(sys.argv[3]))
     print('PASS pointer')
 elif mode=='capture': capture(sys.argv[2])

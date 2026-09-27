@@ -34,6 +34,11 @@ print('Evidence:', profile, flush=True)
 for name, contents, diagnostic in (
     ('broken', 'broken!', 'TOML'),
     ('future', 'schema_version = 999\nnew_field = true\n', 'Raumschema: 999'),
+    ('duplicate-id', 'schema_version = 2\nrevision = 0\nnext_id = 2\n'
+     '[[rooms]]\nid = 1\nname = "A"\ndescription = ""\nassignment = "free"\n'
+     '[[rooms]]\nid = 1\nname = "B"\ndescription = ""\nassignment = "free"\n', 'Raum-ID'),
+    ('zero-id', 'schema_version = 2\nrevision = 0\nnext_id = 2\n'
+     '[[rooms]]\nid = 0\nname = "A"\ndescription = ""\nassignment = "free"\n', 'Raum-ID'),
 ):
     rooms_file.write_text(contents)
     result = subprocess.run([str(binary)], env=env, capture_output=True, timeout=10)
