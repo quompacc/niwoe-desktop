@@ -1,0 +1,8 @@
+Failed to connect to user scope bus via local transport: $DBUS_SESSION_BUS_ADDRESS and $XDG_RUNTIME_DIR not defined (consider using --machine=<user>@.host --user to connect to bus of other user)
+install-local: installed files but did not enable the boot login service.
+To enable after verifying recovery access:
+  sudo systemctl disable getty@tty1.service
+  sudo systemctl enable niwoe-login.service
+  # plus bootsplash.service if installed
+install-local: installed NIWOE to /usr/local
+install-local: desktop user for /var/lib/niwoe: eduard

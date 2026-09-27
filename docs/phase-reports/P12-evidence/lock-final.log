@@ -1,0 +1,5 @@
+PASS unlocked watchdog
+PASS wrong password and Escape remain locked
+PASS locked watchdog
+PASS locked IPC reconnect and input isolation after focus attempt
+PASS real PAM unlock and continued input; protected content preserved

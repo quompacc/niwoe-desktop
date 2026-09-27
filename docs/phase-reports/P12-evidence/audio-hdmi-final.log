@@ -1,0 +1,11 @@
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+PASS real audio profile, running stream and input output:hdmi-stereo+input:analog-stereo
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+PASS real audio profile, running stream and input output:analog-stereo+input:analog-stereo
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+PASS original card profile, default, volume and mute restored

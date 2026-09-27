@@ -1,11 +1,16 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
-**P12 begonnen, 27.09.2026: `in progress`, nicht accepted.** Ausgangsstand
-`f5d7885`; installierte/laufende P11-Hashes und zwei reale Intel-Outputs geprüft.
-Pflichtmatrix und noch offene Fälle: [P12-Bericht](docs/phase-reports/P12.md).
-Wiederzugang erforderlich: Nach realem Suspend am 27.09. um 17:20 CEST ist
-Fedora trotz RTC-Weckalarm nicht erreichbar; physisches Aufwecken angefragt.
-Endmessungen, offene Integrationsfälle und Remote-Cleanup stehen aus.
+**P12 abgeschlossen, 27.09.2026: `accepted`.** Ausgangsstand `f5d7885`,
+Produktstand `8970b17` auf Fedora installiert und laufende Hashes geprüft.
+Pflichtmatrix, Dateiliste und Messgrenzen: [P12-Bericht](docs/phase-reports/P12.md).
+Reale KWrite-Arbeit einschließlich RTC-Suspend/Resume, physischer HDMI-Hotplug,
+optischer Lockschutz während Shellabsturz sowie Ethernet/WLAN-Rundlauf belegt.
+Fokus-, Stapel- und Hotplug-Fehler korrigiert und als Release installiert.
+1.221 Workspace-Tests, separate D-Bus-/Integrationsgates und vollständiges Cleanup
+belegt. Finale 3×300-s-Serie: CPU-Medianänderung +0,01000/+0,000002 Prozentpunkte
+Compositor/Shell, auch alle Einzelwerte innerhalb des Budgets. RSS über 60 finale
+UI-Zyklen konstant. Optische Latenz und Cache-Zähler bleiben unbekannt;
+eine getrennte Repaint-Stichprobe zeigt nur den erwarteten Minutenwechsel.
 P13 bleibt unbegonnen. Frühere Phasenbelege ersetzen keine P12-Integrationstests.
 
 **P11-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
@@ -18,7 +23,7 @@ Fehler-/Crash-/Sitzungs- und Skalierungsabnahme bestanden, Testzugänge bereinig
 Drei finale 300-s-Idle-Proben: CPU-Mediandifferenz −0,00333/+0,00333 Prozentpunkte
 Compositor/Shell; 60 Vergleichszyklen ohne RSS-Wachstum. Optische Latenz und
 Repaint-Zähler bleiben ungemessen. Dateimatrix, Rohdaten und Grenzen:
-[P11-Bericht](docs/phase-reports/P11.md). **P12 bleibt unbegonnen.**
+[P11-Bericht](docs/phase-reports/P11.md). **Aktueller P12-Status siehe oben.**
 
 **P10-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
 P10-01 bis P10-07 umgesetzt: vollständige Raumformulare mit atomarem Save/Cancel,
@@ -920,7 +925,7 @@ Automatisierungs-, Backup-, Aufgaben- oder Dateimanagerprojekt.
 ### P11 — First Run als kurze Einführung
 
 Abnahme: **accepted**, 27.09.2026; Umsetzung und belegte Grenzen im
-[P11-Bericht](docs/phase-reports/P11.md). P12 nicht begonnen.
+[P11-Bericht](docs/phase-reports/P11.md). P12-Abnahme siehe Folgeabschnitt.
 
 **Betroffen:** kleine neue Shell-Wizard-Module, vorhandene Settings-/Room-API,
 benutzerbezogener versionierter First-Run-State.
@@ -944,9 +949,9 @@ etabliertes Nutzerprofil ungefragt.
 
 ### P12 — Linux-Desktop-Alpha stabilisieren
 
-**Status: `in progress`, 27.09.2026.** Maßgeblicher Teststand und vollständige
-Pflichtmatrix: [P12](docs/phase-reports/P12.md). Keine Alpha-Abnahme vor dem
-Nachweis aller Pflichtfälle.
+**Status: `accepted`, 27.09.2026.** P12-01 bis P12-05 auf realer Fedora-/Intel-
+Hardware belegt. Maßgeblicher Teststand, vollständige Pflichtmatrix, rohe
+Messnachweise und ausdrücklich ungemessene Metriken: [P12](docs/phase-reports/P12.md).
 
 1. P12-01: Reproduzierbare Installation/Deinstallation auf der gewählten
    Entwicklungsdistribution dokumentieren; NIWOE als eigene Session testen.

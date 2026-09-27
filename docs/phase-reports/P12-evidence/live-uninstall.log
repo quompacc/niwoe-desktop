@@ -1,0 +1,26 @@
+Removed /usr/local/bin/niwoe
+Removed /usr/local/bin/niwoe-shell
+Removed /usr/local/bin/niwoe-login
+Removed /usr/local/bin/niwoe-lock
+Removed /usr/local/bin/niwoe-portal
+Removed /usr/local/bin/niwoe-polkit-agent
+Removed /usr/local/bin/niwoe-file-picker
+Removed /usr/local/bin/niwoe-session
+Removed /usr/local/share/niwoe/themes/dark/assets/wallpaper.png
+Removed /usr/local/share/niwoe/themes/dark/theme.toml
+Removed /usr/local/share/niwoe/themes/light/assets/wallpaper.png
+Removed /usr/local/share/niwoe/themes/light/theme.toml
+Removed /usr/local/share/niwoe/session-config/autostart/org.kde.xwaylandvideobridge.desktop
+Removed /usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service
+Removed /usr/local/share/xdg-desktop-portal/portals/niwoe.portal
+Removed /usr/local/share/xdg-desktop-portal/niwoe-portals.conf
+Removed /usr/local/lib/systemd/user/niwoe-portal.service
+Removed /usr/local/lib/systemd/user/niwoe-session.target
+Removed /usr/share/wayland-sessions/niwoe.desktop
+Removed /etc/systemd/system/niwoe-login.service
+Removed /etc/pam.d/niwoe-login
+Removed /etc/pam.d/niwoe-login-password
+Removed /etc/pam.d/niwoe-lock
+Removed /etc/xdg/autostart/niwoe-polkit-agent.desktop
+Run systemctl --user daemon-reload in your desktop session.
+NIWOE payload removed; personal data, legacy backups and unowned files retained.

@@ -1,0 +1,19 @@
+{
+  "run": 0,
+  "seconds": 300.0067977639992,
+  "state_unchanged": true,
+  "gpu_engine_percent": 0.00865296893053106,
+  "processes": {
+    "niwoe": {
+      "cpu_percent": 1.0433096927564351,
+      "rss_before": 145195008,
+      "rss_after": 145195008
+    },
+    "niwoe-shell": {
+      "cpu_percent": 0.17999592143401758,
+      "rss_before": 91697152,
+      "rss_after": 91828224
+    }
+  },
+  "raw_sha256": "066497c97a14bb6fc2cc624bb260a9964d946dbc316015ad112cf0d00335f7e3"
+}

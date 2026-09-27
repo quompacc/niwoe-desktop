@@ -1,0 +1,8 @@
+PASS real KWrite Wayland and XWayland opened
+PASS edited, saved and clipboard transferred; files byte-identical
+PASS room round trip and minimize/restore
+PASS KWrite moved to second physical output
+PASS real lock and PAM unlock, files unchanged
+READY: RTC alarm armed; entering real systemd suspend
+PASS after real suspend/resume: both apps usable, continued files byte-identical
+PASS applications closed normally with saved data

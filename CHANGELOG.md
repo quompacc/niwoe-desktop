@@ -10,7 +10,7 @@ single version.
 
 ## [Unreleased]
 
-### Linux desktop alpha stabilization (P12, in progress)
+### Linux desktop alpha stabilization (P12, accepted 2026-09-27)
 
 - Fixed DRM screenshots consuming requests for a different monitor: named
   requests wait for their actual output, unspecified requests use the primary
@@ -19,13 +19,24 @@ single version.
   activation of assigned X11 windows and dialogs.
 - Fixed modifier dragging using the CSD render offset as the window origin,
   and modifier resize clicks opening a competing client popup grab.
+- Restored parent activation after closing Wayland/XWayland dialogs and
+  preserved stacking when tiled neighbours are repositioned.
+- Enabled targeted compositor diagnostics through `RUST_LOG`, retaining the
+  default `info` level.
+- Fixed stale tiled-size constraints after switching to floating and kept
+  normal window frames within surviving workareas after output removal or
+  resolution shrink, including panel clearance and compositor decorations.
 - Added a conservative Fedora removal procedure using the matching release's
   staged payload. Changed files and symlinked paths stop removal before any
   payload is deleted; personal settings and unrelated files are retained.
-- Added an isolated install/update/remove/reinstall regression and live P12
-  Wayland/XWayland input and public screenshot portal checks. Execution status,
-  remaining mandatory cases and evidence are tracked in
-  [P12](docs/phase-reports/P12.md); the desktop alpha is not yet accepted.
+- Verified installation lifecycle, real Wayland/XWayland apps, physical HDMI
+  recovery, locked shell crashes, PAM/Polkit/portals, RTC suspend/resume with
+  saved KWrite data, HDMI audio and Ethernet/WLAN transitions on Fedora.
+- Accepted the desktop alpha after 1,221 workspace tests and separate integration
+  gates. Final idle CPU medians changed by +0.01000/+0.000002 percentage points
+  for compositor/shell, with constant RSS across 60 real UI cycles. Failed
+  preliminary runs and unmeasured optical latency/cache counters remain explicit
+  in [P12](docs/phase-reports/P12.md); temporary access and test profiles are removed.
 - Documented the Fedora release lifecycle in
   [installation instructions](docs/NIWOE_FEDORA_INSTALLATION.md). The active
   alpha uses the central dark green theme; the older palette notes below are

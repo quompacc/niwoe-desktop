@@ -1,0 +1,4 @@
+PASS drm-0 [1920, 1080] [1920, 1080]
+PASS drm-1 [1600, 900] [1600, 900]
+PASS None [1920, 1080] [1920, 1080]
+PASS personal config and real output modes restored

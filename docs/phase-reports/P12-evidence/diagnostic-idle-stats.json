@@ -1,0 +1,10 @@
+{
+  "seconds": 65.00028300700069,
+  "lines": [
+    "2026-09-27T18:00:00.505199Z  INFO niwoe_shell::wayland::state: shell repaint summary: panel_draws=1 launcher_draws=0 panel(ipc=0 clock=1 layer=0 pointer=0 keyboard=0 frame=0 other=0) launcher(ipc=0 layer=0 pointer=0 keyboard=0 toggle=0 frame=0 other=0)",
+    "2026-09-27T18:00:00.505224Z  INFO niwoe_shell::wayland::state: shell commit summary: total=1 panel(initial_create=0 configure_ack=0 draw_panel=1 draw_launcher=0 event_loop_tick=0 input=0 other=0) launcher(initial_create=0 configure_ack=0 draw_panel=0 draw_launcher=0 event_loop_tick=0 input=0 other=0)",
+    "2026-09-27T18:00:00.505232Z  INFO niwoe_shell::wayland::state: shell render summary: panel(renders=1 skips=0 commits=1) launcher(renders=0 skips=0 commits=0)"
+  ],
+  "panel_draws": 1,
+  "launcher_draws": 0
+}

@@ -47,6 +47,10 @@ Komponenten deren Prozessidentität ebenfalls prüfen oder neu anmelden.
 Zur Rückkehr NIWOE regulär abmelden und im Displaymanager KDE auswählen.
 Der Sessionwrapper beendet NIWOEs User-Target und das Portalfrontend nur,
 solange die Aktivierungsumgebung noch der NIWOE-Sitzung gehört.
+Auch KDE vor dem Wechsel regulär abmelden. Ein bloßer Neustart des
+Displaymanagers kann KDE-Userdienste zurücklassen; der P12-Testaufbau traf
+dadurch auf einen noch laufenden KWin/XWayland. Das ist kein sauberer
+Sitzungswechsel und darf nicht als erfolgreicher Rückkehrtest gelten.
 
 ## Isolierter Lebenszyklustest
 
