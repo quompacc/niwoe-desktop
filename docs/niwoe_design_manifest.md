@@ -49,6 +49,15 @@ Bild ein Lieferobjekt und jedem Phasenschritt ein visuelles Gate zu. Fehlende Ba
 Fähigkeiten werden in der vorgesehenen Struktur ehrlich als nicht verfügbar
 gekennzeichnet; sie rechtfertigen keine andere Seitenarchitektur.
 
+**Nutzerentscheidung 27.09.2026:** Der bisherige Navigationseintrag
+„Automatisierung“ entfällt vorerst. Dies ist eine ausdrückliche Korrektur der
+Sidebar aus den Mockups `(3)` und `(4)`; die übrige Seitenstruktur bleibt
+verbindlich. Start-Apps, Wiederherstellung und Benachrichtigungsregeln gehören
+fachlich zu ihren jeweiligen Einstellungen. Ein eigener Automatisierungsbereich
+wird erst bei konkretem Bedarf für Ereignis-/Aktionsregeln erneut geprüft.
+Anwendungsfälle, Umfang und Umsetzung in P10 stehen im
+[Umsetzungsplan, §4.3](../NIWOE_IMPLEMENTATION_PLAN.md#43-zuordnung-start-und-wiederherstellung).
+
 NIWOE ist eine native Rust-Desktopoberfläche. Es gibt genau eine Designquelle:
 `niwoe-tokens` (`Palette`, `Interaction`, `Elevation`, `Radius`) und
 `niwoe-config` (`Decorations`). Jede Farbe,

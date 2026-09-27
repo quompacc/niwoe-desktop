@@ -425,6 +425,28 @@ Raumwechsel löst keinen Restore aus. Restore ist zunächst manuell, idempotent,
 abbrechbar und zeitlich begrenzt. Mehrdeutige Zuordnung wird angezeigt oder
 übersprungen, nicht still auf irgendein Fenster angewendet.
 
+#### Produktentscheidung 27.09.2026: Automatisierung und vorhandene Einstellungen
+
+Der Automatisierungsplatzhalter im Mockup entstand ohne konkret vereinbarten
+Anwendungsfall. Ein eigener Automatisierungsbereich entfällt vorerst; sein
+Navigationseintrag wird in P10 entfernt. Die möglichen Anwendungsfälle werden
+wie folgt eingeordnet:
+
+| Anwendungsfall | Zuständigkeit und Umfang |
+| --- | --- |
+| Bestimmte Apps beim Anmelden starten | Gehört fachlich zu Start-Apps. Ein Login-Autostart ist eine mögliche spätere, ausdrücklich zu aktivierende Erweiterung; P09 führt ihn nicht automatisch ein. Die neutrale Loge und der Willkommens-Hub bleiben der Sitzungsbeginn. |
+| Arbeitskontext mit Apps, Dateien und Fensteranordnung öffnen | Gehört zur Wiederherstellung in P09 und ihrer Konfiguration in P10. Zunächst ausdrücklich ausgelöst; Dateien nur über hinterlegte Referenzen und unterstützte App-Aufrufe. |
+| Beim Raumwechsel Einstellungen ändern, etwa Benachrichtigungen stummschalten | Gehört fachlich zu den jeweiligen Raumeinstellungen. Raumspezifische Benachrichtigungsregeln benötigen vor Umsetzung eine eigene Spezifikation; daraus entsteht kein pauschaler P10-Lieferumfang. |
+| Programme oder Skripte zeitgesteuert ausführen | Möglicher späterer Anwendungsfall, aktuell kein vereinbarter Bedarf und kein Alpha-Lieferumfang. |
+
+Ein eigener Bereich wird erst bei konkretem Bedarf für Regeln nach dem Muster
+„Wenn X passiert, führe Y aus“ erneut geprüft. Start-Apps, Wiederherstellung und
+Benachrichtigungen erhalten ihre Einstellungen im jeweiligen Funktionsbereich;
+die Einordnung verspricht keine noch nicht implementierten Integrationen.
+Ein normaler Raumwechsel zeigt vorhandene Fenster und startet weder Apps noch
+eine Wiederherstellung. Diese Entscheidung dokumentiert Produktumfang und
+Planung; sie ist kein Nachweis einer bereits geänderten Oberfläche.
+
 ### 4.4 IPC und Persistenz
 
 - Neue typisierte Raum-Commands erhalten Request-ID und Success-/Error-Antwort.
@@ -822,6 +844,9 @@ Mutationen und Persistenz. Ein einzelner Popup-Editor erfüllt P10 nicht.
    entfernen. Cursor-, Wallpaper- und andere eigenständige Einstellungen
    erhalten. Vorhandene Nutzerkonfigurationen und fremde GTK-/KDE-Preferences
    beim Umbau nicht überschreiben.
+7. P10-07: Den Navigationseintrag „Automatisierung“ gemäß Produktentscheidung
+   vom 27.09.2026 entfernen. Start-Apps und Wiederherstellung in ihren jeweiligen
+   Einstellungen belassen; keine allgemeine Regel- oder Skriptoberfläche ergänzen.
 
 **Abnahme:** Ungültiger Name, doppelte ID aus Eingabe, verschwundene App,
 konkurrierende Änderung, Speichern schlägt fehl, Abbruch und Neustart im grünen Theme.
