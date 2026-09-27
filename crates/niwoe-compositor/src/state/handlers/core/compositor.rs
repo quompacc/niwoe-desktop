@@ -90,7 +90,7 @@ impl CompositorHandler for NiwoeState {
         if let Some(root) = committed_toplevel_root {
             self.center_pending_xdg_toplevel(&root);
             if layer_surface_has_buffer(&root) {
-                self.present_assigned_xdg(&root);
+                self.present_assigned_window(&root);
             }
         }
 

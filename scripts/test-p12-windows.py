@@ -109,7 +109,7 @@ try:
         for code, name, modal in ((63, 'F5', False), (64, 'F6', True)):
             key(code)
             check('dialog ' + kind + ' ' + name, lambda s, c: any(
-                d['title'] == 'P12 ' + kind + ' ' + name and d['focused'] and d['modal'] == modal
+                d['title'] == 'P12 ' + kind + ' ' + name and d['focused'] and d['active'] and d['modal'] == modal
                 for d in c[kind]['dialogs']) and any(
                     w['title'] == 'P12 ' + kind + ' ' + name for w in s['window-snapshot']['windows']))
             key(1)

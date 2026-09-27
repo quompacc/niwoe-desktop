@@ -198,10 +198,13 @@ impl NiwoeState {
 
     /// Metadata and parent requests precede the first buffer. Focus only once,
     /// and only when the resolved destination is still the user's current room.
-    pub(crate) fn present_assigned_xdg(&mut self, surface: &WlSurface) {
-        let Some((slot, window)) =
-            self.assignment_window(|w| w.toplevel().is_some_and(|t| t.wl_surface() == surface))
-        else {
+    pub(crate) fn present_assigned_window(&mut self, surface: &WlSurface) {
+        let Some((slot, window)) = self.assignment_window(|w| {
+            w.wl_surface().is_some_and(|s| s.as_ref() == surface)
+                && !w
+                    .x11_surface()
+                    .is_some_and(|x11| x11.is_override_redirect())
+        }) else {
             return;
         };
         let mut assignment = tracking(&window).lock().unwrap();
