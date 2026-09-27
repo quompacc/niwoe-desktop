@@ -1,0 +1,5 @@
+PASS real restore-tab cycles 0 20
+PASS real restore-tab cycles 1 20
+PASS real restore-tab cycles 2 20
+Starting three 300 s idle samples after warm-up; no competing GUI/build work
+PASS final P11 same conditions, 3x20 real cycles, 3x300 s idle, original rooms preserved

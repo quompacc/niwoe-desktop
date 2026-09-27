@@ -1,0 +1,3 @@
+CAPTURE p11-error-broken
+CAPTURE p11-error-future
+PASS corrupt/future state visible in real UI; original error documents retained, recovery after repair

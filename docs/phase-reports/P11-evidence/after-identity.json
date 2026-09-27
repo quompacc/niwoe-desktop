@@ -1,0 +1,32 @@
+{
+  "pids": {
+    "niwoe": "132150",
+    "niwoe-shell": "132163"
+  },
+  "hashes": "d6a70f16e58c9ee7fe4c71eab065f3fa6758a0f9bab40598dbaf69671736ab56  /usr/local/bin/niwoe\n8cb3e937ef02dae9729fedf73721a62dca78b29a9e521210ded6948549b9d4b3  /usr/local/bin/niwoe-shell\nd6a70f16e58c9ee7fe4c71eab065f3fa6758a0f9bab40598dbaf69671736ab56  /proc/132150/exe\n8cb3e937ef02dae9729fedf73721a62dca78b29a9e521210ded6948549b9d4b3  /proc/132163/exe\n",
+  "outputs": [
+    {
+      "output_name": "drm-0",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "transform": "Normal",
+      "refresh_millihz": 60000,
+      "primary": true
+    },
+    {
+      "output_name": "drm-1",
+      "x": 1920,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "transform": "Normal",
+      "refresh_millihz": 60000,
+      "primary": false
+    }
+  ],
+  "started": 1790515041.953682
+}

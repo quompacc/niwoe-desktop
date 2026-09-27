@@ -1,0 +1,4 @@
+CAPTURE p11-panel-draft
+CAPTURE p11-resumed
+CAPTURE p11-ready
+PASS real mouse choices, catalog, toggle/back/cancel/resume, panel order, durable completion and no app starts

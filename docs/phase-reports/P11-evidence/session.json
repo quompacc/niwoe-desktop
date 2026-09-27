@@ -1,0 +1,187 @@
+{
+  "before": 121253,
+  "after": 121892,
+  "snapshot": {
+    "room-snapshot": {
+      "type": "room-snapshot",
+      "snapshot": {
+        "revision": 9,
+        "rooms": [
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 1,
+            "workspace": 1,
+            "name": "Raum 1",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 2,
+            "workspace": 2,
+            "name": "Raum 2",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 3,
+            "workspace": 3,
+            "name": "Raum 3",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 4,
+            "workspace": 4,
+            "name": "Raum 4",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 5,
+            "workspace": 5,
+            "name": "Raum 5",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 6,
+            "workspace": 6,
+            "name": "Raum 6",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 7,
+            "workspace": 7,
+            "name": "Raum 7",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 8,
+            "workspace": 8,
+            "name": "Raum 8",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 9,
+            "workspace": 9,
+            "name": "Raum 9",
+            "description": "",
+            "assignment": "free"
+          },
+          {
+            "preferences": {
+              "icon": null,
+              "apps": [],
+              "layout": "tiling",
+              "restore": "disabled"
+            },
+            "id": 16,
+            "workspace": 10,
+            "name": "Arbeit",
+            "description": "Ein Kontext f\u00fcr deine Arbeit",
+            "assignment": "free"
+          }
+        ]
+      }
+    },
+    "window-snapshot": {
+      "type": "window-snapshot",
+      "active_workspace": 0,
+      "windows": []
+    },
+    "output-workspace-snapshot": {
+      "type": "output-workspace-snapshot",
+      "focused_output_id": 1,
+      "outputs": [
+        {
+          "output_id": 1,
+          "output_name": "drm-0",
+          "active_workspace": 0,
+          "primary": true,
+          "focused": true,
+          "x": 0,
+          "y": 0,
+          "width": 1920,
+          "height": 1080,
+          "scale_millis": 1000,
+          "transform": "Normal",
+          "refresh_millihz": 60000,
+          "modes": [
+            {
+              "width": 1920,
+              "height": 1080,
+              "refresh_millihz": 60000,
+              "current": true,
+              "preferred": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "marker": "first-login-hub-shown-416",
+  "unchanged_marker": true,
+  "state": {
+    "schema_version": 1,
+    "revision": 172,
+    "fresh": true,
+    "completed": true,
+    "draft": "{\"step\":4,\"profile\":\"preserve\",\"rooms_revision\":9,\"rooms\":[],\"panel_revision\":3,\"panel\":null,\"practiced\":[true,true,true]}"
+  }
+}

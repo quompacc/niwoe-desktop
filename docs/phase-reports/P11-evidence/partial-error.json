@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "revision": 249,
+  "fresh": true,
+  "completed": true,
+  "draft": "{\"step\":4,\"profile\":\"preserve\",\"rooms_revision\":10,\"rooms\":[{\"operation\":\"configure\",\"id\":null,\"name\":\"Arbeit\",\"description\":\"Ein Kontext f\u00fcr deine Arbeit\",\"assignment\":\"free\",\"preferences\":{\"icon\":null,\"apps\":[],\"layout\":\"tiling\",\"restore\":\"disabled\"},\"position\":9}],\"panel_revision\":3,\"panel\":[\"search\",\"status\",\"tray\"],\"practiced\":[false,false,false]}",
+  "journal": {
+    "rooms_before": {
+      "schema_version": 2,
+      "revision": 10,
+      "next_id": 17,
+      "rooms": [
+        {
+          "id": 1,
+          "name": "Raum 1",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 2,
+          "name": "Raum 2",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 3,
+          "name": "Raum 3",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 4,
+          "name": "Raum 4",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 5,
+          "name": "Raum 5",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 6,
+          "name": "Raum 6",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 7,
+          "name": "Raum 7",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 8,
+          "name": "Raum 8",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 9,
+          "name": "Raum 9",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        }
+      ]
+    },
+    "rooms_after": {
+      "schema_version": 2,
+      "revision": 11,
+      "next_id": 18,
+      "rooms": [
+        {
+          "id": 1,
+          "name": "Raum 1",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 2,
+          "name": "Raum 2",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 3,
+          "name": "Raum 3",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 4,
+          "name": "Raum 4",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 5,
+          "name": "Raum 5",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 6,
+          "name": "Raum 6",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 7,
+          "name": "Raum 7",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 8,
+          "name": "Raum 8",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 9,
+          "name": "Raum 9",
+          "description": "",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        },
+        {
+          "id": 17,
+          "name": "Arbeit",
+          "description": "Ein Kontext f\u00fcr deine Arbeit",
+          "assignment": "free",
+          "preferences": {
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          }
+        }
+      ]
+    },
+    "panel_before": {
+      "schema_version": 1,
+      "revision": 3,
+      "modules": [
+        "search",
+        "status"
+      ]
+    },
+    "panel_after": {
+      "schema_version": 1,
+      "revision": 4,
+      "modules": [
+        "search",
+        "status",
+        "tray"
+      ]
+    }
+  }
+}

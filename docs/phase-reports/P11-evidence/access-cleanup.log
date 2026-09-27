@@ -1,0 +1,4 @@
+PASS original authorized_keys restored byte-for-byte; both temporary keys removed
+PASS remote P11 scratch and capture files removed
+PASS sudo cache invalidated and SSH session closed
+PASS local P11 private keys, scratch and transfer files removed

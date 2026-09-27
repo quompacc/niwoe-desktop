@@ -1,5 +1,17 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P11-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
+P11-01 bis P11-05 umgesetzt: fünf native Seiten, konservative Frischerkennung,
+Maus-/Tastaturbedienung, reale Katalog-/Raum-/Leistenpfade, drei Übungen und
+versionierter Entwurf mit dauerhaftem Mehrdokumentjournal und Wiederaufnahme.
+1.215 Workspace-Tests plus isolierter D-Bus-Test, Check, Clippy und alle Guards grün.
+Release `4b271d1` auf Fedora installiert, laufende Binärhashes geprüft; echte
+Fehler-/Crash-/Sitzungs- und Skalierungsabnahme bestanden, Testzugänge bereinigt.
+Drei finale 300-s-Idle-Proben: CPU-Mediandifferenz −0,00333/+0,00333 Prozentpunkte
+Compositor/Shell; 60 Vergleichszyklen ohne RSS-Wachstum. Optische Latenz und
+Repaint-Zähler bleiben ungemessen. Dateimatrix, Rohdaten und Grenzen:
+[P11-Bericht](docs/phase-reports/P11.md). **P12 bleibt unbegonnen.**
+
 **P10-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
 P10-01 bis P10-07 umgesetzt: vollständige Raumformulare mit atomarem Save/Cancel,
 stabilen IDs, Suche/Belegung/Reihenfolge, echtem Appkatalog, Zuordnung und manuellen
@@ -17,7 +29,7 @@ mit weiteren 60 Zyklen getestet; die Idle-Aussage wird begründet auf den
 unveränderten geschlossenen Pfad übertragen, nicht als neue Messung ausgegeben.
 Optische Latenz-/Repaint-Nachweise bleiben ausdrücklich nicht gemessen.
 Dateimatrix, Livebelege, Bereinigung und Grenzen: [P10-Bericht](docs/phase-reports/P10.md).
-P11 wurde nicht begonnen. Backups, Logs und Benachrichtigungsautomatik bleiben
+Zum P10-Abschluss war P11 noch nicht begonnen. Backups, Logs und Benachrichtigungsautomatik bleiben
 als nicht verfügbar gekennzeichnet; P10 ist kein Abschluss des gesamten Desktops.
 
 **P09-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
@@ -898,6 +910,9 @@ konkurrierende Änderung, Speichern schlägt fehl, Abbruch und Neustart im grün
 Automatisierungs-, Backup-, Aufgaben- oder Dateimanagerprojekt.
 
 ### P11 — First Run als kurze Einführung
+
+Abnahme: **accepted**, 27.09.2026; Umsetzung und belegte Grenzen im
+[P11-Bericht](docs/phase-reports/P11.md). P12 nicht begonnen.
 
 **Betroffen:** kleine neue Shell-Wizard-Module, vorhandene Settings-/Room-API,
 benutzerbezogener versionierter First-Run-State.

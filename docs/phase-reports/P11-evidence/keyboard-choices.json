@@ -1,0 +1,323 @@
+{
+  "before": {
+    "schema_version": 2,
+    "revision": 4,
+    "next_id": 13,
+    "rooms": [
+      {
+        "id": 1,
+        "name": "Raum 1",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Raum 2",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 3,
+        "name": "Raum 3",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 4,
+        "name": "Raum 4",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 5,
+        "name": "Raum 5",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 6,
+        "name": "Raum 6",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 7,
+        "name": "Raum 7",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 8,
+        "name": "Raum 8",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 9,
+        "name": "Raum 9",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      }
+    ]
+  },
+  "draft": {
+    "step": 3,
+    "profile": "mouse",
+    "rooms_revision": 4,
+    "rooms": [
+      {
+        "operation": "configure",
+        "id": null,
+        "name": "Arbeit",
+        "description": "Ein Kontext f\u00fcr deine Arbeit",
+        "assignment": "free",
+        "preferences": {
+          "icon": null,
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        },
+        "position": 9
+      },
+      {
+        "operation": "configure",
+        "id": null,
+        "name": "Privat",
+        "description": "Ein Kontext f\u00fcr pers\u00f6nliche Anwendungen",
+        "assignment": "free",
+        "preferences": {
+          "icon": null,
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        },
+        "position": 10
+      },
+      {
+        "operation": "configure",
+        "id": null,
+        "name": "Entwicklung",
+        "description": "Ein Kontext f\u00fcr Entwicklungswerkzeuge",
+        "assignment": "preferred",
+        "preferences": {
+          "icon": null,
+          "apps": [
+            {
+              "kind": "native",
+              "id": "org.kde.akregator"
+            }
+          ],
+          "layout": "tiling",
+          "restore": "disabled"
+        },
+        "position": 11
+      }
+    ],
+    "panel_revision": 1,
+    "panel": [
+      "search",
+      "status",
+      "tray"
+    ],
+    "practiced": [
+      false,
+      false,
+      false
+    ]
+  },
+  "rooms": {
+    "schema_version": 2,
+    "revision": 5,
+    "next_id": 16,
+    "rooms": [
+      {
+        "id": 1,
+        "name": "Raum 1",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 2,
+        "name": "Raum 2",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 3,
+        "name": "Raum 3",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 4,
+        "name": "Raum 4",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 5,
+        "name": "Raum 5",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 6,
+        "name": "Raum 6",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 7,
+        "name": "Raum 7",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 8,
+        "name": "Raum 8",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 9,
+        "name": "Raum 9",
+        "description": "",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 13,
+        "name": "Arbeit",
+        "description": "Ein Kontext f\u00fcr deine Arbeit",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 14,
+        "name": "Privat",
+        "description": "Ein Kontext f\u00fcr pers\u00f6nliche Anwendungen",
+        "assignment": "free",
+        "preferences": {
+          "apps": [],
+          "layout": "tiling",
+          "restore": "disabled"
+        }
+      },
+      {
+        "id": 15,
+        "name": "Entwicklung",
+        "description": "Ein Kontext f\u00fcr Entwicklungswerkzeuge",
+        "assignment": "preferred",
+        "preferences": {
+          "layout": "tiling",
+          "restore": "disabled",
+          "apps": [
+            {
+              "kind": "native",
+              "id": "org.kde.akregator"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "state": {
+    "schema_version": 1,
+    "revision": 112,
+    "fresh": true,
+    "completed": true
+  }
+}
