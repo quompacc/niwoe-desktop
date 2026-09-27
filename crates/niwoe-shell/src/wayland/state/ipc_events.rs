@@ -1,7 +1,9 @@
 impl NiwoeShell {
     fn apply_ipc_event(&mut self, event: ShellEvent) {
+        self.observe_first_run(&event);
         let hub_target = self.hub_selection_target();
         match event {
+            ShellEvent::FirstRun { request_id, snapshot, error } => self.first_run_result(&request_id, snapshot, error),
             ShellEvent::PanelPreferences {
                 request_id,
                 revision,

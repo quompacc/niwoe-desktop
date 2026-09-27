@@ -3,6 +3,8 @@ use std::{env, io, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 mod appearance;
+mod first_run;
+pub use first_run::{FirstRunAction, FirstRunDraft, FirstRunSnapshot, InteractionProfile};
 mod layouts;
 mod panel_preferences;
 pub use appearance::{AppearanceSnapshot, AppearanceTheme, AppearanceWallpaperMode};
@@ -215,6 +217,11 @@ pub enum ScreenshotBridgeMessage {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellEvent {
+    FirstRun {
+        request_id: String,
+        snapshot: Option<FirstRunSnapshot>,
+        error: Option<String>,
+    },
     PanelPreferences {
         request_id: String,
         revision: u64,
@@ -347,6 +354,10 @@ pub enum ShellCommand {
     PanelPreferences {
         request_id: String,
         action: PanelAction,
+    },
+    FirstRun {
+        request_id: String,
+        action: FirstRunAction,
     },
     Layout {
         #[serde(default)]

@@ -102,6 +102,7 @@ impl NiwoeState {
     pub(crate) fn handle_shell_command(&mut self, command: ShellCommand) {
         match command {
             ShellCommand::Layout { request_id, action } => self.layout_action(request_id, action),
+            ShellCommand::FirstRun { request_id, action } => self.first_run(request_id, action),
             ShellCommand::PanelPreferences { request_id, action } => {
                 self.panel_preferences(request_id, action)
             }

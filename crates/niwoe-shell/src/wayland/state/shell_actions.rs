@@ -138,6 +138,7 @@ impl NiwoeShell {
         if !self.launcher_state.open {
             return;
         }
+        self.pause_first_run();
         self.launcher_state.close();
         self.window_picker = None;
         self.launcher_settings_open = false;

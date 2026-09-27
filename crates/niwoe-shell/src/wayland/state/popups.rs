@@ -3,6 +3,7 @@ impl NiwoeShell {
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
+        self.first_run_send(niwoe_ipc::FirstRunAction::Get, "login");
     }
 
     pub(crate) fn open_room_management(&mut self, qh: &QueueHandle<Self>) {
@@ -24,7 +25,9 @@ impl NiwoeShell {
         self.launcher_layer.set_margin(0, 0, 0, 0);
         self.launcher_layer.set_exclusive_zone(0);
         self.launcher_layer.set_size(0, 0);
-        self.launcher_configured = false;
+        // A Settings -> introduction transition can retain this exact layer
+        // size. Keep its usable buffer until a real configure arrives; waiting
+        // unconditionally would leave the previous page painted indefinitely.
         self.launcher_dirty = true;
         self.commit_surface(CommitSurfaceKind::Launcher, CommitReason::Input);
         self.draw_panel(qh, RepaintReason::Pointer);
@@ -52,6 +55,8 @@ impl NiwoeShell {
     }
 
     pub(crate) fn open_system_settings_from_ipc(&mut self) {
+        self.pause_first_run();
+        self.room_management_open = false;
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
@@ -63,6 +68,7 @@ impl NiwoeShell {
     }
 
     fn toggle_launcher(&mut self) {
+        if self.launcher_state.open { self.pause_first_run(); }
         self.window_picker = None;
         let open_before = self.launcher_state.open;
         if !open_before && self.calendar_popup_open {
@@ -365,6 +371,7 @@ impl NiwoeShell {
     }
 
     pub(super) fn toggle_network_popup(&mut self, reason: CommitReason) {
+        self.pause_first_run();
         if self.network_popup_open {
             self.close_network_popup(reason);
             return;

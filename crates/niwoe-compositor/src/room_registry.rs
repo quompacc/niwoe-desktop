@@ -20,6 +20,15 @@ impl RoomRegistry {
         expected: u64,
         change: niwoe_ipc::RoomChange,
     ) -> Result<(), niwoe_ipc::RoomMutationError> {
+        let next = self.prepare(expected, change)?;
+        self.publish(next)
+    }
+
+    pub(crate) fn prepare(
+        &self,
+        expected: u64,
+        change: niwoe_ipc::RoomChange,
+    ) -> Result<Rooms, niwoe_ipc::RoomMutationError> {
         use niwoe_ipc::{RoomChange, RoomMutationError as Error};
         if expected != self.definitions.revision {
             return Err(Error::Conflict);
@@ -157,6 +166,11 @@ impl RoomRegistry {
                 }
             })
             .map_err(|_| Error::Invalid)?;
+        Ok(next)
+    }
+
+    pub(crate) fn publish(&mut self, next: Rooms) -> Result<(), niwoe_ipc::RoomMutationError> {
+        use niwoe_ipc::RoomMutationError as Error;
         let path = self.path.as_ref().ok_or(Error::Storage)?;
         match store::save(path, &self.definitions, &next) {
             Ok(()) => {
@@ -216,6 +230,9 @@ impl RoomRegistry {
         writer
             .try_lock()
             .map_err(|e| format!("Raumkonfiguration bereits gesperrt oder nicht sperrbar: {e}"))?;
+        if let Err(error) = niwoe_config::first_run::FirstRun::initialize(directory) {
+            tracing::warn!(%error, "introduction state unavailable; preserving original");
+        }
         let definitions = store::load_or_initialize(&directory.join("rooms.toml"))?;
         let mut registry = Self::from_definitions(definitions)?;
         registry._writer = Some(writer);

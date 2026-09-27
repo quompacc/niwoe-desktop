@@ -4,6 +4,7 @@ impl ShellCommand {
     pub fn name(&self) -> &'static str {
         match self {
             Self::Layout { .. } => "layout",
+            Self::FirstRun { .. } => "first-run",
             Self::PanelPreferences { .. } => "panel-preferences",
             Self::RequestRoomSnapshot => "request-room-snapshot",
             Self::MutateRoom { .. } => "mutate-room",

@@ -34,6 +34,7 @@ pub(crate) struct RestoreUi {
 }
 
 pub(crate) struct RoomUi {
+    pub wizard: crate::first_run::Wizard,
     pub panel: panel::PanelUi,
     pub list: list::ListUi,
     pub layouts: std::collections::BTreeMap<u64, niwoe_ipc::LayoutNotice>,
@@ -48,6 +49,7 @@ pub(crate) struct RoomUi {
 impl Default for RoomUi {
     fn default() -> Self {
         Self {
+            wizard: Default::default(),
             panel: Default::default(),
             list: Default::default(),
             layouts: Default::default(),

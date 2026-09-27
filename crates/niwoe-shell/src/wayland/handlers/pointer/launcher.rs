@@ -27,6 +27,15 @@ macro_rules! handle_launcher_pointer {
                 $event.position
             };
 
+            if $shell.workspace_state.rooms.wizard.open {
+                if workspace_click_activation(&$event.kind) {
+                    if let Some(index) = crate::room_management_view::first_run::hit(local_pos.0 as i32,
+                        local_pos.1 as i32, content_width, content_height, &$shell.workspace_state.rooms.wizard) {
+                        $shell.first_run_action($qh, index);
+                    }
+                }
+                continue;
+            }
             if $shell.window_picker_pointer(
                 $qh,
                 &$event.kind,

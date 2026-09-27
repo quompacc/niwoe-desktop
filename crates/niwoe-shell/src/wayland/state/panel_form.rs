@@ -126,19 +126,7 @@ impl NiwoeShell {
         }
         state.focus = index;
         match index {
-            0..=11 => {
-                let module = crate::room_editor::panel::MODULES[index / 3];
-                let position = state.draft.iter().position(|m| *m == module);
-                match (index % 3, position) {
-                    (0, Some(p)) => {
-                        state.draft.remove(p);
-                    }
-                    (0, None) => state.draft.push(module),
-                    (1, Some(p)) if p > 0 => state.draft.swap(p, p - 1),
-                    (2, Some(p)) if p + 1 < state.draft.len() => state.draft.swap(p, p + 1),
-                    _ => {}
-                }
-            }
+            0..=11 => crate::room_editor::panel::change_module(&mut state.draft, index),
             12 => {
                 let id = format!(
                     "panel-{}-{}",

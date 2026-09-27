@@ -2,6 +2,7 @@ mod appearance;
 mod broadcast;
 mod commands;
 mod conversions;
+mod first_run;
 mod launch;
 mod lock_screen;
 mod network;

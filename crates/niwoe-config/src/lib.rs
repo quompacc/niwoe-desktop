@@ -1,5 +1,6 @@
 pub mod config;
 pub mod environment;
+pub mod first_run;
 pub mod keybind;
 pub mod layouts;
 pub mod migration;

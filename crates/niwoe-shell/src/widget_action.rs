@@ -57,6 +57,7 @@ pub(crate) enum WidgetAction {
     PowerLock,
     PowerLogout,
     ToggleSettings,
+    OpenFirstRun,
     SetSettingsCategory(crate::settings_view::SettingsCategory),
     ApplyThemeByIndex(usize),
     ApplyWallpaperByIndex(usize),
@@ -212,6 +213,7 @@ fn exact_action_for_id(id: &str) -> Option<WidgetAction> {
         "power-lock" => Some(WidgetAction::PowerLock),
         "power-logout" => Some(WidgetAction::PowerLogout),
         "launcher-settings" | "show-tile-view" => Some(WidgetAction::ToggleSettings),
+        "first-run-open" => Some(WidgetAction::OpenFirstRun),
         DEFAULT_APPS_AUTO_ID => Some(WidgetAction::DefaultAppsAutoSet),
         "default-apps-back" => Some(WidgetAction::DefaultAppsClosePicker),
         "wallpaper-mode-fill" => Some(WidgetAction::SetWallpaperMode(

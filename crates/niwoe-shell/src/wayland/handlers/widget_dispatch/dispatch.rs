@@ -21,6 +21,7 @@ impl NiwoeShell {
         }
 
         match action {
+            WidgetAction::OpenFirstRun => self.open_first_run(qh),
             WidgetAction::LaunchApp { .. } | WidgetAction::LaunchExec(_) => {
                 self.dispatch_launch_action(qh, action);
             }

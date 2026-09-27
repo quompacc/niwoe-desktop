@@ -39,6 +39,13 @@ impl NiwoeShell {
 
     pub(crate) fn tick(&mut self, qh: &QueueHandle<Self>) {
         let now = Instant::now();
+        let wizard = &mut self.workspace_state.rooms.wizard;
+        if wizard.pending.as_ref().is_some_and(|(_, at)| at.elapsed() >= Duration::from_secs(10)) {
+            wizard.pending = None;
+            wizard.complete_after_save = false;
+            wizard.message = "Antwort fehlt. Gespeicherten Stand neu laden; kein automatischer Wiederholungsversuch.".into();
+            self.launcher_dirty |= wizard.open;
+        }
         if self.volume_osd_open && !self.audio_volume_dragging {
             if let Some(hide_at) = self.volume_osd_hide_at {
                 if now >= hide_at {

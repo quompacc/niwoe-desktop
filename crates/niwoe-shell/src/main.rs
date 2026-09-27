@@ -21,6 +21,7 @@ mod deck_mutation;
 mod default_apps;
 mod draw;
 mod first_login;
+mod first_run;
 mod font_resolve;
 mod hub_state;
 mod hub_view;

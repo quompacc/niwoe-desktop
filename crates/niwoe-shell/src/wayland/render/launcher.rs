@@ -136,7 +136,10 @@ impl NiwoeShell {
                     .clamp(0.0, 1.0);
                 (id.as_str(), p)
             });
-            if self.room_management_open {
+            if self.workspace_state.rooms.wizard.open {
+                crate::room_management_view::first_run::draw(&mut content, content_width, content_height,
+                    &self.workspace_state.rooms.wizard, panel_preview.as_ref(), &self.theme);
+            } else if self.room_management_open {
                 let rooms = &self.workspace_state.rooms.snapshot.rooms;
                 let draft = niwoe_ipc::RoomEntry {
                     preferences: Default::default(),

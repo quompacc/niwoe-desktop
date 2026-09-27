@@ -15,6 +15,22 @@ pub(crate) fn label(module: PanelModule) -> &'static str {
     }
 }
 
+pub(crate) fn change_module(modules: &mut Vec<PanelModule>, index: usize) {
+    let Some(module) = MODULES.get(index / 3) else {
+        return;
+    };
+    let position = modules.iter().position(|m| m == module);
+    match (index % 3, position) {
+        (0, Some(p)) => {
+            modules.remove(p);
+        }
+        (0, None) => modules.push(*module),
+        (1, Some(p)) if p > 0 => modules.swap(p, p - 1),
+        (2, Some(p)) if p + 1 < modules.len() => modules.swap(p, p + 1),
+        _ => {}
+    }
+}
+
 pub(crate) struct PanelUi {
     pub open: bool,
     pub ready: bool,

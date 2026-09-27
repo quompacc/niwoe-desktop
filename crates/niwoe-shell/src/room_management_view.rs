@@ -147,6 +147,7 @@ pub(crate) fn hit_room(
 }
 
 include!("room_management_view/sidebar.rs");
+pub(crate) mod first_run;
 pub(crate) mod list;
 pub(crate) mod panel;
 fn draw_header(pm: &mut tiny_skia::PixmapMut<'_>, width: u32, config: &niwoe_config::ThemeConfig) {

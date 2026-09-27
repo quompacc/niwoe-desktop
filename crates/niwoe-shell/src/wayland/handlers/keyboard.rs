@@ -377,6 +377,10 @@ impl KeyboardHandler for NiwoeShell {
         // grabs the keyboard; the Settings page no longer captures it inline.)
 
         // ── Settings view: type-to-search; Escape clears then exits ───────────
+        if self.workspace_state.rooms.wizard.open {
+            self.first_run_key(qh, event.keysym);
+            return;
+        }
         if self.room_management_open {
             if self.panel_form_key(qh, event.keysym) {
                 return;
@@ -392,6 +396,25 @@ impl KeyboardHandler for NiwoeShell {
         }
 
         if self.launcher_settings_open {
+            if self.settings_category == crate::settings_view::SettingsCategory::SystemOverview
+                && self.settings_search.is_empty()
+                && matches!(
+                    event.keysym,
+                    Keysym::Return
+                        | Keysym::KP_Enter
+                        | Keysym::space
+                        | Keysym::Tab
+                        | Keysym::ISO_Left_Tab
+                )
+            {
+                if matches!(
+                    event.keysym,
+                    Keysym::Return | Keysym::KP_Enter | Keysym::space
+                ) {
+                    self.open_first_run(qh);
+                }
+                return;
+            }
             if is_escape {
                 if !self.settings_search.is_empty() {
                     self.settings_search.clear();
