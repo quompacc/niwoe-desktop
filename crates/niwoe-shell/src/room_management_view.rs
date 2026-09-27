@@ -187,27 +187,6 @@ fn draw_header(pm: &mut tiny_skia::PixmapMut<'_>, width: u32, config: &niwoe_con
         Typography::DEFAULT.body_size as f32,
         p.text_dim,
     );
-    let search = Rect {
-        x: right_rail_x(width),
-        y: C.outer_pad,
-        width: C.right_rail_width,
-        height: C.filter_height,
-    };
-    fill(
-        pm,
-        search,
-        alpha(p.surface, C.card_alpha),
-        Radius::DEFAULT.sm,
-    );
-    outline(pm, search, p.border, Controls::BORDER);
-    paint_text_left_centered(
-        pm,
-        "⌕  Räume, Apps und Einstellungen",
-        search.x + S.md,
-        search,
-        Typography::DEFAULT.caption_size as f32,
-        p.text_dim,
-    );
 }
 
 fn chip(
@@ -241,60 +220,10 @@ fn chip(
 fn draw_toolbar(
     pm: &mut tiny_skia::PixmapMut<'_>,
     rooms: &[RoomEntry],
-    active_workspace: u8,
-    window_counts: &[u16; niwoe_config::rooms::MAX_ROOMS],
-    page: usize,
     new_focused: bool,
     config: &niwoe_config::ThemeConfig,
 ) {
     let p = crate::ui::tokens::theme_from_config(config).palette;
-    let active = rooms
-        .iter()
-        .filter(|room| {
-            room.workspace == active_workspace
-                || window_counts
-                    .get(room.workspace.saturating_sub(1) as usize)
-                    .is_some_and(|count| *count > 0)
-        })
-        .count();
-    let y = C.header_height + (C.toolbar_height - C.filter_height) / 2;
-    let mut x = C.sidebar_width + C.outer_pad;
-    for (label, width, selected) in [
-        (
-            format!("Alle Räume · {}", rooms.len()),
-            C.filter_all_width,
-            true,
-        ),
-        (format!("Aktiv · {active}"), C.filter_status_width, false),
-        (
-            format!("Inaktiv · {}", rooms.len().saturating_sub(active)),
-            C.filter_inactive_width,
-            false,
-        ),
-        (
-            if rooms.len() > ROOM_PAGE_SIZE {
-                format!("Seite {} / {}", page + 1, max_room_page(rooms.len()) + 1)
-            } else {
-                "Nach Name ⌄".to_string()
-            },
-            C.filter_sort_width,
-            false,
-        ),
-    ] {
-        chip(
-            pm,
-            Rect {
-                x,
-                y,
-                width,
-                height: C.filter_height,
-            },
-            &label,
-            selected,
-            config,
-        );
-        x += width + C.card_gap;
-    }
     let add = right_rail_toolbar_rect(pm.width());
     fill(
         pm,
@@ -387,15 +316,7 @@ pub(crate) fn draw_room_management(
     draw_sidebar(&mut pm, height, false, config);
     draw_header(&mut pm, width, config);
     let page = page.min(max_room_page(rooms.len()));
-    draw_toolbar(
-        &mut pm,
-        rooms,
-        active_workspace,
-        window_counts,
-        page,
-        keyboard_focus == Some(rooms.len()),
-        config,
-    );
+    draw_toolbar(&mut pm, rooms, keyboard_focus == Some(rooms.len()), config);
     list::draw_list_controls(&mut pm, list, config);
     let context = RoomRenderContext {
         preview: false,
