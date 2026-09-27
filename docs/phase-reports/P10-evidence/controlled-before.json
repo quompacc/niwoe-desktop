@@ -1,0 +1,30 @@
+{
+  "outputs": [
+    {
+      "output_name": "drm-0",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "refresh_millihz": 60000
+    },
+    {
+      "output_name": "drm-1",
+      "x": 1920,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "refresh_millihz": 60000
+    }
+  ],
+  "pids": {
+    "niwoe": "59155",
+    "niwoe-shell": "59168"
+  },
+  "hashes": "79c949bbf69d766c9dfaa38ee5e40eb2d7deeb2d37c93b8517d6d22a2ecd8d86  /usr/local/bin/niwoe\na57f9a10fa5acc540257807e094ef0d8239ee9ee29f66f3dc144f4b0c4df80c1  /usr/local/bin/niwoe-shell\n79c949bbf69d766c9dfaa38ee5e40eb2d7deeb2d37c93b8517d6d22a2ecd8d86  /proc/59155/exe\na57f9a10fa5acc540257807e094ef0d8239ee9ee29f66f3dc144f4b0c4df80c1  /proc/59168/exe\n",
+  "started": 1790503004.9388463,
+  "latency": "NOT MEASURED: no optical baseline",
+  "repaint_counters": "NOT MEASURED: no comparable exported counters"
+}

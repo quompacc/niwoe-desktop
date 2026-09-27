@@ -1,0 +1,11 @@
+CAPTURE p10-catalog-first
+CAPTURE p10-catalog-second
+CAPTURE p10-catalog-mouse-back
+CAPTURE p10-catalog-keyboard-next
+CAPTURE p10-catalog-keyboard-back
+CAPTURE p10-catalog-keyboard-link
+PASS General link restore mouse
+PASS General link restore keyboard
+PASS General link files mouse
+PASS General link files keyboard
+PASS real catalog next/previous by mouse+keyboard; all General links; no persistent room changes

@@ -1,5 +1,25 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P10-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
+P10-01 bis P10-07 umgesetzt: vollständige Raumformulare mit atomarem Save/Cancel,
+stabilen IDs, Suche/Belegung/Reihenfolge, echtem Appkatalog, Zuordnung und manuellen
+P09-Restore-/Dateiverweisen; persistente Leistenmodule und gemeinsame Produktvorschau.
+Alter Farbtheme-Wähler und Automatisierungsplatzhalter aus aktiver Navigation entfernt.
+1.209 Workspace-Tests plus der separat isolierte D-Bus-Test bestanden; alle
+Pflichtguards/Clippy grün. Endrelease installiert und laufende Hashes geprüft.
+Reguläre Hub-Wege, Maus/Tastatur, Fehler/Konflikte, native/XWayland-Fenster,
+Shell-Watchdog und Neulogin praktisch geprüft. Logische Größen 1920×1080 und
+1366×768 sowie 150/200 % geprüft; kein physischer 1366×768-DRM-Modus verfügbar.
+Je drei kontrollierte Vorher-/Nachher-Idle-Proben und 60 Öffnungszyklen:
+CPU-Mediandifferenz +0,010/−0,003 Prozentpunkte Compositor/Shell, P10-RSS stabil.
+Die letzte reine Listen-Renderbereinigung wurde erneut geprüft/installiert und
+mit weiteren 60 Zyklen getestet; die Idle-Aussage wird begründet auf den
+unveränderten geschlossenen Pfad übertragen, nicht als neue Messung ausgegeben.
+Optische Latenz-/Repaint-Nachweise bleiben ausdrücklich nicht gemessen.
+Dateimatrix, Livebelege, Bereinigung und Grenzen: [P10-Bericht](docs/phase-reports/P10.md).
+P11 wurde nicht begonnen. Backups, Logs und Benachrichtigungsautomatik bleiben
+als nicht verfügbar gekennzeichnet; P10 ist kein Abschluss des gesamten Desktops.
+
 **P09-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
 P09-01 bis P09-06 umgesetzt: versionierte private Layout-Snapshots, ausdrückliche
 und entprellte Speicherung, eindeutiges LayoutOnly, begrenztes manuelles
@@ -12,7 +32,7 @@ temporäre Zugänge und Testrechte entfernt. Drei neue Vorher-/Nachher-Idle-Prob
 mit gleichen Display-Modi; Messbuild, spätere reine Textänderungen und fehlende
 optische Latenz-/Repaint-Nachweise ausdrücklich dokumentiert.
 Details: [P09-Bericht](docs/phase-reports/P09.md).
-Nächste Implementierungsphase ist P10; sie wurde nicht begonnen.
+Der anschließende P10-Stand ist oben und im P10-Bericht dokumentiert.
 
 **P08-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
 P08-01 bis P08-05 umgesetzt: persistente Raum-/Fensterdaten, Navigation und
@@ -443,7 +463,7 @@ abbrechbar und zeitlich begrenzt. Mehrdeutige Zuordnung wird angezeigt oder
 
 Der Automatisierungsplatzhalter im Mockup entstand ohne konkret vereinbarten
 Anwendungsfall. Ein eigener Automatisierungsbereich entfällt vorerst; sein
-Navigationseintrag wird in P10 entfernt. Die möglichen Anwendungsfälle werden
+Navigationseintrag wurde in P10 entfernt. Die möglichen Anwendungsfälle werden
 wie folgt eingeordnet:
 
 | Anwendungsfall | Zuständigkeit und Umfang |
@@ -841,6 +861,11 @@ Abbruch nach Teilstart, Schreibfehler. Kein Start als Nebeneffekt eines Raumwech
 ehrliche UI und keine unbemerkte Wiederholung externer Aktionen.
 
 ### P10 — Control-Center-Funktionen und Persistenz vervollständigen
+
+**Status 27.09.2026:** P10-01 bis P10-07 `accepted` für den im
+[P10-Bericht](docs/phase-reports/P10.md) belegten Fedora-Umfang. Vollständige
+Maus-/Tastaturabnahme und Persistenz einschließlich Konflikt-/Fehlerfällen;
+Endrelease aktiv. Mess-/Hardwaregrenzen stehen ausdrücklich im Bericht.
 
 **Betroffen:** `niwoe-shell/src/settings_view/`, bestehende Widgets,
 Config-/Raum-Commands, Manifest-Komponenten.

@@ -1,0 +1,45 @@
+{
+  "theme_samples": [
+    [
+      [
+        24,
+        33,
+        25
+      ],
+      [
+        24,
+        33,
+        25
+      ]
+    ],
+    [
+      [
+        24,
+        33,
+        25
+      ],
+      [
+        24,
+        33,
+        25
+      ]
+    ],
+    [
+      [
+        24,
+        33,
+        25
+      ],
+      [
+        24,
+        33,
+        25
+      ]
+    ]
+  ],
+  "config_sha256": "13c8e7bc71c3412370f9d788cb5f0d12f56545b541287b4e11bb1e384751dc1d",
+  "legacy_choice_preserved": true,
+  "foreign_preferences_unchanged": true,
+  "keyboard_icon_persisted": true,
+  "icon_cancel_unchanged": true
+}

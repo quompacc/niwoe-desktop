@@ -1,0 +1,326 @@
+[
+  {
+    "run": 0,
+    "seconds": 11.029660734000572,
+    "cycles": 20,
+    "rss_samples": [
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      }
+    ],
+    "before": {
+      "niwoe": [
+        83,
+        148766720
+      ],
+      "niwoe-shell": [
+        592,
+        91283456
+      ]
+    },
+    "after": {
+      "niwoe": [
+        110,
+        148766720
+      ],
+      "niwoe-shell": [
+        810,
+        91283456
+      ]
+    },
+    "gpu_engine_percent": 4.510879473076404
+  },
+  {
+    "run": 1,
+    "seconds": 11.009654597999543,
+    "cycles": 20,
+    "rss_samples": [
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      }
+    ],
+    "before": {
+      "niwoe": [
+        110,
+        148766720
+      ],
+      "niwoe-shell": [
+        810,
+        91283456
+      ]
+    },
+    "after": {
+      "niwoe": [
+        135,
+        148766720
+      ],
+      "niwoe-shell": [
+        1029,
+        91283456
+      ]
+    },
+    "gpu_engine_percent": 4.567899415222153
+  },
+  {
+    "run": 2,
+    "seconds": 11.041535308000675,
+    "cycles": 20,
+    "rss_samples": [
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      },
+      {
+        "niwoe": 148766720,
+        "niwoe-shell": 91283456
+      }
+    ],
+    "before": {
+      "niwoe": [
+        135,
+        148766720
+      ],
+      "niwoe-shell": [
+        1029,
+        91283456
+      ]
+    },
+    "after": {
+      "niwoe": [
+        160,
+        148766720
+      ],
+      "niwoe-shell": [
+        1256,
+        91283456
+      ]
+    },
+    "gpu_engine_percent": 4.661713562850553
+  }
+]
