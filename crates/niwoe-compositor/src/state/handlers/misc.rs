@@ -129,7 +129,7 @@ fn reposition_xdg_window_for_visible_frame(state: &mut NiwoeState, toplevel: &To
 }
 
 impl SeatHandler for NiwoeState {
-    type KeyboardFocus = WlSurface;
+    type KeyboardFocus = crate::state::KeyboardFocusTarget;
     type PointerFocus = WlSurface;
     type TouchFocus = WlSurface;
 
@@ -137,9 +137,9 @@ impl SeatHandler for NiwoeState {
         &mut self.seat_state
     }
 
-    fn focus_changed(&mut self, seat: &Seat<Self>, focused: Option<&WlSurface>) {
+    fn focus_changed(&mut self, seat: &Seat<Self>, focused: Option<&Self::KeyboardFocus>) {
         let dh = &self.display_handle;
-        let client = focused.and_then(|surface| dh.get_client(surface.id()).ok());
+        let client = focused.and_then(|target| dh.get_client(target.surface().id()).ok());
         smithay::wayland::selection::data_device::set_data_device_focus(dh, seat, client.clone());
         smithay::wayland::selection::primary_selection::set_primary_focus(dh, seat, client);
     }
@@ -345,7 +345,7 @@ impl NiwoeState {
         } else {
             new_focus
         };
-        let old_focus = keyboard.current_focus();
+        let old_focus = keyboard.current_focus().map(|target| target.into_surface());
         tracing::debug!(
             "set_keyboard_focus_with_decorations: old_has={} new_has={}",
             old_focus.is_some(),
@@ -356,7 +356,8 @@ impl NiwoeState {
             self.mark_all_outputs_dirty("keyboard-focus-change");
         }
 
-        keyboard.set_focus(self, new_focus, serial);
+        let target = new_focus.map(|surface| self.keyboard_target(surface));
+        keyboard.set_focus(self, target, serial);
     }
 }
 

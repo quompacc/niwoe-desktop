@@ -168,7 +168,11 @@ impl NiwoeState {
         }
         if target != self.current_workspace_index()
             && self.seat.get_keyboard().is_some_and(|keyboard| {
-                keyboard.current_focus().as_ref() == window.wl_surface().as_deref()
+                keyboard
+                    .current_focus()
+                    .map(|target| target.into_surface())
+                    .as_ref()
+                    == window.wl_surface().as_deref()
             })
         {
             let focus = self

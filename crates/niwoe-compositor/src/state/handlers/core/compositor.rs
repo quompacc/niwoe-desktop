@@ -226,7 +226,13 @@ impl CompositorHandler for NiwoeState {
                     let should_set_focus = self
                         .seat
                         .get_keyboard()
-                        .map(|keyboard| keyboard.current_focus().as_ref() != Some(surface))
+                        .map(|keyboard| {
+                            keyboard
+                                .current_focus()
+                                .map(|target| target.into_surface())
+                                .as_ref()
+                                != Some(surface)
+                        })
                         .unwrap_or(false);
                     if should_set_focus {
                         let serial = SERIAL_COUNTER.next_serial();
@@ -250,7 +256,13 @@ impl CompositorHandler for NiwoeState {
                     let should_clear_focus = self
                         .seat
                         .get_keyboard()
-                        .map(|keyboard| keyboard.current_focus().as_ref() == Some(surface))
+                        .map(|keyboard| {
+                            keyboard
+                                .current_focus()
+                                .map(|target| target.into_surface())
+                                .as_ref()
+                                == Some(surface)
+                        })
                         .unwrap_or(false);
                     if should_clear_focus {
                         let serial = SERIAL_COUNTER.next_serial();

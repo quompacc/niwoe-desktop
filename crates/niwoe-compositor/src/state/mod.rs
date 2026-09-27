@@ -59,6 +59,8 @@ mod client;
 mod handlers;
 mod idle;
 mod ipc;
+mod keyboard_focus;
+pub use keyboard_focus::KeyboardFocusTarget;
 mod launch_intent;
 mod layout;
 mod layout_restore;
@@ -493,7 +495,9 @@ impl NiwoeState {
 
     pub fn keyboard_focus_diag_target(&self) -> Option<String> {
         let keyboard = self.seat.get_keyboard()?;
-        let focus_surface = keyboard.current_focus()?;
+        let focus_surface = keyboard
+            .current_focus()
+            .map(|target| target.into_surface())?;
         let focus_surface_id = window_id(&focus_surface);
 
         for workspace in 0..self.workspaces.count() {

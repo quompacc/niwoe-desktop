@@ -1,6 +1,6 @@
 use smithay::{
     desktop::Window, reexports::wayland_server::protocol::wl_surface::WlSurface,
-    utils::SERIAL_COUNTER,
+    utils::SERIAL_COUNTER, wayland::seat::WaylandFocus,
 };
 
 use super::super::NiwoeState;
@@ -10,15 +10,19 @@ impl NiwoeState {
         if self.lobby_active {
             return None;
         }
-        let surface = self.seat.get_keyboard()?.current_focus()?;
+        let surface = self
+            .seat
+            .get_keyboard()?
+            .current_focus()
+            .map(|target| target.into_surface())?;
         let idx = self.current_workspace_index();
         self.workspaces
             .space_at(idx)
             .elements()
             .find(|window| {
                 window
-                    .toplevel()
-                    .is_some_and(|toplevel| toplevel.wl_surface() == &surface)
+                    .wl_surface()
+                    .is_some_and(|candidate| candidate.as_ref() == &surface)
             })
             .cloned()
     }
@@ -28,7 +32,7 @@ impl NiwoeState {
             Some(keyboard) => keyboard,
             None => return,
         };
-        let surface = match keyboard.current_focus() {
+        let surface = match keyboard.current_focus().map(|target| target.into_surface()) {
             Some(surface) => surface,
             None => return,
         };
@@ -38,8 +42,8 @@ impl NiwoeState {
             .elements()
             .find(|window| {
                 window
-                    .toplevel()
-                    .is_some_and(|toplevel| toplevel.wl_surface() == &surface)
+                    .wl_surface()
+                    .is_some_and(|candidate| candidate.as_ref() == &surface)
             })
             .cloned();
         if let Some(window) = window {

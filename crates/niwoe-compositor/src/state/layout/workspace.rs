@@ -371,7 +371,8 @@ impl NiwoeState {
                 return;
             }
         };
-        let Some(focus_surface) = keyboard.current_focus() else {
+        let Some(focus_surface) = keyboard.current_focus().map(|target| target.into_surface())
+        else {
             tracing::debug!(
                 "workspace move ignored, no focused window: reason=no-keyboard-focus target={}",
                 target + 1

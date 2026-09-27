@@ -261,7 +261,9 @@ pub fn handle_pointer_button<I: InputBackend>(
                         state
                             .seat
                             .get_keyboard()
-                            .and_then(|keyboard| keyboard.current_focus())
+                            .and_then(|keyboard| {
+                                keyboard.current_focus().map(|target| target.into_surface())
+                            })
                             .as_ref()
                             == Some(window_surface)
                     });

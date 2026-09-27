@@ -26,7 +26,11 @@ fn wm_split_dir(dir: SplitDir) -> niwoe_wm::SplitDir {
 }
 
 fn focused_window_for_close(state: &NiwoeState) -> Option<Window> {
-    let focus_surface = state.seat.get_keyboard()?.current_focus()?;
+    let focus_surface = state
+        .seat
+        .get_keyboard()?
+        .current_focus()
+        .map(|target| target.into_surface())?;
     (0..state.workspaces.count()).find_map(|idx| {
         state
             .workspaces

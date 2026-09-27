@@ -41,11 +41,12 @@ impl NiwoeState {
         }
         // A menu owns keyboard focus. Never focus the moved window merely to
         // identify it, nor dismiss an unrelated application's or layer's focus.
-        if self
-            .seat
-            .get_keyboard()
-            .is_some_and(|k| k.current_focus().as_ref() == window.wl_surface().as_deref())
-        {
+        if self.seat.get_keyboard().is_some_and(|k| {
+            k.current_focus()
+                .map(|target| target.into_surface())
+                .as_ref()
+                == window.wl_surface().as_deref()
+        }) {
             self.set_keyboard_focus_with_decorations(None, SERIAL_COUNTER.next_serial());
             self.broadcast_toplevel_focus_cleared();
         }

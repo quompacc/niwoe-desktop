@@ -262,7 +262,7 @@ pub(crate) fn handle_minimize_request(state: &mut NiwoeState, surface: ToplevelS
         state
             .seat
             .get_keyboard()
-            .and_then(|keyboard| keyboard.current_focus())
+            .and_then(|keyboard| keyboard.current_focus().map(|target| target.into_surface()))
             .as_ref()
             == Some(window_surface)
     });

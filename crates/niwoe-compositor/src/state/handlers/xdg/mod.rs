@@ -137,7 +137,10 @@ impl XdgShellHandler for NiwoeState {
             }
         };
 
-        let mut grab = match self.popups.grab_popup(root_surface, kind, &seat, serial) {
+        let mut grab = match self
+            .popups
+            .grab_popup(root_surface.into(), kind, &seat, serial)
+        {
             Ok(grab) => grab,
             Err(err) => {
                 tracing::debug!("popup grab denied: {:?}", err);
@@ -154,7 +157,10 @@ impl XdgShellHandler for NiwoeState {
                 grab.ungrab(PopupUngrabStrategy::All);
                 return;
             }
-            self.set_keyboard_focus_with_decorations(grab.current_grab(), serial);
+            self.set_keyboard_focus_with_decorations(
+                grab.current_grab().map(|target| target.into_surface()),
+                serial,
+            );
             keyboard.set_grab(self, PopupKeyboardGrab::new(&grab), serial);
         }
 

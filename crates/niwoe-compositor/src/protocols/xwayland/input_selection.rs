@@ -191,7 +191,7 @@ macro_rules! xwm_input_selection_methods {
         let Some(keyboard) = self.seat.get_keyboard() else {
             return false;
         };
-        let Some(focused_surface) = keyboard.current_focus() else {
+        let Some(focused_surface) = keyboard.current_focus().map(|target| target.into_surface()) else {
             return false;
         };
 

@@ -138,7 +138,7 @@ macro_rules! xwm_state_request_methods {
             let was_focused = window_surface.as_ref().is_some_and(|window_surface| {
                 self.seat
                     .get_keyboard()
-                    .and_then(|keyboard| keyboard.current_focus())
+                    .and_then(|keyboard| keyboard.current_focus().map(|target| target.into_surface()))
                     .as_ref()
                     == Some(window_surface)
             });
