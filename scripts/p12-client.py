@@ -31,6 +31,19 @@ scroll.add(text)
 window.add(scroll)
 events = []
 dialogs = []
+pointer_events = []
+
+
+def pointer_event(_widget, event):
+    value = dict(type=str(event.type), x=event.x, y=event.y)
+    if event.type == Gdk.EventType.SCROLL:
+        value.update(direction=str(event.direction), deltas=list(event.get_scroll_deltas()))
+    pointer_events.append(value)
+    return False
+
+
+text.connect('button-press-event', pointer_event)
+text.connect('scroll-event', pointer_event)
 
 
 def contents():
@@ -54,6 +67,7 @@ def key(_widget, event):
         dialogs.append(dialog)
         return True
     state = window.get_window().get_state()
+    if name == 'F8': window.resize(620, 400); return True
     if name == 'F9': window.iconify(); return True
     if name == 'F10':
         (window.unmaximize if state & Gdk.WindowState.MAXIMIZED else window.maximize)()
@@ -74,9 +88,11 @@ def record():
     gdk = window.get_window()
     value = dict(pid=os.getpid(), backend=type(Gdk.Display.get_default()).__name__,
                  content=contents(), active=window.is_active(),
+                 caps_lock=Gdk.Keymap.get_for_display(Gdk.Display.get_default()).get_caps_lock_state(),
                  focused=bool(gdk.get_state() & Gdk.WindowState.FOCUSED),
                  size=list(window.get_size()), position=list(window.get_position()),
                  state=int(gdk.get_state()), events=events[-200:],
+                 pointer_events=pointer_events[-30:],
                  scroll=scroll.get_vadjustment().get_value(),
                  dialogs=[dict(title=d.get_title(), active=d.is_active(),
                                focused=bool(d.get_window().get_state() & Gdk.WindowState.FOCUSED), modal=d.get_modal())

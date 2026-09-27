@@ -51,6 +51,7 @@ def combo(*keys):
         for code in reversed(keys):
             keyboard.emit(1, code, 0)
             keyboard.emit(0, 0, 0)
+        time.sleep(.15)  # Consume releases before removing the virtual device.
     time.sleep(.4)
 
 
@@ -114,7 +115,7 @@ try:
                     w['title'] == 'P12 ' + kind + ' ' + name for w in s['window-snapshot']['windows']))
             key(1)
             check('dialog closed ' + kind + ' ' + name,
-                  lambda s, c: not c[kind]['dialogs'] and not any(
+                  lambda s, c: not c[kind]['dialogs'] and c[kind]['active'] and not any(
                       w['title'] == 'P12 ' + kind + ' ' + name for w in s['window-snapshot']['windows']))
             focus(kind)
         combo(125, 42, 3)  # move to room 2
