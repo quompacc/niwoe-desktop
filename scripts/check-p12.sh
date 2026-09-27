@@ -24,5 +24,5 @@ gate session bash scripts/test-session-launcher.sh
 gate migration bash scripts/test-install-migration.sh
 gate lifecycle bash scripts/test-install-lifecycle.sh
 gate portal-helper dbus-run-session -- python3 scripts/test-portal-missing-helper.py
-gate python env PYTHONPYCACHEPREFIX=target/p12-pycache python3 -m py_compile scripts/p12-client.py scripts/test-p12-*.py scripts/measure-p12-*.py
+gate python env PYTHONPYCACHEPREFIX=target/p12-pycache python3 -m py_compile scripts/p12-client.py scripts/test-p12-*.py scripts/measure-p12-*.py scripts/prepare-p12-performance.py scripts/summarize-p12-performance.py
 exit "$failed"
