@@ -17,12 +17,16 @@ assert not state['window-snapshot']['windows'], 'empty desktop required'
 baseline = json.loads((data / 'before-state.json').read_text())
 def conditions(snapshot):
     # IDs are session-local and change on a real hotplug. Compare the actual
-    # named output, focus, geometry, scale, refresh and modes instead.
+    # named output, focus, geometry, scale and selected refresh instead.
     value = json.loads(json.dumps(snapshot))
     outputs = value['output-workspace-snapshot']
     outputs.pop('focused_output_id')
     for output in outputs['outputs']:
         output.pop('output_id')
+        # EDID capability/preferred-mode lists can change after KDE/hotplug.
+        # Workload equivalence is the selected geometry, scale and refresh,
+        # all retained above; complete mode lists remain in the saved evidence.
+        output.pop('modes')
     return value
 
 

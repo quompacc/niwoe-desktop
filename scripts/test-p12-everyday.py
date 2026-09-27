@@ -33,6 +33,7 @@ if old_layout is not None: (data / 'layout-before.toml').write_bytes(old_layout)
 processes = []
 records = []
 alarm_armed = False
+suspend_requested = False
 files = {kind: data / ('p12-' + kind + '.txt') for kind in ('wayland', 'x11')}
 
 
@@ -148,6 +149,8 @@ try:
     time.sleep(.5); p.action(room, 'save')
     entry = next(e for e in tomllib.loads(layout.read_text())['entries'] if files['x11'].name in e['title'])
     moved = entry['geometry']
+    (data / 'layout-after-drag.toml').write_bytes(layout.read_bytes())
+    (data / 'snapshot-after-drag.json').write_text(json.dumps(p.snapshot(), indent=2))
     move_matches = abs(moved['x']-geo['x']-(end[0]-start[0])) <= 2 and abs(moved['y']-geo['y']-(end[1]-start[1])) <= 2
     (data / 'output-move.json').write_text(json.dumps(dict(start=start, end=end, before=geo, outputs=outputs, entry=entry)))
     if entry['output']['name'] != 'drm-1' or not move_matches:
@@ -169,7 +172,11 @@ try:
     (data / 'rtc-alarm.json').write_text(json.dumps(dict(alarm=alarm, result=alarm_log)))
     print('READY: RTC alarm armed; entering real systemd suspend', flush=True)
     before = time.clock_gettime(time.CLOCK_BOOTTIME) - time.monotonic()
+    suspend_requested = True
     suspend_log = privileged('systemctl', 'suspend')
+    # systemctl returns after queuing suspend, not after waking. Never cancel
+    # the alarm merely because the machine has not entered sleep yet.
+    wait(lambda: time.clock_gettime(time.CLOCK_BOOTTIME) - time.monotonic() - before > 10, 90)
     slept = time.clock_gettime(time.CLOCK_BOOTTIME) - time.monotonic() - before
     (data / 'suspend.json').write_text(json.dumps(dict(suspend_seconds=slept, result=suspend_log)))
     assert slept > 10, 'kernel clocks must confirm actual sleep'
@@ -188,7 +195,9 @@ try:
     wait(lambda: not p.windows())
     record('applications closed normally with saved data')
 finally:
-    if alarm_armed: privileged('rtcwake', '-m', 'disable')
+    # On an ambiguous/failed suspend keep the recovery alarm armed. It expires
+    # naturally; removing it here could strand the machine just entering sleep.
+    if alarm_armed and not suspend_requested: privileged('rtcwake', '-m', 'disable')
     password = ''
     for process in processes:
         if process.poll() is None:
