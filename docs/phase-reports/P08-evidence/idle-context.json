@@ -1,0 +1,37 @@
+{
+  "compositor": "44a700f90fb5aedd3f3e8143d8b3ff90d4626afd9577519f34d6f545b8578222",
+  "shell": "4f6cae9371f7d1bc40c9b9297eb916e4e2a4f233d1c871aec8532482ad3a54a2",
+  "rooms": 9,
+  "active_workspace": 0,
+  "windows": 0,
+  "outputs": [
+    {
+      "output_id": 1,
+      "output_name": "drm-0",
+      "active_workspace": 0,
+      "primary": true,
+      "focused": true,
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "transform": "Normal",
+      "refresh_millihz": 60000
+    },
+    {
+      "output_id": 2,
+      "output_name": "drm-1",
+      "active_workspace": 0,
+      "primary": false,
+      "focused": false,
+      "x": 1920,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "transform": "Normal",
+      "refresh_millihz": 60000
+    }
+  ]
+}

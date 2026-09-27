@@ -1,5 +1,19 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P08-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
+P08-01 bis P08-05 umgesetzt: persistente Raum-/Fensterdaten, Navigation und
+Suche, isolierte statische native/X11-Vorschauen sowie begrenzte,
+generationsgebundene Cache-Lebensdauer bis einschließlich Lock.
+1185 Tests bestanden; Release installiert und per Neulogin aktiviert.
+64 Räume, große gültige Unicode-Snapshots, zwei Outputs, 150/200 %,
+Fensterende, minimiertes Aktivieren und 60 Öffnungszyklen geprüft.
+Drei fünfminütige Idle-Proben dokumentiert; geänderte Monitor-Modi begrenzen
+den strengen Vorher-/Nachher-Vergleich, eine optische Latenzbaseline fehlt.
+Diese Messgrenzen sind keine behaupteten bestandenen quantitativen Gates.
+Details und Dateimatrix: [P08-Bericht](docs/phase-reports/P08.md).
+Nächste Implementierungsphase ist P09; sie wurde nicht begonnen.
+
+
 **P07-Abschluss, 26.09.2026: `accepted` für den dokumentierten Fedora-Aufbau.**
 P07-01 bis P07-05 sind abgeschlossen: echte Raumleiste, vollständige Navigation
 für 1–64 Räume, gleichwertiges Maus-/Tastaturverschieben, Preferred/Dedicated-
@@ -9,7 +23,7 @@ nativen/X11-Fenstern sowie Tray-/Benachrichtigungszugang dokumentiert.
 Geprüfte Releases sind installiert und nach automatischem Neulogin aktiv.
 Keine ausstehende Aktivierung oder P07-Live-Abnahme. Genaue Matrix und Grenzen:
 [P07-Abschlussabgleich](docs/phase-reports/P07_ACCEPTANCE_REVIEW.md).
-Nächste Phase ist P08; sie wurde noch nicht begonnen. Die folgenden Checkpoints
+Zum damaligen P07-Abschluss war P08 noch nicht begonnen. Die folgenden Checkpoints
 bleiben historische Evidenz und sind gegen diese Abschlussmatrix zu lesen.
 
 **P07 vierter Block, 26.09.2026: `in-progress`.** Einmalige Startkorrelation
