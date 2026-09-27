@@ -135,11 +135,11 @@ fn draw_body(
     for (index, (title, note)) in [
         (
             "Fensterlayout merken",
-            "Noch nicht verfügbar · Fensterpositionen werden nicht gespeichert",
+            "Manuell im Tab Wiederherstellung · kein automatischer Login-Restore",
         ),
         (
             "Dateien wiederherstellen",
-            "Noch nicht verfügbar · keine automatische Dateiöffnung",
+            "Explizite Dateiverweise im Tab Wiederherstellung · unterstützte Apps nötig",
         ),
         (
             "Terminal-Sitzungen fortsetzen",
