@@ -1,5 +1,13 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**P12 begonnen, 27.09.2026: `in progress`, nicht accepted.** Ausgangsstand
+`f5d7885`; installierte/laufende P11-Hashes und zwei reale Intel-Outputs geprüft.
+Pflichtmatrix und noch offene Fälle: [P12-Bericht](docs/phase-reports/P12.md).
+Wiederzugang erforderlich: Nach realem Suspend am 27.09. um 17:20 CEST ist
+Fedora trotz RTC-Weckalarm nicht erreichbar; physisches Aufwecken angefragt.
+Endmessungen, offene Integrationsfälle und Remote-Cleanup stehen aus.
+P13 bleibt unbegonnen. Frühere Phasenbelege ersetzen keine P12-Integrationstests.
+
 **P11-Abschluss, 27.09.2026: `accepted` für den dokumentierten Fedora-Funktionsumfang.**
 P11-01 bis P11-05 umgesetzt: fünf native Seiten, konservative Frischerkennung,
 Maus-/Tastaturbedienung, reale Katalog-/Raum-/Leistenpfade, drei Übungen und
@@ -935,6 +943,10 @@ Keine fingierten Datenschutz-/Updateeinstellungen vor einem realen OS-Unterbau.
 etabliertes Nutzerprofil ungefragt.
 
 ### P12 — Linux-Desktop-Alpha stabilisieren
+
+**Status: `in progress`, 27.09.2026.** Maßgeblicher Teststand und vollständige
+Pflichtmatrix: [P12](docs/phase-reports/P12.md). Keine Alpha-Abnahme vor dem
+Nachweis aller Pflichtfälle.
 
 1. P12-01: Reproduzierbare Installation/Deinstallation auf der gewählten
    Entwicklungsdistribution dokumentieren; NIWOE als eigene Session testen.

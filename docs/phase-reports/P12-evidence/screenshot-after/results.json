@@ -1,0 +1,38 @@
+[
+  {
+    "output": "drm-0",
+    "expected": [
+      1920,
+      1080
+    ],
+    "actual": [
+      1920,
+      1080
+    ],
+    "passed": true
+  },
+  {
+    "output": "drm-1",
+    "expected": [
+      1600,
+      900
+    ],
+    "actual": [
+      1600,
+      900
+    ],
+    "passed": true
+  },
+  {
+    "output": null,
+    "expected": [
+      1920,
+      1080
+    ],
+    "actual": [
+      1920,
+      1080
+    ],
+    "passed": true
+  }
+]

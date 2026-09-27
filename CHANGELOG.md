@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Meridian are documented here.
+All notable changes to NIWOE (formerly Meridian) are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -9,6 +9,27 @@ behavioural changes, `PATCH` for fixes. All crates in the workspace share a
 single version.
 
 ## [Unreleased]
+
+### Linux desktop alpha stabilization (P12, in progress)
+
+- Fixed DRM screenshots consuming requests for a different monitor: named
+  requests wait for their actual output, unspecified requests use the primary
+  output, and unavailable outputs return an error instead of another screen.
+- Fixed XWayland keyboard focus through Smithay's ICCCM target and first-buffer
+  activation of assigned X11 windows and dialogs.
+- Fixed modifier dragging using the CSD render offset as the window origin,
+  and modifier resize clicks opening a competing client popup grab.
+- Added a conservative Fedora removal procedure using the matching release's
+  staged payload. Changed files and symlinked paths stop removal before any
+  payload is deleted; personal settings and unrelated files are retained.
+- Added an isolated install/update/remove/reinstall regression and live P12
+  Wayland/XWayland input and public screenshot portal checks. Execution status,
+  remaining mandatory cases and evidence are tracked in
+  [P12](docs/phase-reports/P12.md); the desktop alpha is not yet accepted.
+- Documented the Fedora release lifecycle in
+  [installation instructions](docs/NIWOE_FEDORA_INSTALLATION.md). The active
+  alpha uses the central dark green theme; the older palette notes below are
+  historical changes, not current design guidance.
 
 ### Fixed
 

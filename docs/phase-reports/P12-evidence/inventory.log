@@ -1,0 +1,49 @@
+2026-09-27T15:57:11+02:00
+NAME="Fedora Linux"
+VERSION="44 (KDE Plasma Desktop Edition)"
+RELEASE_TYPE=stable
+ID=fedora
+VERSION_ID=44
+VERSION_CODENAME=""
+PRETTY_NAME="Fedora Linux 44 (KDE Plasma Desktop Edition)"
+ANSI_COLOR="0;38;2;60;110;180"
+LOGO=fedora-logo-icon
+CPE_NAME="cpe:/o:fedoraproject:fedora:44"
+DEFAULT_HOSTNAME="fedora"
+HOME_URL="https://fedoraproject.org/"
+DOCUMENTATION_URL="https://docs.fedoraproject.org/en-US/fedora/f44/"
+SUPPORT_URL="https://ask.fedoraproject.org/"
+BUG_REPORT_URL="https://bugzilla.redhat.com/"
+REDHAT_BUGZILLA_PRODUCT="Fedora"
+REDHAT_BUGZILLA_PRODUCT_VERSION=44
+REDHAT_SUPPORT_PRODUCT="Fedora"
+REDHAT_SUPPORT_PRODUCT_VERSION=44
+SUPPORT_END=2027-05-19
+VARIANT="KDE Plasma Desktop Edition"
+VARIANT_ID=kde
+Linux fedora-dev 7.2.6-200.fc44.x86_64 #1 SMP PREEMPT_DYNAMIC Mon Sep 14 22:22:41 UTC 2026 x86_64 GNU/Linux
+00:02.0 VGA compatible controller [0300]: Intel Corporation Kaby Lake-U GT2 [HD Graphics 620] [8086:5916] (rev 02)
+	Subsystem: Acer Incorporated [ALI] Device [1025:108f]
+	Kernel driver in use: i915
+	Kernel modules: i915
+--
+01:00.0 3D controller [0302]: NVIDIA Corporation GM107 [GeForce 940MX] [10de:179c] (rev a2)
+	Subsystem: Acer Incorporated [ALI] Device [1025:108f]
+	Kernel driver in use: nouveau
+	Kernel modules: nouveau
+SESSION  UID USER   SEAT  LEADER CLASS   TTY   IDLE SINCE
+      2 1000 eduard -     898    manager -     no   -
+    454 1000 eduard seat0 132107 user    tty1  no   -
+    471 1000 eduard -     135666 user    pts/0 no   -
+
+3 sessions listed.
+132150 /usr/local/bin/niwoe
+132163 /usr/local/bin/niwoe-shell
+d6a70f16e58c9ee7fe4c71eab065f3fa6758a0f9bab40598dbaf69671736ab56  /usr/local/bin/niwoe
+8cb3e937ef02dae9729fedf73721a62dca78b29a9e521210ded6948549b9d4b3  /usr/local/bin/niwoe-shell
+d6a70f16e58c9ee7fe4c71eab065f3fa6758a0f9bab40598dbaf69671736ab56  /proc/132150/exe
+8cb3e937ef02dae9729fedf73721a62dca78b29a9e521210ded6948549b9d4b3  /proc/132163/exe
+active
+rustc 1.98.1 (48a229cea 2026-09-01) (Fedora 1.98.1-1.fc44)
+cargo 1.98.1 (797e8a9bc 2026-08-05) (Fedora 1.98.1-1.fc44)
+Enforcing

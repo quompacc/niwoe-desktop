@@ -1,0 +1,48 @@
+PASS launch wayland
+PASS launch x11
+PASS backend and toolkit focus wayland
+PASS Wayland input
+PASS backend and toolkit focus x11
+PASS clipboard Wayland to XWayland
+PASS backend and toolkit focus wayland
+PASS clipboard XWayland to Wayland
+PASS backend and toolkit focus wayland
+PASS save wayland
+PASS maximize wayland
+PASS unmaximize wayland
+PASS fullscreen wayland
+PASS unfullscreen wayland
+PASS minimize wayland
+PASS backend and toolkit focus wayland
+PASS restore wayland
+PASS dialog wayland F5
+PASS dialog closed wayland F5
+PASS backend and toolkit focus wayland
+PASS dialog wayland F6
+PASS dialog closed wayland F6
+PASS backend and toolkit focus wayland
+PASS move room wayland
+PASS backend and toolkit focus wayland
+PASS backend and toolkit focus wayland
+PASS return room wayland
+PASS backend and toolkit focus x11
+PASS save x11
+PASS maximize x11
+PASS unmaximize x11
+PASS fullscreen x11
+PASS unfullscreen x11
+PASS minimize x11
+PASS backend and toolkit focus x11
+PASS restore x11
+PASS dialog x11 F5
+PASS dialog closed x11 F5
+PASS backend and toolkit focus x11
+PASS dialog x11 F6
+PASS dialog closed x11 F6
+PASS backend and toolkit focus x11
+PASS move room x11
+PASS backend and toolkit focus x11
+PASS backend and toolkit focus x11
+PASS return room x11
+PASS room definitions unchanged
+PASS owned clients removed
