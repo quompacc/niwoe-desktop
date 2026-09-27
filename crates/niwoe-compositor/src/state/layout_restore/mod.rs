@@ -111,8 +111,15 @@ fn result_rows(snapshot: &Snapshot, results: &BTreeMap<u32, String>) -> Vec<Layo
         .map(|e| LayoutResult {
             file: e.file.clone(),
             key: e.key,
-            label: match &e.app {
-                AppReference::Native(s) | AppReference::Xwayland(s) => s.clone(),
+            label: {
+                let app = match &e.app {
+                    AppReference::Native(s) | AppReference::Xwayland(s) => s,
+                };
+                if e.title.is_empty() {
+                    app.clone()
+                } else {
+                    format!("{} · {app}", e.title)
+                }
             },
             message: results
                 .get(&e.key)
@@ -134,4 +141,50 @@ fn match_entry(entry: &Entry, snapshot: &Snapshot, windows: &[Window]) -> Option
         .collect();
     niwoe_config::layouts::matching::unique_match(entry, snapshot, &metadata)
         .map(|index| candidates[index].0.clone())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn file_binding_rows_distinguish_documents_of_the_same_app() {
+        let entry = Entry {
+            key: 0,
+            app: AppReference::Native("org.example.Editor".into()),
+            desktop_id: None,
+            title: "First document".into(),
+            file: None,
+            floating: true,
+            geometry: niwoe_config::layouts::Geometry {
+                x: 0,
+                y: 0,
+                width: 400,
+                height: 300,
+            },
+            output: None,
+        };
+        let mut second = entry.clone();
+        second.key = 1;
+        second.title = "Second document".into();
+        let mut untitled = entry.clone();
+        untitled.key = 2;
+        untitled.title.clear();
+        let snapshot = Snapshot {
+            revision: 1,
+            schema_version: niwoe_config::layouts::VERSION,
+            room_id: RoomId(1),
+            mode: niwoe_config::rooms::RoomLayout::Floating,
+            entries: vec![entry, second, untitled],
+            tree: vec![],
+        };
+        let rows = result_rows(&snapshot, &BTreeMap::new());
+        assert!(rows[0].label.starts_with("First document"));
+        assert!(rows[1].label.starts_with("Second document"));
+        assert_eq!(rows[2].label, "org.example.Editor");
+        assert_eq!(
+            rows.iter().map(|r| r.key).collect::<Vec<_>>(),
+            vec![0, 1, 2]
+        );
+    }
 }
