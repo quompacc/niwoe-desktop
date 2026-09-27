@@ -134,6 +134,7 @@ pub(super) fn handle_toplevel_destroyed(state: &mut NiwoeState, surface: Topleve
         .maximize_restore_locations
         .remove(&format!("keyboard-fullscreen:{id}"));
     state.decoration_manager.remove(surface.wl_surface());
+    state.restore_focus_after_removed(surface.wl_surface(), surface.parent());
     state.broadcast_toplevel_closed(&surface);
     state.broadcast_window_snapshot();
     state.mark_all_outputs_dirty("xdg-toplevel-destroyed");

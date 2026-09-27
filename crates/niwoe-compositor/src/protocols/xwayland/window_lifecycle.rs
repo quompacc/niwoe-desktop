@@ -305,6 +305,12 @@ macro_rules! xwm_window_lifecycle_methods {
             self.workspaces.space_at_mut(workspace).unmap_elem(&win);
             self.mark_all_outputs_dirty("xwayland-unmap-window");
         }
+        if let Some(surface) = window.wl_surface() {
+            let parent = window.is_transient_for()
+                .and_then(|id| find_x11_surface_by_window_id(self, id))
+                .and_then(|parent| parent.wl_surface());
+            self.restore_focus_after_removed(&surface, parent);
+        }
         if !is_override_redirect {
             let _ = window.set_mapped(false);
         }
@@ -332,6 +338,12 @@ macro_rules! xwm_window_lifecycle_methods {
         if let Some((workspace, win)) = find_x11_window_with_workspace(self, &window) {
             self.workspaces.space_at_mut(workspace).unmap_elem(&win);
             self.mark_all_outputs_dirty("xwayland-destroy-window");
+        }
+        if let Some(surface) = window.wl_surface() {
+            let parent = window.is_transient_for()
+                .and_then(|id| find_x11_surface_by_window_id(self, id))
+                .and_then(|parent| parent.wl_surface());
+            self.restore_focus_after_removed(&surface, parent);
         }
         if window.is_override_redirect() {
             let (elapsed_since_announce_ms, elapsed_since_map_ms, last_state) = self
