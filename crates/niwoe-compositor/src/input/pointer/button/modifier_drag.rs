@@ -13,7 +13,10 @@ fn modifier_drag_hit(
         return None;
     }
     let space = state.workspaces.active_space();
-    let (window, origin) = space.element_under(location)?;
+    let (window, _) = space.element_under(location)?;
+    // element_under returns the render origin, which includes the client's
+    // CSD/shadow offset. Grabs relocate the mapped window geometry instead.
+    let origin = space.element_location(window)?;
     if window.x11_surface().is_some_and(|x| x.is_override_redirect()) {
         return None;
     }
