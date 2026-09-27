@@ -85,7 +85,10 @@ impl NiwoeState {
                     tracing::warn!(%error, "failed to configure tiled XWayland window");
                 }
             }
-            space.map_element(window, rect.loc, false);
+            // Reflow changes geometry, not stacking. map_element raises even
+            // with activate=false and would cover a newly floating, focused
+            // window with its tiled neighbour before the next pointer click.
+            space.relocate_element(&window, rect.loc);
         }
     }
 
