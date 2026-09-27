@@ -7,6 +7,11 @@ pub(crate) const SUGGESTIONS: [(&str, &str); 3] = [
     ("Entwicklung", "Ein Kontext für Entwicklungswerkzeuge"),
 ];
 
+/// Match P10's Super+1: resolve the first display position to its stable slot.
+pub(crate) fn practice_workspace(rooms: &[niwoe_ipc::RoomEntry]) -> Option<u8> {
+    rooms.first().map(|room| room.workspace)
+}
+
 #[derive(Default)]
 pub(crate) struct Wizard {
     pub open: bool,
@@ -113,7 +118,7 @@ impl Wizard {
             }
             _ => [
                 "Hub ausprobieren · Super+Space · Panel-Hub",
-                "Raum 1 wählen · Super+1 · Raumleiste",
+                "Ersten Raum wählen · Super+1 · Raumleiste",
                 "Systemdeck öffnen · Super+Escape · Systemstatus",
             ]
             .iter()
@@ -220,6 +225,21 @@ impl Wizard {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn practice_shortcut_target_survives_room_reordering() {
+        let rooms = [2, 1].map(|workspace| niwoe_ipc::RoomEntry {
+            id: u64::from(workspace) + 30,
+            workspace,
+            name: "Existing room".into(),
+            description: String::new(),
+            assignment: Default::default(),
+            preferences: Default::default(),
+        });
+        assert_eq!(practice_workspace(&rooms), Some(2));
+        assert_eq!(practice_workspace(&rooms[1..]), Some(1));
+        assert_eq!(practice_workspace(&[]), None);
+    }
 
     #[test]
     fn incomplete_or_uncertain_state_only_exposes_safe_exit_and_reload() {

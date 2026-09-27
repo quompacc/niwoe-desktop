@@ -384,13 +384,8 @@ impl NiwoeShell {
         let performed = match index {
             0 => self.launcher_state.open,
             1 => {
-                if let Some(workspace) = self
-                    .workspace_state
-                    .rooms
-                    .snapshot
-                    .rooms
-                    .first()
-                    .map(|r| r.workspace)
+                if let Some(workspace) =
+                    crate::first_run::practice_workspace(&self.workspace_state.rooms.snapshot.rooms)
                 {
                     self.workspace_state.rooms.wizard.practice_room = Some(workspace);
                     self.handle_panel_click(qh, ClickAction::SwitchWorkspace(workspace));
