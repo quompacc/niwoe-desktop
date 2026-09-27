@@ -363,6 +363,7 @@ macro_rules! handle_launcher_pointer {
                         let cx = local_pos.0 as i32;
                         let cy = local_pos.1 as i32;
                         if $shell.room_configuration_id.is_some() {
+                            if $shell.layout_click($qh, cx, cy, content_width, content_height) { continue; }
                             if $shell.room_target_menu_click($qh, cx, cy, content_width, content_height) { continue; }
                             if let Some(action) = crate::room_management_view::hit_configuration(
                                 cx, cy, content_width, content_height,

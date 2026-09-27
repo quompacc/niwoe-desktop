@@ -113,6 +113,25 @@ fn configuration_renders_selected_room() {
         },
     };
     let edit = Edit {
+        restore: crate::room_editor::RestoreUi {
+            open: std::env::var_os("NIWOE_PREVIEW_RESTORE").is_some(),
+            message: "Beendet: 1 angeordnet, 1 nicht wiederhergestellt".into(),
+            results: vec![
+                niwoe_ipc::LayoutResult {
+                    key: 0,
+                    label: "org.example.Editor".into(),
+                    message: "Fenster angeordnet".into(),
+                    file: None,
+                },
+                niwoe_ipc::LayoutResult {
+                    key: 1,
+                    label: "org.example.Browser".into(),
+                    message: "App fehlt im Katalog".into(),
+                    file: None,
+                },
+            ],
+            ..Default::default()
+        },
         id: if creating { 0 } else { 2 },
         revision: 1,
         name: room.name.clone(),

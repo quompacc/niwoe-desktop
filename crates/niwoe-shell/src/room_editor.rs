@@ -2,6 +2,7 @@ use niwoe_ipc::{RoomChange, RoomEntry, RoomSnapshot};
 use std::time::{Duration, Instant};
 
 pub(crate) struct Edit {
+    pub restore: RestoreUi,
     pub id: u64,
     pub revision: u64,
     pub name: String,
@@ -15,7 +16,21 @@ pub(crate) struct Edit {
     pub focus: usize,
 }
 
+#[derive(Default)]
+pub(crate) struct RestoreUi {
+    pub revision: u64,
+    pub open: bool,
+    pub focus: usize,
+    pub page: usize,
+    pub file: String,
+    pub file_key: Option<u32>,
+    pub running: bool,
+    pub message: String,
+    pub results: Vec<niwoe_ipc::LayoutResult>,
+}
+
 pub(crate) struct RoomUi {
+    pub layouts: std::collections::BTreeMap<u64, niwoe_ipc::LayoutNotice>,
     pub snapshot: RoomSnapshot,
     pub ready: bool,
     pub edit: Option<Edit>,
@@ -27,6 +42,7 @@ pub(crate) struct RoomUi {
 impl Default for RoomUi {
     fn default() -> Self {
         Self {
+            layouts: Default::default(),
             snapshot: RoomSnapshot {
                 revision: 0,
                 rooms: (1..=9)
@@ -127,6 +143,7 @@ impl RoomUi {
             .find(|r| r.workspace == workspace)
         {
             self.edit = Some(Edit {
+                restore: Default::default(),
                 id: room.id,
                 revision: self.snapshot.revision,
                 name: room.name.clone(),
@@ -150,6 +167,7 @@ impl RoomUi {
             return false;
         }
         self.edit = Some(Edit {
+            restore: Default::default(),
             id: 0,
             revision: self.snapshot.revision,
             name: String::new(),

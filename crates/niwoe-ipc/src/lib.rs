@@ -3,7 +3,9 @@ use std::{env, io, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 mod appearance;
+mod layouts;
 pub use appearance::{AppearanceSnapshot, AppearanceTheme, AppearanceWallpaperMode};
+pub use layouts::{LayoutAction, LayoutLaunch, LayoutNotice, LayoutResult};
 mod room_preferences;
 pub use room_preferences::{AppReference, RoomLayout, RoomPreferences, RoomRestore};
 mod rooms;
@@ -211,6 +213,11 @@ pub enum ScreenshotBridgeMessage {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellEvent {
+    Layout {
+        #[serde(default)]
+        request_id: String,
+        notice: LayoutNotice,
+    },
     RoomSnapshot {
         snapshot: RoomSnapshot,
     },
@@ -329,6 +336,11 @@ pub enum ShellEvent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "kebab-case")]
 pub enum ShellCommand {
+    Layout {
+        #[serde(default)]
+        request_id: String,
+        action: LayoutAction,
+    },
     RequestRoomSnapshot,
     MutateRoom {
         request_id: String,
@@ -415,41 +427,7 @@ pub enum ShellCommand {
     },
 }
 
-impl ShellCommand {
-    pub fn name(&self) -> &'static str {
-        match self {
-            Self::RequestRoomSnapshot => "request-room-snapshot",
-            Self::MutateRoom { .. } => "mutate-room",
-            Self::Authenticate { .. } => "authenticate",
-            Self::SwitchWorkspace { .. } => "switch-workspace",
-            Self::ToggleLauncher => "toggle-launcher",
-            Self::ToggleQuickSettings => "toggle-quick-settings",
-            Self::OpenSystemSettings => "open-system-settings",
-            Self::SettingsRefresh => "settings-refresh",
-            Self::AppearanceRefresh => "appearance-refresh",
-            Self::AppearanceThemeSet { .. } => "appearance-theme-set",
-            Self::AppearanceWallpaperSet { .. } => "appearance-wallpaper-set",
-            Self::AppearanceWallpaperModeSet { .. } => "appearance-wallpaper-mode-set",
-            Self::QuickSettingsNetworkRefresh => "quick-settings-network-refresh",
-            Self::QuickSettingsNetworkConnect { .. } => "quick-settings-network-connect",
-            Self::QuickSettingsNetworkDisconnect => "quick-settings-network-disconnect",
-            Self::AudioVolumeSet { .. } => "audio-volume-set",
-            Self::AudioMuteToggle => "audio-mute-toggle",
-            Self::PowerProfileSet { .. } => "power-profile-set",
-            Self::FocusWindow { .. } => "focus-window",
-            Self::MoveWindowToRoom { .. } => "move-window-to-room",
-            Self::LaunchApp { .. } => "launch-app",
-            Self::LockSession => "lock-session",
-            Self::PowerPrepareSleep => "power-prepare-sleep",
-            Self::PowerResume => "power-resume",
-            Self::ReloadConfig => "reload-config",
-            Self::Quit => "quit",
-            Self::CaptureWindowThumbnail { .. } => "capture-window-thumbnail",
-            Self::ScreenshotConsentResponse { .. } => "screenshot-consent-response",
-            Self::ScreenshotRegionResponse { .. } => "screenshot-region-response",
-        }
-    }
-}
+mod command_name;
 
 /// State sent from the shell owner to the unprivileged Quick Settings
 /// document. Backend identities and privileged implementation details stay

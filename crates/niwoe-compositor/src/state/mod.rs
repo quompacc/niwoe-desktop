@@ -61,6 +61,7 @@ mod idle;
 mod ipc;
 mod launch_intent;
 mod layout;
+mod layout_restore;
 mod lock;
 #[cfg(test)]
 mod output_hotplug_tests;
@@ -375,6 +376,7 @@ pub struct NiwoeState {
     pub theme_manager: ThemeManager,
     pub wallpaper_manager: WallpaperManager,
     pub wm_workspaces: Vec<WmWorkspace>,
+    pub(crate) layout_restore: layout_restore::Controller,
     pub ipc: IpcServer,
     pub keybind_config: KeybindConfig,
     pub decoration_manager: DecorationManager,

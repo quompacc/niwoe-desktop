@@ -39,6 +39,7 @@ fn draw_landscape(pm: &mut tiny_skia::PixmapMut<'_>, rect: Rect) {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ConfigurationAction {
+    Restore,
     Back,
     Name,
     MoveEarlier,
@@ -51,6 +52,7 @@ pub(crate) enum ConfigurationAction {
 }
 
 mod actions;
+pub(crate) mod restore;
 use actions::{deletion_rect, description_rect, draw_deletion};
 mod target_menu;
 pub(crate) use target_menu::hit_target_menu;
@@ -148,6 +150,9 @@ pub(crate) fn hit_configuration(
     height: u32,
     scroll_y: i32,
 ) -> Option<ConfigurationAction> {
+    if restore::hit_tab(x, y) {
+        return Some(ConfigurationAction::Restore);
+    }
     if contains(back_rect(height), x, y)
         || contains(
             Rect {
@@ -319,10 +324,10 @@ fn draw_chrome(
     fill(pm, tabs, p.background, Radius::DEFAULT.none);
     let mut tab_x = tabs.x + C.outer_pad;
     for (label, selected) in [
-        ("Allgemein", true),
+        ("Allgemein", !edit.restore.open),
         ("Apps", false),
         ("Dateien", false),
-        ("Wiederherstellung", false),
+        ("Wiederherstellung", edit.restore.open),
         ("Automatisierung", false),
         ("Benachrichtigungen", false),
     ] {
@@ -346,8 +351,17 @@ fn draw_chrome(
             ),
             Radius::DEFAULT.sm,
         );
-        if selected {
-            outline(pm, tab, p.accent, Controls::BORDER);
+        if selected || (label == "Wiederherstellung" && edit.focus == 8) {
+            outline(
+                pm,
+                tab,
+                p.accent,
+                if edit.focus == 8 && label == "Wiederherstellung" {
+                    Controls::FOCUS_WIDTH
+                } else {
+                    Controls::BORDER
+                },
+            );
         }
         paint_text_centered(
             pm,
@@ -367,7 +381,9 @@ fn draw_chrome(
     fill(pm, footer, p.background, Radius::DEFAULT.none);
     paint_text_left_centered(
         pm,
-        if message.is_empty() {
+        if edit.restore.open {
+            "Esc: Allgemein · Tab/Enter: Bedienung · Kein automatischer Login-Restore"
+        } else if message.is_empty() {
             "Name und Beschreibung werden gemeinsam gespeichert."
         } else {
             message
@@ -381,6 +397,9 @@ fn draw_chrome(
             p.text_dim
         },
     );
+    if edit.restore.open {
+        return;
+    }
     for (save, label) in [(false, "Abbrechen"), (true, "Änderungen speichern")] {
         let action = footer_action_rect(pm.width(), pm.height(), save);
         fill(
@@ -447,10 +466,14 @@ pub(crate) fn draw_room_configuration(
         p.background,
         Radius::DEFAULT.none,
     );
-    draw_body(
-        &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, config,
-    );
-    target_menu::draw(&mut pm, edit, rooms, scroll_y, p);
+    if edit.restore.open {
+        restore::draw(&mut pm, &edit.restore, p);
+    } else {
+        draw_body(
+            &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, config,
+        );
+        target_menu::draw(&mut pm, edit, rooms, scroll_y, p);
+    }
     draw_chrome(
         &mut pm,
         room,

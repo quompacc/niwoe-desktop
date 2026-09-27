@@ -12,6 +12,9 @@ use std::{
 };
 
 use tracing::debug;
+mod restore;
+#[cfg(test)]
+mod restore_tests;
 
 const XDG_DATA_DIRS_DEFAULT: &str = "/usr/local/share:/usr/share";
 const NIWOE_DESKTOP_ENV: &str = "NIWOE";
@@ -34,6 +37,8 @@ const NON_LAUNCHER_DESKTOP_IDS: &[&str] = &[
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DesktopApp {
+    pub startup_wm_class: Option<String>,
+    pub(crate) file_argv: Option<Vec<String>>,
     pub desktop_id: String,
     pub name: String,
     pub program: String,
@@ -56,6 +61,8 @@ impl DesktopApp {
         let args = exec_argv.iter().skip(1).cloned().collect::<Vec<_>>();
         let exec = argv_to_display(&program, &args);
         Self {
+            startup_wm_class: None,
+            file_argv: None,
             desktop_id: String::new(),
             name_key: name.to_lowercase(),
             exec_key: exec.to_lowercase(),
@@ -126,6 +133,8 @@ impl DesktopApp {
         let mut desktop_type = None;
         let mut categories = None;
         let mut icon_name = None;
+        let mut startup_wm_class = None;
+        let mut file_argv = None;
 
         for line in raw.lines() {
             let line = line.trim();
@@ -144,7 +153,20 @@ impl DesktopApp {
                 "Name" if !value.is_empty() => {
                     name.get_or_insert_with(|| value.to_string());
                 }
-                "Exec" => {
+                "Exec" if exec_argv.is_none() => {
+                    let tokens = tokenize_exec(value);
+                    if tokens.first().is_some_and(|s| !s.contains('%'))
+                        && tokens
+                            .iter()
+                            .filter(|s| s.as_str() == "%f" || s.as_str() == "%F")
+                            .count()
+                            == 1
+                        && tokens
+                            .iter()
+                            .all(|s| !s.contains('%') || s == "%f" || s == "%F")
+                    {
+                        file_argv = Some(tokens);
+                    }
                     let argv = parse_exec_argv(value);
                     if !argv.is_empty() {
                         exec_argv.get_or_insert(argv);
@@ -177,6 +199,7 @@ impl DesktopApp {
                 "Icon" => {
                     icon_name = normalize_icon_name(value);
                 }
+                "StartupWMClass" if !value.is_empty() => startup_wm_class = Some(value.to_string()),
                 _ => {}
             };
         }
@@ -206,6 +229,8 @@ impl DesktopApp {
             app.categories = parse_categories(&raw_categories);
         }
         app.icon_name = icon_name;
+        app.startup_wm_class = startup_wm_class;
+        app.file_argv = file_argv;
         if app.name.is_empty() || app.program.is_empty() {
             return Err("empty-name-or-exec");
         }

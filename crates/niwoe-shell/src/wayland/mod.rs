@@ -3,6 +3,7 @@ mod handlers;
 mod hub;
 mod init;
 mod ipc;
+mod layout_restore;
 mod render;
 mod screencopy;
 mod shell;

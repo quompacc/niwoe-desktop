@@ -55,6 +55,9 @@ impl NiwoeShell {
             return;
         }
         match action {
+            ConfigurationAction::Restore => {
+                self.open_layout_panel();
+            }
             ConfigurationAction::Back | ConfigurationAction::Cancel => {
                 self.return_to_room_management(qh);
                 return;
@@ -137,6 +140,7 @@ impl NiwoeShell {
     ) {
         use crate::room_management_view::ConfigurationAction;
         use smithay_client_toolkit::seat::keyboard::Keysym;
+        if self.layout_key(qh, key) { return; }
         if self.workspace_state.rooms.pending.is_some() {
             return;
         }
@@ -172,9 +176,10 @@ impl NiwoeShell {
                 RoomEditAction::Name,
                 RoomEditAction::Target,
                 RoomEditAction::Delete,
+                RoomEditAction::Name,
             ];
             if let Some(edit) = self.workspace_state.rooms.edit.as_ref() {
-                let order = [0, 5, 1, 2, 6, 7, 3, 4];
+                let order = [0, 5, 1, 2, 6, 7, 8, 3, 4];
                 let step = if key == Keysym::Tab { 1 } else { order.len() - 1 };
                 let mut position = order.iter().position(|i| *i == edit.focus).unwrap_or(0);
                 let mut focus = edit.focus;
@@ -207,6 +212,7 @@ impl NiwoeShell {
                 Some(4) => ConfigurationAction::Cancel,
                 Some(6) => ConfigurationAction::Target,
                 Some(7) => ConfigurationAction::Delete,
+                Some(8) => ConfigurationAction::Restore,
                 _ => ConfigurationAction::Save,
             };
             self.room_configuration_action(qh, action);

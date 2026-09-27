@@ -20,6 +20,17 @@ pub struct WmWorkspace {
 }
 
 impl WmWorkspace {
+    pub fn layout_snapshot(&self) -> Vec<crate::tiling::LayoutNode<Window>> {
+        self.tiling.snapshot()
+    }
+
+    pub fn restore_layout(
+        &mut self,
+        nodes: Vec<crate::tiling::LayoutNode<Option<Window>>>,
+    ) -> bool {
+        self.tiling.restore(nodes)
+    }
+
     pub fn swap_windows(&mut self, a: &Window, b: &Window) -> bool {
         self.tiling.swap_windows(a, b)
     }

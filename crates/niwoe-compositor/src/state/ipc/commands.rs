@@ -11,6 +11,7 @@ use crate::{
 
 impl NiwoeState {
     pub fn poll_ipc(&mut self) {
+        self.poll_layout_restore();
         let poll = self.ipc.poll();
 
         if poll.authenticated_clients > 0 {
@@ -98,8 +99,9 @@ impl NiwoeState {
         }
     }
 
-    fn handle_shell_command(&mut self, command: ShellCommand) {
+    pub(crate) fn handle_shell_command(&mut self, command: ShellCommand) {
         match command {
+            ShellCommand::Layout { request_id, action } => self.layout_action(request_id, action),
             ShellCommand::RequestRoomSnapshot => {
                 self.broadcast_rooms();
                 if self.lock_manager.is_locked_or_pending() {

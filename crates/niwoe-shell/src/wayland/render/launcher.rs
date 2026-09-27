@@ -5,7 +5,8 @@ impl NiwoeShell {
 
     pub(crate) fn launcher_content_size(&self) -> (u32, u32) {
         let (width, height) = self.launcher_fitted_size();
-        if !self.room_management_open && !self.launcher_settings_open {
+        if (!self.room_management_open && !self.launcher_settings_open)
+            || (self.room_management_open && self.workspace_state.rooms.edit.as_ref().is_some_and(|edit| edit.restore.open)) {
             niwoe_tokens::Hub::DEFAULT.canvas_size(width, height)
         } else {
             (width, height)

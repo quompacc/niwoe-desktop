@@ -450,6 +450,7 @@ struct RoomRenderContext<'a> {
 
 include!("room_management_view/cards.rs");
 mod configuration;
+pub(crate) use configuration::restore;
 pub(crate) use configuration::{
     draw_room_configuration, hit_configuration, hit_target_menu, max_configuration_scroll,
     ConfigurationAction,

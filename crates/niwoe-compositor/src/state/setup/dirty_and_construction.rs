@@ -213,6 +213,7 @@ impl NiwoeState {
             theme_manager,
             wallpaper_manager,
             wm_workspaces: (0..workspace_count).map(|_| WmWorkspace::new()).collect(),
+            layout_restore: Default::default(),
             ipc: IpcServer::new(),
             keybind_config: niwoe_config.keybinds,
             decoration_manager: DecorationManager::new(),

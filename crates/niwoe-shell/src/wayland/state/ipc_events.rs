@@ -2,7 +2,9 @@ impl NiwoeShell {
     fn apply_ipc_event(&mut self, event: ShellEvent) {
         let hub_target = self.hub_selection_target();
         match event {
+            ShellEvent::Layout { notice, .. } => self.apply_layout_notice(notice),
             ShellEvent::RoomSnapshot { snapshot } => {
+                self.workspace_state.rooms.layouts.retain(|id, _| snapshot.rooms.iter().any(|room| room.id == *id));
                 if self.workspace_state.rooms.accept(snapshot) {
                     self.panel_last_signature = None;
                     self.panel_dirty = true;

@@ -138,6 +138,9 @@ impl Default for Decorations {
 }
 
 impl Decorations {
+    /// Minimum useful restored client area, still capped by the available output.
+    pub const RESTORE_MIN_WIDTH: i32 = 160;
+    pub const RESTORE_MIN_HEIGHT: i32 = 100;
     /// All compositor-owned glass uses the approved popup material.
     pub fn compositor_surface_treatment(&self, surface: ThemeSurface) -> SurfaceTreatment {
         self.surface_treatment(surface)
