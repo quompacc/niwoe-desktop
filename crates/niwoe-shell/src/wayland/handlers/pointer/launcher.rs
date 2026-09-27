@@ -11,19 +11,22 @@ macro_rules! handle_launcher_pointer {
                     let (px, py) = $event.position;
                     let vx = $shell.launcher_visual_x as f64;
                     let vy = $shell.launcher_visual_y as f64;
-                    let (lw, lh) = (content_width as f64, content_height as f64);
+                    let (fitted_width, fitted_height) = $shell.launcher_fitted_size();
+                    let (lw, lh) = (fitted_width as f64, fitted_height as f64);
                     if px < vx || px >= vx + lw || py < vy || py >= vy + lh {
                         if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
                             $shell.close_launcher_after_launch($qh, RepaintReason::Pointer);
                         }
                         continue;
                     }
-                    (px - vx, py - vy)
+                    ((px - vx) * content_width as f64 / lw,
+                     (py - vy) * content_height as f64 / lh)
                 } else {
                     $event.position
                 };
 
                 if $shell.window_picker_pointer($qh, &$event.kind, local_pos, content_width, content_height) { continue; }
+                if $shell.hub_pointer($qh, &$event.kind, local_pos, content_width, content_height) { continue; }
                 // ── Step 0: Context-menu left-click — before the widget tree so clicking
                 //    a menu item does not also fire the underlying tile.
                 if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {

@@ -341,6 +341,7 @@ pub(crate) fn clear_tiled_toplevel_states(state: &mut smithay::wayland::shell::x
 
 #[derive(Debug)]
 pub struct ThumbnailRequest {
+    pub request_id: Option<String>,
     pub window_id: String,
     pub max_width: u32,
     pub max_height: u32,
@@ -434,6 +435,7 @@ pub struct NiwoeState {
     pub screencopy_sessions: Vec<CaptureSession>,
     pub pending_screencopy_frames: Vec<(CaptureFrame, Output)>,
     pub pending_thumbnail_requests: Vec<ThumbnailRequest>,
+    pub thumbnail_files: std::collections::VecDeque<std::path::PathBuf>,
     pub pending_screenshot_requests: Vec<PendingScreenshotRequest>,
     /// Screenshot requests awaiting the user's consent answer (keyed by the
     /// request_id carried in each entry). Moved to `pending_screenshot_requests`

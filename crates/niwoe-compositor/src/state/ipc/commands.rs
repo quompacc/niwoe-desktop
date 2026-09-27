@@ -100,7 +100,12 @@ impl NiwoeState {
 
     fn handle_shell_command(&mut self, command: ShellCommand) {
         match command {
-            ShellCommand::RequestRoomSnapshot => self.broadcast_rooms(),
+            ShellCommand::RequestRoomSnapshot => {
+                self.broadcast_rooms();
+                if self.lock_manager.is_locked_or_pending() {
+                    self.ipc.broadcast(&ShellEvent::SessionLocked);
+                }
+            }
             ShellCommand::MutateRoom {
                 request_id,
                 expected_revision,
@@ -270,15 +275,30 @@ impl NiwoeState {
                 self.loop_signal.stop();
             }
             ShellCommand::CaptureWindowThumbnail {
+                request_id,
                 id,
                 max_width,
                 max_height,
             } => {
                 use crate::state::ThumbnailRequest;
+                if self.lock_manager.is_locked_or_pending()
+                    || self.pending_thumbnail_requests.len() >= 16
+                {
+                    return;
+                }
                 self.pending_thumbnail_requests.push(ThumbnailRequest {
+                    request_id,
                     window_id: id,
-                    max_width: if max_width == 0 { 200 } else { max_width },
-                    max_height: if max_height == 0 { 112 } else { max_height },
+                    max_width: if max_width == 0 {
+                        200
+                    } else {
+                        max_width.min(512)
+                    },
+                    max_height: if max_height == 0 {
+                        112
+                    } else {
+                        max_height.min(288)
+                    },
                 });
                 // Mark all outputs dirty so the render loop picks up the request
                 // on the next frame (same pattern as screencopy frame handler).

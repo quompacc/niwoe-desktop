@@ -109,6 +109,22 @@ impl NiwoeShell {
             && matches!(event, PointerEventKind::Release { button: 0x110, .. })
             && crate::hub_view::hit_windows(pos.0 as i32, pos.1 as i32, width, height)
         {
+            if let Some(index) =
+                crate::hub_view::hit_recent(pos.0 as i32, pos.1 as i32, width, height)
+            {
+                if let Some(window) = self
+                    .windows
+                    .iter()
+                    .filter(|w| !w.title.trim().is_empty())
+                    .nth(index)
+                {
+                    self.activate_hub_target(
+                        qh,
+                        crate::hub_state::Target::Window(window.id.clone()),
+                    );
+                    return true;
+                }
+            }
             self.window_picker = Some(Picker::default());
             self.draw_launcher(qh, RepaintReason::Pointer);
             return true;

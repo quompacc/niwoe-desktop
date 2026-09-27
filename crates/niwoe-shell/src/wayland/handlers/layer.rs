@@ -39,6 +39,7 @@ impl LayerShellHandler for NiwoeShell {
 
         if self.launcher_layer == *layer {
             warn!("Launcher layer surface closed by compositor; recovering launcher state");
+            self.hub.clear();
             self.launcher_state.open = false;
             self.launcher_configured = false;
             self.launcher_dirty = false;

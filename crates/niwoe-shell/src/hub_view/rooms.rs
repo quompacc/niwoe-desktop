@@ -7,6 +7,10 @@ fn draw_rooms(
     window_counts: &[u16; niwoe_config::rooms::MAX_ROOMS],
     hovered_room: Option<usize>,
     keyboard_focus: Option<usize>,
+    hub: &crate::hub_state::HubState,
+    windows: &[WindowInfo],
+    apps: &[crate::launcher::DesktopApp],
+    icons: &crate::icons::IconCache,
     config: &niwoe_config::ThemeConfig,
 ) {
     let p = crate::ui::tokens::theme_from_config(config).palette;
@@ -57,14 +61,22 @@ fn draw_rooms(
             "◇",
             icon,
             Typography::DEFAULT.title_size as f32,
-            p.accent,
+            if active { p.accent } else { p.text_dim },
         );
+        if let Some(image) = room.preferences.icon.as_deref()
+            .and_then(|name| icons.lookup(name, S.xxl as u32))
+            .and_then(crate::icons::icon_image_to_pixmap) {
+            fill(pm, icon, alpha(p.surface_alt, H.card_alpha), Radius::DEFAULT.sm);
+            pm.draw_pixmap(icon.x+(icon.width-image.width() as i32)/2,icon.y+(icon.height-image.height() as i32)/2,
+                image.as_ref(),&tiny_skia::PixmapPaint::default(),tiny_skia::Transform::identity(),None);
+        }
         let name = truncate_to_fit(
             &room.name,
             rect.width - H.room_icon_size - H.card_pad * 3,
             body,
         );
         paint_text_left_centered(pm, &name, icon.x + icon.width + S.md, icon, body, p.text);
+        draw_room_preview(pm, rect, room, windows, hub, apps, icons, config);
         let count = window_counts
             .get(room.workspace.saturating_sub(1) as usize)
             .copied()
@@ -96,7 +108,7 @@ fn draw_rooms(
                 width: H.status_dot_size,
                 height: H.status_dot_size,
             },
-            if active { p.success } else { p.text_dim },
+            if count > 0 { p.text } else { p.text_dim },
             Radius::DEFAULT.lg,
         );
         paint_text_right_centered(

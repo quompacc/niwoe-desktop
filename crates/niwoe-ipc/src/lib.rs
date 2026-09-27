@@ -298,7 +298,10 @@ pub enum ShellEvent {
         x: i32,
         y: i32,
     },
+    SessionLocked,
     WindowThumbnail {
+        #[serde(default)]
+        request_id: Option<String>,
         id: String,
         path: String,
         width: u32,
@@ -391,6 +394,8 @@ pub enum ShellCommand {
     ReloadConfig,
     Quit,
     CaptureWindowThumbnail {
+        #[serde(default)]
+        request_id: Option<String>,
         id: String,
         #[serde(default)]
         max_width: u32,
@@ -580,3 +585,5 @@ fn encode_json_line<T: Serialize>(value: &T) -> io::Result<Vec<u8>> {
 #[cfg(test)]
 #[path = "lib_tests.rs"]
 mod tests;
+#[cfg(test)]
+mod thumbnail_tests;

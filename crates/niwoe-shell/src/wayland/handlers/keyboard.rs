@@ -411,6 +411,10 @@ impl KeyboardHandler for NiwoeShell {
             return;
         }
 
+        if self.hub_key(qh, event.keysym) {
+            return;
+        }
+
         // ── Command palette keyboard input ────────────────────────────────────
         if self.window_picker_key(qh, event.keysym) {
             return;

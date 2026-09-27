@@ -1,12 +1,15 @@
 impl NiwoeShell {
     fn apply_ipc_event(&mut self, event: ShellEvent) {
+        let hub_target = self.hub_selection_target();
         match event {
             ShellEvent::RoomSnapshot { snapshot } => {
                 if self.workspace_state.rooms.accept(snapshot) {
                     self.panel_last_signature = None;
                     self.panel_dirty = true;
                     self.workspace_dirty = true;
-                    self.launcher_dirty |= self.room_management_open;
+                    self.launcher_dirty |= self.launcher_state.open;
+                    self.launcher_icons_warmed = false;
+                    if self.launcher_state.open { self.warm_launcher_icons(); }
                 }
             }
             ShellEvent::RoomMutationResult {
@@ -319,30 +322,10 @@ impl NiwoeShell {
             ShellEvent::DesktopContextMenu { x, y } => {
                 self.open_desktop_context_menu_from_ipc(x, y);
             }
-            ShellEvent::WindowThumbnail {
-                id,
-                path,
-                width,
-                height,
-            } => match std::fs::read(&path) {
-                Ok(data) => {
-                    let _ = std::fs::remove_file(&path);
-                    tracing::debug!(
-                        "thumbnail received: id={} {}x{} bytes={}",
-                        id,
-                        width,
-                        height,
-                        data.len()
-                    );
-                    self.thumbnail_cache.insert(id, (width, height, data));
-                    if self.thumbnail_popup_open {
-                        self.thumbnail_dirty = true;
-                    }
-                }
-                Err(e) => {
-                    tracing::warn!("thumbnail: read failed {}: {}", path, e);
-                }
-            },
+            ShellEvent::SessionLocked => self.discard_hub_on_lock(),
+            ShellEvent::WindowThumbnail { request_id, id, path, width, height } => {
+                self.receive_hub_thumbnail(request_id, id, path, width, height);
+            }
             ShellEvent::ScreenshotConsentRequest { request_id, app_id } => {
                 self.open_consent_modal(request_id, app_id);
             }
@@ -350,6 +333,7 @@ impl NiwoeShell {
                 self.open_region_picker(request_id, app_id);
             }
         }
+        self.reconcile_hub_selection(hub_target);
     }
 
     fn handle_config_reloaded(&mut self, success: bool) {
@@ -359,6 +343,7 @@ impl NiwoeShell {
             return;
         }
 
+        self.hub.clear();
         let mut config = NiwoeConfig::default();
         if let Err(err) = config.reload() {
             tracing::warn!(
@@ -462,13 +447,16 @@ impl NiwoeShell {
         if self.launcher_icons_warmed || self.launcher_icons_rx.is_some() {
             return;
         }
-        let names: Vec<String> = self
+        let mut names: Vec<String> = self
             .launcher_state
             .apps
             .iter()
             .filter_map(|app| app.icon_name.clone())
             .filter(|name| !name.is_empty())
             .collect();
+        names.extend(self.workspace_state.rooms.snapshot.rooms.iter().filter_map(|r|r.preferences.icon.clone()));
+        names.extend(self.windows.iter().filter_map(|w|w.app_id.clone()));
+        names.sort(); names.dedup();
         if names.is_empty() {
             self.launcher_icons_warmed = true;
             return;

@@ -559,6 +559,7 @@ fn screenshot_bridge_request_metadata_roundtrip_works() {
 #[test]
 fn capture_window_thumbnail_command_roundtrip_is_supported() {
     let command = ShellCommand::CaptureWindowThumbnail {
+        request_id: None,
         id: "win-1".to_string(),
         max_width: 200,
         max_height: 112,
@@ -571,6 +572,7 @@ fn capture_window_thumbnail_command_roundtrip_is_supported() {
 #[test]
 fn window_thumbnail_event_roundtrip_is_supported() {
     let event = ShellEvent::WindowThumbnail {
+        request_id: None,
         id: "win-1".to_string(),
         path: "/tmp/test.rgba".to_string(),
         width: 200,

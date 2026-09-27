@@ -202,6 +202,7 @@ NiwoeShell {
         hidden_execs: crate::wayland::state::load_hidden_apps(),
         search_query: String::new(),
         hub_search_active: false,
+        hub: Default::default(),
         window_picker: None,
         settings_search: String::new(),
         calendar_dirty: true,

@@ -22,6 +22,7 @@ mod default_apps;
 mod draw;
 mod first_login;
 mod font_resolve;
+mod hub_state;
 mod hub_view;
 mod icons;
 mod launcher;

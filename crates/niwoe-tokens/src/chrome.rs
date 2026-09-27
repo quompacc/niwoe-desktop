@@ -247,16 +247,6 @@ pub struct Launcher {
 }
 
 impl Launcher {
-    /// Centered card fitted to the available logical layer extent.
-    /// Shared by drawing, input hit tests and the compositor glass backdrop.
-    pub fn fitted_rect(self, width: u32, height: u32) -> (i32, i32, u32, u32) {
-        let width = width.max(1);
-        let height = height.max(1);
-        let w = (self.width as u32).min(width);
-        let h = (self.height as u32).min(height);
-        (((width - w) / 2) as i32, ((height - h) / 2) as i32, w, h)
-    }
-
     /// Search-only launcher; Settings retains its independent larger viewport.
     pub const SEARCH: Launcher = Launcher {
         width: 640,

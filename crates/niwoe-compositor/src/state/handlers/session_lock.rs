@@ -21,6 +21,11 @@ impl SessionLockHandler for NiwoeState {
             drop(confirmation);
             return;
         }
+        self.pending_thumbnail_requests.clear();
+        for path in self.thumbnail_files.drain(..) {
+            let _ = std::fs::remove_file(path);
+        }
+        self.ipc.broadcast(&niwoe_ipc::ShellEvent::SessionLocked);
         let targets = self
             .output_registry
             .list()

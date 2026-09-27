@@ -74,6 +74,9 @@ impl NiwoeShell {
         if !open_before && self.audio_popup_open {
             self.close_audio_popup(CommitReason::Input);
         }
+        self.hub.clear();
+        self.hub.page = 0;
+        self.hub.selected = None;
         self.launcher_state.toggle();
         let open_after = self.launcher_state.open;
         if self.launcher_state.open {

@@ -4,6 +4,15 @@ impl NiwoeShell {
     }
 
     pub(crate) fn launcher_content_size(&self) -> (u32, u32) {
+        let (width, height) = self.launcher_fitted_size();
+        if !self.room_management_open && !self.launcher_settings_open {
+            niwoe_tokens::Hub::DEFAULT.canvas_size(width, height)
+        } else {
+            (width, height)
+        }
+    }
+
+    pub(crate) fn launcher_fitted_size(&self) -> (u32, u32) {
         if self.room_management_open {
             (self.launcher_width, self.launcher_height)
         } else if self.launcher_is_fullscreen {
@@ -42,6 +51,7 @@ impl NiwoeShell {
             );
             return;
         }
+        self.prepare_hub();
         self.repaint_stats.record_launcher(reason);
 
         let width = if self.launcher_is_fullscreen {
@@ -67,7 +77,9 @@ impl NiwoeShell {
 
         let stride = buffer::shm_buffer_stride(width);
         let (content_width, content_height) = self.launcher_content_size();
+        let (fitted_width, fitted_height) = self.launcher_fitted_size();
         let hub_active_workspace = self.panel_active_workspace();
+        let hub_results = if self.hub_search_active { self.hub_results() } else { Vec::new() };
         for attempt in 0..CANVAS_RETRY_ATTEMPTS {
             let buf = buffer::buffer_for(
                 &mut self.pool,
@@ -188,6 +200,8 @@ impl NiwoeShell {
                     &self.theme,
                     &state_fn,
                 );
+            } else if self.hub_search_active {
+                crate::hub_view::draw_search(&mut content, content_width, content_height, &self.search_query, &hub_results, self.hub.selected.unwrap_or(0), &self.theme);
             } else if !self.hub_search_active {
                 crate::hub_view::draw_hub(
                     &mut content,
@@ -199,7 +213,10 @@ impl NiwoeShell {
                     &self.windows,
                     &self.system_info,
                     self.hovered_bento_idx,
-                    self.room_keyboard_focus,
+                    self.hub.selected,
+                    &self.hub,
+                    &self.launcher_state.apps,
+                    &self.icon_cache,
                     &self.theme,
                 );
             } else {
@@ -243,6 +260,17 @@ impl NiwoeShell {
 
             if let Some(picker) = &self.window_picker {
                 crate::window_picker::draw(&mut content,content_width,content_height,picker,&self.windows,&self.workspace_state.rooms.snapshot.rooms,&self.theme);
+            }
+            // Event-driven resize only: no animation, extra capture or idle work.
+            // The pointer path applies the exact inverse canvas/fitted ratio.
+            let (lw, lh) = (fitted_width as usize, fitted_height as usize);
+            if (content_width, content_height) != (fitted_width, fitted_height) {
+                if let Some(source) = image::RgbaImage::from_raw(content_width, content_height, content) {
+                    content = image::imageops::resize(&source, fitted_width, fitted_height,
+                        image::imageops::FilterType::Triangle).into_raw();
+                } else {
+                    return;
+                }
             }
             let launcher_radius = crate::ui::tokens::surface_radius_from_config(
                 &self.theme,
@@ -330,6 +358,7 @@ impl NiwoeShell {
     }
 
     pub(crate) fn unmap_launcher(&mut self, reason: CommitReason) {
+        self.hub.clear();
         debug!(
             "unmap_launcher: reason={:?} open={} configured={} surface=launcher attach_none=true commit=true",
             reason,

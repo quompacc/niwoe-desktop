@@ -29,3 +29,14 @@ fn transient_empty_configure_cannot_underflow_card_geometry() {
     assert_eq!(Launcher::DEFAULT.fitted_rect(0, 0), (0, 0, 1, 1));
     assert_eq!(Launcher::DEFAULT.fitted_rect(1, 1), (0, 0, 1, 1));
 }
+
+#[test]
+fn hub_controls_stay_below_panel_on_short_hidpi_outputs() {
+    for (w, h) in [(1920, 1080), (1366, 768), (1280, 720), (960, 540)] {
+        let (_, y, _, card_h) = Launcher::HUB.fitted_rect(w, h);
+        assert!(y >= niwoe_tokens::Panel::DEFAULT.height as i32);
+        assert!(y as u32 + card_h <= h);
+    }
+    assert_eq!(Launcher::HUB.fitted_rect(1920, 1080), (260, 124, 1400, 832));
+    assert_eq!(Launcher::HUB.fitted_rect(0, 0), (0, 0, 1, 1));
+}

@@ -1,5 +1,6 @@
 mod calendar;
 mod handlers;
+mod hub;
 mod init;
 mod ipc;
 mod render;

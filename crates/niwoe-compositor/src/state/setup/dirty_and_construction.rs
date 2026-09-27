@@ -261,6 +261,7 @@ impl NiwoeState {
             screencopy_sessions: Vec::new(),
             pending_screencopy_frames: Vec::new(),
             pending_thumbnail_requests: Vec::new(),
+            thumbnail_files: Default::default(),
             pending_screenshot_requests: Vec::new(),
             pending_screenshot_consent: Vec::new(),
             pending_screenshot_region: Vec::new(),

@@ -15,6 +15,10 @@ impl CompositorHandler for NiwoeShell {
         _surface: &wl_surface::WlSurface,
         _new_factor: i32,
     ) {
+        if self.launcher_layer.wl_surface() == _surface {
+            self.hub.clear();
+            self.launcher_dirty = self.launcher_state.open;
+        }
     }
 
     fn transform_changed(

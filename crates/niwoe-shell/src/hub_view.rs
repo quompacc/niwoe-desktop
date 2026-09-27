@@ -77,6 +77,9 @@ pub(crate) fn draw_hub(
     system: &SystemInfo,
     hovered_room: Option<usize>,
     keyboard_focus: Option<usize>,
+    hub: &crate::hub_state::HubState,
+    apps: &[crate::launcher::DesktopApp],
+    icons: &crate::icons::IconCache,
     config: &niwoe_config::ThemeConfig,
 ) {
     if canvas.len() != width as usize * height as usize * 4 {
@@ -103,19 +106,27 @@ pub(crate) fn draw_hub(
         width,
         rooms.len(),
         active_workspace == 0,
-        keyboard_focus == Some(rooms.len().min(H.room_columns as usize)),
+        keyboard_focus == Some(rooms.len()),
         config,
     );
     draw_rooms(
         &mut pm,
         width,
-        rooms,
+        &rooms[hub
+            .page
+            .saturating_mul(H.room_columns as usize)
+            .min(rooms.len())..],
         active_workspace,
         window_counts,
         hovered_room,
-        keyboard_focus,
+        keyboard_focus.and_then(|i| i.checked_sub(hub.page * H.room_columns as usize)),
+        hub,
+        windows,
+        apps,
+        icons,
         config,
     );
+    draw_pages(&mut pm, width, hub.page, rooms.len(), config);
     draw_recent(&mut pm, lower_rect(0, width, height), windows, config);
     draw_shortcuts(&mut pm, lower_rect(1, width, height), config);
     draw_system(&mut pm, lower_rect(2, width, height), system, config);
@@ -439,81 +450,8 @@ fn draw_system(
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn room_hit_test_uses_same_four_card_geometry() {
-        let width = H.width as u32;
-        for index in 0..4 {
-            let rect = room_rect(index, width);
-            assert_eq!(hit_room(rect.x + 1, rect.y + 1, width, 9), Some(index));
-        }
-        assert_eq!(hit_room(H.outer_pad, H.outer_pad, width, 9), None);
-    }
-
-    #[test]
-    fn hub_renders_room_and_capability_overview() {
-        let rooms: Vec<_> = ["Entwicklung", "Recherche", "Konstruktion", "Kommunikation"]
-            .into_iter()
-            .enumerate()
-            .map(|(index, name)| RoomEntry {
-                preferences: Default::default(),
-                id: index as u64 + 1,
-                workspace: index as u8 + 1,
-                name: name.into(),
-                description: String::new(),
-                assignment: niwoe_ipc::RoomAssignment::Free,
-            })
-            .collect();
-        let windows = vec![WindowInfo {
-            id: "preview".into(),
-            title: "Raumkonzept.md".into(),
-            workspace: 1,
-            minimized: false,
-            app_id: None,
-        }];
-        let system = SystemInfo {
-            os_name: "Fedora Linux".into(),
-            hostname: "niwoe".into(),
-            kernel: "Linux".into(),
-            uptime: "2 Stunden".into(),
-            cpu: "Test CPU".into(),
-            memory: "4.0 GiB / 8.0 GiB belegt".into(),
-        };
-        let width = std::env::var("NIWOE_PREVIEW_WIDTH")
-            .ok()
-            .and_then(|value| value.parse::<u32>().ok())
-            .unwrap_or(H.width as u32);
-        let height = std::env::var("NIWOE_PREVIEW_HEIGHT")
-            .ok()
-            .and_then(|value| value.parse::<u32>().ok())
-            .unwrap_or(H.height as u32);
-        let mut canvas = vec![0; (width * height * 4) as usize];
-        let mut counts = [0; niwoe_config::rooms::MAX_ROOMS];
-        counts[..4].copy_from_slice(&[3, 2, 1, 4]);
-        draw_hub(
-            &mut canvas,
-            width,
-            height,
-            &rooms,
-            1,
-            &counts,
-            &windows,
-            &system,
-            None,
-            None,
-            &niwoe_config::ThemeConfig::default(),
-        );
-        assert!(canvas.as_chunks::<4>().0.iter().any(|pixel| pixel[3] != 0));
-        if let Ok(path) = std::env::var("NIWOE_HUB_PREVIEW") {
-            for pixel in canvas.as_chunks_mut::<4>().0 {
-                pixel.swap(0, 2);
-            }
-            Pixmap::from_vec(canvas, tiny_skia::IntSize::from_wh(width, height).unwrap())
-                .unwrap()
-                .save_png(path)
-                .unwrap();
-        }
-    }
-}
+mod interaction_tests;
+#[cfg(test)]
+mod tests;
+include!("hub_view/search.rs");
+include!("hub_view/previews.rs");

@@ -102,6 +102,7 @@ macro_rules! handle_panel_and_popups_pointer {
                             );
                             for id in window_ids.iter().take(crate::THUMBNAIL_MAX_WINDOWS) {
                                 let cmd = niwoe_ipc::ShellCommand::CaptureWindowThumbnail {
+ request_id: None,
                                     id: id.clone(),
                                     max_width: crate::THUMBNAIL_THUMB_W,
                                     max_height: crate::THUMBNAIL_THUMB_H,
