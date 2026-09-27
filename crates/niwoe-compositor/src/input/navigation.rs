@@ -173,7 +173,12 @@ pub(super) fn toggle_floating(state: &mut NiwoeState) {
     }
     if floating {
         if let Some(toplevel) = window.toplevel() {
-            toplevel.with_pending_state(crate::state::clear_tiled_toplevel_states);
+            toplevel.with_pending_state(|pending| {
+                crate::state::clear_tiled_toplevel_states(pending);
+                // A floating client chooses its size; retaining the last tile
+                // size makes a later focus configure undo client-side resizing.
+                pending.size = None;
+            });
             toplevel.send_pending_configure();
         }
     }

@@ -168,7 +168,7 @@ impl<E: SpaceElement + PartialEq> WorkspaceManager<E> {
                 .cloned()
                 .collect();
             for w in strays {
-                space.map_element(w, fallback, false);
+                space.relocate_element(&w, fallback);
                 moved += 1;
             }
         }

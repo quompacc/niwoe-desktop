@@ -74,8 +74,10 @@ impl NiwoeState {
             .primary()
             .map(|p| (p.geometry.x, p.geometry.y).into())
             .unwrap_or_default();
-        self.workspaces
-            .reclamp_offscreen_windows(&live_outputs, fallback)
+        let moved = self.workspaces
+            .reclamp_offscreen_windows(&live_outputs, fallback);
+        self.fit_normal_windows_to_live_workareas();
+        moved
     }
 
     pub fn handle_output_removed(&mut self, id: OutputId) -> bool {
