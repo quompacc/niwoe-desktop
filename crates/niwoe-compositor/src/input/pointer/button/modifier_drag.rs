@@ -1,10 +1,12 @@
 // Modifier dragging reuses the same move/resize grabs as decoration input.
 // No new grab lifecycle, timers or render work is introduced.
-fn modifier_drag_hit(
-    state: &NiwoeState,
+fn begin_modifier_drag(
+    state: &mut NiwoeState,
     location: Point<f64, Logical>,
     button: u32,
     under_is_layer_surface: bool,
+    serial: smithay::utils::Serial,
+    time: u32,
 ) -> Option<HitInfo> {
     if under_is_layer_surface || state.lock_manager.is_locked_or_pending() {
         return None;
@@ -37,7 +39,14 @@ fn modifier_drag_hit(
         }
         _ => return None,
     };
-    Some((window.clone(), hit, origin, None))
+    let hit = (window.clone(), hit, origin, None);
+    // The compositor owns this click. Clear client pointer focus before the
+    // shared path installs its implicit grab, otherwise Super+right-click
+    // also opens a client context menu whose popup can take over the grab.
+    let pointer = state.seat.get_pointer()?;
+    pointer.motion(state, None, &MotionEvent { location, serial, time });
+    pointer.frame(state);
+    Some(hit)
 }
 
 fn modifier_resize_corner(x: f64, y: f64, w: i32, h: i32) -> DecorationResizeEdge {

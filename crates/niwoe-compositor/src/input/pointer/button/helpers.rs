@@ -5,6 +5,24 @@ type HitInfo = (
     Option<smithay::utils::Rectangle<i32, smithay::utils::Logical>>,
 );
 
+fn log_pointer_button_output_selection(
+    selected: Option<&OutputInfo>,
+    location: Point<f64, Logical>,
+    fallback_reason: &str,
+) {
+    if let Some(info) = selected {
+        debug!(
+            "pointer button output selection requested: x={:.2} y={:.2} selected_output_id={} name={} fallback_reason={}",
+            location.x, location.y, info.id.0, info.name, fallback_reason
+        );
+    } else {
+        debug!(
+            "pointer button output selection requested: x={:.2} y={:.2} selected_output=none fallback_reason={}",
+            location.x, location.y, fallback_reason
+        );
+    }
+}
+
 fn decoration_hit_info(
     state: &NiwoeState,
     location: Point<f64, Logical>,

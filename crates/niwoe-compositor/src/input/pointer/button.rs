@@ -64,33 +64,29 @@ pub fn handle_pointer_button<I: InputBackend>(
                 time: event.time_msec(),
             },
         );
-        let (selected_output_info, fallback_reason) =
-            select_pointer_button_output_info(state.output_registry.list(), Some(location));
-        if let Some(info) = selected_output_info {
-            debug!(
-                "pointer button output selection requested: x={:.2} y={:.2} selected_output_id={} name={} fallback_reason={}",
-                location.x, location.y, info.id.0, info.name, fallback_reason
-            );
-        } else {
-            debug!(
-                "pointer button output selection requested: x={:.2} y={:.2} selected_output=none fallback_reason={}",
-                location.x, location.y, fallback_reason
-            );
-        }
         let under_is_layer_surface = under
             .as_ref()
-            .map(|(surface, _)| surface_belongs_to_layer(state, surface))
-            .unwrap_or(false);
+            .is_some_and(|(surface, _)| surface_belongs_to_layer(state, surface));
+        let modifier_hit = begin_modifier_drag(
+            state,
+            location,
+            button,
+            under_is_layer_surface,
+            serial,
+            event.time_msec(),
+        );
+        let (selected_output_info, fallback_reason) =
+            select_pointer_button_output_info(state.output_registry.list(), Some(location));
+        log_pointer_button_output_selection(selected_output_info, location, fallback_reason);
 
-        let hit_info =
-            modifier_drag_hit(state, location, button, under_is_layer_surface).or_else(|| {
-                decoration_hit_info(
-                    state,
-                    location,
-                    selected_output_info,
-                    under_is_layer_surface,
-                )
-            });
+        let hit_info = modifier_hit.or_else(|| {
+            decoration_hit_info(
+                state,
+                location,
+                selected_output_info,
+                under_is_layer_surface,
+            )
+        });
 
         if let Some((window, hit, initial_window_location, output_geo)) = hit_info {
             match hit {
