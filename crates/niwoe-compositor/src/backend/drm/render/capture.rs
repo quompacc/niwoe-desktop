@@ -44,7 +44,8 @@ fn serve_screencopy_frames(
             let _ = gles_frame.clear([0.0f32, 0.0, 0.0, 1.0].into(), &[phys_region]);
             for element in out.scratch_final.iter().rev() {
                 let src = element.src();
-                let dst = element.geometry(Scale::from(out.output.current_scale().fractional_scale()));
+                let dst =
+                    element.geometry(Scale::from(out.output.current_scale().fractional_scale()));
                 // damage must be in element-local coords (origin at 0,0 within dst),
                 // not absolute physical coords — passing dst directly would clamp y≥dst.size.h to 0.
                 let element_damage = [smithay::utils::Rectangle::from_size(dst.size)];
@@ -88,6 +89,7 @@ fn serve_screencopy_frames(
 }
 
 include!("thumbnails.rs");
+include!("screenshot_output.rs");
 
 /// Fulfil queued (policy-allowed) screenshot bridge requests: render the full
 /// output once, encode it as a PNG under XDG_RUNTIME_DIR, and reply to each
@@ -112,6 +114,45 @@ fn process_screenshot_requests(
     };
 
     if state.pending_screenshot_requests.is_empty() {
+        return;
+    }
+
+    // A repaint on another output must not consume this output's requests.
+    // Route before allocating an offscreen buffer; idle and unrelated outputs
+    // do no additional GPU work. Unnamed requests consistently use primary.
+    let current = out.output.name();
+    let primary = state
+        .output_registry
+        .primary()
+        .map(|info| info.name.as_str());
+    let available: Vec<_> = state
+        .output_registry
+        .list()
+        .iter()
+        .map(|info| info.name.as_str())
+        .collect();
+    let mut requests = Vec::new();
+    for pending in std::mem::take(&mut state.pending_screenshot_requests) {
+        match screenshot_output_route(
+            &current,
+            pending.request.output.as_deref(),
+            primary,
+            &available,
+        ) {
+            ScreenshotOutputRoute::Capture => requests.push(pending),
+            ScreenshotOutputRoute::Wait => state.pending_screenshot_requests.push(pending),
+            ScreenshotOutputRoute::Unavailable => state.ipc.send_screenshot_bridge_response(
+                pending.client_id,
+                pending.request.request_id,
+                ScreenshotBridgeResult::Error {
+                    error: ScreenshotBridgeError::InvalidRequest(
+                        "requested screenshot output is unavailable".to_string(),
+                    ),
+                },
+            ),
+        }
+    }
+    if requests.is_empty() {
         return;
     }
 
@@ -146,8 +187,6 @@ fn process_screenshot_requests(
         let raw = renderer.map_texture(&mapping).ok()?;
         Some(raw.to_vec())
     })();
-
-    let requests = std::mem::take(&mut state.pending_screenshot_requests);
 
     let Some(full_pixels) = full_pixels else {
         tracing::warn!(
