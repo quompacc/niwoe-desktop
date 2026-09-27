@@ -3,6 +3,8 @@
 - `p09-*.log`: finale Workspace-Prüfungen, expliziter Designguard, separater
   D-Bus-Test, Release-Build und SHA-256-Abgleich von Build/Installation/Prozess.
   Die leere `p09-fmt.log` entspricht einem erfolgreichen stillen fmt-Check.
+  Zusätzliche leere Endzeilen der Testlogs wurden für `git diff --check` entfernt;
+  die Testausgaben selbst sind unverändert.
 - `source-manifest.json`: SHA-256 der 37 Rust-Dateien des Abschlussstands;
   auf dem Fedora-Buildbaum einzeln abgeglichen. `idle-source-manifest.json`
   und `idle-build-identity.log` halten den Messstand `85b785c` vor der letzten
