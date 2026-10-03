@@ -1,0 +1,39 @@
+{
+    "captured_date":  "2026-10-03",
+    "retained_local":  true,
+    "available_in_fresh_clone":  false,
+    "local_manifest":  "target/park-private-archive-manifest.json",
+    "manifest_sha256":  "ec97a0d3a0060a3fcabcd55d62d468c80f4a2d1d6f959faacc93680aec05234a",
+    "archives":  [
+                     {
+                         "path":  "docs/phase-reports/UI_VISUAL_AUDIT_2026-10-02-evidence",
+                         "files":  569,
+                         "bytes":  441140099
+                     },
+                     {
+                         "path":  "docs/phase-reports/evidence/r5",
+                         "files":  79,
+                         "bytes":  53541460
+                     },
+                     {
+                         "path":  "docs/phase-reports/evidence/r6",
+                         "files":  393,
+                         "bytes":  139421086
+                     },
+                     {
+                         "path":  "docs/phase-reports/evidence/r7",
+                         "files":  877,
+                         "bytes":  180355336
+                     },
+                     {
+                         "path":  "docs/phase-reports/evidence/r8",
+                         "files":  89,
+                         "bytes":  679677
+                     },
+                     {
+                         "path":  "target/r7-provider-matrix-evidence",
+                         "files":  324,
+                         "bytes":  208776409
+                     }
+                 ]
+}

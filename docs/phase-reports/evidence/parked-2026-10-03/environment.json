@@ -1,0 +1,341 @@
+{
+  "captured_at": "2026-10-03T21:35:07.646113+02:00",
+  "collection": "read-only; no package changes, graphics contexts or UI input",
+  "os": {
+    "ID": "fedora",
+    "VERSION_ID": "44",
+    "PRETTY_NAME": "Fedora Linux 44 (KDE Plasma Desktop Edition)",
+    "VARIANT": "KDE Plasma Desktop Edition",
+    "VARIANT_ID": "kde"
+  },
+  "kernel_release": "7.2.6-200.fc44.x86_64",
+  "device": {
+    "vendor": "Acer",
+    "product_name": "Aspire F5-573G",
+    "product_version": "V1.15",
+    "cpu": "Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz",
+    "memory_total": "16227136 kB"
+  },
+  "selinux": {
+    "exit_code": 0,
+    "stdout": "Enforcing"
+  },
+  "gpu_pci": [
+    "0000:00:02.0 VGA compatible controller [0300]: Intel Corporation Kaby Lake-U GT2 [HD Graphics 620] [8086:5916] (rev 02)\n\tSubsystem: Acer Incorporated [ALI] Device [1025:108f]\n\tKernel driver in use: i915\n\tKernel modules: i915",
+    "0000:01:00.0 3D controller [0302]: NVIDIA Corporation GM107 [GeForce 940MX] [10de:179c] (rev a2)\n\tSubsystem: Acer Incorporated [ALI] Device [1025:108f]\n\tKernel driver in use: nouveau\n\tKernel modules: nouveau"
+  ],
+  "kernel_drivers": {
+    "i915": {
+      "loaded": true,
+      "loaded_version": null,
+      "loaded_srcversion": null,
+      "module_version": {
+        "exit_code": 0,
+        "stdout": ""
+      },
+      "module_vermagic": {
+        "exit_code": 0,
+        "stdout": "7.2.6-200.fc44.x86_64 SMP preempt mod_unload"
+      }
+    },
+    "nouveau": {
+      "loaded": true,
+      "loaded_version": null,
+      "loaded_srcversion": null,
+      "module_version": {
+        "exit_code": 0,
+        "stdout": ""
+      },
+      "module_vermagic": {
+        "exit_code": 0,
+        "stdout": "7.2.6-200.fc44.x86_64 SMP preempt mod_unload"
+      }
+    },
+    "nvidia": {
+      "loaded": false,
+      "loaded_version": null,
+      "loaded_srcversion": null,
+      "module_version": {
+        "exit_code": 1,
+        "stdout": ""
+      },
+      "module_vermagic": {
+        "exit_code": 1,
+        "stdout": ""
+      }
+    },
+    "nvidia_drm": {
+      "loaded": false,
+      "loaded_version": null,
+      "loaded_srcversion": null,
+      "module_version": {
+        "exit_code": 1,
+        "stdout": ""
+      },
+      "module_vermagic": {
+        "exit_code": 1,
+        "stdout": ""
+      }
+    }
+  },
+  "nvidia_proprietary_version_file": null,
+  "nvidia_drm_modeset": null,
+  "graphics_runtime_packages": [
+    {
+      "name": "cargo",
+      "version_release": "1.98.1-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "gcc",
+      "version_release": "16.2.1-2.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "glibc",
+      "version_release": "2.43-8.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-core",
+      "version_release": "6.19.10-300.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-core",
+      "version_release": "7.2.5-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-core",
+      "version_release": "7.2.6-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-headers",
+      "version_release": "7.2.4-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules",
+      "version_release": "6.19.10-300.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules",
+      "version_release": "7.2.5-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules",
+      "version_release": "7.2.6-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules-core",
+      "version_release": "6.19.10-300.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules-core",
+      "version_release": "7.2.5-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules-core",
+      "version_release": "7.2.6-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules-extra",
+      "version_release": "6.19.10-300.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules-extra",
+      "version_release": "7.2.5-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-modules-extra",
+      "version_release": "7.2.6-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-tools",
+      "version_release": "7.2.6-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "kernel-tools-libs",
+      "version_release": "7.2.6-200.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "libdrm",
+      "version_release": "2.4.134-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "libinput",
+      "version_release": "1.31.3-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "linux-firmware",
+      "version_release": "20260916-1.fc44",
+      "arch": "noarch"
+    },
+    {
+      "name": "linux-firmware-whence",
+      "version_release": "20260916-1.fc44",
+      "arch": "noarch"
+    },
+    {
+      "name": "mesa-demos",
+      "version_release": "9.0.0-11.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-dri-drivers",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-filesystem",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-libEGL",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-libEGL-devel",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-libGL",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-libGLU",
+      "version_release": "9.0.3-8.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-libgbm",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-libgbm-devel",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "mesa-vulkan-drivers",
+      "version_release": "26.2.2-6.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "nvidia-gpu-firmware",
+      "version_release": "20260916-1.fc44",
+      "arch": "noarch"
+    },
+    {
+      "name": "pipewire",
+      "version_release": "1.6.9-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "plasma-workspace",
+      "version_release": "6.7.5-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "plasma-workspace-common",
+      "version_release": "6.7.5-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "plasma-workspace-libs",
+      "version_release": "6.7.5-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "plasma-workspace-wallpapers",
+      "version_release": "6.7.5-1.fc44",
+      "arch": "noarch"
+    },
+    {
+      "name": "rust",
+      "version_release": "1.98.1-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "vulkan-loader",
+      "version_release": "1.4.341.0-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "xdg-desktop-portal",
+      "version_release": "1.22.1-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "xdg-desktop-portal-gtk",
+      "version_release": "1.15.3-3.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "xdg-desktop-portal-kde",
+      "version_release": "6.7.5-1.fc44",
+      "arch": "x86_64"
+    },
+    {
+      "name": "xorg-x11-server-Xwayland",
+      "version_release": "24.1.13-1.fc44",
+      "arch": "x86_64"
+    }
+  ],
+  "rpm_query_exit_code": 0,
+  "toolchain": {
+    "rustc": {
+      "exit_code": 0,
+      "stdout": "rustc 1.98.1 (48a229cea 2026-09-01) (Fedora 1.98.1-1.fc44)\nbinary: rustc\ncommit-hash: 48a229ceaefd4985c50990b14116b6d856af0985\ncommit-date: 2026-09-01\nhost: x86_64-unknown-linux-gnu\nrelease: 1.98.1\nLLVM version: 22.1.8"
+    },
+    "cargo": {
+      "exit_code": 0,
+      "stdout": "cargo 1.98.1 (797e8a9bc 2026-08-05) (Fedora 1.98.1-1.fc44)"
+    }
+  },
+  "running_processes": {
+    "niwoe": [
+      {
+        "pid": 647751,
+        "executable_sha256": "8f1e15e3678860e9160cc00ee17e61c0650e9c15ae1ecb086fef53e48c3290e3",
+        "drm_devices": [
+          {
+            "drm-driver": "i915",
+            "drm-pdev": "0000:00:02.0"
+          }
+        ]
+      }
+    ],
+    "niwoe-shell": [
+      {
+        "pid": 678998,
+        "executable_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+        "drm_devices": []
+      }
+    ]
+  },
+  "installed_binary_sha256": {
+    "niwoe": "8f1e15e3678860e9160cc00ee17e61c0650e9c15ae1ecb086fef53e48c3290e3",
+    "niwoe-shell": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451"
+  }
+}

@@ -1,5 +1,12 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
+**Geparkt auf Nutzerwunsch, 03.10.2026.** Aktuelle Produktcode-Basis `dc5b65d`;
+die erste ruhigere Designrunde ist positiv abgenommen, R9/Gesamtfreigabe offen,
+P13 unbegonnen. Wiedereinstieg über [HANDOVER.md](HANDOVER.md), einschließlich
+bekannter Fehler, Gaming/Vollbild, Dauerbetrieb, Testumgebung und unveränderter
+Guards. Die folgende Befund-/Phasenhistorie bleibt erhalten; der Parkstatus
+ist kein zusätzliches Abnahmegate und keine neue Roadmap.
+
 **Aktueller Arbeitsstand, 02.10.2026: visuelle Abnahme wieder offen.**
 Der Nutzer hat die Behauptung einer fertigen Desktop-Alpha ausdrücklich
 zurückgewiesen. Der erneute Live-Vergleich mit allen vier verbindlichen Mockups

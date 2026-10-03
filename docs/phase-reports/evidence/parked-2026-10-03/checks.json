@@ -1,0 +1,14 @@
+{
+    "date":  "2026-10-03",
+    "product_source_commit":  "dc5b65dfe04cc58726f53da88f00746a9f4f8e9b",
+    "normalised_source_files":  180,
+    "source_hash_mismatches":  0,
+    "installed_running_binary_hashes_equal":  true,
+    "original_uinput_acl_restored":  true,
+    "private_archive_files_verified":  2331,
+    "handover_readme_plan_relative_links_resolve":  true,
+    "guards_and_cargo_manifests_unchanged":  true,
+    "inventory_script_executed_read_only_on_fedora":  true,
+    "rust_changes":  false,
+    "new_cargo_run":  false
+}

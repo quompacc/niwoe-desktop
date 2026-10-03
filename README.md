@@ -11,6 +11,14 @@ das Control Center führt Verwaltung und Einstellungen zusammen.
 > den tatsächlich laufenden nativen Desktop auf Fedora vom **03.10.2026**.
 > Funktionen, Integration und visuelle Qualität werden weiter überarbeitet.
 
+**Geparkt seit 03.10.2026.** [Kurze Übergabe](HANDOVER.md),
+[erfasste Testumgebung samt Grafiktreibern](docs/TEST_ENVIRONMENT_2026-10-03.md)
+und [Codekarte/Guards](docs/CODE_GUIDE.md) halten den Wiedereinstieg fest.
+Die erste ruhigere Designrunde ist abgenommen; R9 und die Gesamtfreigabe bleiben offen.
+**Gaming/Vollbild unter Spielelast und Dauerbetrieb sind nicht freigegeben.**
+Bekannt offen sind außerdem HiDPI-Schärfe, Kontrast über hellen Apps,
+einzelne lange Hinweistexte und die Fedora-Updateintegration.
+
 [![Der native NIWOE-Hub mit dunkelgrünen Raumkarten, Landschaftskopf und transparenter Oberfläche](assets/screenshots/hub.png)](assets/screenshots/hub.png)
 
 *Der Hub: Räume wählen, Anwendungen suchen und den aktuellen Kontext sehen.*
@@ -44,6 +52,8 @@ Oberfläche. Ein Klick öffnet die jeweilige Aufnahme in voller Größe.
 | Hintergrund, Mauszeiger und Anzeige im gemeinsamen Rahmen. | Module und Reihenfolge mit einer Vorschau in Originalgröße. |
 
 Aufnahmedaten und Buildidentitäten: [Screenshot-Herkunft](assets/screenshots/README.md).
+Die Galerie stammt vor der ruhigeren Designrunde vom selben Tag;
+deren geprüfter Stand steht im [aktuellen Prüfbericht](docs/phase-reports/evidence/r9/calm-controls/README.md).
 
 ## Produktziel
 

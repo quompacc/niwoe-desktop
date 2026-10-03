@@ -1,6 +1,12 @@
 # NIWOE Agent Rules
 
 ## Projekt (Kurz)
+Geparkt auf Nutzerwunsch seit 03.10.2026. Vor Wiederaufnahme `HANDOVER.md`,
+`docs/TEST_ENVIRONMENT_2026-10-03.md` und `docs/CODE_GUIDE.md` lesen;
+danach ausschließlich dem aktiven Umsetzungsplan folgen. Modell-/Agentwechsel
+rechtfertigen keine Lockerung von Guards, Scanbereichen, Regressionassertions
+oder der 600-Zeilen-Grenze. Historische und aktuelle Evidenz unterscheiden.
+
 NIWOE ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess. Produktziel
 ist zuerst ein kohärenter nativer Linux-Desktop auf einer bestehenden Linux-
 Distribution; ein eigenes Linux-basiertes OS folgt erst nach der Desktop-Alpha.
