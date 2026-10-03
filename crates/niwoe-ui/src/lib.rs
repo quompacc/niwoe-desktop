@@ -29,6 +29,7 @@ pub use taffy::prelude::Size as UiSize;
 pub use taffy::prelude::Style as WidgetStyle;
 pub use taffy::Overflow;
 pub use taffy::Point as TaffyPoint;
+pub use taffy::Position;
 
 #[cfg(test)]
 mod smoke {

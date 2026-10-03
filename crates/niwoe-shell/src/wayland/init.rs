@@ -21,11 +21,11 @@ use wayland_protocols::ext::{
 
 use crate::{
     default_pinned_apps, launcher, network::NetworkController, panel, TextRenderer,
-    AUDIO_POPUP_HEIGHT, AUDIO_POPUP_WIDTH, CALENDAR_POPUP_HEIGHT, CALENDAR_POPUP_RIGHT_MARGIN,
-    CALENDAR_POPUP_WIDTH, LAUNCHER_HEIGHT, LAUNCHER_WIDTH, NETWORK_POPUP_HEIGHT,
-    NETWORK_POPUP_RIGHT_MARGIN, NETWORK_POPUP_WIDTH, SHELL_POPUP_BOTTOM_MARGIN,
-    THUMBNAIL_POPUP_HEIGHT, THUMBNAIL_POPUP_MAX_WIDTH, WORKSPACE_POPUP_HEIGHT,
-    WORKSPACE_POPUP_LEFT_MARGIN, WORKSPACE_POPUP_WIDTH,
+    AUDIO_POPUP_HEIGHT, AUDIO_POPUP_WIDTH, CALENDAR_POPUP_HEIGHT, CALENDAR_POPUP_WIDTH,
+    LAUNCHER_HEIGHT, LAUNCHER_WIDTH, NETWORK_POPUP_HEIGHT, NETWORK_POPUP_RIGHT_MARGIN,
+    NETWORK_POPUP_WIDTH, SHELL_POPUP_BOTTOM_MARGIN, THUMBNAIL_POPUP_HEIGHT,
+    THUMBNAIL_POPUP_MAX_WIDTH, WORKSPACE_POPUP_HEIGHT, WORKSPACE_POPUP_LEFT_MARGIN,
+    WORKSPACE_POPUP_WIDTH,
 };
 
 use super::{calendar::CalendarDisplayPolicy, CommitStats, IpcClient, NiwoeShell, SurfaceKind};
@@ -181,8 +181,8 @@ pub(crate) fn initialize(
         Some("niwoe-calendar-popup"),
         None,
     );
-    calendar_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
-    let calendar_right = CALENDAR_POPUP_RIGHT_MARGIN;
+    calendar_layer.set_anchor(Anchor::TOP);
+    let calendar_right = 0;
     calendar_layer.set_margin(crate::PANEL_POPUP_TOP_MARGIN, calendar_right, 0, 0);
     calendar_layer.set_size(
         crate::popup_surface_w(CALENDAR_POPUP_WIDTH),
@@ -191,7 +191,7 @@ pub(crate) fn initialize(
     calendar_layer.set_exclusive_zone(0);
     calendar_layer.set_keyboard_interactivity(KeyboardInteractivity::OnDemand);
     debug!(
-        "Calendar popup surface created: namespace=niwoe-calendar-popup layer=Overlay anchor=Top|Right size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
+        "Calendar popup surface created: namespace=niwoe-calendar-popup layer=Overlay anchor=Top size={}x{} margin_bottom={} margin_right={} exclusive_zone=0 keyboard_interactivity=OnDemand",
         CALENDAR_POPUP_WIDTH,
         CALENDAR_POPUP_HEIGHT,
         SHELL_POPUP_BOTTOM_MARGIN,

@@ -1,5 +1,10 @@
 use super::*;
 
+mod apps;
+mod general;
+pub(crate) use apps::draw_apps;
+pub(super) use general::draw_general;
+
 pub(crate) const TABS: [&str; 5] = [
     "Allgemein",
     "Apps",
@@ -15,10 +20,10 @@ pub(crate) fn tab_rect(index: usize) -> Rect {
             + C.outer_pad
             + TABS[..index]
                 .iter()
-                .map(|label| measure_text(label, size).0 + S.xxl + C.card_gap)
+                .map(|label| measure_text(label, size).0 + S.xxl + S.xl + C.card_gap)
                 .sum::<i32>(),
         y: C.config_header_height + S.sm,
-        width: measure_text(TABS[index], size).0 + S.xxl,
+        width: measure_text(TABS[index], size).0 + S.xxl + S.xl,
         height: C.config_tabs_height - S.sm * 2,
     }
 }
@@ -33,9 +38,9 @@ pub(crate) fn rect(width: u32, scroll: i32, index: usize) -> Rect {
     if index == 9 {
         return Rect {
             x: left + C.card_pad,
-            y: name_rect(width, scroll).y,
-            width: S.xxl * 2 - C.card_pad,
-            height: C.config_field_height,
+            y: name_rect(width, scroll).y - S.lg,
+            width: S.xxl * 2,
+            height: S.xxl * 2,
         };
     }
     let context_top = top + C.config_details_height + C.card_gap;
@@ -70,179 +75,35 @@ pub(crate) fn app_rect(width: u32, index: usize) -> Rect {
     let row = match index {
         14 => 0,
         15 | 16 => 1,
-        20..=25 => index - 18,
+        20..=25 => 2 + (index - 20) / 2,
         _ => 0,
     };
     let half = (available - C.card_gap) / 2;
     Rect {
-        x: left + if index == 16 { half + C.card_gap } else { 0 },
-        y: body_top() + S.xxl * 2 + row as i32 * (C.config_field_height + C.card_gap),
-        width: if index == 15 || index == 16 {
+        x: left
+            + if index == 16 || ((20..=25).contains(&index) && index % 2 == 1) {
+                half + C.card_gap
+            } else {
+                0
+            },
+        y: body_top()
+            + S.xxl
+            + S.lg
+            + if index >= 20 {
+                2 * (C.config_field_height + S.md)
+                    + (row - 2) as i32 * (Controls::TEXT_PAIR_HEIGHT + S.md)
+            } else {
+                row as i32 * (C.config_field_height + S.md)
+            },
+        width: if index == 15 || index == 16 || (20..=25).contains(&index) {
             half
         } else {
             available
         },
-        height: C.config_field_height,
-    }
-}
-
-fn button(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    rect: Rect,
-    label: &str,
-    focus: bool,
-    enabled: bool,
-    p: niwoe_tokens::Palette,
-) {
-    fill(
-        pm,
-        rect,
-        if enabled { p.surface_alt } else { p.surface },
-        Radius::DEFAULT.sm,
-    );
-    outline(
-        pm,
-        rect,
-        if focus { p.accent } else { p.border },
-        if focus {
-            Controls::FOCUS_WIDTH
+        height: if index >= 20 {
+            Controls::TEXT_PAIR_HEIGHT
         } else {
-            Controls::BORDER
+            C.config_field_height
         },
-    );
-    paint_text_left_centered(
-        pm,
-        &truncate_to_fit(
-            label,
-            rect.width - S.md * 2,
-            Typography::DEFAULT.caption_size as f32,
-        ),
-        rect.x + S.md,
-        rect,
-        Typography::DEFAULT.caption_size as f32,
-        if enabled { p.text } else { p.text_dim },
-    );
-}
-
-pub(super) fn draw_general(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    edit: &Edit,
-    scroll: i32,
-    p: niwoe_tokens::Palette,
-) {
-    let assignment = match edit.assignment {
-        niwoe_ipc::RoomAssignment::Free => "Zuordnung: Frei · alle Apps willkommen",
-        niwoe_ipc::RoomAssignment::Preferred => {
-            "Zuordnung: Bevorzugt · ausgewählte Apps bevorzugen diesen Raum"
-        }
-        niwoe_ipc::RoomAssignment::Dedicated => {
-            "Zuordnung: Dediziert · andere Apps bleiben erlaubt"
-        }
-    };
-    let restore = match edit.preferences.restore {
-        niwoe_ipc::RoomRestore::Disabled => "Wiederherstellung: Keine Vorgabe",
-        niwoe_ipc::RoomRestore::LayoutOnly => "Wiederherstellung: Nur Fenster anordnen",
-        niwoe_ipc::RoomRestore::RelaunchApps => {
-            "Wiederherstellung: Apps ausdrücklich wieder öffnen"
-        }
-    };
-    for (index, label) in [
-        (9, "Icon"),
-        (10, assignment),
-        (11, restore),
-        (8, "Layout und Wiederherstellung öffnen →"),
-        (12, "App-Zuordnung konfigurieren →"),
-        (13, "Explizite Dateiverweise öffnen →"),
-    ] {
-        button(
-            pm,
-            rect(pm.width(), scroll, index),
-            label,
-            edit.focus == index,
-            true,
-            p,
-        );
     }
-    if !edit.name_error.is_empty() {
-        let name = name_rect(pm.width(), scroll);
-        outline(pm, name, p.error, Controls::FOCUS_WIDTH);
-        paint_text(
-            pm,
-            &edit.name_error,
-            name.x,
-            name.y + name.height + S.md,
-            Typography::DEFAULT.caption_size as f32,
-            p.error,
-        );
-    }
-}
-
-pub(crate) fn draw_apps(pm: &mut tiny_skia::PixmapMut<'_>, edit: &Edit, p: niwoe_tokens::Palette) {
-    let x = C.sidebar_width + C.outer_pad;
-    paint_text(
-        pm,
-        "App-Präferenzen · keine automatischen Starts",
-        x,
-        body_top() + S.xl,
-        Typography::DEFAULT.title_size as f32,
-        p.text,
-    );
-    paint_text(pm,"Native App-ID und XWayland-Klasse sind getrennte Identitäten. Fehlende Apps bleiben entfernbar.",x,body_top()+S.xxl+S.md,Typography::DEFAULT.caption_size as f32,p.text_dim);
-    let rows = edit.app_rows();
-    for (index, label) in [
-        (14, format!("Suchen: {}", edit.form.query)),
-        (15, "← Vorige Apps".into()),
-        (
-            16,
-            format!(
-                "Weitere Apps → · Seite {} / {}",
-                edit.form.page + 1,
-                rows.len().saturating_sub(1) / 6 + 1
-            ),
-        ),
-    ] {
-        button(
-            pm,
-            app_rect(pm.width(), index),
-            &label,
-            edit.focus == index,
-            match index {
-                15 => edit.form.page > 0,
-                16 => (edit.form.page + 1) * 6 < rows.len(),
-                _ => true,
-            },
-            p,
-        );
-    }
-    for (row, index) in rows.iter().skip(edit.form.page * 6).take(6).enumerate() {
-        let (label, reference) = &edit.form.apps[*index];
-        let selected = edit.preferences.apps.contains(reference);
-        button(
-            pm,
-            app_rect(pm.width(), 20 + row),
-            &format!("{} {label}", if selected { "[✓]" } else { "[ ]" }),
-            edit.focus == 20 + row,
-            true,
-            p,
-        );
-    }
-    let note = if !edit.form.error.is_empty() {
-        edit.form.error.as_str()
-    } else if rows.is_empty() {
-        "Keine passenden Apps im Katalog."
-    } else {
-        "Auswahl wird erst mit Änderungen speichern übernommen."
-    };
-    paint_text(
-        pm,
-        note,
-        x,
-        app_rect(pm.width(), 25).y + C.config_field_height + S.xl,
-        Typography::DEFAULT.caption_size as f32,
-        if edit.form.error.is_empty() {
-            p.text_dim
-        } else {
-            p.error
-        },
-    );
 }

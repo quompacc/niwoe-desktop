@@ -80,9 +80,9 @@ pub struct PanelConfig {
 #[derive(Debug, Clone)]
 pub struct WallpaperEntry {
     pub display_name: String,
-    /// Best-quality image to apply (largest file in the group).
+    /// Largest landscape resolution of a verified pack, or the individual image.
     pub apply_path: String,
-    /// Smallest file — used for fast thumbnail decoding.
+    /// The same image as apply_path, keeping thumbnail and selected image aligned.
     pub thumbnail_path: String,
 }
 
@@ -309,3 +309,5 @@ mod tests;
 include!("config/mutation.rs");
 include!("config/output_toml.rs");
 include!("config/wallpapers.rs");
+#[path = "config/wallpaper_catalog.rs"]
+mod wallpaper_catalog;

@@ -1,0 +1,8 @@
+{
+  "owned_acl_guard": true,
+  "restore_exit_code": 0,
+  "original_uinput_acl_restored": true,
+  "sudo_scope": "authorized temporary input permission cleanup",
+  "runtime_activation": "NEW_LOGIN_REQUIRED",
+  "native_after_proof": "NOT_RUN"
+}

@@ -1,0 +1,6 @@
+   Compiling niwoe-tokens v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-tokens)
+   Compiling niwoe-app-catalog v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-app-catalog)
+   Compiling niwoe-config v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-config)
+   Compiling niwoe-ui v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-ui)
+   Compiling niwoe-shell v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-shell)
+    Finished `release` profile [optimized] target(s) in 51.58s

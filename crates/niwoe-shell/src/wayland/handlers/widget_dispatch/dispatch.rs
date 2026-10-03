@@ -22,6 +22,7 @@ impl NiwoeShell {
 
         match action {
             WidgetAction::OpenFirstRun => self.open_first_run(qh),
+            WidgetAction::OpenControlCenter(page) => self.navigate_control_center_page(qh, page),
             WidgetAction::LaunchApp { .. } | WidgetAction::LaunchExec(_) => {
                 self.dispatch_launch_action(qh, action);
             }
@@ -32,6 +33,7 @@ impl NiwoeShell {
             | WidgetAction::SetSettingsCategory(_)
             | WidgetAction::ApplyThemeByIndex(_)
             | WidgetAction::ApplyWallpaperByIndex(_)
+            | WidgetAction::PageWallpaper { .. }
             | WidgetAction::SetWallpaperMode(_)
             | WidgetAction::SetCursorSize(_)
             | WidgetAction::ApplyCursorThemeByIndex(_)
@@ -50,11 +52,14 @@ impl NiwoeShell {
             | WidgetAction::CycleOutputScale(_)
             | WidgetAction::CycleOutputTransform(_)
             | WidgetAction::ToggleOutputModeDropdown(_)
+            | WidgetAction::PageDisplay { .. }
+            | WidgetAction::PageProviders { .. }
             | WidgetAction::SetOutputMode { .. }
             | WidgetAction::DefaultAppsAutoSet
             | WidgetAction::DefaultAppsTogglePicker(_)
             | WidgetAction::DefaultAppsPick { .. }
             | WidgetAction::DefaultAppsClosePicker => self.dispatch_settings_action(qh, action),
+            WidgetAction::PageDefaultApps { forward } => self.page_default_apps(qh, forward),
             WidgetAction::PowerOff
             | WidgetAction::PowerRestart
             | WidgetAction::PowerSleep
@@ -119,25 +124,30 @@ impl NiwoeShell {
     fn dispatch_settings_action(&mut self, qh: &QueueHandle<NiwoeShell>, action: WidgetAction) {
         match action {
             WidgetAction::ToggleSettings => {
-                self.launcher_settings_open = !self.launcher_settings_open;
                 if self.launcher_settings_open {
-                    // entering settings — start with an empty search
-                    self.settings_search.clear();
+                    self.close_settings(qh, RepaintReason::Pointer);
                 } else {
-                    // returning to the command palette
-                    self.ui_preview_widget_state = None;
+                    self.settings_search.clear();
+                    self.open_settings_category(qh, self.settings_category);
                 }
-                self.draw_launcher(qh, RepaintReason::Pointer);
             }
             WidgetAction::SetSettingsCategory(cat) => {
+                self.settings_search.clear();
+                self.control_center_nav.sidebar_focus = None;
+                self.control_center_nav.widget_focus = Some(cat.chip_id());
+                self.ui_preview_widget_state = None;
                 self.settings_category = cat;
+                self.wallpaper_page = 0;
+                self.provider_page = 0;
                 self.display_mode_dropdown_open = None;
+                self.display_pages = crate::settings_view::DisplayPages::default();
                 if cat == crate::settings_view::SettingsCategory::Network {
                     self.wifi_password_prompt = None;
                     self.wifi_password_input.clear();
                 }
                 if cat == crate::settings_view::SettingsCategory::DefaultApps {
                     self.default_apps_picker_open = None;
+                    self.default_apps_page = 0;
                 }
                 self.request_settings_refresh(cat);
                 self.draw_launcher(qh, RepaintReason::Pointer);
@@ -146,6 +156,34 @@ impl NiwoeShell {
                 if let Some(name) = self.available_themes.get(idx).cloned() {
                     self.apply_theme(qh, name);
                 }
+            }
+            WidgetAction::PageWallpaper { forward } => {
+                let (_, height) = self.launcher_content_size();
+                let c = niwoe_tokens::Settings::DEFAULT;
+                let body = height.saturating_sub(
+                    (c.header_height + niwoe_tokens::ControlCenter::DEFAULT.config_tabs_height)
+                        as u32,
+                );
+                let slots = crate::settings_view::wallpaper_page_size(body);
+                let count = crate::settings_view::wallpaper_visible_indices(
+                    &self.available_wallpapers,
+                    &self.settings_search,
+                )
+                .len();
+                let last = count.div_ceil(slots).saturating_sub(1);
+                let current = self.wallpaper_page.min(last);
+                self.wallpaper_page = if forward {
+                    current.saturating_add(1).min(last)
+                } else {
+                    current.saturating_sub(1)
+                };
+                self.control_center_nav.widget_focus = Some(if self.wallpaper_page == last {
+                    "wallpaper-page-previous"
+                } else {
+                    "wallpaper-page-next"
+                });
+                self.ui_preview_widget_state = None;
+                self.draw_launcher(qh, RepaintReason::Pointer);
             }
             WidgetAction::ApplyWallpaperByIndex(idx) => {
                 if let Some(entry) = self.available_wallpapers.get(idx) {
@@ -165,6 +203,7 @@ impl NiwoeShell {
             WidgetAction::SetCursorSize(size) => {
                 if self.cursor_size != size {
                     self.cursor_size = size;
+                    self.request_settings_refresh(crate::settings_view::SettingsCategory::Cursor);
                     // Persist alongside the current theme, then ask the
                     // compositor to reload so the live cursor updates at once.
                     niwoe_config::NiwoeConfig::save_cursor(&self.cursor_theme, size);
@@ -334,18 +373,7 @@ impl NiwoeShell {
                     let Some(name) = output.output_name else {
                         return;
                     };
-                    let cur = output.transform.as_deref().unwrap_or("");
-                    let cycle = crate::settings_view::DISPLAY_ROTATE_CYCLE;
-                    let pos = cycle
-                        .iter()
-                        .position(|(v, _)| *v == cur)
-                        .unwrap_or(usize::MAX);
-                    let (next_val, _) = cycle[pos.wrapping_add(1) % cycle.len()];
-                    let next = if next_val.is_empty() {
-                        None
-                    } else {
-                        Some(next_val)
-                    };
+                    let next = next_output_transform(output.transform.as_deref());
                     niwoe_config::NiwoeConfig::save_output_transform(&name, next);
                     if let Some(state) = self.output_workspaces.get_mut(idx) {
                         state.transform = next.map(|s| s.to_string());
@@ -354,7 +382,10 @@ impl NiwoeShell {
                     self.draw_launcher(qh, RepaintReason::Pointer);
                 }
             }
+            WidgetAction::PageProviders { forward } => self.page_providers(qh, forward),
+            WidgetAction::PageDisplay { modes, forward } => self.page_display(qh, modes, forward),
             WidgetAction::ToggleOutputModeDropdown(idx) => {
+                self.display_pages.modes = 0;
                 self.display_mode_dropdown_open = if self.display_mode_dropdown_open == Some(idx) {
                     None
                 } else {
@@ -369,32 +400,15 @@ impl NiwoeShell {
                 self.apply_output_mode_selection(qh, output_index, mode_index);
             }
             WidgetAction::DefaultAppsAutoSet => {
-                // xdg-mime is a subprocess per write; run off the event
-                // loop. Use the cached MimeAppIndex if available, fall
-                // back to a fresh load — the index is otherwise built
-                // on page entry.
-                let index = match self.default_apps_index.as_ref() {
-                    Some(idx) => idx.clone(),
-                    None => crate::default_apps::MimeAppIndex::load_system(),
-                };
-                std::thread::spawn(move || {
-                    let applied = crate::default_apps::apply_sensible_defaults_for_empty(&index);
-                    for (cat, app) in applied {
-                        tracing::info!("default apps auto-set: category={:?} app={}", cat, app);
-                    }
-                });
-                // Refresh immediately on the event loop so the page
-                // reflects everything we just changed. The background
-                // thread's writes hit disk by the time the page
-                // re-renders; a follow-up tick refresh will catch any
-                // outstanding ones.
-                self.refresh_default_apps_snapshot();
-                self.default_apps_picker_open = None;
+                self.start_default_apps_change(
+                    crate::default_apps::refresh::ChangeRequest::FillEmpty,
+                );
                 self.draw_launcher(qh, RepaintReason::Pointer);
             }
             WidgetAction::DefaultAppsClosePicker => {
                 tracing::info!("default_apps: close picker (back)");
                 self.default_apps_picker_open = None;
+                self.default_apps_page = 0;
                 self.draw_launcher(qh, RepaintReason::Pointer);
             }
             WidgetAction::DefaultAppsTogglePicker(idx) => {
@@ -405,6 +419,7 @@ impl NiwoeShell {
                 else {
                     return;
                 };
+                self.default_apps_page = 0;
                 self.default_apps_picker_open = match self.default_apps_picker_open {
                     Some(open) if open == cat => None,
                     _ => Some(cat),
@@ -426,19 +441,14 @@ impl NiwoeShell {
                 let Some(app) = apps.get(app_idx) else {
                     return;
                 };
-                let desktop_id = app.desktop_id.clone();
-                let mimes: Vec<String> = cat.all_mimes().iter().map(|m| (*m).to_string()).collect();
-                std::thread::spawn(move || {
-                    let mime_refs: Vec<&str> = mimes.iter().map(String::as_str).collect();
-                    if !crate::default_apps::set_default_for_mimes(&desktop_id, &mime_refs) {
-                        tracing::warn!("xdg-mime default {} {:?} failed", desktop_id, mime_refs);
-                    }
-                });
-                // Optimistic local update: reflect the pick right away so
-                // the user doesn't have to wait for the subprocess to land.
-                self.default_apps_current
-                    .insert(cat, app.desktop_id.clone());
-                self.default_apps_picker_open = None;
+                if app_idx >= crate::default_apps::MAX_APPS_PER_CATEGORY {
+                    return;
+                }
+                let request = crate::default_apps::refresh::ChangeRequest::Pick {
+                    category: cat,
+                    desktop_id: app.desktop_id.clone(),
+                };
+                self.start_default_apps_change(request);
                 self.draw_launcher(qh, RepaintReason::Pointer);
             }
             _ => unreachable!("non settings action routed to settings dispatcher"),

@@ -6,6 +6,7 @@ pub(crate) struct ListUi {
     /// 0: all, 1: occupied, 2: empty. Active room is independent of occupancy.
     pub filter: usize,
     pub alphabetical: bool,
+    pub list_view: bool,
     pub search_focus: bool,
     pub focus: Option<usize>,
 }

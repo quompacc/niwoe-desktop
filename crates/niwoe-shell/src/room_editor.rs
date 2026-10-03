@@ -22,6 +22,7 @@ pub(crate) struct Edit {
 
 #[derive(Default)]
 pub(crate) struct RestoreUi {
+    pub ready: bool,
     pub revision: u64,
     pub open: bool,
     pub focus: usize,

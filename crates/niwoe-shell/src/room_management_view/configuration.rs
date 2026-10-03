@@ -2,41 +2,6 @@
 
 use super::*;
 use crate::room_editor::Edit;
-use std::sync::OnceLock;
-use tiny_skia::{PixmapPaint, Transform};
-
-fn landscape() -> Option<&'static Pixmap> {
-    static LANDSCAPE: OnceLock<Option<Pixmap>> = OnceLock::new();
-    LANDSCAPE
-        .get_or_init(|| {
-            Pixmap::decode_png(include_bytes!(
-                "../../../../assets/wallpapers/niwoe-alpine-dawn.png"
-            ))
-            .ok()
-        })
-        .as_ref()
-}
-
-fn draw_landscape(pm: &mut tiny_skia::PixmapMut<'_>, rect: Rect) {
-    if let Some(image) = landscape() {
-        pm.draw_pixmap(
-            0,
-            0,
-            image.as_ref(),
-            &PixmapPaint::default(),
-            Transform::from_row(
-                rect.width as f32 / image.width() as f32,
-                0.0,
-                0.0,
-                rect.height as f32 / image.height() as f32,
-                rect.x as f32,
-                rect.y as f32,
-            ),
-            None,
-        );
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ConfigurationAction {
     Restore,
@@ -86,8 +51,9 @@ fn lower_height(height: u32) -> i32 {
         .max(C.config_lower_height.max(C.config_note_height))
 }
 
-fn preview_height(_height: u32) -> i32 {
+fn preview_height(height: u32) -> i32 {
     C.config_preview_height
+        .min(body_height(height).max(C.config_details_height))
 }
 
 fn note_height(height: u32) -> i32 {
@@ -123,9 +89,9 @@ fn footer_action_rect(width: u32, height: u32, save: bool) -> Rect {
 fn name_rect(width: u32, scroll_y: i32) -> Rect {
     let (left, left_width, _, _) = content_bounds(width);
     Rect {
-        x: left + C.card_pad + S.xxl * 2,
+        x: left + C.card_pad + S.xxl * 2 + S.md,
         y: body_top() - scroll_y + S.xxl * 2,
-        width: (left_width - C.card_pad * 3 - S.xxl * 2) / 2,
+        width: (left_width - C.card_pad * 3 - S.xxl * 2 - S.md) / 2,
         height: C.config_field_height,
     }
 }
@@ -227,160 +193,7 @@ fn section(pm: &mut tiny_skia::PixmapMut<'_>, rect: Rect, title: &str, p: niwoe_
 
 include!("configuration/body.rs");
 
-fn draw_chrome(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    room: &RoomEntry,
-    edit: &Edit,
-    message: &str,
-    pending: bool,
-    config: &niwoe_config::ThemeConfig,
-) {
-    let p = crate::ui::tokens::theme_from_config(config).palette;
-    let height = pm.height();
-    draw_sidebar(pm, height, true, config);
-    let header = Rect {
-        x: C.sidebar_width,
-        y: 0,
-        width: pm.width() as i32 - C.sidebar_width,
-        height: C.config_header_height,
-    };
-    fill(pm, header, p.background, Radius::DEFAULT.none);
-    draw_landscape(pm, header);
-    fill(
-        pm,
-        header,
-        alpha(p.background, C.header_tint_alpha),
-        Radius::DEFAULT.none,
-    );
-    let x = header.x + C.outer_pad;
-    paint_text(
-        pm,
-        &format!("Räume  ›  {}  ›  Konfiguration", room.name),
-        x,
-        C.outer_pad + S.md,
-        Typography::DEFAULT.caption_size as f32,
-        p.text_dim,
-    );
-    paint_text(
-        pm,
-        if edit.id == 0 {
-            "Neuer Raum"
-        } else {
-            "Raum konfigurieren"
-        },
-        x,
-        C.outer_pad + S.xxl * 2,
-        Typography::DEFAULT.display_size as f32,
-        p.text,
-    );
-    paint_text(
-        pm,
-        &truncate_to_fit(
-            &format!(
-                "Passe den Raum {} und seine verfügbaren Funktionen an.",
-                room.name
-            ),
-            header.width - C.outer_pad * 2,
-            Typography::DEFAULT.body_size as f32,
-        ),
-        x,
-        C.outer_pad + S.xxl * 3 + S.lg,
-        Typography::DEFAULT.body_size as f32,
-        p.text_dim,
-    );
-    let tabs = Rect {
-        x: C.sidebar_width,
-        y: C.config_header_height,
-        width: pm.width() as i32 - C.sidebar_width,
-        height: C.config_tabs_height,
-    };
-    fill(pm, tabs, p.background, Radius::DEFAULT.none);
-    for (index, label) in form::TABS.iter().enumerate() {
-        let tab = form::tab_rect(index);
-        let selected = edit.form.tab == index;
-        if index < 4 {
-            fill(pm, tab, p.surface, Radius::DEFAULT.sm);
-            outline(
-                pm,
-                tab,
-                if selected || edit.focus == 30 + index {
-                    p.accent
-                } else {
-                    p.border
-                },
-                if edit.focus == 30 + index {
-                    Controls::FOCUS_WIDTH
-                } else {
-                    Controls::BORDER
-                },
-            );
-        }
-        paint_text_centered(
-            pm,
-            label,
-            tab,
-            Typography::DEFAULT.caption_size as f32,
-            if selected { p.text } else { p.text_dim },
-        );
-    }
-    let footer = Rect {
-        x: C.sidebar_width,
-        y: pm.height() as i32 - C.config_footer_height,
-        width: pm.width() as i32 - C.sidebar_width,
-        height: C.config_footer_height,
-    };
-    fill(pm, footer, p.background, Radius::DEFAULT.none);
-    paint_text_left_centered(
-        pm,
-        if edit.restore.open {
-            "Esc: Allgemein · Tab/Enter: Bedienung · Kein automatischer Login-Restore"
-        } else if message.is_empty() {
-            "Lokaler Entwurf · Änderungen gemeinsam speichern."
-        } else {
-            message
-        },
-        footer.x + C.outer_pad,
-        footer,
-        Typography::DEFAULT.caption_size as f32,
-        if message.contains("fehl") || message.contains("Ungült") {
-            p.error
-        } else {
-            p.text_dim
-        },
-    );
-    if edit.restore.open {
-        return;
-    }
-    for (save, label) in [(false, "Abbrechen"), (true, "Änderungen speichern")] {
-        let action = footer_action_rect(pm.width(), pm.height(), save);
-        fill(
-            pm,
-            action,
-            if save && !pending {
-                p.accent
-            } else {
-                p.surface
-            },
-            Radius::DEFAULT.sm,
-        );
-        outline(pm, action, p.border, Controls::BORDER);
-        paint_text_centered(
-            pm,
-            label,
-            action,
-            Typography::DEFAULT.caption_size as f32,
-            if save && !pending {
-                p.on_accent()
-            } else {
-                p.text_dim
-            },
-        );
-    }
-    if edit.focus == 3 || edit.focus == 4 {
-        let target = footer_action_rect(pm.width(), pm.height(), edit.focus == 3);
-        outline(pm, target, p.accent, Controls::FOCUS_WIDTH);
-    }
-}
+mod chrome;
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn draw_room_configuration(
@@ -397,6 +210,8 @@ pub(crate) fn draw_room_configuration(
     pending: bool,
     scroll_y: i32,
     icons: &crate::icons::IconCache,
+    hub: &crate::hub_state::HubState,
+    apps: &[crate::launcher::DesktopApp],
     config: &niwoe_config::ThemeConfig,
 ) {
     if canvas.len() != width as usize * height as usize * 4 {
@@ -419,17 +234,23 @@ pub(crate) fn draw_room_configuration(
         Radius::DEFAULT.none,
     );
     if edit.restore.open {
-        restore::draw(&mut pm, &edit.restore, p);
+        restore::draw(
+            &mut pm,
+            &edit.restore,
+            restore::Page::from_tab(edit.form.tab),
+            config,
+        );
     } else if edit.form.tab == 1 {
-        form::draw_apps(&mut pm, edit, p);
+        form::draw_apps(&mut pm, edit, icons, apps, config);
     } else {
         draw_body(
-            &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, icons, config,
+            &mut pm, room, edit, order, room_count, rooms, windows, scroll_y, icons, hub, apps,
+            config,
         );
-        form::draw_general(&mut pm, edit, scroll_y, p);
+        form::draw_general(&mut pm, edit, scroll_y, icons, config);
         target_menu::draw(&mut pm, edit, rooms, scroll_y, p);
     }
-    draw_chrome(
+    chrome::draw(
         &mut pm,
         room,
         edit,

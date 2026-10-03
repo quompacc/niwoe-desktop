@@ -124,8 +124,8 @@ impl Component<'_> {
         let pal = theme.palette;
         let interactive = self.accepts_input();
         let selected = self.state.selected && interactive;
-        let mut bg = if selected && self.kind == ComponentKind::Button {
-            pal.accent
+        let mut bg = if selected {
+            Interaction::DEFAULT.selected_tint(pal.surface)
         } else {
             pal.surface_raised()
         };
@@ -138,15 +138,16 @@ impl Component<'_> {
         }
         let fg = if self.state.disabled {
             pal.text_disabled()
-        } else if selected && self.kind == ComponentKind::Button {
-            niwoe_tokens::contrast_text(bg)
         } else {
             pal.text
         };
         let outline = if self.state.error {
             pal.error
-        } else if selected {
-            pal.accent
+        } else if matches!(
+            self.kind,
+            ComponentKind::Tab | ComponentKind::Chip | ComponentKind::Card
+        ) {
+            pal.border_subtle()
         } else if interactive {
             pal.border_control()
         } else {
@@ -169,11 +170,7 @@ impl Component<'_> {
                 paint_border(
                     canvas,
                     &path,
-                    if selected && self.kind == ComponentKind::Button {
-                        fg
-                    } else {
-                        pal.border_focus()
-                    },
+                    pal.border_focus(),
                     px(Controls::FOCUS_WIDTH) as f32,
                 );
             }
@@ -210,7 +207,21 @@ impl Component<'_> {
             return;
         }
         let size = Typography::DEFAULT.body_size as f32 * scale;
-        let label = truncate_to_fit(self.label, area.width - theme.spacing.lg * 2, size);
+        let marked = selected
+            && matches!(
+                self.kind,
+                ComponentKind::Tab | ComponentKind::Chip | ComponentKind::Card
+            );
+        let mark_width = if marked {
+            px(Controls::SYMBOL_SIZE as i32) + theme.spacing.sm
+        } else {
+            0
+        };
+        let label = truncate_to_fit(
+            self.label,
+            area.width - theme.spacing.lg * 2 - mark_width,
+            size,
+        );
         let (ascent, descent) = crate::effect::ui_line_metrics(size);
         let baseline = area.y + ((area.height as f32 + ascent + descent) / 2.0).round() as i32;
         paint_text(
@@ -221,20 +232,20 @@ impl Component<'_> {
             size,
             fg,
         );
-        if selected
-            && matches!(
-                self.kind,
-                ComponentKind::Tab | ComponentKind::Chip | ComponentKind::Card
-            )
-        {
-            let mark = Rect {
-                x: body.x + theme.spacing.sm,
-                y: body.y + body.height - px(Controls::FOCUS_INSET),
-                width: body.width - theme.spacing.sm * 2,
-                height: px(Controls::FOCUS_WIDTH),
-            };
-            if let Some(path) = rounded_rect_path(mark, theme.radius.none) {
-                paint_fill(canvas, &path, pal.accent);
+        if marked {
+            if let Some(check) = crate::effect::symbol_icon(
+                crate::effect::Symbol::Check,
+                fg,
+                px(Controls::SYMBOL_SIZE as i32) as u32,
+            ) {
+                canvas.draw_pixmap(
+                    area.x + area.width - theme.spacing.lg - check.width() as i32,
+                    area.y + (area.height - check.height() as i32) / 2,
+                    check.as_ref().as_ref(),
+                    &Default::default(),
+                    tiny_skia::Transform::identity(),
+                    None,
+                );
             }
         }
     }

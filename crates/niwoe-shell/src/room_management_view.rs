@@ -76,12 +76,7 @@ fn paint_text_centered(
 }
 
 fn back_rect(height: u32) -> Rect {
-    Rect {
-        x: C.outer_pad,
-        y: height as i32 - C.config_footer_height + C.card_gap,
-        width: C.sidebar_width - C.outer_pad * 2,
-        height: C.config_field_height,
-    }
+    crate::control_center::back_rect(height)
 }
 
 fn right_rail_x(width: u32) -> i32 {
@@ -89,28 +84,27 @@ fn right_rail_x(width: u32) -> i32 {
 }
 
 fn right_rail_toolbar_rect(width: u32) -> Rect {
-    Rect {
-        x: right_rail_x(width),
-        y: C.header_height + (C.toolbar_height - C.filter_height) / 2,
-        width: C.right_rail_width,
-        height: C.filter_height,
-    }
+    list::new_rect(width)
 }
 
-fn grid_geometry(width: u32, height: u32, room_count: usize) -> (i32, i32, i32, i32, usize) {
+fn grid_geometry(width: u32, height: u32, _room_count: usize) -> (i32, i32, i32, i32, usize) {
     let grid_x = C.sidebar_width + C.outer_pad;
-    let grid_y = C.header_height + C.toolbar_height;
+    let grid_y = list::grid_top(width);
     let grid_right = right_rail_x(width) - C.outer_pad;
     let grid_width = (grid_right - grid_x).max(C.room_columns);
-    let rows = room_count.max(1).div_ceil(C.room_columns as usize);
+    let rows = C.room_page_rows as usize;
     let card_width = (grid_width - C.card_gap * (C.room_columns - 1)) / C.room_columns;
-    let available_height = (height as i32 - grid_y - C.outer_pad).max(rows as i32);
+    let available_height =
+        (height as i32 - grid_y - C.outer_pad - C.room_page_footer_height).max(rows as i32);
     let card_height =
         (available_height - C.card_gap * (rows.saturating_sub(1) as i32)) / rows as i32;
     (grid_x, grid_y, card_width, card_height, rows)
 }
 
-fn room_rect(index: usize, width: u32, height: u32, room_count: usize) -> Rect {
+fn room_rect(index: usize, width: u32, height: u32, room_count: usize, list_view: bool) -> Rect {
+    if list_view {
+        return list::row_rect(index, width, height);
+    }
     let (grid_x, grid_y, card_width, card_height, _) = grid_geometry(width, height, room_count);
     let column = index as i32 % C.room_columns;
     let row = index as i32 / C.room_columns;
@@ -137,142 +131,37 @@ pub(crate) fn hit_room(
     height: u32,
     room_count: usize,
     page: usize,
+    list_view: bool,
 ) -> Option<usize> {
     let page = page.min(max_room_page(room_count));
     let start = page * ROOM_PAGE_SIZE;
     let count = room_count.saturating_sub(start).min(ROOM_PAGE_SIZE);
     (0..count)
-        .find(|&index| contains(room_rect(index, width, height, count), x, y))
+        .find(|&index| contains(room_rect(index, width, height, count, list_view), x, y))
         .map(|index| start + index)
 }
 
 include!("room_management_view/sidebar.rs");
 pub(crate) mod first_run;
+mod header;
 pub(crate) mod list;
+mod management;
+pub(crate) mod pages;
 pub(crate) mod panel;
-fn draw_header(pm: &mut tiny_skia::PixmapMut<'_>, width: u32, config: &niwoe_config::ThemeConfig) {
-    let p = crate::ui::tokens::theme_from_config(config).palette;
-    fill(
-        pm,
-        Rect {
-            x: C.sidebar_width,
-            y: 0,
-            width: width as i32 - C.sidebar_width,
-            height: C.header_height,
-        },
-        alpha(p.background, C.header_tint_alpha),
-        Radius::DEFAULT.none,
-    );
-    let x = C.sidebar_width + C.outer_pad * 2;
-    paint_text(
-        pm,
-        "RÄUME",
-        x,
-        C.outer_pad + S.lg,
-        Typography::DEFAULT.caption_size as f32,
-        p.accent,
-    );
-    paint_text(
-        pm,
-        "Räume verwalten",
-        x,
-        C.outer_pad + S.xxl * 2,
-        Typography::DEFAULT.display_size as f32,
-        p.text,
-    );
-    paint_text(
-        pm,
-        "Organisiere deine Arbeitsumgebungen. Räume bündeln Kontext und Fenster.",
-        x,
-        C.outer_pad + S.xxl * 3 + S.lg,
-        Typography::DEFAULT.body_size as f32,
-        p.text_dim,
-    );
-}
-
-fn chip(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    rect: Rect,
-    text: &str,
-    active: bool,
-    config: &niwoe_config::ThemeConfig,
-) {
-    let p = crate::ui::tokens::theme_from_config(config).palette;
-    fill(pm, rect, alpha(p.surface, C.card_alpha), Radius::DEFAULT.sm);
-    outline(
-        pm,
-        rect,
-        if active { p.accent } else { p.border },
-        if active {
-            Controls::FOCUS_WIDTH
-        } else {
-            Controls::BORDER
-        },
-    );
-    paint_text_centered(
-        pm,
-        text,
-        rect,
-        Typography::DEFAULT.caption_size as f32,
-        if active { p.text } else { p.text_dim },
-    );
-}
-
-fn draw_toolbar(
-    pm: &mut tiny_skia::PixmapMut<'_>,
-    rooms: &[RoomEntry],
-    new_focused: bool,
-    config: &niwoe_config::ThemeConfig,
-) {
-    let p = crate::ui::tokens::theme_from_config(config).palette;
-    let add = right_rail_toolbar_rect(pm.width());
-    fill(
-        pm,
-        add,
-        if rooms.len() < niwoe_config::rooms::MAX_ROOMS {
-            p.accent
-        } else {
-            alpha(p.surface, C.disabled_alpha)
-        },
-        Radius::DEFAULT.sm,
-    );
-    outline(
-        pm,
-        add,
-        if new_focused { p.text } else { p.border },
-        if new_focused {
-            Controls::FOCUS_WIDTH
-        } else {
-            Controls::BORDER
-        },
-    );
-    paint_text_centered(
-        pm,
-        "+  Neuer Raum",
-        add,
-        Typography::DEFAULT.caption_size as f32,
-        if rooms.len() < niwoe_config::rooms::MAX_ROOMS {
-            p.on_accent()
-        } else {
-            p.text_dim
-        },
-    );
-}
+use header::draw_header;
 
 struct RoomRenderContext<'a> {
     preview: bool,
     icons: &'a crate::icons::IconCache,
-    rooms: &'a [RoomEntry],
     active_workspace: u8,
     window_counts: &'a [u16; niwoe_config::rooms::MAX_ROOMS],
     windows: &'a [WindowInfo],
     hovered_room: Option<usize>,
     keyboard_focus: Option<usize>,
-    page: usize,
     config: &'a niwoe_config::ThemeConfig,
 }
 
-include!("room_management_view/cards.rs");
+// Room cards share the native management composition, including configuration previews.
 mod configuration;
 pub(crate) use configuration::{
     draw_room_configuration, hit_configuration, hit_target_menu, max_configuration_scroll,
@@ -285,6 +174,7 @@ pub(crate) fn draw_room_management(
     width: u32,
     height: u32,
     rooms: &[RoomEntry],
+    all_rooms: &[RoomEntry],
     active_workspace: u8,
     window_counts: &[u16; niwoe_config::rooms::MAX_ROOMS],
     windows: &[WindowInfo],
@@ -293,6 +183,8 @@ pub(crate) fn draw_room_management(
     page: usize,
     list: &crate::room_editor::list::ListUi,
     icons: &crate::icons::IconCache,
+    hub: &crate::hub_state::HubState,
+    apps: &[crate::launcher::DesktopApp],
     config: &niwoe_config::ThemeConfig,
 ) {
     if canvas.len() != width as usize * height as usize * 4 {
@@ -314,25 +206,44 @@ pub(crate) fn draw_room_management(
         alpha(p.background, C.content_alpha),
         Radius::DEFAULT.none,
     );
-    draw_sidebar(&mut pm, height, false, config);
+    draw_sidebar(
+        &mut pm,
+        height,
+        crate::control_center::Page::Rooms,
+        false,
+        config,
+    );
     draw_header(&mut pm, width, config);
     let page = page.min(max_room_page(rooms.len()));
-    draw_toolbar(&mut pm, rooms, keyboard_focus == Some(rooms.len()), config);
-    list::draw_list_controls(&mut pm, list, config);
+    list::draw_list_controls(
+        &mut pm,
+        list,
+        all_rooms,
+        window_counts,
+        keyboard_focus == Some(rooms.len()),
+        config,
+    );
     let context = RoomRenderContext {
         preview: false,
         icons,
-        rooms,
         active_workspace,
         window_counts,
         windows,
         hovered_room,
         keyboard_focus,
-        page,
         config,
     };
-    draw_room_cards(&mut pm, width, height, &context);
-    draw_right_rail(&mut pm, width, &context);
+    let management = management::Context {
+        card: &context,
+        rooms,
+        all_rooms,
+        page,
+        list,
+        hub,
+        apps,
+    };
+    management::draw(&mut pm, width, height, &management);
+    pages::draw(&mut pm, rooms.len(), page, list.focus, config);
     for (rgba, bgra) in image
         .data()
         .as_chunks::<4>()

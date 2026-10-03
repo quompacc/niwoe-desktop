@@ -1,0 +1,20 @@
+[
+    {
+        "label":  "r9-primary-before-before-second-output",
+        "sha256":  "69faf4b1d47aa4fbedc30de8c5b47addfd730e1d29959538b786ba753d5e4eb2",
+        "actually_viewed":  true,
+        "finding":  "V32: selecting second output succeeds, but new primary shows wallpaper and shell stays on old output"
+    },
+    {
+        "label":  "r9-primary-before-second-primary-saved",
+        "sha256":  "c01fcc7a75487566b21ad2c4fbc2e93df3552cb858024b6be37758e1fd314210",
+        "actually_viewed":  true,
+        "finding":  "V32: selecting second output succeeds, but new primary shows wallpaper and shell stays on old output"
+    },
+    {
+        "label":  "r9-primary-before-old-output-after-save",
+        "sha256":  "a83244c84a6fd17be3a179ba62681c9b652b62e9c8e0ed065d0ca53cfdd33d22",
+        "actually_viewed":  true,
+        "finding":  "V32: selecting second output succeeds, but new primary shows wallpaper and shell stays on old output"
+    }
+]

@@ -27,10 +27,22 @@ macro_rules! handle_launcher_pointer {
                 $event.position
             };
 
+            if $shell.control_center_visible()
+                && matches!($event.kind, PointerEventKind::Press { .. })
+            {
+                $shell.control_center_nav = Default::default();
+                $shell.launcher_dirty = true;
+            }
+
             if $shell.workspace_state.rooms.wizard.open {
                 if workspace_click_activation(&$event.kind) {
-                    if let Some(index) = crate::room_management_view::first_run::hit(local_pos.0 as i32,
-                        local_pos.1 as i32, content_width, content_height, &$shell.workspace_state.rooms.wizard) {
+                    if let Some(index) = crate::room_management_view::first_run::hit(
+                        local_pos.0 as i32,
+                        local_pos.1 as i32,
+                        content_width,
+                        content_height,
+                        &$shell.workspace_state.rooms.wizard,
+                    ) {
                         $shell.first_run_action($qh, index);
                     }
                 }
@@ -96,6 +108,7 @@ macro_rules! handle_launcher_pointer {
                         content_height,
                         $shell.visible_rooms().len(),
                         $shell.room_management_page,
+                        $shell.workspace_state.rooms.list.list_view,
                     );
                     if next != $shell.hovered_bento_idx {
                         $shell.hovered_bento_idx = next;
@@ -207,40 +220,7 @@ macro_rules! handle_launcher_pointer {
                 }
                 // Fall through to widget tree for settings right-click
                 let tree = if $shell.launcher_settings_open {
-                    crate::settings_view::build_settings_widget_tree(
-                        content_width,
-                        content_height,
-                        $shell.settings_category,
-                        &$shell.settings_search,
-                        &$shell.available_themes,
-                        &$shell.theme_name,
-                        &$shell.available_wallpapers,
-                        &$shell.wallpaper_thumbnails,
-                        $shell.wallpaper_path.as_deref(),
-                        $shell.wallpaper_mode,
-                        $shell.cursor_size,
-                        $shell.available_cursor_themes.as_slice(),
-                        $shell.cursor_theme.as_str(),
-                        $shell.idle_timeout_secs,
-                        &$shell.pinned_apps,
-                        &$shell.output_workspaces,
-                        $shell.display_mode_dropdown_open,
-                        &$shell.printer_snapshot,
-                        &$shell.audio_snapshot,
-                        &$shell.system_info,
-                        $shell.network_controller.state(),
-                        $shell.network_profiles.as_slice(),
-                        &$shell.bluetooth_snapshot,
-                        $shell.wifi_networks.as_slice(),
-                        $shell.settings_pinned_adding,
-                        &$shell.launcher_state.apps,
-                        &$shell.icon_cache,
-                        None,
-                        $shell.default_apps_index.as_ref(),
-                        &$shell.default_apps_current,
-                        $shell.default_apps_picker_open,
-                        &crate::ui::tokens::theme_from_config(&$shell.theme),
-                    )
+                    $shell.settings_widget_tree(content_width, content_height)
                 } else {
                     return;
                 };
@@ -334,16 +314,17 @@ macro_rules! handle_launcher_pointer {
                 } else if $shell.room_management_open {
                     let count = $shell.visible_rooms().len();
                     let max = crate::room_management_view::max_room_page(count);
-                    let next = if vertical.discrete < 0 || vertical.absolute < -1.0 {
-                        $shell.room_management_page.saturating_add(1).min(max)
-                    } else if vertical.discrete > 0 || vertical.absolute > 1.0 {
-                        $shell.room_management_page.saturating_sub(1)
-                    } else {
-                        $shell.room_management_page
-                    };
+                    let next =
+                        match crate::hub_state::scroll_back(vertical.discrete, vertical.absolute) {
+                            Some(false) => $shell.room_management_page.saturating_add(1).min(max),
+                            Some(true) => $shell.room_management_page.saturating_sub(1),
+                            None => $shell.room_management_page,
+                        };
                     if next != $shell.room_management_page {
                         $shell.room_management_page = next;
                         $shell.hovered_bento_idx = None;
+                        $shell.room_keyboard_focus = None;
+                        $shell.workspace_state.rooms.list.focus = None;
                         $shell.draw_launcher($qh, RepaintReason::Pointer);
                     }
                     continue;
@@ -464,42 +445,7 @@ macro_rules! handle_launcher_pointer {
 
             if $shell.launcher_settings_open {
                 if let Some(ev) = translate_pointer_event(&$event.kind, local_pos) {
-                    let tree = {
-                        crate::settings_view::build_settings_widget_tree(
-                            content_width,
-                            content_height,
-                            $shell.settings_category,
-                            &$shell.settings_search,
-                            &$shell.available_themes,
-                            &$shell.theme_name,
-                            &$shell.available_wallpapers,
-                            &$shell.wallpaper_thumbnails,
-                            $shell.wallpaper_path.as_deref(),
-                            $shell.wallpaper_mode,
-                            $shell.cursor_size,
-                            $shell.available_cursor_themes.as_slice(),
-                            $shell.cursor_theme.as_str(),
-                            $shell.idle_timeout_secs,
-                            &$shell.pinned_apps,
-                            &$shell.output_workspaces,
-                            $shell.display_mode_dropdown_open,
-                            &$shell.printer_snapshot,
-                            &$shell.audio_snapshot,
-                            &$shell.system_info,
-                            $shell.network_controller.state(),
-                            $shell.network_profiles.as_slice(),
-                            &$shell.bluetooth_snapshot,
-                            $shell.wifi_networks.as_slice(),
-                            $shell.settings_pinned_adding,
-                            &$shell.launcher_state.apps,
-                            &$shell.icon_cache,
-                            None,
-                            $shell.default_apps_index.as_ref(),
-                            &$shell.default_apps_current,
-                            $shell.default_apps_picker_open,
-                            &crate::ui::tokens::theme_from_config(&$shell.theme),
-                        )
-                    };
+                    let tree = { $shell.settings_widget_tree(content_width, content_height) };
                     let pixel_size = niwoe_ui::PixelSize {
                         width: content_width,
                         height: content_height,

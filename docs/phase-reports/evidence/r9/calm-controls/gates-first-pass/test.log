@@ -1,0 +1,1577 @@
+   Compiling niwoe-tokens v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-tokens)
+   Compiling niwoe-app-catalog v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-app-catalog)
+   Compiling niwoe-config v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-config)
+   Compiling niwoe-ui v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-ui)
+   Compiling niwoe-lock v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-lock)
+   Compiling niwoe-compositor v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-compositor)
+   Compiling niwoe-portal v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-portal)
+   Compiling niwoe-login v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-login)
+   Compiling niwoe-shell v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-shell)
+   Compiling niwoe v0.5.1 (/home/eduard/niwoe-desktop)
+   Compiling niwoe-polkit v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-polkit)
+   Compiling niwoe-freetype v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-freetype)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 30.47s
+     Running unittests src/main.rs (target/debug/deps/niwoe-3176641fbd0ee21f)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_app_catalog-165a032e094d77b1)
+
+running 9 tests
+test restore_tests::duplicate_exec_cannot_replace_verified_program_for_file_launch ... ok
+test tests::helper_and_broken_standalone_entries_are_not_launcher_apps ... ok
+test restore_tests::shell_characters_and_spaces_remain_a_single_literal_argument ... ok
+test restore_tests::documents_use_only_explicit_standalone_file_slots ... ok
+test tests::exec_tokenization_removes_field_codes_and_preserves_quotes ... ok
+test tests::parses_and_normalizes_desktop_entry ... ok
+test tests::mime_handler_metadata_allows_nodisplay_but_keeps_validation ... ok
+test tests::rejects_hidden_non_application_and_missing_try_exec ... ok
+test tests::visibility_is_niwoe_specific ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_boot_common-d5150845b1e65a9d)
+
+running 5 tests
+test platform_path_tests::boot_sockets_use_the_native_runtime_directory ... ok
+test appearance_tests::roundtrip_via_file ... ok
+test appearance_tests::parse_defaults_to_dark ... ok
+test tests::cleanup_removes_original_socket ... ok
+test tests::cleanup_rejects_replaced_non_socket ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_compass_render-ad19962c4454360c)
+
+running 14 tests
+test tests::garbage_sans_font_yields_build_error ... ok
+test tests::garbage_script_font_yields_build_error ... ok
+test tests::glow_base_radius_matches_internal_geometry ... ok
+test tests::needle_angle_at_settle_is_near_north ... ok
+test tests::needle_angle_finite_for_relevant_t_range ... ok
+test tests::measure_text_width_is_positive_for_non_empty ... ok
+test tests::north_glow_position_consistent_with_needle_angle ... ok
+test tests::quompacc_fonts_construct_a_painter ... ok
+test tests::render_text_left_returns_pen_past_last_glyph ... ok
+test tests::render_glow_at_alone_lights_up_pixels ... ok
+test tests::veil_alpha_255_yields_black_frame ... ok
+test tests::watermark_alpha_dims_compass_toward_background ... ok
+test tests::north_glow_disabled_changes_some_pixels ... ok
+test tests::renders_without_panic_at_typical_resolutions ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.06s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_compositor-0168af8ef9844fed)
+
+running 442 tests
+test backend::drm::init::tests::repaint_deadline_does_not_add_render_time_to_the_interval ... ok
+test backend::drm::mode_selection::tests::toml_mode_override_falls_back_when_size_unavailable ... ok
+test backend::drm::mode_selection::tests::toml_mode_override_none_delegates_to_select_add_mode ... ok
+test backend::drm::mode_selection::tests::toml_mode_override_invalid_dimensions_delegate_to_auto_selection ... ok
+test backend::drm::mode_selection::tests::toml_mode_override_picks_closest_refresh_when_specified ... ok
+test backend::drm::mode_selection::tests::toml_mode_override_picks_matching_size ... ok
+test backend::drm::render::layers::tests::launcher_namespace_forces_upper_bucket ... ok
+test backend::drm::render::layers::tests::non_launcher_uses_layer_role ... ok
+test backend::drm::render::layers::tests::quick_settings_namespace_forces_upper_bucket ... ok
+test backend::drm::render::screenshot_output_tests::removed_or_unknown_output_never_falls_back_to_another_screen ... ok
+test backend::drm::render::screenshot_output_tests::secondary_request_survives_primary_repaint_and_vice_versa ... ok
+test backend::drm::render::screenshot_output_tests::unspecified_output_uses_primary_even_if_secondary_renders_first ... ok
+test backend::drm::render::screenshot_tests::short_buffer_is_an_error_not_a_panic ... ok
+test backend::drm::render::stack::tests::cursor_role_is_always_first_when_present ... ok
+test backend::drm::render::stack::tests::element_order_is_front_to_back ... ok
+test backend::drm::render::stack::tests::layer_role_background_and_bottom_are_bottom_layer ... ok
+test backend::drm::render::stack::tests::layer_role_overlay_and_top_are_top_layer ... ok
+test backend::drm::render::screenshot_tests::encodes_xrgb_with_red_blue_swapped ... ok
+test backend::drm::render::screenshot_tests::dimensions_and_blue_channel_round_trip ... ok
+test backend::drm::render::stack::tests::render_stack_empty_returns_empty_vec ... ok
+test backend::drm::render::stack::tests::render_stack_without_cursor_has_no_cursor_role ... ok
+test backend::winit::layers::tests::launcher_namespace_forces_upper_bucket ... ok
+test backend::winit::layers::tests::non_launcher_uses_layer_role ... ok
+test backend::winit::layers::tests::quick_settings_namespace_forces_upper_bucket ... ok
+test cursor::tests::cursor_has_valid_image ... ok
+test cursor::tests::embedded_cursor_has_correct_dimensions ... ok
+test cursor::tests::cursor_theme_loads_successfully ... ok
+test cursor::tests::embedded_cursor_hotspot_is_origin ... ok
+test cursor::tests::embedded_cursor_icon_name_is_left_ptr ... ok
+test cursor::tests::embedded_cursor_is_not_all_transparent ... ok
+test cursor::tests::embedded_cursor_is_valid ... ok
+test cursor::tests::embedded_cursor_pixel_spot_check ... ok
+test cursor::tests::embedded_cursor_tip_is_opaque ... ok
+test cursor::tests::embedded_cursor_to_memory_buffer_succeeds ... ok
+test cursor::tests::embedded_cursor_uses_premultiplied_alpha ... ok
+test cursor::tests::empty_theme_resize_icon_requests_return_named_embedded_variants ... ok
+test cursor::tests::embedded_resize_variants_are_visually_distinct_from_default ... ok
+test cursor::tests::empty_theme_returns_embedded ... ok
+test cursor::tests::empty_theme_uses_requested_size ... ok
+test decoration::icons::tests::test_rasterize_close_has_pixels_near_diagonals ... ok
+test decoration::model::tests::clear_hover_returns_true_iff_some_deco_was_hovered ... ok
+test decoration::icons::tests::test_rasterize_minimize_returns_correct_size ... ok
+test decoration::icons::tests::test_rasterize_close_has_transparent_corners ... ok
+test decoration::model::tests::maximized_window_has_square_corners ... ok
+test decoration::model::tests::set_hover_reports_transitions_only_when_value_changes ... ok
+test decoration::model::tests::frame_has_no_titlebar_and_respects_thin_border_bounds ... ok
+test decoration::render::buffers::tests::effective_shadow_alpha_drops_to_inactive_when_unfocused ... ok
+test decoration::render::buffers::tests::effective_shadow_alpha_uses_theme_for_focused_window ... ok
+test decoration::render::buffers::tests::effective_shadow_radius_halves_when_unfocused ... ok
+test decoration::render::geometry::tests::button_rects_are_absent_when_titlebar_is_hidden ... ok
+test decoration::render::geometry::tests::button_rects_match_current_render_and_hit_formulas ... ok
+test decoration::render::geometry::tests::metrics_from_client_origin_reconstructs_frame_origin ... ok
+test decoration::render::geometry::tests::metrics_from_frame_origin_match_expected_client_and_frame_geometry ... ok
+test decoration::render::geometry::tests::offset_and_inset_match_existing_formulas_for_common_states ... ok
+test decoration::render::geometry::tests::resize_bands_and_corners_match_hit_region_edges ... ok
+test decoration::render::geometry::tests::zero_titlebar_case_keeps_top_inset_to_border_only ... ok
+test decoration::render::hit::tests::border_corner_points_hit_available_resize_corners ... ok
+test decoration::render::hit::tests::border_points_hit_left_right_top_and_bottom_regions ... ok
+test decoration::render::hit::tests::button_points_hit_close_maximize_and_minimize_regions ... ok
+test decoration::render::hit::tests::client_aligned_titlebar_leaves_outer_top_right_corner_for_resize ... ok
+test decoration::render::hit::tests::client_content_point_hits_client_region ... ok
+test decoration::render::hit::tests::fractional_pointer_coordinates_keep_truncation_behavior_at_titlebar_boundary ... ok
+test decoration::render::hit::tests::point_outside_frame_misses ... ok
+test decoration::render::hit::tests::resize_top_band_precedence_is_before_titlebar ... ok
+test decoration::render::hit::tests::thin_visual_border_still_has_practical_resize_hit_area ... ok
+test decoration::render::hit::tests::titlebar_lower_boundary_is_exclusive ... ok
+test decoration::render::hit::tests::titlebar_point_hits_titlebar_region ... ok
+test decoration::icons::tests::test_rasterize_uses_stroke_color ... ok
+test decoration::tests::update_hover_button_marks_dirty_only_on_state_transition ... ok
+test grabs::move_grab::tests::anchored_restore_location_applies_floating_insets_after_frame_anchor ... ok
+test grabs::move_grab::tests::anchored_restore_location_preserves_pointer_horizontal_ratio ... ok
+test grabs::move_grab::tests::consume_half_snap_restore_geometry_falls_back_to_current_geometry ... ok
+test grabs::move_grab::tests::consume_half_snap_restore_geometry_prefers_and_consumes_stored_entry ... ok
+test grabs::move_grab::tests::drag_restore_anchor_clamps_pointer_ratio_near_left_edge ... ok
+test grabs::move_grab::tests::drag_restore_anchor_clamps_pointer_ratio_near_right_edge ... ok
+test grabs::move_grab::tests::drag_restore_threshold_requires_real_drag_distance ... ok
+test grabs::move_grab::tests::half_snap_drag_restore_clears_tiled_bits_and_preserves_other_states ... ok
+test grabs::move_grab::tests::half_snap_restore_prefers_maximize_restore_geometry ... ok
+test grabs::move_grab::tests::half_snap_tiled_states_are_set_for_left_and_right ... ok
+test grabs::move_grab::tests::left_edge_release_triggers_left_half_snap ... ok
+test grabs::move_grab::tests::move_release_workarea_subtracts_panel_reservation ... ok
+test grabs::move_grab::tests::release_away_from_edges_does_not_snap ... ok
+test grabs::move_grab::tests::right_edge_release_triggers_right_half_snap ... ok
+test grabs::move_grab::tests::top_edge_maximize_precedes_side_snap ... ok
+test grabs::move_grab::tests::top_edge_threshold_detects_near_top ... ok
+test grabs::move_grab::tests::top_edge_threshold_rejects_deeper_positions ... ok
+test grabs::move_grab::tests::top_edge_threshold_requires_pointer_inside_output ... ok
+test grabs::move_grab::tests::xwayland_snap_rect_for_half_snap_splits_width ... ok
+test grabs::move_grab::tests::xwayland_snap_rect_for_maximize_uses_workarea_geometry ... ok
+test grabs::resize_grab::interval_tests::configure_interval_tracks_refresh_and_has_safe_fallback ... ok
+test grabs::resize_grab::pacing::tests::coalesces_to_newest_target_until_interval_elapses ... ok
+test grabs::resize_grab::pacing::tests::emits_first_target_immediately_and_drops_duplicates ... ok
+test grabs::resize_grab::pacing::tests::flush_delivers_last_pending_target_once ... ok
+test grabs::resize_grab::pacing::tests::waits_for_client_commit_but_has_a_bounded_timeout ... ok
+test grabs::resize_grab::state::tests::bottom_right_resize_does_not_move_client_origin ... ok
+test grabs::resize_grab::state::tests::left_and_top_edges_remain_anchored_to_initial_opposite_edges ... ok
+test input::keyboard::audio_key_tests::audio_keys_map_to_events ... ok
+test input::keyboard::navigation::tests::directional_focus_rejects_opposite_and_same_center_candidates ... ok
+test input::pointer::button::modifier_drag_tests::resize_uses_nearest_corner_including_center_boundary ... ok
+test input::pointer::button::tests::click_point_on_output_one ... ok
+test input::pointer::button::tests::click_point_on_output_two ... ok
+test input::pointer::button::tests::empty_registry_is_safe ... ok
+test decoration::render::icon_cache::tests::test_icon_cache_returns_same_buffer_on_second_request ... ok
+test decoration::render::icon_cache::tests::test_icon_cache_lazy_builds_on_first_request ... ok
+test input::pointer::button::tests::outside_point_uses_primary_fallback ... ok
+test input::pointer::button::tests::no_primary_uses_first_fallback ... ok
+test input::pointer::tests::absolute_point_outside_uses_primary_fallback ... ok
+test input::pointer::tests::absolute_point_selects_output_one ... ok
+test input::pointer::tests::absolute_point_selects_output_two ... ok
+test input::pointer::tests::focus_update_candidate_is_none_outside_outputs ... ok
+test input::pointer::tests::non_resize_hit_maps_to_default_cursor_icon ... ok
+test input::pointer::tests::relative_clamp_keeps_point_inside_bounds ... ok
+test input::pointer::tests::relative_clamp_noop_when_inside_bounds ... ok
+test input::pointer::tests::resize_hit_maps_to_expected_cursor_icons ... ok
+test input::pointer::tests::xwayland_edge_hit_detects_corners_and_edges ... ok
+test input::pointer::tests::xwayland_edge_hit_ignores_interior_and_outside_points ... ok
+test layer_order::tests::hidden_or_input_transparent_surface_does_not_mask_next_target ... ok
+test layer_order::tests::overlay_beats_top_and_stale_shell_role_stays_above_windows ... ok
+test layer_order::tests::visible_consent_over_settings_receives_both_buttons ... ok
+test protocols::xwayland::tests::apply_managed_map_ssd_is_idempotent_when_called_twice ... ok
+test protocols::xwayland::tests::apply_override_redirect_ssd_overrides_prior_managed_state ... ok
+test protocols::xwayland::tests::configure_request_rect_uses_requested_x_y_when_present ... ok
+test protocols::xwayland::tests::decorated_xwayland_rect_keeps_the_complete_frame_on_screen ... ok
+test protocols::xwayland::tests::decoration_state_sync_after_map_managed ... ok
+test protocols::xwayland::tests::decoration_state_sync_for_override_redirect_is_no_ssd ... ok
+test protocols::xwayland::tests::initial_maximized_geometry_applies_only_to_managed_non_fullscreen_windows ... ok
+test protocols::xwayland::tests::managed_configure_still_clamps_to_panel_safe_workarea ... ok
+test protocols::xwayland::tests::managed_fullscreen_request_matching_output_is_deny_noop ... ok
+test protocols::xwayland::tests::managed_fullscreen_request_with_other_rect_is_implicit_unfullscreen ... ok
+test protocols::xwayland::tests::managed_maximized_request_matching_workarea_is_deny_noop ... ok
+test protocols::xwayland::tests::managed_maximized_request_with_other_rect_is_implicit_unmaximize ... ok
+test protocols::xwayland::tests::managed_maximized_request_with_same_size_but_other_loc_is_implicit_unmaximize ... ok
+test protocols::xwayland::tests::managed_fullscreen_takes_priority_over_maximized ... ok
+test protocols::xwayland::tests::managed_normal_window_passes_through ... ok
+test protocols::xwayland::tests::maximized_x11_content_size_clamps_minimum_dimension_to_one ... ok
+test protocols::xwayland::tests::maximized_x11_content_size_subtracts_frame_insets_in_both_axes ... ok
+test protocols::xwayland::tests::maximized_x11_content_size_with_zero_decoration_offset_equals_workarea ... ok
+test protocols::xwayland::tests::normal_xwayland_rect_is_clamped_to_panel_safe_bottom ... ok
+test protocols::xwayland::tests::normal_xwayland_window_centers_its_complete_frame ... ok
+test protocols::xwayland::tests::output_sized_normal_window_is_promoted_but_fullscreen_and_splash_are_not ... ok
+test protocols::xwayland::tests::output_sized_rect_is_treated_as_fullscreen_and_left_unchanged ... ok
+test protocols::xwayland::tests::override_redirect_always_passes_through ... ok
+test protocols::xwayland::tests::override_redirect_configure_bypasses_panel_clamp ... ok
+test protocols::xwayland::tests::x11_splash_is_the_only_managed_role_without_ssd ... ok
+test room_assignment::tests::identities_are_exact_and_protocol_specific ... ok
+test room_assignment::tests::priorities_and_saved_order_use_stable_ids ... ok
+test decoration::render::icon_cache::tests::test_icon_cache_rebuilds_when_theme_tint_changes ... ok
+test room_registry::tests::damaged_file_is_preserved_and_error_releases_lock ... ok
+test room_registry::tests::display_order_and_name_do_not_change_slot_identity ... ok
+test room_registry::tests::dynamic_count_reopens_without_rewriting_saved_rooms ... ok
+test room_registry::tests::failed_disk_write_never_publishes_candidate_in_memory ... ok
+test room_registry::tests::complete_form_is_validated_and_persisted_atomically ... ok
+test room_registry::tests::create_delete_keep_stable_ids_and_compact_slots ... ok
+test room_registry::tests::configuration_transaction_keeps_slots_and_rejects_partial_or_stale_forms ... ok
+test room_registry::tests::writer_lock_is_exclusive_and_released_on_drop ... ok
+test state::handlers::core::compositor::tests::configures_new_and_remapping_layer_surfaces ... ok
+test state::handlers::core::layer_shell::assignment::tests::missing_output_uses_live_fallback_and_empty_registry_has_no_target ... ok
+test state::handlers::core::layer_shell::assignment::tests::primary_changes_move_implicit_layers_and_preserve_explicit_output_intent ... ok
+test state::handlers::core::layer_shell::tests::empty_registry_is_safe ... ok
+test state::handlers::core::layer_shell::tests::explicit_output_wins ... ok
+test state::handlers::core::layer_shell::tests::first_fallback_without_primary ... ok
+test state::handlers::core::layer_shell::tests::primary_fallback_without_request ... ok
+test state::handlers::core::layer_shell::tests::recovery_lost_output_falls_back_to_first_without_primary ... ok
+test state::handlers::core::layer_shell::tests::recovery_lost_output_falls_back_to_primary ... ok
+test state::handlers::core::layer_shell::tests::recovery_no_outputs_is_safe_none ... ok
+test state::handlers::core::layer_shell::tests::recovery_reconfigure_keeps_same_output_assignment ... ok
+test state::handlers::core::layer_shell::tests::unknown_requested_output_falls_back_to_primary ... ok
+test state::handlers::misc::tests::keeps_location_when_frame_is_already_fully_visible ... ok
+test state::handlers::misc::tests::moves_client_down_when_frame_top_would_be_offscreen ... ok
+test state::handlers::misc::tests::moves_client_right_when_left_border_would_be_offscreen ... ok
+test state::handlers::misc::tests::oversized_window_keeps_top_left_reachable ... ok
+test state::handlers::screencopy::tests::screencopy_constraints_uses_current_mode ... ok
+test state::handlers::xdg::requests::state::tests::empty_infos_is_safe ... ok
+test state::handlers::xdg::requests::state::tests::normal_maximize_frame_uses_panel_safe_height ... ok
+test state::handlers::xdg::requests::state::tests::remeasured_maximized_frame_tracks_output_and_skips_noop ... ok
+test state::handlers::xdg::requests::state::tests::selects_first_when_no_primary_marked ... ok
+test state::handlers::xdg::requests::state::tests::selects_primary_on_fallback ... ok
+test state::handlers::xdg::tests::unconstrain_flips_up_when_popup_overflows_bottom_edge ... ok
+test state::handlers::xdg::tests::unconstrain_keeps_geometry_when_inside_workarea ... ok
+test state::handlers::xdg::tests::unconstrain_resizes_when_popup_is_larger_than_workarea ... ok
+test state::handlers::xdg::tests::unconstrain_slides_left_when_popup_overflows_right_edge ... ok
+test state::idle::tests::add_existing_key_returns_false ... ok
+test state::idle::tests::first_add_transitions_to_inhibited_returns_true ... ok
+test state::idle::tests::new_default_is_not_inhibited ... ok
+test state::idle::tests::remove_last_returns_true_not_inhibited ... ok
+test state::idle::tests::remove_non_last_returns_false_still_inhibited ... ok
+test state::idle::tests::remove_unknown_key_returns_false_no_transition ... ok
+test state::idle::tests::second_add_does_not_transition_returns_false ... ok
+test state::ipc::appearance::tests::wallpaper_path_must_be_absolute_and_use_supported_image_extension ... ok
+test state::ipc::broadcast::tests::lobby_snapshot_has_no_active_room_on_any_output ... ok
+test state::ipc::broadcast::tests::output_workspace_snapshot_empty_registry_is_safe ... ok
+test state::ipc::broadcast::tests::output_workspace_snapshot_for_two_outputs_sets_flags ... ok
+test state::ipc::conversions::tests::index_to_legacy_ipc_workspace_is_one_based ... ok
+test state::ipc::conversions::tests::ipc_workspace_to_index_clamps_and_normalizes ... ok
+test state::ipc::launch::tests::empty_program_is_rejected ... ok
+test state::ipc::launch::tests::non_terminal_launch_keeps_program_and_args ... ok
+test state::ipc::launch::tests::terminal_env_executable_file_is_accepted ... ok
+test state::ipc::launch::tests::terminal_env_non_executable_file_is_rejected ... ok
+test state::ipc::launch::tests::thunar_uses_xwayland_without_client_side_decorations ... ok
+test state::ipc::network::tests::connect_request_rejects_empty_oversized_and_control_values ... ok
+test state::ipc::screenshot::tests::invalid_request_is_rejected ... ok
+test state::ipc::screenshot::tests::nonzero_client_id_is_forwarded_to_policy_context ... ok
+test state::ipc::screenshot::tests::portal_interactive_request_awaits_region_pick ... ok
+test state::ipc::screenshot::tests::portal_request_awaits_consent ... ok
+test state::ipc::screenshot::tests::region_request_with_nonzero_size_follows_consent_path ... ok
+test state::ipc::screenshot_policy::tests::internal_origin_allowed_only_with_dev_flag ... ok
+test state::ipc::screenshot_policy::tests::internal_origin_with_invalid_request_still_rejected ... ok
+test state::ipc::screenshot_policy::tests::invalid_request_is_invalid ... ok
+test state::ipc::screenshot_policy::tests::portal_interactive_request_needs_region_pick ... ok
+test state::ipc::screenshot_policy::tests::portal_request_needs_consent_not_auto_allowed ... ok
+test state::ipc::screenshot_policy::tests::region_request_with_nonzero_size_needs_consent ... ok
+test state::ipc::screenshot_policy::tests::region_request_with_zero_dimension_is_invalid ... ok
+test state::ipc::screenshot_policy::tests::unknown_origin_is_denied ... ok
+test state::ipc::screenshot_policy::tests::unknown_requester_via_portal_still_needs_consent ... ok
+test state::ipc::server::tests::authenticated_shell_control_command_is_accepted ... ok
+test state::ipc::server::tests::broadcasts_only_reach_authenticated_shell_clients ... ok
+test state::ipc::server::tests::cleanup_check_matches_original_socket_identity ... ok
+test state::ipc::server::tests::cleanup_check_rejects_replaced_non_socket_path ... ok
+test room_registry::tests::rename_and_move_persist_without_changing_slots_and_reject_stale_writes ... ok
+test state::ipc::server::tests::delayed_authentication_requests_initial_snapshots_once ... ok
+test state::ipc::server::tests::different_uid_is_rejected ... ok
+test state::ipc::server::tests::peer_uid_of_socketpair_matches_own_euid ... ok
+test state::ipc::server::tests::event_listener_clone_observes_new_connections ... ok
+test state::ipc::server::tests::same_uid_is_allowed ... ok
+test state::ipc::server::tests::unauthenticated_control_command_is_ignored ... ok
+test state::launch_intent::tests::only_live_server_intents_for_existing_rooms_are_accepted ... ok
+test state::layout::output_fit::tests::oversized_frame_fits_below_panel_with_all_decorations ... ok
+test state::layout::output_fit::tests::partially_stranded_window_keeps_size_but_recovers_controls ... ok
+test state::layout::surface::tests::empty_registry_is_safe ... ok
+test state::layout::surface::tests::first_fallback_is_used_when_no_primary_exists ... ok
+test state::layout::surface::tests::hidden_persistent_popups_do_not_accept_pointer_input ... ok
+test state::layout::surface::tests::outside_point_uses_primary_fallback ... ok
+test state::layout::surface::tests::point_on_output_one_is_selected ... ok
+test room_registry::tests::room_metadata_is_validated_and_persisted ... ok
+test state::layout::output_fit::tests::visible_frame_keeps_its_geometry_on_negative_origin_output ... ok
+test state::layout::surface::tests::point_on_output_two_is_selected ... ok
+test state::layout::tiling::tests::tiling_handles_empty_infos ... ok
+test state::layout::tiling::tests::tiling_selects_first_when_no_primary_exists ... ok
+test state::layout::tiling::tests::tiling_selects_primary_output ... ok
+test state::layout::workspace::tests::move_request_invalid_target_is_ignored ... ok
+test state::layout::workspace::tests::move_request_target_equal_source_is_ignored ... ok
+test state::layout::workspace::tests::move_request_with_valid_target_and_source_is_accepted ... ok
+test state::layout::workspace::tests::move_request_without_focused_window_is_ignored ... ok
+test state::layout_restore::tests::file_binding_rows_distinguish_documents_of_the_same_app ... ok
+test state::lock::tests::begin_lock_from_pending_or_locked_is_noop ... ok
+test state::lock::tests::begin_lock_from_unlocked_transitions_to_pending ... ok
+test state::lock::tests::begin_pending_with_targets_keeps_phase_pending_until_all_frames ... ok
+test state::lock::tests::client_failure_after_acquisition_remains_locked ... ok
+test state::lock::tests::client_failure_while_pending_remains_fail_closed ... ok
+test state::lock::tests::client_failure_before_acquisition_does_not_create_a_lock ... ok
+test state::lock::tests::confirm_locked_only_from_pending ... ok
+test state::lock::tests::default_is_unlocked ... ok
+test state::lock::tests::full_lifecycle_unlocked_pending_locked_unlocked ... ok
+test state::lock::tests::forget_pending_target_drains_just_like_record ... ok
+test state::lock::tests::record_pending_frame_last_target_returns_ready_signal ... ok
+test state::lock::tests::record_pending_frame_unknown_output_is_noop ... ok
+test state::lock::tests::unlock_from_locked_clears_surfaces ... ok
+test state::lock::tests::unlock_during_pending_clears_targets_and_locker_state ... ok
+test state::output_hotplug_tests::add_remove_add_is_idempotent ... ok
+test state::output_hotplug_tests::cyclic_add_remove_add_does_not_leak_entered_outputs ... ok
+test state::output_hotplug_tests::cyclic_add_remove_stability ... ok
+test state::output_hotplug_tests::disable_then_re_enable_output_window_overlap_restored ... ok
+test state::output_hotplug_tests::layout_below_chain_two_outputs ... ok
+test state::output_hotplug_tests::four_outputs_complex_layout_snapshot ... ok
+test state::output_hotplug_tests::layout_coord_position_pins_exact_xy ... ok
+test state::output_hotplug_tests::layout_dangling_reference_falls_back_to_auto ... ok
+test state::output_hotplug_tests::layout_right_of_chain_three_outputs ... ok
+test state::output_hotplug_tests::layout_with_explicit_primary_overrides_first_default ... ok
+test state::output_hotplug_tests::multiple_windows_distributed_across_outputs_snapshot ... ok
+test state::output_hotplug_tests::multi_workspace_window_survives_output_remove ... ok
+test state::output_hotplug_tests::reconfigure_changes_width_keeps_chain_after ... ok
+test state::output_hotplug_tests::reconfigure_grow_brings_window_into_output ... ok
+test state::output_hotplug_tests::reconfigure_geometry_keeps_window_position_updates_overlap ... ok
+test state::output_hotplug_tests::reconfigure_same_size_is_stable ... ok
+test state::output_hotplug_tests::reconfigure_unknown_output_is_safe_noop ... ok
+test state::output_hotplug_tests::reload_layout_changes_primary_assignment ... ok
+test state::output_hotplug_tests::reload_layout_coord_pin_overrides_chain ... ok
+test state::output_hotplug_tests::reload_layout_empty_entries_falls_back_to_auto_chain ... ok
+test state::output_hotplug_tests::reload_layout_noop_when_registry_empty ... ok
+test state::output_hotplug_tests::reload_layout_safety_net_re_enables_all_disabled ... ok
+test state::output_hotplug_tests::reload_layout_repositions_output_via_below ... ok
+test state::output_hotplug_tests::reload_layout_with_mode_change_safely_logs_only_in_harness ... ok
+test room_registry::tests::preferences_survive_edits_reorder_restart_and_invalid_update ... ok
+test state::output_hotplug_tests::reload_position_change_brings_output_under_window ... ok
+test state::output_hotplug_tests::reload_re_enabling_output_re_adds_to_registry ... ok
+test state::output_hotplug_tests::reload_safety_net_re_enables_all_disabled_via_harness ... ok
+test state::output_hotplug_tests::reload_position_change_to_below_window_loses_overlap ... ok
+test state::output_hotplug_tests::reload_with_enabled_false_simulates_disable_via_registry ... ok
+test state::output_hotplug_tests::remove_primary_falls_back_to_remaining ... ok
+test state::output_hotplug_tests::remove_unknown_output_is_safe_noop ... ok
+test state::output_hotplug_tests::safety_net_triggers_when_all_outputs_disabled_in_layout ... ok
+test state::output_hotplug_tests::safety_net_re_enable_keeps_window_overlap ... ok
+test state::output_hotplug_tests::two_outputs_default_layout_chains_horizontally ... ok
+test state::output_hotplug_tests::window_on_remaining_output_undisturbed_by_sibling_removal ... ok
+test state::output_hotplug_tests::window_on_removed_output_stays_at_logical_position ... ok
+test state::output_hotplug_tests::window_moved_between_workspaces_preserves_overlap ... ok
+test state::output_layout::tests::above_uses_self_height ... ok
+test state::output_hotplug_tests::single_output_add_yields_zero_origin_primary ... ok
+test state::output_hotplug_tests::window_straddling_two_outputs_loses_one_on_removal ... ok
+test state::output_layout::tests::below_stacks_vertically ... ok
+test state::output_layout::tests::connected_order_preserved_in_result ... ok
+test state::output_layout::tests::coord_position_places_at_exact_xy ... ok
+test state::output_layout::tests::dangling_reference_falls_back_to_auto ... ok
+test state::output_layout::tests::diff_combined_mode_and_enabled_change ... ok
+test state::output_layout::tests::diff_enabled_changed_toggles ... ok
+test state::output_layout::tests::cycle_two_outputs_falls_back_to_auto_for_second ... ok
+test state::output_layout::tests::diff_mode_changed_when_dimensions_differ ... ok
+test state::output_layout::tests::diff_enabled_unchanged_when_default_true_both_sides ... ok
+test state::output_layout::tests::diff_mode_changed_when_one_side_is_none ... ok
+test state::output_layout::tests::diff_mode_changed_when_refresh_differs ... ok
+test state::output_layout::tests::diff_no_change_when_both_none ... ok
+test state::output_layout::tests::diff_no_change_when_identical_modes ... ok
+test state::output_layout::tests::disabled_output_is_skipped_in_chain ... ok
+test state::output_layout::tests::empty_layout_single_output_matches_legacy_x_offset_behavior ... ok
+test state::output_layout::tests::empty_layout_three_outputs_matches_legacy_x_offset_chain ... ok
+test state::output_layout::tests::empty_layout_two_outputs_chains_horizontally ... ok
+test state::output_layout::tests::empty_layout_two_outputs_matches_legacy_x_offset_chain ... ok
+test state::output_layout::tests::explicit_primary_overrides_first ... ok
+test state::output_layout::tests::from_config_entries_builds_layout_in_order ... ok
+test state::output_layout::tests::from_config_entries_empty_yields_empty_layout ... ok
+test state::output_layout::tests::from_config_entry_maps_auto_position ... ok
+test state::output_layout::tests::from_config_entry_maps_coord_position ... ok
+test state::output_layout::tests::from_config_entry_maps_each_relation ... ok
+test state::output_layout::tests::from_config_entry_preserves_primary_and_enabled ... ok
+test state::output_layout::tests::left_of_uses_self_width ... ok
+test state::output_layout::tests::multiple_primary_keeps_first_in_placements ... ok
+test state::output_layout::tests::no_enabled_output_yields_no_primary ... ok
+test state::output_layout::tests::parse_output_transform_is_case_insensitive ... ok
+test state::output_layout::tests::parse_output_transform_trims_whitespace ... ok
+test state::output_layout::tests::parse_output_transform_unknown_falls_back_to_normal ... ok
+test state::output_layout::tests::placement_for_returns_existing_or_none ... ok
+test state::output_layout::tests::right_of_resolves_to_target_right_edge ... ok
+test state::output_layout::tests::safety_net_force_enables_when_all_disabled ... ok
+test state::output_layout::tests::safety_net_noop_when_at_least_one_enabled ... ok
+test state::output_layout::tests::safety_net_noop_when_resolved_empty ... ok
+test state::output_layout::tests::single_monitor_default_config_remains_enabled_with_normal_transform_scale_one ... ok
+test state::output_layout::tests::single_monitor_disabled_via_config_safety_net_re_enables ... ok
+test state::output_power::tests::cycle_off_on_off_with_multiple_outputs_consistent ... ok
+test state::output_power::tests::default_mode_for_unknown_output_is_on ... ok
+test state::output_power::tests::forget_removes_mode_and_returns_previous ... ok
+test state::output_power::tests::forget_unknown_returns_default_on ... ok
+test state::output_power::tests::projected_on_count_no_change_keeps_count ... ok
+test state::output_power::tests::projected_on_count_turning_off_last_returns_zero ... ok
+test state::output_power::tests::projected_on_count_turning_off_one_of_many ... ok
+test state::output_power::tests::projected_on_count_turning_on_already_off ... ok
+test state::output_power::tests::safety_net_allows_off_when_other_on_exists ... ok
+test state::output_power::tests::safety_net_allows_on_anytime ... ok
+test state::output_power::tests::safety_net_rejects_last_on_off_via_projected_count ... ok
+test state::output_power::tests::set_mode_off_returns_true_first_time ... ok
+test state::output_power::tests::set_mode_on_after_off_returns_true ... ok
+test state::output_power::tests::set_mode_same_returns_false ... ok
+test state::output_registry::tests::empty_registry_is_safe ... ok
+test state::output_layout::tests::parse_output_transform_recognizes_all_known_variants ... ok
+test state::output_registry::tests::output_at_point_handles_two_horizontal_outputs ... ok
+test state::output_registry::tests::lookup_by_id_works ... ok
+test state::output_registry::tests::output_id_is_not_reused_after_remove_and_add ... ok
+test state::output_registry::tests::output_modes_are_stored_by_output_id ... ok
+test state::output_registry::tests::primary_and_first_fallback_work ... ok
+test state::output_registry::tests::primary_fallback_works_after_primary_remove ... ok
+test state::output_registry::tests::reconfigure_keeps_output_id ... ok
+test state::output_registry::tests::reconfigure_updates_geometry_and_scale ... ok
+test state::output_registry::tests::register_and_list_outputs ... ok
+test state::output_registry::tests::remove_by_id_removes_output ... ok
+test state::output_registry::tests::remove_by_name_promotes_first_remaining_to_primary ... ok
+test state::output_registry::tests::remove_non_primary_does_not_change_primary_flag ... ok
+test state::output_registry::tests::remove_only_output_leaves_empty_registry_without_panic ... ok
+test state::output_registry::tests::remove_primary_promotes_first_remaining_to_primary ... ok
+test state::output_registry::tests::remove_unknown_output_is_safe_noop ... ok
+test state::output_registry::tests::remove_when_no_primary_was_set_still_promotes_first ... ok
+test state::output_registry::tests::select_for_point_with_fallback_is_none_when_empty ... ok
+test state::output_registry::tests::select_for_point_with_fallback_prefers_point_match ... ok
+test state::output_registry::tests::select_for_point_with_fallback_uses_first_when_no_primary_exists ... ok
+test state::output_registry::tests::select_for_point_with_fallback_uses_primary_before_first ... ok
+test state::placement::tests::centers_the_complete_decorated_frame ... ok
+test state::placement::tests::oversized_frame_is_anchored_at_the_workarea_origin ... ok
+test state::session_lock_tests::confirm_without_pending_is_noop ... ok
+test state::session_lock_tests::default_phase_is_unlocked ... ok
+test state::session_lock_tests::double_lock_request_is_rejected ... ok
+test state::session_lock_tests::drop_surface_for_unknown_output_is_noop ... ok
+test state::session_lock_tests::full_lifecycle_without_surfaces ... ok
+test state::session_lock_tests::lock_request_transitions_to_pending_then_locked ... ok
+test state::session_lock_tests::lock_then_output_removed_drains_target ... ok
+test state::session_lock_tests::lock_with_targets_via_test_helper_then_record_all_reaches_locked ... ok
+test state::session_lock_tests::unlock_from_locked_returns_to_unlocked_and_clears_surfaces ... ok
+test state::session_lock_tests::unlock_from_pending_returns_to_unlocked ... ok
+test state::session_lock_tests::unlock_from_unlocked_is_noop ... ok
+test state::setup::xkb_tests::handles_quotes_and_ignores_comments ... ok
+test state::setup::xkb_tests::parses_openbsd_kbdtype_layout_and_variant ... ok
+test state::setup::xkb_tests::parses_vconsole_layout_and_options ... ok
+test state::tests::capture_known_loc_and_size_preserves_client_size ... ok
+test state::tests::clear_tiled_toplevel_states_unsets_only_tiled_bits ... ok
+test state::tests::existing_entry_is_not_overwritten ... ok
+test state::tests::half_snap_left_placement_uses_left_output_half ... ok
+test state::tests::half_snap_nonzero_output_origin_is_preserved ... ok
+test state::tests::half_snap_odd_output_width_assigns_extra_pixel_to_right_half ... ok
+test state::tests::half_snap_placement_applies_ssd_offset_and_inset ... ok
+test state::tests::half_snap_right_placement_uses_right_output_half ... ok
+test state::tests::maximize_mapping_adds_decoration_offset_to_output_origin ... ok
+test state::tests::maximized_client_rect_subtracts_all_frame_insets ... ok
+test state::tests::missing_restore_entry_uses_fallback_location ... ok
+test state::tests::normal_window_workarea_rect_preserves_origin_and_width ... ok
+test state::tests::normal_window_workarea_reserves_top_and_preserves_bottom ... ok
+test state::tests::premaximized_entry_allows_missing_client_size ... ok
+test state::tests::unmaximize_restore_uses_decoration_offset_when_missing ... ok
+test state::tests::unmaximize_restore_uses_stored_geometry_without_fallback ... ok
+test state::utils::tests::x11_window_id_key_matches_window_list_scheme ... ok
+test state::setup::tests::apply_config_overrides_marks_cursor_change_when_cursor_override_differs ... ok
+test state::workspace_output_state::tests::add_new_output_gets_global_active_mapping_and_focus_stays_stable ... ok
+test state::workspace_output_state::tests::all_outputs_removed_clears_focused_output ... ok
+test state::workspace_output_state::tests::deleting_room_remaps_every_output_index ... ok
+test state::workspace_output_state::tests::focused_output_mapping_is_used_for_current_workspace_read ... ok
+test state::workspace_output_state::tests::invalid_target_for_output_mapping_is_ignored ... ok
+test state::workspace_output_state::tests::missing_focused_output_falls_back_to_global_active ... ok
+test state::workspace_output_state::tests::missing_mapping_falls_back_to_global_active ... ok
+test state::workspace_output_state::tests::reconfigure_keeps_focused_output_and_mapping_for_same_id ... ok
+test state::workspace_output_state::tests::removed_focused_output_falls_back_to_first_when_no_primary ... ok
+test state::workspace_output_state::tests::removed_focused_output_falls_back_to_primary ... ok
+test state::workspace_output_state::tests::set_get_active_workspace_per_output ... ok
+test state::workspace_output_state::tests::single_output_initializes_focused_output ... ok
+test state::workspace_output_state::tests::sync_creates_active_workspace_mapping_for_outputs ... ok
+test state::setup::tests::apply_config_overrides_marks_wallpaper_change_and_updates_override ... ok
+test state::workspace_output_state::tests::sync_removes_stale_output_mapping ... ok
+test state::workspace_output_state::tests::unknown_output_fallback_is_safe ... ok
+test wallpaper::compose::tests::center_places_single_pixel_in_canvas_center ... ok
+test wallpaper::compose::tests::compose_without_image_uses_expected_solid_fallback ... ok
+test wallpaper::compose::tests::tile_repeats_source_pattern ... ok
+test wallpaper::compose::tests::fill_and_fit_modes_preserve_expected_uniform_and_letterbox_behavior ... ok
+test workspace::tests::find_element_workspace_finds_window_on_non_active_workspace ... ok
+test workspace::tests::find_element_workspace_is_none_for_absent_or_empty ... ok
+test workspace::tests::move_guards_share_same_target_validation ... ok
+test state::setup::tests::apply_config_overrides_with_unknown_theme_keeps_current_theme_and_flags_unchanged ... ok
+test workspace::tests::reclamp_leaves_onscreen_windows_untouched ... ok
+test workspace::tests::move_window_to_rejects_active_and_out_of_range ... ok
+test workspace::tests::move_window_to_relocates_and_leaves_no_duplicate ... ok
+test workspace::tests::reclamp_moves_window_stranded_off_all_outputs ... ok
+test workspace::tests::reclamp_runs_across_all_workspaces ... ok
+test workspace::tests::reclamp_without_outputs_is_noop ... ok
+test workspace::tests::removing_room_moves_windows_and_keeps_other_room_identity ... ok
+test workspace::tests::try_switch_ignores_current_workspace ... ok
+test workspace::tests::try_switch_ignores_invalid_target ... ok
+test workspace::tests::try_switch_updates_active_workspace_on_valid_target ... ok
+test workspace::tests::window_room_identity_uses_space_slot_not_display_position ... ok
+
+test result: ok. 442 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/layer_shell.rs (target/debug/deps/layer_shell-7e57c4734e62bccf)
+
+running 2 tests
+test layer_surface_maps_correctly ... ok
+test render_elements_include_layer_surfaces ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_config-c1f4077b09d819bd)
+
+running 98 tests
+test config::tests::missing_file_uses_defaults ... ok
+test config::tests::keybinds_section_remains_supported ... ok
+test config::tests::cursor_and_wallpaper_modes_parse ... ok
+test config::tests::invalid_toml_falls_back_to_defaults ... ok
+test config::tests::outputs_defaults_when_only_name_set ... ok
+test config::tests::outputs_position_coord_inline_table_parses ... ok
+test config::tests::outputs_mode_table_parses ... ok
+test config::tests::outputs_position_empty_table_means_auto ... ok
+test config::tests::outputs_position_multiple_relations_returns_error ... ok
+test config::tests::outputs_position_only_x_returns_error ... ok
+test config::tests::outputs_position_string_auto_parses ... ok
+test config::tests::outputs_position_table_variants_parse ... ok
+test config::tests::outputs_section_missing_keeps_empty_vec ... ok
+test config::tests::outputs_position_xy_mixed_with_relation_returns_error ... ok
+test config::tests::outputs_position_string_other_returns_error ... ok
+test config::tests::outputs_section_parses_two_outputs_with_relative_position ... ok
+test config::tests::outputs_unknown_field_returns_error ... ok
+test config::tests::outputs_transform_passes_through_string_unvalidated ... ok
+test config::tests::outputs_section_preserved_with_other_sections ... ok
+test config::tests::panel_pinned_apps_parse_from_toml ... ok
+test config::tests::panel_pinned_unknown_field_returns_error ... ok
+test config::tests::panel_section_missing_gives_empty_pinned ... ok
+test config::tests::reload_from_path_with_invalid_file_returns_error_and_preserves_old_config ... ok
+test config::tests::reload_from_path_with_missing_file_resets_to_defaults ... ok
+test config::tests::reload_from_path_with_invalid_keybind_keeps_previous_config ... ok
+test config::tests::remove_output_key_drops_transform_only_for_target ... ok
+test config::tests::reload_from_path_with_valid_file_updates_all_sections ... ok
+test config::tests::reload_with_outputs_replaces_previous_set ... ok
+test config::tests::set_idle_timeout_appends_general_when_absent ... ok
+test config::tests::set_cursor_in_toml_appends_when_absent ... ok
+test config::tests::set_idle_timeout_none_on_missing_key_is_noop ... ok
+test config::tests::set_cursor_in_toml_replaces_existing_section_and_round_trips ... ok
+test config::tests::set_output_key_appends_section_when_output_absent ... ok
+test config::tests::set_idle_timeout_none_removes_the_key ... ok
+test config::tests::set_idle_timeout_inserts_into_existing_general_section ... ok
+test config::tests::set_idle_timeout_replaces_existing_key_and_round_trips ... ok
+test config::tests::set_output_key_replaces_existing_scale_in_section ... ok
+test config::tests::set_output_key_inserts_transform_when_absent_and_round_trips ... ok
+test config::tests::set_output_mode_appends_missing_output_section ... ok
+test config::tests::set_output_mode_updates_existing_output_section ... ok
+test config::tests::set_primary_output_appends_missing_output_section ... ok
+test config::tests::set_primary_output_updates_existing_output_sections ... ok
+test config::wallpaper_catalog::tests::repeated_roots_and_selected_catalog_path_do_not_duplicate_a_choice ... ok
+test config::wallpaper_catalog::tests::catalog_traversal_respects_depth_and_entry_budget ... ok
+test config::tests::valid_toml_parses_general_cursor_and_wallpaper ... ok
+test config::wallpaper_catalog::tests::unrelated_images_are_individual_choices_even_with_resolution_like_names ... ok
+test environment::tests::new_override_wins_even_when_empty ... ok
+test environment::tests::only_absent_new_override_falls_back ... ok
+test first_run::tests::existing_and_legacy_profiles_are_never_fresh_from_missing_marker ... ok
+test config::wallpaper_catalog::tests::verified_pack_uses_landscape_resolution_and_never_its_presentation_screenshot ... ok
+test keybind::tests::defaults_do_not_include_reload_config_binding ... ok
+test first_run::tests::origin_is_decided_before_rooms_and_survives_restarts ... ok
+test first_run::tests::corrupt_unknown_and_stale_state_remain_untouched ... ok
+test keybind::tests::defaults_include_move_to_workspace_1_to_9 ... ok
+test keybind::tests::invalid_keybind_returns_controlled_error ... ok
+test keybind::tests::defaults_include_workspace_switch_1_to_9 ... ok
+test keybind::tests::reload_config_action_is_bindable ... ok
+test keybind::tests::valid_keybinds_are_parsed ... ok
+test keybind::tests::omarchy_shell_entry_points_are_distinct_and_parseable ... ok
+test layouts::tests::geometry_is_reachable_for_extreme_inputs_and_smaller_scaled_outputs ... ok
+test layouts::tests::invalid_tree_and_incompatible_schema_are_rejected ... ok
+test config::wallpaper_catalog::tests::selected_missing_custom_image_stays_reachable_beyond_the_bounded_catalog ... ok
+test layouts::tests::matching_never_uses_start_order_or_cross_protocol_names ... ok
+test layouts::tests::limits_and_file_paths_are_validated_without_requiring_installation ... ok
+test migration::tests::fresh_install_does_not_create_legacy_or_configuration ... ok
+test migration::tests::existing_new_config_wins_even_if_legacy_is_invalid ... ok
+test migration::tests::invalid_legacy_is_preserved_and_backed_up_but_not_published ... ok
+test layouts::tests::roundtrip_has_stable_room_and_local_keys_only ... ok
+test migration::tests::never_migrate_global_toolkit_settings_or_unknown_files ... ok
+test migration::tests::symlinks_cannot_redirect_migration ... ok
+test migration::tests::legacy_is_backed_up_copied_and_never_overwrites_on_repeat ... ok
+test panel_preferences::tests::panel_save_conflict_and_invalid_data_preserve_previous_document ... ok
+test rooms::tests::identity_counter_never_reuses_removed_ids ... ok
+test rooms::tests::invalid_or_future_file_is_never_overwritten ... ok
+test rooms::tests::invalid_save_leaves_file_byte_identical ... ok
+test layouts::tests::atomic_store_retains_invalid_data_and_reports_write_failure ... ok
+test rooms::tests::oversized_file_is_preserved ... ok
+test rooms::tests::migration_retry_reuses_exact_backup_but_never_overwrites_another ... ok
+test rooms::tests::concurrent_initialization_publishes_one_complete_document ... ok
+test rooms::tests::published_file_is_private_and_symlink_is_not_followed ... ok
+test rooms::tests::migration_is_idempotent_and_preserves_names_and_order_after_edits ... ok
+test rooms::tests::schema_upgrade_preserves_identity_revision_and_exact_backup ... ok
+test theme::manager::tests::available_themes_scans_all_configured_dirs ... ok
+test rooms::tests::unicode_limits_empty_names_counts_and_schema_are_checked ... ok
+test theme::types::config::tests::panel_and_launcher_share_popup_material_without_double_fill ... ok
+test theme::manager::tests::set_theme_prefers_earlier_dirs ... ok
+test theme::types::config::tests::surface_treatment_uses_theme_radius_and_glass_alpha ... ok
+test theme::types::config::tests::test_cursor_default_uses_installed_theme ... ok
+test theme::types::config::tests::test_decorations_default_central_glass ... ok
+test theme::types::config::tests::surface_treatment_non_glass_is_opaque_without_blur ... ok
+test theme::types::config::tests::test_fonts_default_uses_inter ... ok
+test theme::types::config::tests::test_theme_colors_default_is_dark_palette ... ok
+test theme::types::config::tests::test_glass_tint_color_defaults_none_and_parses ... ok
+test theme::types::config::tests::theme_config_appearance_tracks_background_luminance ... ok
+test theme::types::config::tests::test_theme_config_partial_toml_fills_new_defaults ... ok
+test theme::types::config::tests::ui_family_strips_trailing_size ... ok
+test rooms::tests::preferences_preserve_order_and_separate_native_from_xwayland ... ok
+test rooms::tests::stale_save_retains_latest_file_and_failed_candidate_retains_memory ... ok
+
+test result: ok. 98 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/design_themes.rs (target/debug/deps/design_themes-b97c7a43d3e03679)
+
+running 1 test
+test shipped_theme_files_match_canonical_palettes_and_shared_geometry ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_freetype-85b1f0f39fea5769)
+
+running 1 test
+test tests::freetype_rasterizes_embedded_font ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_ipc-a22a0cb043007cc5)
+
+running 36 tests
+test rooms::tests::mutation_and_snapshot_wire_roundtrip ... ok
+test tests::appearance_snapshot_rejects_untrusted_display_text ... ok
+test rooms::tests::create_and_delete_wire_roundtrip ... ok
+test layouts::tests::explicit_restore_and_cancel_keep_correlation_on_the_wire ... ok
+test tests::capture_window_thumbnail_command_roundtrip_is_supported ... ok
+test tests::default_app_shortcut_events_roundtrip ... ok
+test tests::appearance_control_commands_roundtrip ... ok
+test tests::desktop_context_menu_event_roundtrip_is_supported ... ok
+test tests::launch_app_command_accepts_legacy_command_field ... ok
+test tests::launch_app_command_roundtrip_uses_argv ... ok
+test tests::legacy_workspace_changed_roundtrip_remains_stable ... ok
+test tests::lock_session_command_roundtrip_is_supported ... ok
+test tests::output_workspace_changed_event_roundtrip_supports_optional_name ... ok
+test tests::output_workspace_snapshot_decodes_legacy_output_without_display_details ... ok
+test tests::output_workspace_snapshot_allows_missing_focused_output ... ok
+test tests::output_workspace_snapshot_event_roundtrip_supports_two_outputs ... ok
+test tests::power_sleep_prepared_event_roundtrip ... ok
+test tests::quick_settings_snapshot_validates_display_boundary ... ok
+test tests::quit_command_roundtrip_is_supported ... ok
+test tests::screenshot_bridge_request_accepts_region_with_nonzero_size ... ok
+test tests::quick_settings_control_commands_roundtrip ... ok
+test tests::screenshot_bridge_request_rejects_empty_request_id ... ok
+test tests::screenshot_bridge_request_rejects_region_with_zero_dimension ... ok
+test tests::screenshot_bridge_request_metadata_roundtrip_works ... ok
+test tests::screenshot_bridge_request_supports_full_output_mode ... ok
+test tests::screenshot_bridge_request_roundtrip_works ... ok
+test tests::screenshot_bridge_response_roundtrip_with_error_works ... ok
+test tests::screenshot_bridge_response_roundtrip_with_success_works ... ok
+test tests::window_focus_cleared_event_roundtrip_is_supported ... ok
+test tests::window_snapshot_entry_contains_workspace_id_and_title ... ok
+test tests::settings_snapshot_rejects_untrusted_system_text ... ok
+test tests::window_snapshot_entry_missing_minimized_decodes_to_false ... ok
+test tests::window_thumbnail_event_roundtrip_is_supported ... ok
+test tests::window_snapshot_event_roundtrip_supports_multiple_workspaces ... ok
+test thumbnail_tests::correlated_thumbnail_and_lock_roundtrip ... ok
+test thumbnail_tests::legacy_thumbnail_command_defaults_to_uncorrelated ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_lock-9d35e5c097d09f70)
+
+running 3 tests
+test auth_protocol::tests::password_request_round_trips_without_text_delimiters ... ok
+test auth_protocol::tests::truncated_password_request_is_rejected ... ok
+test auth_protocol::tests::oversized_password_is_rejected_on_both_sides ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/niwoe_lock-1cb6179cfb5991eb)
+
+running 10 tests
+test tests::backspace_removes_one_ascii_char ... ok
+test tests::backspace_on_empty_password_is_noop ... ok
+test tests::backspace_removes_one_full_utf8_char ... ok
+test tests::auth_in_progress_blocks_input ... ok
+test tests::color_unpacks_rgba_channels ... ok
+test tests::escape_clears_password_and_resets_status ... ok
+test tests::return_with_empty_password_does_not_start_auth ... ok
+test tests::typing_appends_characters ... ok
+test tests::typing_resets_failed_status_to_idle ... ok
+test tests::card_frame_is_bounded_and_reflects_password_length ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+     Running unittests src/bin/niwoe-openbsd-auth.rs (target/debug/deps/niwoe_openbsd_auth-e6d1d9a33716db7a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/niwoe_login-1426fa0ac9db8d0a)
+
+running 58 tests
+test auth::pam_backend::tests::drain_pam_env_on_null_handle_is_empty ... ok
+test auth::pam_backend::tests::auth_backend_selects_expected_pam_service ... ok
+test input::tests::process_filters_pure_control_chars ... ok
+test auth::pam_backend::tests::empty_username_returns_failed_quickly ... ok
+test input::tests::keyboard_status_exposes_layout_and_caps_lock ... ok
+test input::tests::keyboard_constructs_with_default_layout ... ok
+test session::tests::openbsd_session_path_can_find_x11_binaries ... ok
+test input::tests::read_system_layout_returns_some_or_none_without_panic ... ok
+test session::tests::runtime_dir_path_format ... ok
+test input::tests::process_maps_keypad_digits_without_numlock ... ok
+test tests::anim_frame_at_t0_matches_settle_state ... ok
+test tests::anim_frame_at_ui_fade_end_is_full ... ok
+test tests::anim_frame_reports_steady_after_intro ... ok
+test tests::auth_username_uses_manual_username_without_yubikey ... ok
+test tests::auth_username_uses_smartcard_mapping_when_ready ... ok
+test tests::backspace_removes_last_char_from_pin_field ... ok
+test tests::card_rect_clamped_dimensions ... ok
+test tests::empty_placeholder_keeps_caret_at_text_start ... ok
+test tests::failed_power_action_restores_greeter_but_success_does_not ... ok
+test tests::greeter_restarts_after_desktop_exit_or_failed_spawn ... ok
+test session::tests::unknown_user_yields_user_not_found ... ok
+test tests::hidraw_detector_matches_yubico_hid_id ... ok
+test tests::hidraw_detector_matches_yubikey_hid_name ... ok
+test tests::hint_allows_password_login_with_unregistered_yubikey ... ok
+test tests::hint_mentions_yubikey_when_present ... ok
+test tests::hint_prompts_touch_while_authenticating_with_yubikey ... ok
+test tests::hint_changes_with_phase ... ok
+test tests::hint_warns_when_caps_lock_is_active ... ok
+test tests::insert_appends_to_pin_field ... ok
+test tests::keyboard_can_confirm_reboot_and_escape_cancels_confirmation ... ok
+test tests::insert_respects_max_field_len ... ok
+test tests::linux_power_actions_use_absolute_systemctl_commands ... ok
+test tests::login_button_is_submit_target ... ok
+test tests::manual_mode_cycles_between_username_and_password ... ok
+test tests::manual_mode_edits_username_and_password ... ok
+test tests::manual_mode_focuses_username_and_password_fields ... ok
+test tests::poll_auth_returns_none_when_no_thread_running ... ok
+test tests::power_action_requires_second_matching_click ... ok
+test tests::power_confirmation_switches_and_expires ... ok
+test tests::reject_keeps_username_and_resets_password_focus ... ok
+test tests::rounded_rect_path_does_not_panic_on_small_inputs ... ok
+test tests::shake_offset_is_zero_outside_failed_state ... ok
+test tests::power_buttons_are_click_targets ... ok
+test tests::smartcard_focus_cycles_through_power_controls ... ok
+test tests::smartcard_mode_does_not_focus_username_field ... ok
+test tests::smartcard_mode_focuses_short_pin_field ... ok
+test tests::start_auth_with_empty_username_returns_failed_quickly ... ok
+test tests::smartcard_user_reads_first_mapping_user ... ok
+test tests::submit_and_cancel_return_their_control_flow ... ok
+test tests::yubikey_detector_accepts_zero_padded_hid_vendor_id ... ok
+test tests::yubikey_detector_matches_yubico_vendor_id ... ok
+test tests::yubikey_detector_ignores_other_vendor_ids ... ok
+test visual::tests::backdrop_rejects_empty_output ... ok
+test tests::yubikey_detector_matches_yubikey_product_name ... ok
+test input::tests::process_maps_keypad_enter_to_submit ... ok
+test visual::tests::backdrop_rejects_wrong_target_size ... ok
+test visual::tests::backdrop_renders_without_wallpaper_and_restores_frame ... ok
+test tests::shake_offset_nonzero_inside_failed_window ... ok
+
+test result: ok. 58 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/main.rs (target/debug/deps/niwoe_polkit_agent-96084df75327bfe2)
+
+running 15 tests
+test dbus::registration::tests::authority_restart_reregisters_and_cancels_pending_auth ... ignored, run with dbus-run-session: isolated mock authority, never system bus
+test auth::tests::helper_candidates_include_openbsd_package_path ... ok
+test dbus::tests::consolekit_object_path_is_the_polkit_session_id ... ok
+test dbus::tests::parse_identities_skips_entry_without_uid ... ok
+test dbus::tests::parse_identities_skips_non_unix_user ... ok
+test dbus::tests::unix_session_subject_carries_session_id ... ok
+test singleton::tests::only_one_owner_and_release_allows_restart ... ok
+test ui::tests::color_helpers_roundtrip ... ok
+test ui::tests::rgba_to_color_unpacks_channels ... ok
+test ui::tests::u32_from_color_packs_argb_with_explicit_alpha ... ok
+test ui::tests::wrap_text_empty_yields_single_empty_line ... ok
+test dbus::tests::parse_identities_keeps_unix_user_and_resolves_name ... ok
+test ui::tests::wrap_text_short_text_stays_one_line ... ok
+test ui::tests::wrap_text_truncates_with_ellipsis_at_max_lines ... ok
+test ui::tests::wrap_text_wraps_when_too_narrow ... ok
+
+test result: ok. 14 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_portal-13a500460688b593)
+
+running 8 tests
+test file_chooser::tests::path_to_uri_preserves_existing_file_uri ... ok
+test file_chooser::tests::path_to_uri_percent_encodes_path_bytes ... ok
+test file_chooser::tests::save_names_preserve_order_and_spaces ... ok
+test file_chooser::tests::save_result_has_portal_uri_array ... ok
+test screenshot::tests::file_uri_preserves_existing_scheme ... ok
+test screenshot::tests::file_uri_percent_encodes_path_bytes ... ok
+test screenshot::tests::request_ids_are_unique_per_call ... ok
+test file_chooser::tests::save_names_reject_invalid_paths_and_encoding ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/niwoe_portal-e6c05f1c1a3e5886)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/niwoe_shell-76349ce3bfb5cbd7)
+
+running 469 tests
+test app_view::tests::result_hit_testing_excludes_search_footer_and_row_gaps ... ok
+test app_view::tests::selection_remains_visible_on_small_outputs ... ok
+test app_view::tests::search_matches_words_across_name_and_program_and_keeps_terminal_apps ... ok
+test audio::tests::running_with_default_output_is_settled ... ok
+test app_view::tests::search_order_is_stable_and_exact_names_rank_first ... ok
+test audio::tests::running_without_default_output_is_not_settled ... ok
+test audio::tests::unavailable_snapshot_is_not_settled ... ok
+test audio::tests::unavailable_snapshot_uses_muted_panel_fallback ... ok
+test audio::wpctl::tests::malformed_success_is_unavailable_but_valid_empty_sections_are_running ... ok
+test audio::wpctl::tests::parse_wpctl_status_extracts_default_sink_and_source ... ok
+test audio::wpctl::tests::parse_wpctl_status_handles_real_unicode_tree_output ... ok
+test audio::wpctl::tests::set_default_args_passes_numeric_id ... ok
+test audio::wpctl::tests::set_mute_args_toggles_default_sink ... ok
+test audio::wpctl::tests::set_volume_args_targets_default_sink_with_fractional_level ... ok
+test audio_popup::tests::volume_from_bar_x_maps_position_to_percent ... ok
+test autostart::tests::excludes_foreign_desktop_autostarts ... ok
+test autostart::tests::hidden_disables_but_no_display_does_not ... ok
+test autostart::tests::ignores_keys_in_other_groups ... ok
+test autostart::tests::matches_exact_names_in_desktop_lists ... ok
+test battery::tests::aggregate_empty_is_none ... ok
+test battery::tests::aggregate_prefers_discharging_over_full ... ok
+test battery::tests::aggregate_single_battery_passes_through ... ok
+test battery::tests::aggregates_multiple_batteries_to_mean_and_charging_priority ... ok
+test battery::tests::label_is_percent ... ok
+test battery::tests::poll_does_not_panic ... ok
+test bluetooth::tests::argv_builders ... ok
+test bluetooth::tests::failed_device_or_pairing_reads_are_unknown_and_cannot_offer_guesswork ... ok
+test bluetooth::tests::parse_device_addresses_extracts_addrs ... ok
+test bluetooth::tests::parse_devices_flags_paired_and_connected ... ok
+test bluetooth::tests::parse_show_flag_reads_yes_no ... ok
+test buffer::tests::buffer_format_is_argb8888 ... ok
+test buffer::tests::buffer_size_matches_dimensions ... ok
+test buffer::tests::buffer_stride_is_width_times_4 ... ok
+test context_menu::selection_tests::flyout_hit_requires_visible_content_and_ignores_gap ... ok
+test context_menu::selection_tests::settings_parent_never_dispatches_an_unrelated_page ... ok
+test context_menu::tests::clamp_position_bottom_edge_flips_up ... ok
+test context_menu::tests::clamp_position_fits_inside_launcher ... ok
+test context_menu::tests::clamp_position_right_edge_clamped ... ok
+test context_menu::tests::contains_point_outside_returns_false ... ok
+test context_menu::tests::desktop_hit_item_uses_desktop_coordinates ... ok
+test context_menu::tests::desktop_item_list_has_five_items_with_settings_at_idx_three ... ok
+test context_menu::tests::draw_overlay_does_not_panic ... ok
+test context_menu::tests::draw_overlay_modifies_canvas_at_menu_location ... ok
+test context_menu::tests::glass_menu_palette_uses_theme_colors ... ok
+test context_menu::tests::hit_item_above_menu_is_none ... ok
+test context_menu::tests::hit_item_first_row ... ok
+test context_menu::tests::hit_item_last_row ... ok
+test context_menu::tests::item_list_non_terminal_non_pinned_has_five_items ... ok
+test context_menu::tests::item_list_non_terminal_pinned_shows_unpin ... ok
+test context_menu::tests::item_list_terminal_pinned_has_four_items ... ok
+test context_menu::tests::submenu_hit_item_local_hits_every_row_and_rejects_gap ... ok
+test context_menu::tests::submenu_hit_item_local_returns_correct_index ... ok
+test context_menu::tests::submenu_items_has_expected_categories ... ok
+test context_menu::tests::total_menu_width_grows_when_submenu_open ... ok
+test control_center::tests::active_page_follows_existing_provider_category ... ok
+test control_center::tests::sidebar_layout_and_hit_geometry_match_on_both_workareas ... ok
+test cursor::preview::tests::inherited_preview_has_localized_name_reuses_arc_and_invalidates_size_or_file ... ok
+test cursor::preview::tests::invalid_offsets_dimensions_hotspots_and_truncated_files_are_rejected ... ok
+test cursor::preview::tests::lookup_respects_roots_stops_cycles_and_rejects_oversized_input ... ok
+test cursor::preview::tests::nearest_preview_uses_first_frame_and_preserves_compositor_bytes ... ok
+test cursor::tests::scan_cursor_themes_finds_dirs_with_cursors_subdir_only ... ok
+test cursor::tests::size_options_ids_match_prefix_and_value ... ok
+test audio_popup::tests::popup_hit_detection_reports_inside_and_outside ... ok
+test cursor::tests::theme_widget_ids_match_prefix_and_index ... ok
+test deck_mutation::tests::confirmation_requires_target_value_and_same_device ... ok
+test deck_mutation::tests::disconnected_worker_is_a_failure_not_permanent_pending ... ok
+test deck_mutation::tests::job_keeps_pending_until_backend_returns_and_retains_failed_observation ... ok
+test deck_mutation::tests::rapid_slider_requests_keep_only_latest_and_mute_does_not_replace_it ... ok
+test deck_mutation::tests::successful_readback_clears_pending ... ok
+test default_apps::refresh::tests::filling_keeps_existing_choices_and_reports_missing_candidates_honestly ... ok
+test default_apps::refresh::tests::missing_cached_candidate_and_failed_query_do_not_write_defaults ... ok
+test default_apps::refresh::tests::read_failures_remain_distinct_from_empty_and_finish_clears_busy ... ok
+test default_apps::refresh::tests::rejected_or_partial_writes_never_report_success_or_invent_a_snapshot ... ok
+test default_apps::tests::category_metadata_matches_per_variant ... ok
+test default_apps::refresh::tests::saved_requires_the_whole_mime_cluster_to_round_trip ... ok
+test default_apps::tests::index_apps_for_mime_returns_only_matching ... ok
+test default_apps::tests::parse_hidden_entry_is_skipped ... ok
+test default_apps::tests::parse_minimal_desktop_entry_with_mimes ... ok
+test default_apps::tests::stored_hidden_from_menu_handler_keeps_name_without_becoming_a_choice ... ok
+test draw::painter::tests::corner_coverage_reports_expected_partial_and_full_values ... ok
+test draw::painter::tests::draw_image_alpha_blending_respects_transparent_and_opaque_pixels ... ok
+test draw::painter::tests::draw_image_clips_out_of_bounds_without_panic ... ok
+test draw::painter::tests::draw_image_blits_centered_pixels ... ok
+test draw::painter::tests::radius_is_clamped_to_half_extent ... ok
+test draw::painter::tests::radius_zero_behaves_like_rect_fill ... ok
+test draw::painter::tests::rounded_corners_clip_outer_pixels ... ok
+test draw::painter::tests::rounded_fill_edge_pixels_use_partial_blending ... ok
+test draw::painter::tests::rounded_fill_full_coverage_pixels_are_premultiplied ... ok
+test draw::painter::tests::rounded_fill_outside_corner_pixels_remain_untouched ... ok
+test draw::painter::tests::rounded_fill_uses_premultiplied_alpha_write_semantics ... ok
+test draw::painter::tests::text_centered_uses_fallback_measurement_when_font_missing ... ok
+test draw::painter::tests::text_right_aligned_uses_right_padding_when_font_missing ... ok
+test draw::painter::tests::tiny_rectangles_are_handled_consistently ... ok
+test audio_popup::tests::popup_hit_test_returns_settings_link_in_footer ... ok
+test app_view::tests::native_launcher_renders_real_results_and_empty_state ... ok
+test first_login::tests::marker_is_claimed_exactly_once ... ok
+test first_run::tests::existing_room_and_capacity_are_not_presented_as_active_creation ... ok
+test first_run::tests::incomplete_or_uncertain_state_only_exposes_safe_exit_and_reload ... ok
+test first_run::tests::practice_shortcut_target_survives_room_reordering ... ok
+test first_run::tests::unreadable_state_preserves_local_draft_and_only_offers_exit_or_reload ... ok
+test hub_state::tests::bounded_static_generation_rejects_late_and_closed_responses ... ok
+test hub_state::tests::configuration_preview_selects_only_edited_room_and_rejects_previous_surface_generations ... ok
+test hub_state::tests::management_previews_are_bounded_and_reject_other_pages_minimized_and_ended_windows ... ok
+test hub_state::tests::output_window_end_and_invalid_dimensions_invalidate ... ok
+test hub_state::tests::scroll_direction_matches_wayland_and_ignores_horizontal_frames ... ok
+test hub_state::tests::search_preserves_room_ids_and_minimized_window_identity ... ok
+test hub_view::interaction_tests::preview_click_and_room_click_share_the_card_geometry ... ok
+test hub_view::interaction_tests::room_preview_and_app_strip_leave_the_status_footer_clear ... ok
+test hub_view::interaction_tests::search_hit_test_tracks_last_page_without_aliasing_rows ... ok
+test draw::text::tests::measure_text_is_monotonic_for_longer_strings ... ok
+test draw::text::tests::measure_text_empty_is_zero ... ok
+test hub_view::tests::room_hit_test_uses_same_four_card_geometry ... ok
+test icons::cache::tests::absolute_path_svg_warm_finds_file ... ok
+test icons::cache::tests::absolute_path_warm_downscale_resizes_to_requested ... ok
+test draw::text::tests::test_renderer_creates_from_embedded_font ... ok
+test icons::cache::tests::absolute_path_warm_missing_file_negative_cache ... ok
+test icons::cache::tests::absolute_path_warm_finds_file ... ok
+test icons::cache::tests::asynchronous_results_invalidate_dependent_rasters ... ok
+test icons::cache::tests::lookup_without_warm_returns_none ... ok
+test icons::cache::tests::lookup_returns_stable_reference_without_clone ... ok
+test icons::cache::tests::missing_icon_is_negative_cached_after_warm ... ok
+test icons::loader::tests::absolute_path_loader_loads_png ... ok
+test icons::cache::tests::warm_is_idempotent_for_existing_key ... ok
+test icons::loader::tests::absolute_path_loader_loads_svg ... ok
+test icons::loader::tests::falls_back_to_svg_when_no_png ... ok
+test icons::loader::tests::downscale_produces_requested_dimensions ... ok
+test icons::loader::tests::indexed_palette_png_is_skipped_without_panic ... ok
+test icons::loader::tests::inheritance_chain_finds_parent_theme_icon ... ok
+test icons::loader::tests::lookup_falls_back_to_default_theme_before_hicolor ... ok
+test icons::loader::tests::lookup_falls_back_to_rcc_after_fs_exhausted ... ok
+test icons::loader::tests::lookup_finds_icon_in_theme_directory ... ok
+test icons::loader::tests::lookup_prefers_fs_over_rcc_when_both_present ... ok
+test icons::loader::tests::lookup_uses_terminal_alias_for_mini_xterm ... ok
+test icons::loader::tests::prefers_png_over_svg_in_same_directory ... ok
+test icons::loader::tests::pixmaps_fallback_is_used_when_theme_lookup_misses ... ok
+test icons::loader::tests::rcc_archives_are_discovered_in_theme_directory ... ok
+test icons::loader::tests::svg_in_theme_directory_is_loaded ... ok
+test icons::rcc::tests::integration_real_breeze_rcc_can_be_opened_and_query_known_icon ... ok
+test icons::rcc::tests::lookup_nonexistent_path_returns_none ... ok
+test icons::rcc::tests::parse_header_accepts_v3_with_expected_offsets ... ok
+test icons::rcc::tests::parse_header_returns_none_for_wrong_magic ... ok
+test icons::rcc::tests::parse_header_returns_none_for_wrong_version ... ok
+test icons::rcc::tests::read_file_decompresses_zstd_payload ... ok
+test icons::rcc::tests::read_file_rejects_zlib_compressed_files ... ok
+test icons::rcc::tests::tree_walk_finds_root_directory_listing ... ok
+test icons::rcc::tests::tree_walk_navigates_subdirectories ... ok
+test icons::rcc::tests::tree_walk_works_when_tree_is_last_section ... ok
+test icons::loader::tests::size_selection_prefers_closest_larger_before_upscaling_smaller ... ok
+test icons::svg::tests::decode_svg_empty_returns_none ... ok
+test icons::svg::tests::decode_svg_invalid_returns_none ... ok
+test icons::svg::tests::decode_svg_alpha_unpremultiplied ... ok
+test icons::svg::tests::decode_svg_minimal_valid_returns_image ... ok
+test icons::svg::tests::decode_svg_size_zero_returns_none ... ok
+test icons::svg::tests::decode_svg_renders_at_requested_size ... ok
+test icons::svg::tests::decode_svg_substitutes_breeze_color_scheme ... ok
+test icons::svg::tests::decode_svg_uses_custom_symbolic_color ... ok
+test icons::svg::tests::substitute_color_scheme_no_breeze_marker_is_noop ... ok
+test icons::tests::default_theme_is_breeze ... ok
+test icons::tests::icon_image_to_pixmap_bgra_to_premul ... ok
+test icons::theme_index::tests::directory_defaults_follow_spec_for_threshold_and_type ... ok
+test icons::theme_index::tests::missing_optional_fields_do_not_fail_parse ... ok
+test icons::svg::tests::symbolic_recolor_is_iconset_independent ... ok
+test icons::theme_index::tests::parses_fixed_scalable_and_threshold_directory_types ... ok
+test icons::theme_index::tests::parses_minimal_theme_with_inherits_and_directories ... ok
+test launcher::tests::launcher_state_tracks_open_close_and_apps ... ok
+test network::lists::tests::failed_empty_and_partial_queries_remain_distinct ... ok
+test network::lists::tests::malformed_success_is_unknown_and_escaped_names_keep_their_identity ... ok
+test network::nmcli::tests::activate_connection_args_uses_id_form ... ok
+test network::nmcli::tests::connect_wifi_invocation_uses_stdin_for_passwords ... ok
+test network::nmcli::tests::integration_real_nmcli_can_be_polled ... ok
+test network::nmcli::tests::parse_saved_connections_handles_quoted_colons_in_name ... ok
+test network::nmcli::tests::parse_saved_connections_marks_active_and_skips_loopback ... ok
+test network::nmcli::tests::parse_state_ignores_loopback ... ok
+test network::nmcli::tests::parse_state_returns_disconnected_when_general_is_not_connected ... ok
+test network::nmcli::tests::parse_state_returns_ethernet_when_wired_connected ... ok
+test network::nmcli::tests::parse_state_returns_offline_for_unparsable_general ... ok
+test network::nmcli::tests::parse_state_returns_wifi_when_wireless_connected ... ok
+test network::nmcli::tests::parse_state_strips_quoted_colons_in_connection_names ... ok
+test network::nmcli::tests::parse_wifi_networks_dedups_sorts_and_flags_security ... ok
+test network::nmcli::tests::parse_wifi_signal_finds_active_network ... ok
+test network::nmcli::tests::redact_nmcli_args_hides_password_values ... ok
+test network::tests::icon_name_for_each_variant ... ok
+test network::tests::settings_rows_summarize_state ... ok
+test network_popup::tests::popup_hit_detection_reports_inside_and_outside ... ok
+test network_popup::tests::popup_hit_test_returns_settings_link_in_network_detail_footer ... ok
+test network_popup::tests::switching_to_status_tab_clears_wifi_row_targets ... ok
+test network_popup::tests::tabs_are_hit_testable ... ok
+test network_popup::tests::wifi_rows_hit_test_to_their_index ... ok
+test notifications::state::tests::expired_when_ttl_elapsed ... ok
+test notifications::state::tests::never_expires_with_none ... ok
+test notifications::state::tests::timeout_negative_means_default ... ok
+test notifications::state::tests::timeout_positive_used_as_is ... ok
+test notifications::state::tests::timeout_zero_means_never ... ok
+test notifications::state::tests::urgency_byte_mapping ... ok
+test panel_view::room_tests::every_active_room_is_visible_on_a_bounded_ordered_page ... ok
+test panel_view::room_tests::room_label_ink_is_vertically_centered ... ok
+test panel_view::room_tests::visible_room_sequence_is_stable_and_bounded ... ok
+test panel_view::tests::action_for_id_as_click_screenshot ... ok
+test panel_view::tests::build_panel_widget_tree_root_has_three_children ... ok
+test panel_view::tests::draw_panel_ui_modifies_canvas_and_fills_clicks ... ok
+test panel_view::tests::module_visibility_and_order_keep_required_access_and_centered_clock ... ok
+test panel_view::tests::panel_chip_style_returns_correct_size ... ok
+test panel_view::tests::panel_layout_keeps_clock_centered_and_controls_separate_across_viewports ... ok
+test panel_view::tests::panel_omits_room_overflow_when_every_room_fits ... ok
+test panel_view::tests::panel_room_rail_uses_fixed_pages_and_keeps_active_room_visible ... ok
+test panel_view::tests::panel_window_chip_focus_window_id_returns_id ... ok
+test panel_view::tests::status_icon_tint_preserves_alpha_and_uses_premultiplied_theme_color ... ok
+test panel_view::tests::status_icons_have_legible_native_size ... ok
+test panel_view::tests::status_notifier_label_prefers_title_then_icon_then_service ... ok
+test panel_view::tests::tray_chip_widths_match ... ok
+test power_profile::tests::maps_user_names_to_daemon_ids ... ok
+test power_profile::tests::round_trips_through_daemon_id ... ok
+test printers::tests::failed_reads_remain_unknown_while_successful_empty_job_lists_are_zero ... ok
+test printers::tests::parse_snapshot_extracts_default_status_and_jobs ... ok
+test printers::tests::parse_snapshot_handles_no_default_and_empty_printer_list ... ok
+test process::tests::fast_command_returns_stdout ... ok
+test process::tests::hung_command_is_killed_and_reported_as_none ... ok
+test process::tests::missing_binary_is_none ... ok
+test hub_view::interaction_tests::search_results_use_cached_app_icons_in_the_bgra_output ... ok
+test quick_settings_popup::tests::outside_is_not_a_hit ... ok
+test hub_view::tests::hub_renders_room_and_capability_overview ... ok
+test quick_settings_popup::tests::bluetooth_target_requires_completed_refresh_and_adapter ... ok
+test quick_settings_popup::tests::slider_x_maps_and_clamps_to_percent ... ok
+test quick_settings_popup::tests::unavailable_controls_are_not_clickable_or_keyboard_targets ... ok
+test region_picker::tests::rect_from_drag_clamps_to_canvas ... ok
+test region_picker::tests::rect_from_drag_normalises_direction ... ok
+test region_picker::tests::rect_from_drag_returns_none_for_zero_area ... ok
+test region_picker::tests::to_screenshot_region_preserves_geometry ... ok
+test room_editor::form::tests::duplicate_native_and_xwayland_choices_keep_independent_draft_selection ... ok
+test room_editor::form::tests::keyboard_traversal_skips_unsaved_actions_empty_rows_and_unavailable_pages ... ok
+test room_editor::form::tests::missing_catalog_entries_remain_visible_removable_and_cancelled_locally ... ok
+test room_editor::list::tests::filter_and_sort_keep_stable_ids_and_use_real_occupancy ... ok
+test room_editor::panel::tests::panel_ack_is_correlated_conflicts_keep_draft_and_closing_rolls_back_preview ... ok
+test room_editor::panel::tests::unreadable_document_reports_error_without_replacing_known_state ... ok
+test room_editor::tests::accepts_compact_dynamic_slots_and_rejects_gaps ... ok
+test room_editor::tests::cancelled_order_and_preferences_never_change_snapshot ... ok
+test room_editor::tests::concurrent_snapshot_does_not_silently_rebase_an_open_name_edit ... ok
+test room_editor::tests::create_is_a_draft_until_explicit_save_and_cancel_has_no_mutation ... ok
+test room_editor::tests::description_and_name_use_one_revision_and_delete_requires_target_and_confirmation ... ok
+test room_editor::tests::editing_waits_for_snapshot_and_ack_and_never_optimistically_changes_panel ... ok
+test quick_settings_popup::tests::populated_deck_targets_do_not_overlap_and_follow_visual_order_in_both_themes ... ok
+test room_editor::tests::invalid_snapshots_cannot_rebind_click_targets ... ok
+test room_editor::tests::moves_preserve_id_and_timeout_requests_refresh_instead_of_retrying ... ok
+test room_editor::tests::removed_room_retains_draft_but_only_cancel_can_finish_it ... ok
+test room_editor::tests::snapshot_retains_preferences_and_rejects_invalid_replacement ... ok
+test room_editor::tests::target_menu_does_not_change_destination_until_selection_and_survives_reordering ... ok
+test room_editor::tests::uncertain_creation_cannot_be_retried_and_duplicated ... ok
+test room_management_view::configuration::restore::tests::absent_rows_invalid_selection_and_active_jobs_do_not_offer_file_edits ... ok
+test room_management_view::configuration::restore::tests::hidden_page_actions_never_become_pointer_or_keyboard_targets ... ok
+test room_management_view::configuration::restore::tests::invalid_file_draft_is_rejected_before_sending_without_losing_selection ... ok
+test room_management_view::configuration::restore::tests::loading_missing_and_failure_have_distinct_capabilities_and_messages ... ok
+test room_management_view::configuration::restore::tests::paging_clamps_after_scale_or_result_changes_and_controls_fit ... ok
+test room_management_view::configuration::target_menu::tests::all_other_rooms_can_be_reached_without_overlapping_chrome ... ok
+test room_management_view::configuration::tests::complete_form_controls_have_visible_hits_with_shared_small_canvas ... ok
+test room_management_view::configuration::tests::configuration_actions_follow_drawn_controls ... ok
+test room_management_view::configuration::tests::configuration_footer_and_context_have_readable_geometry ... ok
+test quick_settings_popup::tests::pending_controls_block_duplicate_actions_but_allow_latest_volume_and_retry ... ok
+test room_management_view::configuration::tests::new_form_fields_and_deletion_actions_remain_reachable_at_both_sizes ... ok
+test room_management_view::first_run::layout::tests::all_five_pages_fit_without_overlapping_action_regions ... ok
+test room_management_view::first_run::layout::tests::missing_state_keeps_only_safe_exit_and_reload_hittable ... ok
+test room_management_view::panel::tests::focus_and_hits_exclude_unavailable_positions_and_pending_actions ... ok
+test room_management_view::panel::tests::native_preview_and_all_controls_fit_the_minimum_canvas ... ok
+test room_editor::tests::editor_buttons_stay_within_popup_and_do_not_overlap ... ok
+test room_management_view::tests::occupancy_counts_use_the_given_room_scope ... ok
+test room_management_view::tests::responsive_toolbar_and_list_rows_share_visible_non_overlapping_hits ... ok
+test room_management_view::tests::right_toolbar_and_cards_share_one_rail_edge ... ok
+test room_management_view::tests::room_grid_and_back_hit_regions_match_draw_geometry ... ok
+test room_management_view::tests::room_pages_keep_card_hits_bound_to_stable_entries ... ok
+test room_management_view::tests::six_card_pages_and_footer_remain_reachable_in_both_target_canvases ... ok
+test screenshot_consent::tests::buttons_lie_within_the_modal ... ok
+test screenshot_consent::tests::hit_button_distinguishes_allow_and_deny ... ok
+test screenshot_consent::tests::hit_button_misses_outside_buttons ... ok
+test settings_refresh::tests::only_io_backed_pages_request_a_refresh ... ok
+test settings_refresh::wallpaper::tests::bounded_thumbnail_keeps_aspect_and_premultiplies_once ... ok
+test settings_refresh::wallpaper::tests::catalog_growth_is_bounded_and_reordering_keeps_path_identity ... ok
+test settings_refresh::wallpaper::tests::oversized_input_dimension_and_invalid_files_are_unavailable ... ok
+test settings_refresh::wallpaper::tests::unchanged_files_share_pixels_and_changes_size_or_deletion_invalidate ... ok
+test settings_view::display_limit_tests::mode_limit_preserves_indices_and_exposes_omitted_entries ... ok
+test settings_view::layout_tests::all_forty_wallpapers_have_pointer_and_keyboard_targets_across_pages ... ok
+test settings_view::layout_tests::all_power_and_idle_actions_fit_and_are_reachable_on_the_minimum_canvas ... ok
+test settings_view::layout_tests::app_categories_and_twelve_cursor_themes_are_visible_and_pointer_reachable ... ok
+test settings_view::layout_tests::default_app_writes_are_not_focusable_while_busy_but_back_remains_available ... ok
+test room_management_view::tests::management_view_renders_real_room_surface ... ok
+test settings_view::layout_tests::empty_display_snapshot_and_oversized_page_positions_are_safe ... ok
+test settings_view::layout_tests::twenty_four_app_choices_keep_original_actions_and_fit_every_page ... ok
+test settings_view::navigation_tests::content_tabs_keep_all_active_providers_reachable_without_pin_or_theme_selection ... ok
+test settings_view::navigation_tests::historical_pinning_requests_use_the_active_apps_page ... ok
+test settings_view::navigation_tests::search_updates_category_and_frame_identity_together ... ok
+test settings_view::navigation_tests::single_page_sections_do_not_repeat_the_sidebar_as_a_tab ... ok
+test settings_view::network_count_tests::unknown_network_counts_are_not_zero_and_known_counts_keep_their_limits ... ok
+test settings_view::network_tests::audio_device_targets_preserve_snapshot_indices_and_defaults_are_inert ... ok
+test settings_view::network_tests::bluetooth_discovery_is_only_startable_when_powered_and_not_scanning ... ok
+test settings_view::network_tests::network_rows_preserve_provider_identity_and_connected_rows_are_inert ... ok
+test room_management_view::configuration::tests::configuration_renders_selected_room ... ok
+test settings_view::provider_tests::paging_clamps_after_provider_refresh_and_counts_disclose_existing_caps ... ok
+test settings_view::tests::settings_navigation_contains_every_category_once ... ok
+test soft_shadow::tests::translucent_clip_keeps_the_actual_edge_pixel ... ok
+test status_notifier::tests::display_entries_flattens_children_with_depth ... ok
+test status_notifier::tests::normalize_menu_label_removes_mnemonics ... ok
+test status_notifier::tests::normalize_service_trims_input ... ok
+test status_notifier::tests::parse_dbus_menu_layout_filters_hidden_items ... ok
+test status_notifier::tests::parse_dbus_menu_layout_keeps_separators_and_children ... ok
+test status_notifier::tests::snapshot_items_is_sorted_and_stable ... ok
+test status_notifier_popup::tests::hit_item_ignores_separators ... ok
+test status_notifier_popup::tests::hit_item_returns_enabled_row_id ... ok
+test status_notifier_popup::tests::menu_height_grows_with_rows ... ok
+test sysinfo::tests::cpuinfo_counts_processors_and_takes_first_model ... ok
+test sysinfo::tests::meminfo_parses_kib_and_formats_used_over_total ... ok
+test sysinfo::tests::missing_meminfo_fields_degrade_gracefully ... ok
+test sysinfo::tests::openbsd_sysctl_snapshot_is_parsed ... ok
+test sysinfo::tests::os_pretty_name_handles_quotes_and_absence ... ok
+test sysinfo::tests::uptime_parses_first_field_and_formats ... ok
+test tests::default_pinned_apps_contains_expected_entries ... ok
+test tests::workspace_and_quick_settings_align_below_their_panel_groups ... ok
+test theme_export::tests::app_icon_theme_maps_papirus_to_dark_light_variant ... ok
+test theme_export::tests::backup_user_file_is_one_time_and_skips_generated ... ok
+test theme_export::tests::config_gtk_css_carries_libadwaita_named_colours ... ok
+test theme_export::tests::generated_header_is_recognised ... ok
+test theme_export::tests::gtk_css_substitutes_all_tokens_with_hex ... ok
+test theme_export::tests::gtk_ini_light_clears_dark_flag ... ok
+test theme_export::tests::gtk_ini_selects_niwoe_theme_and_dark_flag ... ok
+test theme_export::tests::index_theme_names_niwoe ... ok
+test theme_export::tests::kdeglobals_dark_has_scheme_groups_and_breeze ... ok
+test theme_export::tests::kdeglobals_light_switches_scheme_name ... ok
+test theme_export::tests::readable_on_picks_contrasting_role ... ok
+test theme_export::tests::toolkit_export_preserves_other_desktop_settings ... ok
+test theme_export::tests::triplet_formats_decimal_rgb ... ok
+test thumbnail_popup::tests::draw_thumbnail_popup_blits_thumbnail_pixels ... ok
+test thumbnail_popup::tests::draw_thumbnail_popup_does_not_panic_with_empty_cache ... ok
+test thumbnail_popup::tests::popup_width_falls_back_to_max_for_uncached_ids ... ok
+test thumbnail_popup::tests::popup_width_uses_cached_thumb_widths ... ok
+test updates::tests::parse_extracts_package_names ... ok
+test updates::tests::parse_ignores_header_and_blanks ... ok
+test updates::tests::provider_uses_distribution_identity_and_never_apt_for_fedora ... ok
+test updates::tests::rows_count_and_overflow ... ok
+test updates::tests::rows_up_to_date_when_empty ... ok
+test users::tests::parse_filters_to_human_uids ... ok
+test users::tests::parse_skips_malformed_lines ... ok
+test users::tests::rows_handle_no_accounts ... ok
+test users::tests::rows_put_current_first_and_mark_active ... ok
+test users::tests::unreadable_accounts_are_distinct_from_a_successfully_empty_list ... ok
+test wayland::calendar::tests::cells_place_days_in_expected_positions_for_monday_start ... ok
+test wayland::calendar::tests::first_weekday_uses_monday_zero_mapping_when_monday_is_selected ... ok
+test wayland::calendar::tests::invalid_month_is_rejected ... ok
+test wayland::calendar::tests::leap_year_february_has_29_days ... ok
+test wayland::calendar::tests::normal_february_has_28_days ... ok
+test wayland::calendar::tests::thirty_day_month_is_reported ... ok
+test wayland::calendar::tests::thirty_one_day_month_is_reported ... ok
+test wayland::calendar::tests::today_day_is_kept_only_when_in_month_range ... ok
+test wayland::calendar::tests::weekday_labels_follow_selected_week_start ... ok
+test wayland::desktop_menu_focus::tests::menu_layer_focus_does_not_count_as_app_focus ... ok
+test wayland::handlers::keyboard::control_center_navigation::tests::escape_dismisses_transient_selection_before_the_settings_page ... ok
+test wayland::handlers::keyboard::control_center_navigation::tests::keyboard_traverses_every_visible_page_and_wraps_in_both_directions ... ok
+test wayland::handlers::keyboard::room_navigation::tests::management_focus_skips_unavailable_pages_and_new_room_at_capacity ... ok
+test wayland::handlers::keyboard::room_navigation::tests::room_focus_cycles_and_wraps ... ok
+test wayland::handlers::pointer_state::tests::apply_enter_on_empty_path_returns_hovered_at_root ... ok
+test wayland::handlers::pointer_state::tests::apply_leave_returns_none ... ok
+test wayland::handlers::pointer_state::tests::apply_move_keeps_pressed_when_still_on_pressed_path ... ok
+test wayland::handlers::pointer_state::tests::apply_move_to_other_widget_while_pressed_switches_to_hovered_new ... ok
+test wayland::handlers::pointer_state::tests::apply_move_with_hit_returns_hovered ... ok
+test wayland::handlers::pointer_state::tests::apply_move_without_hit_returns_none ... ok
+test wayland::handlers::pointer_state::tests::apply_press_left_returns_pressed ... ok
+test wayland::handlers::pointer_state::tests::apply_press_right_keeps_current ... ok
+test wayland::handlers::pointer_state::tests::apply_release_left_off_target_returns_none ... ok
+test wayland::handlers::pointer_state::tests::apply_release_left_on_pressed_returns_hovered ... ok
+test wayland::handlers::pointer_state::tests::click_on_different_widget_not_detected ... ok
+test wayland::handlers::pointer_state::tests::click_on_same_widget_detected ... ok
+test wayland::handlers::pointer_state::tests::non_release_event_not_click ... ok
+test wayland::handlers::pointer_state::tests::release_without_prior_press_not_click ... ok
+test wayland::handlers::pointer_translate::tests::translate_axis_yields_none ... ok
+test wayland::handlers::pointer_translate::tests::translate_button_left ... ok
+test wayland::handlers::pointer_translate::tests::translate_button_middle ... ok
+test wayland::handlers::pointer_translate::tests::translate_button_right ... ok
+test wayland::handlers::pointer_translate::tests::translate_button_unknown ... ok
+test wayland::handlers::pointer_translate::tests::translate_enter_yields_pointer_enter_with_position ... ok
+test wayland::handlers::pointer_translate::tests::translate_leave_yields_pointer_leave ... ok
+test wayland::handlers::pointer_translate::tests::translate_motion_yields_pointer_move_with_position ... ok
+test wayland::handlers::pointer_translate::tests::translate_position_truncates_to_i32 ... ok
+test wayland::handlers::pointer_translate::tests::translate_press_left_yields_pointer_press_left ... ok
+test wayland::handlers::pointer_translate::tests::translate_press_middle_yields_pointer_press_middle ... ok
+test wayland::handlers::pointer_translate::tests::translate_press_right_yields_pointer_press_right ... ok
+test wayland::handlers::pointer_translate::tests::translate_press_unknown_button_yields_none ... ok
+test wayland::handlers::pointer_translate::tests::translate_release_left_yields_pointer_release_left ... ok
+test wayland::handlers::pointer_translate::tests::workspace_click_activates_only_on_left_release ... ok
+test wayland::handlers::widget_dispatch::display_transform_tests::mirrored_and_unknown_snapshots_reset_to_normal ... ok
+test wayland::handlers::widget_dispatch::display_transform_tests::rotation_cycle_survives_compositor_snapshot_after_every_reload ... ok
+test wayland::handlers::widget_dispatch::power_tests::lock_has_no_external_command ... ok
+test wayland::handlers::widget_dispatch::power_tests::logout_has_no_external_command ... ok
+test wayland::handlers::widget_dispatch::power_tests::privileged_actions_map_to_session_service_requests ... ok
+test wayland::init::flags::tests::missing_flag_is_disabled ... ok
+test wayland::ipc::tests::invalid_line_is_ignored ... ok
+test wayland::ipc::tests::json_event_parsing_remains_preferred ... ok
+test wayland::ipc::tests::legacy_window_focus_cleared_event_still_parses ... ok
+test wayland::ipc::tests::legacy_workspace_changed_event_still_parses ... ok
+test settings_view::provider_tests::full_provider_lists_keep_every_original_action_visible_and_reachable_on_every_page ... ok
+test wayland::ipc::tests::valid_64_room_snapshot_with_unicode_metadata_fits_event_budget ... ok
+test wayland::ipc::tests::valid_snapshot_burst_larger_than_buffer_limit_keeps_every_event ... ok
+test wayland::panel_preview::tests::painted_inputs_invalidate_and_replacement_retains_one_raster ... ok
+test wayland::panel_preview::tests::ultrawide_preview_is_bounded_before_allocation ... ok
+test wayland::panel_preview::tests::unchanged_preview_reuses_pixels_and_close_releases_them ... ok
+test wayland::popup_placement::tests::popup_tracks_trigger_and_clamps_card_not_its_transparent_shadow ... ok
+test wayland::screencopy::tests::screenshot_buffer_layout_rejects_empty_or_oversized_constraints ... ok
+test wayland::screencopy::tests::xrgb_to_rgb_channel_swap ... ok
+test wayland::state::tests::empty_snapshot_marks_all_workspaces_empty ... ok
+test wayland::state::tests::full_snapshot_preserves_workspace_on_window_entries ... ok
+test wayland::state::tests::full_snapshot_recalculates_counts_and_active_workspace ... ok
+test wayland::state::tests::legacy_workspace_changed_still_works_with_and_without_output_aware_state ... ok
+test wayland::state::tests::lobby_snapshot_has_no_active_room_but_keeps_window_room_counts ... ok
+test wayland::state::tests::local_capture_output_empty_state_is_none ... ok
+test wayland::state::tests::local_capture_output_falls_back_to_first_without_primary ... ok
+test wayland::state::tests::local_capture_output_none_when_selected_entry_has_no_name ... ok
+test wayland::state::tests::local_capture_output_prefers_primary_over_first ... ok
+test wayland::state::tests::output_workspace_changed_clamps_workspace_and_handles_focus_drop ... ok
+test wayland::state::tests::output_workspace_changed_unknown_output_is_added_safely ... ok
+test wayland::state::tests::output_workspace_changed_updates_known_output ... ok
+test wayland::state::tests::output_workspace_snapshot_clamps_workspace_values ... ok
+test wayland::state::tests::output_workspace_snapshot_with_two_outputs_is_stored ... ok
+test wayland::state::tests::panel_active_workspace_falls_back_to_first_output ... ok
+test wayland::state::tests::panel_active_workspace_falls_back_to_focused_flag ... ok
+test wayland::state::tests::panel_active_workspace_falls_back_to_legacy_when_unavailable ... ok
+test wayland::state::tests::panel_active_workspace_falls_back_to_primary_output ... ok
+test wayland::state::tests::panel_active_workspace_normalizes_out_of_range ... ok
+test wayland::state::tests::panel_active_workspace_prefers_focused_output_id ... ok
+test wayland::state::tests::panel_global_activation_point_uses_top_panel_y ... ok
+test wayland::state::tests::panel_theme_signature_changes_when_border_changes ... ok
+test wayland::state::tests::panel_theme_signature_changes_when_surface_alt_changes ... ok
+test wayland::state::tests::panel_theme_signature_changes_when_theme_changes ... ok
+test wayland::state::tests::resolve_shell_theme_from_config_applies_cursor_and_wallpaper_overrides ... ok
+test wayland::state::tests::resolve_shell_theme_from_config_preserves_unused_legacy_theme ... ok
+test wayland::state::tests::snapshot_with_one_window_marks_single_workspace_occupied ... ok
+test wayland::state::tests::snapshot_workspace_values_out_of_range_are_clamped_safely ... ok
+test wayland::state::tests::stale_focused_window_id_is_cleared_when_no_window_matches ... ok
+test wayland::state::tests::window_closed_is_safe_for_unknown_id ... ok
+test wayland::state::tests::window_closed_removes_existing_window ... ok
+test wayland::state::tests::window_opened_updates_or_inserts_without_crash ... ok
+test wayland::state::tests::workspace_changed_clamps_workspace_range ... ok
+test widget_action::tests::action_for_id_activate_connection ... ok
+test widget_action::tests::action_for_id_bluetooth ... ok
+test widget_action::tests::action_for_id_cursor_size ... ok
+test widget_action::tests::action_for_id_cursor_theme ... ok
+test widget_action::tests::action_for_id_default_audio_device ... ok
+test widget_action::tests::action_for_id_idle_timeout ... ok
+test widget_action::tests::action_for_id_indexed_ids ... ok
+test widget_action::tests::action_for_id_indexed_ids_reject_malformed_suffixes ... ok
+test widget_action::tests::action_for_id_power_logout ... ok
+test widget_action::tests::action_for_id_power_off ... ok
+test widget_action::tests::action_for_id_settings_category ... ok
+test widget_action::tests::action_for_id_unknown ... ok
+test widget_action::tests::action_for_id_volume_and_mute ... ok
+test widget_action::tests::action_for_id_wifi_connect ... ok
+test widget_traversal::tests::find_widget_at_path_empty_returns_root ... ok
+test widget_traversal::tests::find_widget_at_path_out_of_bounds_returns_none ... ok
+test widget_traversal::tests::find_widget_at_path_smoke_finds_apps_switch ... ok
+test widget_traversal::tests::keyboard_targets_match_pointer_hits_and_exclude_disabled_or_clipped_rows ... ok
+test wayland::ipc::tests::oversized_incomplete_line_disconnects_and_clears_buffer ... ok
+test wifi_password_modal::tests::buttons_and_field_lie_within_the_modal ... ok
+test wifi_password_modal::tests::hit_button_distinguishes_connect_and_cancel ... ok
+test wifi_password_modal::tests::hit_button_misses_outside_buttons ... ok
+test window_picker::tests::focus_keeps_the_config_accent_in_the_bgra_shell_buffer ... ok
+test window_picker::tests::native_preview_keeps_distinct_and_minimized_windows ... ok
+test window_picker::tests::pages_reach_last_window_and_room_and_clamp_after_close ... ok
+test workspaces::tests::all_rooms_remain_reachable_after_reorder_and_shrink ... ok
+test wifi_password_modal::tests::draw_does_not_panic_for_empty_and_long_input ... ok
+test workspaces::tests::workspace_grid_uses_central_geometry ... ok
+test workspaces::tests::workspace_popup_generates_nine_switch_click_zones ... ok
+test workspaces::tests::workspace_popup_hover_idx_finds_first_tile_inside_grid ... ok
+test settings_view::layout_tests::display_modes_keep_original_indices_and_all_targets_fit_every_page ... ok
+test workspaces::tests::last_page_renders_room_64_without_slot_clamping ... ok
+test landscape::tests::identity_reuse_and_dimension_eviction_keep_header_storage_bounded ... ok
+
+test result: ok. 469 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.28s
+
+     Running tests/centralization_guard.rs (target/debug/deps/centralization_guard-32a0644b4be04a9f)
+
+running 1 test
+test hover_pressed_states_use_interaction_not_raw_lerp ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_tokens-f12144ebdf20fed7)
+
+running 30 tests
+test chrome::tests::defaults_via_default_trait_match_consts ... ok
+test chrome::tests::defaults_locked ... ok
+test color::tests::contrast_text_picks_dark_on_light_and_white_on_dark ... ok
+test color::tests::dark_and_light_differ_only_in_being_distinct_tables ... ok
+test color::tests::dark_palette_anchors_match_mockup ... ok
+test color::tests::default_palette_is_dark ... ok
+test color::tests::from_str_parses_rgb_and_rgba ... ok
+test color::tests::from_str_rejects_multibyte_without_panicking ... ok
+test color::tests::from_str_rejects_wrong_length ... ok
+test color::tests::light_palette_anchors_match_muted_user_direction ... ok
+test color::tests::lerp_midpoint_keeps_base_alpha ... ok
+test color::tests::luminance_orders_dark_below_light ... ok
+test color::tests::metro_palette_anchors_match_spec ... ok
+test color::tests::rgb_sets_alpha_opaque ... ok
+test color::tests::rgba_preserves_alpha ... ok
+test color::tests::to_hex_roundtrips ... ok
+test elevation::tests::launcher_shadow_extent_includes_vertical_offset ... ok
+test elevation::tests::launcher_sits_above_popup ... ok
+test elevation::tests::levels_match_phase4_values ... ok
+test hub::tests::hidpi_canvas_preserves_composition_and_pointer_coordinates ... ok
+test interaction::tests::accent_cushion_keeps_rgb_sets_alpha ... ok
+test interaction::tests::armed_darkens_the_accent ... ok
+test interaction::tests::canonical_values_locked ... ok
+test interaction::tests::hover_lightens_pressed_darkens ... ok
+test interaction::tests::selected_tint_lightens_and_darken_darkens ... ok
+test interaction::tests::selection_blends_base_toward_accent ... ok
+test radius::tests::default_scale_matches_phase1_values ... ok
+test radius::tests::metro_radius_is_all_zero ... ok
+test radius::tests::scales_are_non_decreasing ... ok
+test typography::tests::scale_and_weights_are_ordered ... ok
+
+test result: ok. 30 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/contrast.rs (target/debug/deps/contrast-168c5e87c2a9d197)
+
+running 2 tests
+test panel_glass_text_and_active_border_survive_extreme_backdrops ... ok
+test composed_text_status_controls_and_focus_meet_contrast_targets ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/design_guard.rs (target/debug/deps/design_guard-9da2ccc380b429fe)
+
+running 1 test
+test no_hardcoded_design_values_outside_central_source ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+
+     Running tests/launcher_geometry.rs (target/debug/deps/launcher_geometry-dfafe1812518019e)
+
+running 4 tests
+test settings_card_is_centered_with_independent_size ... ok
+test transient_empty_configure_cannot_underflow_card_geometry ... ok
+test hub_controls_stay_below_panel_on_short_hidpi_outputs ... ok
+test card_fits_logical_outputs_at_supported_scales ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/source_size_guard.rs (target/debug/deps/source_size_guard-f7327b8926874a42)
+
+running 1 test
+test rust_source_files_stay_within_line_limit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_ui-918fb3b49d19f2a4)
+
+running 73 tests
+test effect::dominant_color::tests::grayscale_returns_fallback ... ok
+test effect::dominant_color::tests::near_black_returns_fallback ... ok
+test effect::border::tests::empty_like_path_is_noop ... ok
+test effect::dominant_color::tests::solid_blue_returns_blue ... ok
+test effect::dominant_color::tests::solid_red_returns_red ... ok
+test effect::dominant_color::tests::transparent_returns_fallback ... ok
+test effect::fill::tests::empty_like_path_is_noop ... ok
+test effect::border::tests::border_paint_changes_pixels ... ok
+test effect::fill::tests::fill_paint_changes_pixels ... ok
+test effect::image_cover::tests::shallow_and_tall_crops_preserve_aspect_and_cover_destination ... ok
+test effect::metro_surface::tests::paint_metro_surface_draws_body_and_stripe ... ok
+test effect::radius::tests::degenerate_rect_returns_none ... ok
+test effect::radius::tests::positive_radius_produces_non_empty_path ... ok
+test effect::radius::tests::radius_is_clamped_to_half_extent ... ok
+test effect::radius::tests::radius_zero_matches_rect_bounds ... ok
+test effect::image_contain::tests::reduced_and_native_images_stay_inside_the_nonzero_destination ... ok
+test effect::symbol::tests::native_symbols_render_without_font_glyphs_and_reuse_matching_rasters ... ok
+test effect::symbol::tests::color_size_and_cache_bounds_prevent_stale_or_unbounded_rasters ... ok
+test effect::text::tests::measure_text_empty_is_zero ... ok
+test effect::text::tests::measure_text_returns_positive_for_non_empty ... ok
+test effect::text::tests::paint_text_empty_string_is_noop ... ok
+test effect::text::tests::paint_text_writes_pixels ... ok
+test event::hit_test::tests::event_pointer_press_carries_position_and_button ... ok
+test event::hit_test::tests::hit_test_accumulates_parent_offsets ... ok
+test event::hit_test::tests::hit_test_picks_correct_sibling ... ok
+test event::hit_test::tests::hit_test_picks_deepest_child ... ok
+test event::hit_test::tests::hit_test_returns_empty_path_for_root_only_hit ... ok
+test event::hit_test::tests::hit_test_returns_none_outside_root ... ok
+test event::hit_test::tests::pointer_button_eq_per_variant ... ok
+test event::hit_test::tests::widget_path_empty_is_empty ... ok
+test event::hit_test::tests::widget_path_iter_yields_indices_in_order ... ok
+test paint::layout::tests::computes_row_layout_for_two_fixed_children ... ok
+test paint::layout::tests::root_matches_requested_size ... ok
+test paint::render::tests::button_paint_hovered_differs_from_idle ... ok
+test paint::render::tests::lerp_color_endpoints ... ok
+test paint::render::tests::lerp_color_preserves_alpha ... ok
+test paint::render::tests::render_accumulates_offset_across_nested_containers ... ok
+test paint::render::tests::render_node_path_indices_for_child ... ok
+test paint::render::tests::render_node_path_root_is_empty ... ok
+test paint::render::tests::render_smoke_does_not_crash ... ok
+test paint::render::tests::render_with_idle_state_matches_legacy ... ok
+test paint::render::tests::tile_paint_hovered_differs_from_idle ... ok
+test paint::render::tests::tile_paint_pressed_differs_from_idle ... ok
+test paint::render::tests::widget_state_default_is_idle ... ok
+test paint::render::tests::widget_state_eq_per_variant ... ok
+test smoke::taffy_computes_basic_flex_layout ... ok
+test smoke::tiny_skia_pixmap_allocates ... ok
+test style::tests::default_theme_bundles_metro_tokens ... ok
+test style::tests::token_types_are_copy ... ok
+test widget::base::tests::centered_viewport_sets_center_alignment_and_size ... ok
+test widget::base::tests::column_stacks_children_vertically_with_gap ... ok
+test widget::base::tests::container_leaf_has_no_children ... ok
+test widget::base::tests::container_row_has_correct_child_count ... ok
+test widget::base::tests::container_style_roundtrips ... ok
+test widget::base::tests::flow_wraps_mixed_child_sizes ... ok
+test widget::base::tests::footer_row_places_left_and_right_clusters ... ok
+test widget::base::tests::grid_places_tiles_on_cell_boundaries ... ok
+test widget::button::tests::armed_icon_button_draws_confirmation_label ... ok
+test widget::button::tests::button_new_stores_fields ... ok
+test widget::button::tests::button_paint_smoke ... ok
+test widget::button::tests::button_style_uses_explicit_size ... ok
+test widget::button::tests::button_with_id_and_icon_none_does_not_panic ... ok
+test widget::tile::tests::tile_new_launch_exec_is_none ... ok
+test widget::tile::tests::tile_new_stores_label_accent_and_size ... ok
+test widget::tile::tests::tile_paint_draws_stripe_and_body_for_wide_tile ... ok
+test widget::tile::tests::tile_paint_with_none_icon_does_not_panic ... ok
+test widget::tile::tests::tile_size_cell_span_matches_win10_scale ... ok
+test widget::tile::tests::tile_size_dimensions_match_win10_scale ... ok
+test widget::tile::tests::tile_style_forwards_cell_spans ... ok
+test widget::tile::tests::tile_with_exec_stores_exec ... ok
+test effect::heading::tests::heading_cannot_paint_outside_its_region ... ok
+test effect::text::tests::font_parses_with_line_metrics ... ok
+test effect::heading::tests::heading_coverage_is_reused_and_bounded ... ok
+
+test result: ok. 73 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+
+     Running tests/components.rs (target/debug/deps/components-421af1a3e35f534c)
+
+running 5 tests
+test embedded_sans_covers_interface_glyphs_and_identifies_missing_glyphs ... ok
+test themes_share_geometry_and_alpha_coverage ... ok
+test focus_is_additional_geometry_and_disabled_ignores_pointer ... ok
+test selection_is_neutral_and_keyboard_focus_remains_distinct_at_each_scale ... ok
+test font_loading_rejects_missing_glyphs_and_invalid_bytes ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+     Running tests/text_roles.rs (target/debug/deps/text_roles-f389bdb96e5b832d)
+
+running 2 tests
+test two_line_roles_separate_complete_font_boxes_and_stay_inside_rows ... ok
+test accented_long_labels_are_truncated_to_their_own_text_column ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_wm-eb63b73d1d2104d9)
+
+running 21 tests
+test tiling::snapshot::tests::invalid_topology_and_nonfinite_ratios_are_rejected ... ok
+test tiling::tree::tests::contains_window_detects_existing_and_missing_values ... ok
+test tiling::snapshot::tests::missing_leaves_collapse_without_inventing_windows ... ok
+test tiling::tree::tests::insert_at_last_keeps_deterministic_in_order ... ok
+test tiling::tree::tests::insert_next_to_inserts_beside_focused_leaf ... ok
+test tiling::tree::tests::remove_from_node_collapses_parent_when_child_removed ... ok
+test tiling::tree::tests::insert_unique_skips_duplicate_window ... ok
+test tiling::tree::tests::split_rect_horizontal_applies_gap_and_ratio ... ok
+test tiling::tree::tests::insert_unique_inserts_new_window ... ok
+test tiling::tree::tests::split_rect_horizontal_width_one_keeps_sizes_positive ... ok
+test tiling::tree::tests::split_rect_horizontal_clamps_extreme_ratios ... ok
+test tiling::tree::tests::split_rect_horizontal_width_zero_keeps_sizes_positive ... ok
+test tiling::tree::tests::split_rect_vertical_applies_gap_and_ratio ... ok
+test tiling::tree::tests::split_rect_vertical_clamps_extreme_ratios ... ok
+test tiling::tree::tests::split_rect_vertical_height_one_keeps_sizes_positive ... ok
+test tiling::tree::tests::split_rect_vertical_height_zero_keeps_sizes_positive ... ok
+test tiling::tree::tests::swapping_leaves_preserves_layout_and_window_set ... ok
+test tiling::types::tests::other_flips_vertical_to_horizontal ... ok
+test tiling::types::tests::other_flips_horizontal_to_vertical ... ok
+test workspace::tests::new_sets_expected_defaults ... ok
+test workspace::tests::toggle_mode_switches_between_floating_and_tiling ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/niwoe_xwayland_drm_bridge-56f715ed128e4aa8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_app_catalog
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_boot_common
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_compass_render
+
+running 1 test
+test crates/niwoe-compass-render/src/lib.rs - (line 16) - compile ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests niwoe_compositor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_config
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_freetype
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_ipc
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_lock
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_portal
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_tokens
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_ui
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_wm
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests niwoe_xwayland_drm_bridge
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

@@ -1,0 +1,18 @@
+[
+  {
+    "label": "watchdog-neutral-desktop",
+    "pid": "648754",
+    "shell_sha256": "010d2ac4b1afd1fe1b4f27270ee1ef1b07b019b4c97a0df9a21580031837da17",
+    "neutral_foyer": true,
+    "login_marker_unchanged": true,
+    "image_sha256": "99e14594fc6acc28c0717bad91f831cea12f15698872d611ab51fd5ed4e6a8dc"
+  },
+  {
+    "label": "regular-hub-after-watchdog",
+    "pid": "648754",
+    "shell_sha256": "010d2ac4b1afd1fe1b4f27270ee1ef1b07b019b4c97a0df9a21580031837da17",
+    "neutral_foyer": true,
+    "login_marker_unchanged": true,
+    "image_sha256": "14fdc94860ca42de69a64bb34e9e410033ab7f5006b003537b8e77d89d106fb7"
+  }
+]

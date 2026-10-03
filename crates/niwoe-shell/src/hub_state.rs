@@ -4,7 +4,14 @@ use niwoe_ipc::RoomEntry;
 use std::collections::HashMap;
 
 pub(crate) const PAGE_SIZE: usize = niwoe_tokens::Hub::DEFAULT.room_columns as usize;
-type PreviewSignature = (Vec<(u64, Option<String>)>, String);
+type PreviewSignature = (Vec<(u64, Option<String>)>, String, PreviewPage);
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct PreviewPage {
+    pub index: usize,
+    pub count: usize,
+    pub max_width: u32,
+    pub max_height: u32,
+}
 #[derive(Default)]
 pub(crate) struct HubState {
     pub page: usize,
@@ -28,13 +35,50 @@ impl HubState {
         context: String,
     ) -> Vec<(String, String)> {
         self.page = self.page.min(rooms.len().saturating_sub(1) / PAGE_SIZE);
+        let h = niwoe_tokens::Hub::DEFAULT;
+        self.prepare_page(
+            rooms,
+            windows,
+            context,
+            PreviewPage {
+                index: self.page,
+                count: PAGE_SIZE,
+                max_width: h.preview_width,
+                max_height: h.preview_height,
+            },
+        )
+    }
+    pub fn prepare_page(
+        &mut self,
+        rooms: &[RoomEntry],
+        windows: &[WindowInfo],
+        context: String,
+        mut page: PreviewPage,
+    ) -> Vec<(String, String)> {
+        let c = niwoe_tokens::ControlCenter::DEFAULT;
+        let max_height = if page.count == 1 {
+            c.config_preview_capture_height
+        } else {
+            c.room_preview_height
+        };
+        if page.count == 0
+            || page.count > (c.room_columns * c.room_page_rows) as usize
+            || page.max_width == 0
+            || page.max_height == 0
+            || page.max_width > c.room_preview_width
+            || page.max_height > max_height
+        {
+            self.clear();
+            return Vec::new();
+        }
+        page.index = page.index.min(rooms.len().saturating_sub(1) / page.count);
         let visible: Vec<_> = rooms
             .iter()
-            .skip(self.page * PAGE_SIZE)
-            .take(PAGE_SIZE)
+            .skip(page.index * page.count)
+            .take(page.count)
             .map(|r| (r.id, preview_window(r, windows).map(|w| w.id.clone())))
             .collect();
-        if self.signature.as_ref() == Some(&(visible.clone(), context.clone())) {
+        if self.signature.as_ref() == Some(&(visible.clone(), context.clone(), page)) {
             return Vec::new();
         }
         self.clear();
@@ -47,7 +91,7 @@ impl HubState {
                 (request, id.clone())
             })
             .collect();
-        self.signature = Some((visible, context));
+        self.signature = Some((visible, context, page));
         requests
     }
     pub fn accept(
@@ -62,11 +106,13 @@ impl HubState {
             return false;
         }
         self.pending.remove(request);
-        let h = niwoe_tokens::Hub::DEFAULT;
+        let Some((_, _, page)) = self.signature.as_ref() else {
+            return false;
+        };
         if width == 0
             || height == 0
-            || width > h.preview_width
-            || height > h.preview_height
+            || width > page.max_width
+            || height > page.max_height
             || data.len() != width as usize * height as usize * 4
         {
             return false;

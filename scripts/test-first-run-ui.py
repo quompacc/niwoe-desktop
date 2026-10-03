@@ -5,7 +5,6 @@ Requires the isolated DRM session in target/p11-profile. No IPC navigation.
 """
 import importlib.util
 import json
-import math
 from pathlib import Path
 import subprocess
 import sys
@@ -21,6 +20,7 @@ _, env = ui.p.environment()
 DIRECTORY = Path(env['XDG_CONFIG_HOME']) / 'niwoe'
 assert DIRECTORY == ROOT / 'target/p11-profile/config/niwoe', 'isolated DRM profile required'
 ui.lib['KEYS']['alt'] = 56
+ui.lib['KEYS']['f8'] = 66
 
 
 def state(): return tomllib.loads((DIRECTORY / 'first-run.toml').read_text())
@@ -40,35 +40,53 @@ def geometry():
     output = next(o for o in ui.p.snapshot()['output-workspace-snapshot']['outputs'] if o['primary'])
     scale = output['scale_millis'] / 1000
     width, height = round(output['width'] / scale), round(output['height'] / scale) - 48
-    ratio = min(width / 1366, height / 768, 1)
-    return width, height, math.ceil(width / ratio), math.ceil(height / ratio)
+    return width, height, max(width, 1366), max(height, 720)
 
 
 def canvas(x, y):
     width, height, cw, ch = geometry()
-    ui.click(x * width / cw, 48 + y * height / ch)
+    output = next(o for o in ui.p.snapshot()['output-workspace-snapshot']['outputs'] if o['primary'])
+    ui.click(output['x'] + x * width / cw, output['y'] + 48 + y * height / ch)
 
 
 def footer(index):
     _, _, width, height = geometry()
-    cell = (width - 40 - 48) // 5
-    canvas(20 + index * (cell + 12) + cell // 2, height - 60 + 12 + 19)
+    left = (width - min(width - 40, 1280)) // 2
+    right = width - left
+    x = {0: right - 200 - 12 - 142 + 71, 1: right - 100,
+         2: right - 200 - 12 - 142 - 12 - 142 + 71,
+         3: left + 110, 4: right - 110}[index]
+    canvas(x, 39 if index == 4 else height - 60 + 12 + 19)
 
 
 def control(index, step):
     _, _, width, _ = geometry()
-    columns = 3 if step == 3 else 2 if step == 2 else 1
-    row, col = divmod(index, columns)
-    cell = (width - 40 - 12 * (columns - 1)) // columns
-    canvas(20 + col * (cell + 12) + cell // 2, 192 + 96 + row * 50 + 19)
+    body_width = min(width - 40, 1280)
+    left = (width - body_width) // 2
+    if step == 3:
+        row, col = divmod(index, 3)
+        main = body_width - 2 * 142 - 24
+        x = left + (main / 2 if col == 0 else main + 12 + 71 if col == 1 else main + 24 + 142 + 71)
+        y = 240 + row * 62 + 25
+    elif step == 2:
+        column = (body_width - 32) // 2
+        right = left + column + 32
+        if index < 3: x, y = left + column / 2, 240 + index * 62 + 25
+        elif index == 3: x, y = right + column / 2, 259
+        elif index >= 6: x, y = right + column / 2, 290 + (index - 6) * 62 + 25
+        else:
+            cell = (column - 12) // 2
+            x, y = right + (cell + 12 if index == 5 else 0) + cell / 2, 557
+    else: x, y = width / 2, 240 + index * 62 + 25
+    canvas(x, y)
 
 
 def keyboard_open():
     ui.key(*(['escape'] * 5))
-    with ui.lib['VirtualKeyboard']() as keys:
-        keys.key_down(125); keys.key_down(56); keys.tap(57); keys.key_up(56); keys.key_up(125)
-    time.sleep(.7)
-    ui.key('enter')
+    # Hub -> room management -> F8 sidebar -> System; Files is unavailable.
+    ui.key('hub', 'backtab', 'enter', 'f8', 'down', 'down', 'down', 'enter')
+    time.sleep(1)
+    ui.key('backtab', 'enter')  # Last real Overview target: introduction.
     time.sleep(.5)
 
 
@@ -77,7 +95,8 @@ def mouse_open(hub_open=False):
     if not hub_open: ui.click(30, 24)
     ui.click(1424, 172)  # Visible Hub -> room management.
     ui.click(120, 396)  # Actual System sidebar row, including panel offset.
-    ui.click(1000, 312)  # Overview inside the panel-excluding layer from room management.
+    ui.click(401, 148)  # System -> Overview.
+    ui.click(1000, 442)  # Visible introduction button in the shared Control Center.
     time.sleep(.4)
 
 

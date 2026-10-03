@@ -121,6 +121,16 @@ impl DesktopApp {
     }
 
     pub fn parse(raw: &str) -> Result<Self, &'static str> {
+        Self::parse_entry(raw, false)
+    }
+
+    /// Resolve an installed MIME handler even when it is hidden from launch menus.
+    /// Hidden/deleted entries and every other executable/visibility check still apply.
+    pub fn parse_mime_handler(raw: &str) -> Result<Self, &'static str> {
+        Self::parse_entry(raw, true)
+    }
+
+    fn parse_entry(raw: &str, allow_no_display: bool) -> Result<Self, &'static str> {
         let mut in_entry = false;
         let mut name = None;
         let mut exec_argv = None;
@@ -207,7 +217,7 @@ impl DesktopApp {
         if desktop_type.as_deref() != Some("Application") {
             return Err("unsupported-type");
         }
-        if hidden || no_display {
+        if hidden || (no_display && !allow_no_display) {
             return Err("hidden-or-nodisplay");
         }
         if only_show_in.is_some_and(|value| !desktop_env_list_contains(&value, NIWOE_DESKTOP_ENV)) {

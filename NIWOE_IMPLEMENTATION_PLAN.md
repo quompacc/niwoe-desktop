@@ -1,6 +1,305 @@
 # NIWOE: Umsetzungsplan und Phasenabnahme
 
-**P12 abgeschlossen, 27.09.2026: `accepted`.** Ausgangsstand `f5d7885`,
+**Aktueller Arbeitsstand, 02.10.2026: visuelle Abnahme wieder offen.**
+Der Nutzer hat die Behauptung einer fertigen Desktop-Alpha ausdrücklich
+zurückgewiesen. Der erneute Live-Vergleich mit allen vier verbindlichen Mockups
+bestätigt erhebliche Mängel an Hub, Control Center, Formularen und Einstellungen.
+Die früheren Funktions-, Sicherheits- und Performancebelege bleiben historische
+Nachweise; sie ersetzen keine Abnahme von Komposition, Material, Typografie,
+Abständen, Icons und Navigation. Die betroffenen visuellen Gates P02–P12 sind
+wieder offen. P13 bleibt unbegonnen; nächster Auftrag ist die native Qualitätsrunde.
+Befunde, Screenshots und erster installierter Navigationsfix:
+[UI-Prüfbericht vom 02.10.2026](docs/phase-reports/UI_VISUAL_AUDIT_2026-10-02.md).
+
+## Aktiver Reparaturplan für die Benutzeroberfläche
+
+Stand 02.10.2026. Der Prüfbericht ist die **Befund- und Belegbasis**;
+dieser Abschnitt ist der **verbindliche Abarbeitungsplan**. Er konkretisiert
+die wieder geöffneten visuellen Gates der bestehenden Phasen und ersetzt
+deren frühere Fertigmeldungen nicht durch neue. Es entsteht keine zweite
+Roadmap. Designmanifest und die vier verbindlichen Mockups einschließlich
+späterer Nutzerkorrekturen bestimmen weiterhin das Ziel.
+
+**Ausgangsstatus:** V01–V20 sind offen. Nur der im Prüfbericht separat
+beschriebene Layer-/Rückwegfehler ist bereits geprüft und installiert.
+Insbesondere V01 ist dadurch nicht erledigt: Apps öffnet weiterhin die alte
+Settings-Oberfläche. Auch die bislang nur beobachteten Popup-/Vorschaufehler
+und die fehlende Prüfmatrix werden unten ausdrücklich mitgeführt.
+
+**Fortschreibung nach der Reparaturrunde:** Der Ausgangsstatus beschreibt
+den Beginn der Prüfung. R1–R3 sind umgesetzt, geprüft und installiert;
+der gemeinsame Control-Center-Rahmen R4 ist inzwischen visuell geprüft,
+einschließlich aller regulären Settings-Einstiege, Rückwege, beider Outputs
+und aktueller 40-Zyklen-/3×300-s-Messreihe. Apps öffnet jetzt die Seite im
+gemeinsamen Rahmen. R5 ist implementiert und in den dokumentierten Verwaltungs-
+zuständen visuell geprüft: Kopf, sechs native Karten, Toolbar, echte Vorschauen,
+Liste und Paging auf beiden Outputs bei vier Skalierungen. Aktueller
+installierter Shell-Stand:
+`98864dc2a01163b005b0bdc2ba580609fe73d19710a57d69c64a8fa6c7182c62`.
+Die aktuelle 40-Zyklen-/3×300-s-Serie liegt im CPU-Budget; der Speicher blieb
+während aller Ruheproben konstant. Der zusätzliche Compositor-Speicheraufbau
+zwischen Zyklus 20 und 40 bleibt Gegenstand der längeren R9-Prüfung.
+Details und Grenzen stehen im Prüfbericht. R6 ist im dokumentierten Umfang umgesetzt: Kopf, echte Vorschau
+und Neu-Raum-Entwurf, Symbol-/Kontextcontrols, App-Auswahl sowie getrennte
+Datei-/Restore-Seiten sind in den dokumentierten Zuständen geprüft/installiert.
+Bestätigtes Raum-/Layout-/Dateiverweisspeichern und Anordnen wurden mit eigenen
+Testdaten nachgewiesen; anschließend wurden diese Daten entfernt. Als Nächstes
+ist die Leistenpreview im Control Center in lesbarer Originalgeometrie geprüft.
+Der Fokus-/Textabstandsbefund am ersten Stand wurde zentral korrigiert; alle
+47 finalen Live-/Matrixaufnahmen wurden angesehen. Speichern/Wiederöffnen,
+Tastaturbedienung und exakte Bereinigung sind bestätigt. Die aktuelle R6-Serie
+mit 40 Bedienzyklen und drei Ruheproben zu je 300 Sekunden ist bestanden:
+CPU im Budget, kein RSS-Aufbau zwischen Zyklus 20 und 40, einmalig 128 KiB
+Shell-RSS in der ersten Ruheprobe, danach konstant. R7 läuft nach der aktuellen
+Settings-Inventur weiter: Cursor und Wallpaper sind in ihrem dokumentierten
+Bedien-/Monitor-/Scale-Umfang visuell geprüft; die Anzeige-Reparatur ist geprüft
+und installiert; alle 32 Bilder ihrer Monitor-/Scale-/Navigationsmatrix sind
+durchgesehen. Der dabei gesondert reproduzierte Drehungsfehler V31 ist korrigiert
+und für den vollständigen nativen Drehzyklus visuell geprüft. Auflösung,
+Skalierung und Primärrückwahl sind im dokumentierten Speicherumfang geprüft;
+die Layerzuordnung beim laufenden Primärwechsel bleibt als V32 in R9 offen.
+Die Standard-App-Darstellung ist in fünf regulären und allen 32 tatsächlichen
+Monitor-/Scale-/Listenbildern durchgesehen. Der anschließend reproduzierte
+optimistische Schreibfehler V33 ist korrigiert/installiert; der Fall einer
+entfernten eigenen App sowie erfolgreiche Maus-/Tastaturspeicherung,
+Wiederöffnen und Erhaltung vorhandener Auto-Zuordnungen sind in zwölf
+Nachherbildern nativ visuell geprüft. Weitere Fehlerzustände bleiben in R9 offen.
+Netzwerk-/Bluetooth-Zeilen und Controls sind auf die gemeinsamen Rollen
+überführt, geprüft und installiert. Die reguläre FHD-Darstellung ist in vier tatsächlichen
+Bildern geprüft, einschließlich korrekter Kabelnetz-/WLAN-Symbole und
+Bluetooth-Suchfokus. Die anschließende Provider-Matrix umfasst 82 tatsächlich
+angesehene Bilder auf beiden Outputs bei vier Skalierungen, einschließlich
+der zweiten Netzwerk-/Bluetooth-/Audioseite bei kleinerem Canvas.
+Audio und Drucker verwenden die gemeinsamen Zeilen/Controls; der installierte
+Stand ist in vier tatsächlichen FHD-Aufnahmen mit Tastaturfokus durchgesehen.
+Alle vier Provider sind zusätzlich in 32 tatsächlichen Leer-/Aus-/Lesefehler-/
+Überlaufbildern bei 100/200 Prozent durchgesehen. Fehlerhafte Bluetooth-/Audio-/
+Druckerantworten bleiben unbekannt statt leer oder null (V37 korrigiert).
+Der dabei gefundene sprachlich vermischte Netzwerk-Listenstatus V38 ist korrigiert,
+vollständig automatisch geprüft und installiert. Zeilentexte sind nativ bestätigt;
+ein zusätzlich gefundener unbekannter Footerzähler ist ebenfalls korrigiert und
+installiert und in sechs tatsächlichen Bildern beider Teilfehlerrichtungen und
+ungültiger Antworten bei 100/200 Prozent bestätigt. Die aktuelle R7-Serie mit
+40 Bedienzyklen und drei vollen 300-Sekunden-Ruheproben ist abgeschlossen:
+CPU im Budget, kein RSS-Zuwachs im Leerlauf. Die Shell nimmt zwischen Zyklus
+20 und 40 noch 2,125 MiB auf; die längere Lebensdauerprüfung bleibt in R9 offen.
+Diese lesenden Fixtures ersetzen keine echten Geräte-Schreib-/Hardwarebelege.
+Übersicht, Konten, Updates und Energie sind im dokumentierten Inhaltsschritt
+installiert; alle acht regulären FHD-Bilder sind durchgesehen. Der zusätzliche
+Bestätigungsbefund V35 ist korrigiert und in fünf nativen Erstbestätigungs-/
+Abbruch-/Ablaufbildern geprüft. Fedora zeigt die fehlende Paketintegration ehrlich;
+deren gesonderter Backendumfang bleibt offen. Historische Panel-Pinninganfragen
+führen zur aktiven Apps-Seite, gespeicherte Daten bleiben erhalten.
+R7 ist im dokumentierten Darstellungsumfang visuell geprüft und installiert;
+R8 ist umgesetzt und installiert; alle fünf finalen FHD-Seiten und alle 40
+Monitor-/Scale-Bilder der Einführung sind tatsächlich angesehen. Die native
+Bedienrunde mit 19 angesehenen Bildern einschließlich eigener bestätigter
+Leistenübernahme ist bestanden und exakt bereinigt. Der Lesefehlerfall ist nach
+einem korrigierten Prüfeinstieg tatsächlich angesehen: Weiter deaktiviert,
+Neuladen und sicherer Ausstieg erhalten. Der dabei bestätigte englische
+Parserhinweis V39 ist korrigiert, vollständig automatisch geprüft/installiert
+und in beiden aktuellen Fehlerbildern tatsächlich bestätigt.
+Die aktuelle R8-Serie mit 40 Fünfseitenzyklen und drei vollen 300-Sekunden-
+Ruheproben ist abgeschlossen: CPU im Budget, RSS im Leerlauf konstant.
+Shell +2,125 MiB und Compositor +7,03125 MiB zwischen Zyklus 20 und 40 bleiben
+in R9 zu prüfen. Die Messung stammt vom Darstellungsrelease vor dem reinen
+Fehlertextfix. R8 ist im dokumentierten Umfang geschlossen; R9, zusätzliche Live-/Fehlerfälle
+aus R6, lange Datenfälle
+und die Skalierungsweichheit V23 bleiben offen. Keine Gesamtfreigabe.
+
+R9/V32 ist inzwischen automatisch geprüft und als Release installiert:
+Compositor `8f1e15e3…`, Shell `010d2ac4…`, 1309 Tests bestanden.
+Nach der tatsächlichen neuen Anmeldung vom 03.10.2026 laufen die neuen
+Identitäten. Beide nativen Primärwechsel sind ohne Prozessneustart visuell
+geprüft: Panel und Control Center folgen dem neuen Primärmonitor, der andere
+zeigt ausschließlich Wallpaper. Alle neun Nachher-/Sitzungsbilder angesehen;
+Loge, einmaliger Login-Hub und Watchdog ohne erneute Begrüßung bestätigt.
+Originaldateien, Outputs und Eingabegeräte-ACL exakt wiederhergestellt.
+Der interne Tailfehler des ersten Helpers und der erfolgreiche separate
+Abschluss bleiben ausdrücklich dokumentiert, nicht als ein fehlerfreier
+Gesamtlauf umgedeutet. [Native Belege](docs/phase-reports/evidence/r9/primary-after/README.md).
+Physischer Hotplug und weitere R9-Pflichtfälle bleiben offen.
+
+**Neue Designkorrektur, 03.10.2026:** Der Nutzer beanstandet gelbe
+Aktivitätsstriche, gequetschte Controls/Flächen und komplexe Menüführung.
+Diese Korrektur wird in der laufenden Qualitätsrunde vor der weiteren
+R9-Abschlussmatrix umgesetzt: neutrale Auswahlflächen, getrennter Hover und
+Tastaturfokus, mehr Höhe/Innenabstand, eine klare globale Navigation mit sieben
+verfügbaren Bereichen. Alle Einstellungen bleiben im Control Center;
+raumbezogene Dateien/Wiederherstellung in der Raumkonfiguration. Manifest
+fortgeschrieben; keine neue Roadmap oder Alpha-Freigabe. Der größere
+gemeinsame Dichteschritt öffnet die betroffenen visuellen Abstände-/Layoutgates
+erneut; frühere R4–R8-Bilder ersetzen seinen aktuellen Nachhervergleich nicht.
+
+Die erste gemeinsame Korrekturrunde ist automatisch geprüft und auf dem
+Testrechner aktiv: Shell `e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451`,
+Compositor weiterhin `8f1e15e3…`. 1311 Workspacetests, Format, Workspacecheck,
+Design-/Größen-/Zentralitätsguards und striktes Clippy bestanden. 19 aktuelle
+FHD-Ansichten und 60 zusätzliche Ansichten beider tatsächlichen Monitore bei
+100/150/200 Prozent einzeln angesehen; ursprüngliche Konfiguration und
+Sitzungszustand wiederhergestellt. Neutrale Auswahl/Fokus, sieben Sidebarziele,
+Settings im Control Center, größere Controls und sechs ausreichend hohe
+Appauswahlen nachgewiesen. [Änderungen und genaue Grenzen](docs/phase-reports/evidence/r9/calm-controls/README.md).
+Weitere acht angesehene Bilder bestätigen nach korrigierter Helper-Scrollrichtung
+den erreichbaren unteren Formularbereich auf FHD bei 150/200 Prozent; alle
+Bereinigungsbelege einschließlich ursprünglicher Eingabegeräte-ACL bestätigt.
+Die bekannte Skalierungsweichheit V23 und die lange Speicher-/Ruheprüfung des
+neuen Binärstandes bleiben offen; dies ist keine R9-Gesamtfreigabe.
+
+### Arbeitsweise und Abschluss eines Mangels
+
+- Vor einer Änderung den Befund am installierten Desktop reproduzieren,
+  aktuellen Screenshot und Buildidentität sichern. Prüfen, ob ein gemeinsamer
+  Komponentenfehler mehrere Seiten betrifft; dann an dieser Quelle reparieren.
+- In kleinen, nach Verantwortung getrennten Rust-Modulen arbeiten. Designwerte
+  ausschließlich in `niwoe-tokens`/`niwoe-config`, gemeinsame Controls in
+  `niwoe-ui`; keine lokale Farb-, Alpha-, Radius- oder Geometriekorrektur.
+  Keine neue Dependency und keine Änderung an Cargo-Manifesten im Reparaturumfang.
+- Für Bildköpfe, Icons und Vorschauen jeweils Cache-Schlüssel, Invalidierung,
+  Speichergrenze und Lebensdauer festhalten. Keine neue dauernde Capture- oder
+  Frame-Schleife; compositorseitiges Glas und Renderreihenfolge erhalten.
+- Nach Rust-Änderungen `cargo check --workspace`, für Fixes
+  `cargo test --workspace`, `cargo fmt` und den Design Guard ausführen.
+  Bei Rendering/Input/IPC den echten Call-Flow zusätzlich prüfen. Relevante
+  Regressionstests ergänzen; keine Tests als Ersatz für die Bildprüfung.
+- Jeden erfolgreich geprüften Implementierungsstand als Release auf Fedora
+  installieren. Release-, installierte und laufende Hashes vergleichen;
+  Shelländerungen über den vorhandenen Watchdog aktivieren, bei
+  Compositoränderungen einen erforderlichen Neulogin ausdrücklich melden.
+- Ein Mangel erhält erst **visuell geprüft**, wenn Vorher-/Nachher-Aufnahmen
+  des installierten Stands angesehen wurden, das unten genannte Kriterium
+  erfüllt ist und Maus/Tastatur funktionieren. **Geprüft/installiert** allein
+  genügt nicht. Eine Nutzerabnahme wird nur bei tatsächlicher Freigabe vermerkt.
+  Fehlende Pflichtfälle bleiben `NOT RUN` und offen.
+
+Pro Mangel im Prüfbericht fortschreiben: Status (`offen`, `in Arbeit`,
+`geprüft/installiert`, `visuell geprüft`), Ursache, geänderte Dateien,
+Buildhash, Befehle/Exitcodes, Bildvergleich, getestete Zustände und offene Fälle.
+Historische Bilder und Fehlversuche erhalten; sie niemals nachträglich als
+bestandene neue Prüfung umdeuten. Neue Befunde ab V21 fortlaufend ergänzen.
+
+### Reihenfolge der Arbeitspakete
+
+Nutzerpräzisierung vom 02.10.2026: Die Einstellungen gehören vollständig
+in das gemeinsame Control Center (R4). Die separate Settings-Karte ist kein
+Zielzustand. Die Reparaturen werden weiterhin sorgfältig in der festgelegten
+Reihenfolge ausgeführt; R4 wird nicht vor Hub und Quick Settings vorgezogen.
+
+Die Pakete sind Reparaturschritte innerhalb P02–P12, keine neuen Produktphasen.
+Aktuell ist kein Paket als fertig erklärt. Mit R1 beginnen; die vorhandene
+Panelgestaltung bleibt erhalten, sofern kein konkret belegter Fehler eine
+Korrektur verlangt. Danach Hub und Quick Settings prüfen, bevor weitere
+Verwaltungsflächen umgebaut werden.
+
+| Reihenfolge | Reparaturauftrag | Lieferobjekt und Abhängigkeit |
+| --- | --- | --- |
+| R1 | Gemeinsame Text-, Icon-, Fokus- und Formularrollen; Panel gegen `(1)` prüfen. | Sichtbar passende Überschriftenhierarchie, getrennte Haupt-/Unterzeilen, native Icons statt fehlender Glyphen, einheitlicher Fokus und klare Controlzustände. Panelhöhe, mittige Uhr, Raumfolge und freigegebenes Material bewahren. Bestandene Panelprüfung ist Voraussetzung für R2. |
+| R2 | Hub nach `(2)` einschließlich Suche und Fensterliste. | Eigener gecachter atmosphärischer Bildkopf, vier vollständig komponierte Raumkarten, drei untere Informationsbereiche; reale Vorschauen in der vorgesehenen Bildfläche. Lesbarkeit über Wallpaper und heller Anwendung; echte Fähigkeitszustände statt erfundener Inhalte. Gemeinsame Rollen aus R1 verwenden. |
+| R3 | Quick Settings und zugehörige Popups nach `(1)`. | Freigegebenes Deck-/OSD-Material erhalten; Icons, Text und Fokus vereinheitlichen. Kalender und Raumoverflow am auslösenden Control ausrichten, auf Outputgrenzen begrenzen. Popup-Kollision und Kontextmenü-Flyout reproduzieren und beheben, falls bestätigt. Nach R1/R2. |
+| R4 | Ein gemeinsamer Control-Center-Rahmen und konsistente Navigation. | Sidebar mit Icons und tatsächlichem Aktivzustand für Räume, Apps, Benutzer, System, Einstellungen und Leiste. Vorhandene Settings-Inhalte und Provider in diesen Rahmen übernehmen; alte parallele Settings-Karte aus allen regulären Einstiegen entfernen. Kein weiterer Settings-Neubau daneben. Nach der Qualitätsrunde R1–R3. |
+| R5 | Räume verwalten nach `(3)`. | Eigener proportionaler Bildkopf, vollständige Toolbar, bildliche Raumkarten, Schnellaktionen und Statistik im vorgesehenen Raster. Vorhandene Sortierung/Filter wirklich anbinden; fehlende Kategorie-/Import-/Vorlagenfähigkeiten in dieser Struktur ehrlich kennzeichnen. R4 und vorhandene Vorschauquelle nutzen. |
+| R6 | Raum konfigurieren nach `(4)` und Leistenkonfiguration. | Proportionaler Bildkopf, Symbolvorschau, klare Detail-/Kontextcontrols, echte räumliche Vorschau; getrennte Apps-, Dateien- und Restore-Seiten. Leistenpreview in lesbarer Originalgeometrie oder ausdrücklich bezeichnetem Ausschnitt. Entwürfe, Speichern/Abbrechen und Fehler erhalten. Nach R4/R5. |
+| R7 | Übrige Settings-Inhalte und Providerdarstellung bereinigen. | Bild-/Cursorvorschauen, lesbare Katalognamen, konsistente Sprache, verständliche Geräte-/Statusdarstellung, Standard-App-Auswahl. Veraltete Panel-Pinning-Behauptung entfernen. Fedora-Updates gesondert behandeln wie unten beschrieben. R4-Rahmen und R1-Controls nutzen. |
+| R8 | Alle fünf First-Run-Seiten mit denselben Komponenten korrigieren. | Inhalt, Gruppen, Vorschauen und primäre/sekundäre Aktionen passend zur verfügbaren Fläche. Keine fünf gleich gewichteten Footeraktionen und keine langen Pseudo-Checkboxbuttons. Entwurf/Wiederaufnahme und Übernahmegrenzen erhalten. Nach R1/R6/R7. |
+| R9 | Vollständige visuelle und funktionale Abschlussrunde. | Vier Mockup-Bildschirme und sämtliche Nebenflächen in der unten genannten Matrix; offene Beobachtungen nachprüfen, neue Mängel aufnehmen. Aktuelle Performancebelege und vollständiges Cleanup. Erst danach Gesamtfreigabe/P13 erneut bewerten. |
+
+R1 korrigiert gemeinsame Rollen, ersetzt aber nicht die gesonderte Abnahme
+jeder betroffenen Seite. Beispielsweise gilt V15 erst nach Prüfung der
+Standard-App-Zeilen **und** der Netzwerksymbole als visuell geprüft.
+
+### Zuordnung und überprüfbare Kriterien für V01 bis V20
+
+Alle Status bleiben zunächst **offen**. Die Kriterien unten beschreiben das
+Ergebnis am installierten Desktop, nicht allein eine Quellcodeänderung.
+
+| Befund | Paket | Erforderlicher sichtbarer Abschlussnachweis |
+| --- | --- | --- |
+| V01 Alte Settings-Familie | R4 | Apps, Benutzer, System und Einstellungen bleiben im selben Control-Center-Rahmen. Zurück/Escape erreichen den richtigen Ursprung; kein Einstieg öffnet die alte separate Settings-Karte. Hublage und Glas bleiben nach jedem Rückweg korrekt. |
+| V02 Hubkopf und Material | R2 | Hub neben `(2)` vergleichen: atmosphärischer Kopf, passende Größe/Position/Gewichtung der Texte und vollständige Kartenkomposition. Dahinterliegende Apptexte konkurrieren nicht mit dem Hubinhalt. Beide Hintergründe mit demselben zentralen Materialpfad prüfen. |
+| V03 Verwaltungskopf | R5 | Eigene Landschaftskomposition wie `(3)`, ohne sichtbares fremdes Appmenü. Kopf bleibt bei Wallpaper und heller Anwendung stabil, lesbar und proportional. |
+| V04 Gestauchter Konfigurationskopf | R6 | Landschaft wird proportional skaliert und passend beschnitten; Berge/Strukturen bleiben unverzerrt. Ausschnitt in beiden Zielgrößen neben `(4)` prüfen. |
+| V05 Fehlende Raumvorschauen | R5/R6 | Belegter Raum zeigt echte Fenster-/Layoutvorschau in Verwaltung und Konfiguration; Fensterende/Minimieren/Raumwechsel aktualisieren oder invalidieren sie. Leerer Raum erhält einen gestalteten ehrlichen Leerzustand. Keine erfundenen Beispiel-Appbilder. |
+| V06 Unvollständige Toolbar | R5 | Filter mit echten Zählern, klare Sortierung, Kategoriencontrol, Suche, Neuer Raum und Raster-/Listencontrols an den vorgesehenen Stellen. Verfügbare Controls wirken tatsächlich; ein Control ohne Backend ist sichtbar als nicht verfügbar gekennzeichnet. Fehlende Kategoriequelle nicht durch erfundene Kategorien ersetzen. |
+| V07 Sidebaricons und Aktivzustand | R4 | Alle vorgesehenen Einträge nutzen native Icons; die Markierung folgt der tatsächlich geöffneten Seite. Leiste markiert nicht Räume. Maus und Tastatur erreichen dieselben Ziele. |
+| V08 Reduzierte Raumdetails | R6 | Sichtbare Symbolvorschau und geordnete Beschriftung/Felder; Kontextoptionen als verständliche Controlzeilen mit Fähigkeitszustand. Keine namenlosen Großbuttons; Entwurfsänderung und Abbrechen nachvollziehbar. |
+| V09 Raum-App-Liste | R6 | Appicon, lesbarer Name, sekundäre Beschreibung und eindeutige Auswahl pro Zeile; Identitätsdetails nur wo entscheidungsrelevant. Seitenwechsel, lange Namen und native/XWayland-Dubletten verständlich bedienbar. |
+| V10 Dateien und Restore vermischt | R6 | Dateien zeigt explizite Dateireferenzen, Restore seine Layout-/Wiederöffnenaktionen und Ergebnisse. Leerzustand erklärt fehlendes Layout ohne rohen OS-Fehler. Eingabe, Abbruch, Fehler und Bestätigung jeweils am passenden Inhalt. |
+| V11 Winzige Panelvorschau | R6 | Preview zeigt dieselbe Panelgeometrie und Textmetriken wie das Produkt; Vorschau und Einstellungsgruppen bilden eine lesbare Seite. Keine Verzerrung oder unbeschriftete Miniatur. Übernahme/Abbrechen an beiden Zielgrößen prüfen. |
+| V12 Wallpaperliste | R7 | Tatsächliche gecachte Bildthumbnails; eindeutige Katalognamen ohne ungeprüfte Screenshotduplikate. Deutsche, verständliche Moduscontrols; fehlende Datei hat erkennbaren Fehlerzustand. Auswahl wirkt nur über den vorhandenen bestätigten Pfad. |
+| V13 Cursorliste | R7 | Tatsächliche Cursorvorschau und benutzerlesbare Theme-/Größenbezeichnungen. Vorschau entspricht Auswahl; Laden/Fehler/Skalierung geprüft. |
+| V14 Veraltetes Panel-Pinning | R4/R7 | Kein aktiver Einstellungsweg verspricht angeheftete Programme im Panel. Bestehende Daten nicht löschen; einen verbleibenden echten Hub-/Schnellstartzweck ausdrücklich korrekt beschreiben. Falls kein Produktzweck besteht, veralteten UI-Eintrag entfernen. |
+| V15 Textabstände und fehlende Glyphen | R1/R3/R7 | Standard-App-Haupt-/Unterzeilen berühren oder überdecken sich nicht. Dropdown-/Sicherheitsicons sind erkennbar statt Rechteckglyphen. Normal, Fokus, Auswahl, lange Namen und Scale-Wechsel auf beiden Seiten prüfen. |
+| V16 Technische und falsche Statusdarstellung | R7 | Geräte-/System-/Audio-/Druckerseiten benutzerlesbar und sprachlich konsistent. Fedora-Updates verwendet einen vorhandenen Fedora-Provider oder benennt eine tatsächlich fehlende Integration korrekt. Kein „apt nicht verfügbar“ als Fedora-Produktstatus und keine erfundene Updatezahl. Backendumfang separat nachweisen. |
+| V17 Popupanker und Sprache | R3 | Kalender an der mittigen Uhr, Raumoverflow an seinem Auslöser; beide auf dem richtigen Output und innerhalb dessen Grenzen. Deutsche Wochentage und einheitlicher Fokus bei langen Raumlisten/Scale. |
+| V18 First Run | R8 | Alle fünf Seiten mit klarer Hierarchie, lesbaren Controls und eindeutiger Hauptaktion. Katalog-/Panelvorschauen nutzbar; Entwurf fortsetzen, Abbrechen und bestätigte Übernahme visuell und funktional prüfen. |
+| V19 Suche und Fensterlistenfokus | R1/R2 | Suchzeilen mit Appicon, sauber getrennten Textrollen und einheitlicher Auswahl; Fensterliste verwendet die gemeinsame Fokusrolle. Pfeile/Enter/Escape und langer Ergebnistext ohne Layoutbruch. |
+| V20 Technischer Neu-Raum-Platzhalter | R6 | Ungespeicherter Raum erscheint als Entwurf ohne „Raum 0“. Benennen aktualisiert die Vorschau; Abbrechen erzeugt keinen Raum. Loge bleibt neutral und wird weder angelegt noch als Raum mitgezählt. |
+
+V16 wird bei Bedarf in dokumentierte Teilaufträge für Darstellung und
+Fedora-Provider aufgeteilt. Der jetzige Provider ruft ausschließlich `apt`
+auf (`crates/niwoe-shell/src/updates.rs`); ein Fedora-Provider ist daher nicht
+durch bloße Textkorrektur nachgewiesen. Eine neue Paketverwaltungsfunktion
+oder privilegierte Updateaktion gehört nicht stillschweigend zu dieser
+UI-Reparatur. Bis ein fehlender Backendumfang entschieden und geprüft ist,
+bleibt diese Teilanforderung offen; eine ehrliche Fähigkeitsanzeige beseitigt
+nur den irreführenden UI-Zustand.
+
+### Noch nicht bestätigte Fehler und fehlende Bildschirmabdeckung
+
+Diese Punkte sind eigene offene Prüfaufträge in R3/R9 und dürfen nicht hinter
+den zwanzig bestätigten Befunden verschwinden:
+
+- Raumoverflow plus Desktopkontextmenü: genaue Klickfolge reproduzieren;
+  feststellen, welche Popups gleichzeitig zulässig sind und ob das fremde
+  Popup korrekt geschlossen wird. Erst nach Reproduktion einen Fix zuordnen.
+- Settings-Flyout: Hover sowie Klick/Pfeiltasten prüfen; tatsächliche
+  Interaktionsvorgabe von fehlendem Rendern oder falschem Hitbereich trennen.
+- Zeitweise fehlende Fenstervorschau: Fenster-/Raumidentität, Generation und
+  Invalidierung beim Öffnen der Fensterliste prüfen; kein dauernder Capture
+  als Ersatz für die Cachekorrektur.
+- Noch nicht besichtigte Oberflächen inventarisieren und wirklich öffnen:
+  Audio-OSD, Screenshot-Regionsauswahl, alle Picker, Bestätigungen und
+  Fehlerdialoge sowie Login, Lock, PAM und Polkit. Nicht nur Happy Paths zählen.
+  Schutzflächen nicht für Screenshots aufheben; wenn die Aufnahme gesperrt ist,
+  lokal visuell prüfen und Aufnahmegrenze dokumentieren. Ein nicht ausgeführter
+  Pflichtfall bleibt offen.
+
+### Gemeinsame visuelle Prüfmatrix und Abschlussgate
+
+Für jede geänderte Seite festhalten: Zielgröße, Scale, Output, Datenzustand,
+Eingabemethode, installierter Build und Screenshot. Den neuen Screenshot
+direkt neben das passende Originalmockup stellen. Bei Nebenflächen ohne
+eigenes Mockup dieselben geprüften Komponenten und Rollen als Maßstab verwenden.
+
+| Dimension | Pflichtfälle |
+| --- | --- |
+| Zielgrößen | 1920×1080 und 1366×768; physische Modi und logische Testgröße unterscheiden. Fehlenden DRM-Modus nicht als physisch getestet ausgeben. |
+| Skalierung und Outputs | 100/150/200 % wo verfügbar; beide vorhandenen Outputs. Eingabe-/Popupkoordinaten, Monitorwechsel und Grenzen prüfen. |
+| Hintergründe | Wallpaper und helle reale Anwendung; besonders Hub/Control Center auf lesbaren Kontrast und unerwünschtes Durchscheinen prüfen. |
+| Inhalte | Leere und belegte Räume, mehrere echte Fenster, lange Namen/Beschreibungen, große gültige Raum-/Appkataloge, fehlende Daten/Assets/Provider. |
+| Controlzustände | Normal, Hover, Fokus, gedrückt, ausgewählt, deaktiviert, Laden und Fehler; Textposition, Größe, Abstand, Icon und Hitbereich prüfen. |
+| Bedienwege | Maus und Tastatur; Hub → Verwaltung → Konfiguration → zurück, sämtliche Sidebarziele, Suche, Picker, Speichern/Abbrechen/Konflikt. |
+| Lebenszyklus | Wiederöffnen, Shell-Watchdog, neue Login-Sitzung: Loge, genau einmaliger Willkommens-Hub, direkter Appstart nach Raum 1; keine alten Layer-/Fokuszustände. |
+
+Aktuelle Performancebelege für Änderungen an Material, Assets, Vorschauen
+und Invalidierung gemäß §7: gleiche Hardware/Modi/Last, Warm-up,
+drei Fünf-Minuten-Idle-Proben vor/nach der relevanten Änderung und die dort
+genannten Öffnungszyklen. Cache-/RSS-Lebensdauer beim wiederholten Öffnen prüfen.
+Fehlende GPU-, Repaint- oder Latenzmetriken bleiben ausdrücklich unbekannt;
+historische P12-Werte sind keine neue Messung. Nach jeder Prüfrunde eigene
+Testfenster/Entwürfe bereinigen und temporäre Zugänge/Berechtigungen entfernen;
+vorhandene Räume und KDE-/GTK-Konfiguration erhalten.
+
+**Gesamtabschluss erst**, wenn V01–V20 einschließlich aller Teilanforderungen
+belegt erledigt oder durch eine ausdrückliche Produktentscheidung ersetzt
+sind, zusätzliche bestätigte Mängel abgearbeitet sind und keine erforderliche
+Bildschirm-/Zustandsprüfung als `NOT RUN` verbleibt. Die vier Kompositionen
+und durchgehenden Wege müssen am installierten Desktop stimmen. Erst dann
+den Gesamtstatus erneut bewerten; P13 bleibt bis dahin gesperrt.
+
+## Historische Belege für Implementierung und Abnahme
+
+**Historischer P12-Funktionsabschluss, 27.09.2026: `accepted`.** Ausgangsstand `f5d7885`,
 Produktstand `8970b17` auf Fedora installiert und laufende Hashes geprüft.
 Pflichtmatrix, Dateiliste und Messgrenzen: [P12-Bericht](docs/phase-reports/P12.md).
 Reale KWrite-Arbeit einschließlich RTC-Suspend/Resume, physischer HDMI-Hotplug,

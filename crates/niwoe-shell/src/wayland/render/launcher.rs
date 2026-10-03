@@ -5,15 +5,15 @@ impl NiwoeShell {
 
     pub(crate) fn launcher_content_size(&self) -> (u32, u32) {
         let (width, height) = self.launcher_fitted_size();
-        if !self.launcher_settings_open {
-            niwoe_tokens::Hub::DEFAULT.canvas_size(width, height)
+        if self.control_center_visible() {
+            niwoe_tokens::ControlCenter::DEFAULT.canvas_size(width, height)
         } else {
-            (width, height)
+            niwoe_tokens::Hub::DEFAULT.canvas_size(width, height)
         }
     }
 
     pub(crate) fn launcher_fitted_size(&self) -> (u32, u32) {
-        if self.room_management_open {
+        if self.control_center_visible() {
             (self.launcher_width, self.launcher_height)
         } else if self.launcher_is_fullscreen {
             let (_, _, width, height) = self
@@ -27,7 +27,8 @@ impl NiwoeShell {
     }
 
     pub(crate) fn draw_launcher(&mut self, _qh: &QueueHandle<Self>, reason: RepaintReason) {
-        if self.room_management_open {
+        let control_center_visible = self.control_center_visible();
+        if control_center_visible {
             self.launcher_visual_x = 0;
             self.launcher_visual_y = 0;
         } else if self.launcher_is_fullscreen {
@@ -46,6 +47,9 @@ impl NiwoeShell {
             self.launcher_configured && self.launcher_state.open
         );
         if !self.launcher_configured || !self.launcher_state.open {
+            if !self.launcher_state.open {
+                self.panel_preview.clear();
+            }
             // info! (temp) — diagnosing "launcher won't open": a skip with
             // open=true configured=false means the layer configure never arrived.
             info!(
@@ -81,15 +85,31 @@ impl NiwoeShell {
         let stride = buffer::shm_buffer_stride(width);
         let (content_width, content_height) = self.launcher_content_size();
         let (fitted_width, fitted_height) = self.launcher_fitted_size();
+        let sidebar_focus = self
+            .control_center_nav
+            .sidebar_focus
+            .filter(|_| control_center_visible && !self.workspace_state.rooms.wizard.open)
+            .map(|index| crate::control_center::entry_rect(content_height, index));
+        let focus_theme = crate::ui::tokens::theme_from_config(&self.theme);
+        let focus_color = crate::ui::tokens::bgra_color(focus_theme.palette.border_focus());
+        let focus_radius = focus_theme.radius.sm;
         let hub_active_workspace = self.panel_active_workspace();
         let hub_results = if self.hub_search_active {
             self.hub_results()
         } else {
             Vec::new()
         };
-        let panel_preview = if self.workspace_state.rooms.panel.open {
-            self.panel_form_preview(content_width)
+        let panel_preview = if self.workspace_state.rooms.panel.open && !self.launcher_settings_open
+        {
+            let c = niwoe_tokens::ControlCenter::DEFAULT;
+            let preview_width = if self.workspace_state.rooms.wizard.open {
+                crate::room_management_view::first_run::preview_width(content_width)
+            } else {
+                content_width.saturating_sub((c.outer_pad * 2 + c.sidebar_width) as u32)
+            };
+            self.panel_form_preview(preview_width)
         } else {
+            self.panel_preview.clear();
             None
         };
         for attempt in 0..CANVAS_RETRY_ATTEMPTS {
@@ -137,8 +157,14 @@ impl NiwoeShell {
                 (id.as_str(), p)
             });
             if self.workspace_state.rooms.wizard.open {
-                crate::room_management_view::first_run::draw(&mut content, content_width, content_height,
-                    &self.workspace_state.rooms.wizard, panel_preview.as_ref(), &self.theme);
+                crate::room_management_view::first_run::draw(
+                    &mut content,
+                    content_width,
+                    content_height,
+                    &self.workspace_state.rooms.wizard,
+                    panel_preview.as_deref(),
+                    &self.theme,
+                );
             } else if self.room_management_open {
                 let rooms = &self.workspace_state.rooms.snapshot.rooms;
                 let draft = niwoe_ipc::RoomEntry {
@@ -155,7 +181,7 @@ impl NiwoeShell {
                         content_width,
                         content_height,
                         &self.workspace_state.rooms.panel,
-                        panel_preview.as_ref(),
+                        panel_preview.as_deref(),
                         &self.theme,
                     );
                 } else if let Some((room, edit, order)) =
@@ -190,6 +216,8 @@ impl NiwoeShell {
                             || (edit.id != 0 && !rooms.iter().any(|room| room.id == edit.id)),
                         self.room_configuration_scroll_y,
                         &self.icon_cache,
+                        &self.hub,
+                        &self.launcher_state.apps,
                         &self.theme,
                     );
                 } else {
@@ -203,6 +231,7 @@ impl NiwoeShell {
                         content_width,
                         content_height,
                         &visible_rooms,
+                        rooms,
                         hub_active_workspace,
                         &self.workspace_window_counts,
                         &self.windows,
@@ -211,6 +240,8 @@ impl NiwoeShell {
                         self.room_management_page,
                         &self.workspace_state.rooms.list,
                         &self.icon_cache,
+                        &self.hub,
+                        &self.launcher_state.apps,
                         &self.theme,
                     );
                 }
@@ -221,24 +252,32 @@ impl NiwoeShell {
                     content_height,
                     self.settings_category,
                     &self.settings_search,
+                    self.settings_return_to_room_management,
+                    self.control_center_nav.widget_focus,
                     &self.available_themes,
                     &self.theme_name,
                     &self.available_wallpapers,
                     &self.wallpaper_thumbnails,
+                    self.wallpaper_page,
                     self.wallpaper_path.as_deref(),
                     self.wallpaper_mode,
                     self.cursor_size,
+                    &self.cursor_previews,
                     self.available_cursor_themes.as_slice(),
                     self.cursor_theme.as_str(),
                     self.idle_timeout_secs,
                     &self.pinned_apps,
                     &self.output_workspaces,
                     self.display_mode_dropdown_open,
+                    self.display_pages,
+                    self.provider_page,
                     &self.printer_snapshot,
                     &self.audio_snapshot,
                     &self.system_info,
+                    &self.user_accounts,
                     self.network_controller.state(),
                     self.network_profiles.as_slice(),
+                    self.network_list_status,
                     &self.bluetooth_snapshot,
                     self.wifi_networks.as_slice(),
                     self.settings_pinned_adding,
@@ -248,6 +287,8 @@ impl NiwoeShell {
                     self.default_apps_index.as_ref(),
                     &self.default_apps_current,
                     self.default_apps_picker_open,
+                    self.default_apps_page,
+                    &self.default_apps_status,
                     &self.theme,
                     &state_fn,
                 );
@@ -259,6 +300,9 @@ impl NiwoeShell {
                     &self.search_query,
                     &hub_results,
                     self.hub.selected.unwrap_or(0),
+                    &self.launcher_state.apps,
+                    &self.windows,
+                    &self.icon_cache,
                     &self.theme,
                 );
             } else if !self.hub_search_active {
@@ -298,6 +342,13 @@ impl NiwoeShell {
                     self.hovered_power_btn,
                     &self.theme,
                 );
+            }
+            if let Some(area) = sidebar_focus {
+                if let Some(mut pm) =
+                    tiny_skia::PixmapMut::from_bytes(&mut content, content_width, content_height)
+                {
+                    niwoe_ui::effect::paint_focus(&mut pm, area, focus_color, focus_radius);
+                }
             }
             if let Some(ref cm) = self.context_menu {
                 let items = crate::context_menu::item_list(
@@ -350,12 +401,12 @@ impl NiwoeShell {
                 &self.theme,
                 niwoe_config::ThemeSurface::Launcher,
             );
-            if !self.room_management_open {
+            if !control_center_visible {
                 round_buffer_corners(&mut content, lw, lh, launcher_radius);
             }
 
             if self.launcher_is_fullscreen {
-                if self.room_management_open {
+                if control_center_visible {
                     canvas.copy_from_slice(&content);
                 } else {
                     // Blit fitted card content into the full-screen canvas at visual offset.
@@ -433,6 +484,7 @@ impl NiwoeShell {
 
     pub(crate) fn unmap_launcher(&mut self, reason: CommitReason) {
         self.hub.clear();
+        self.panel_preview.clear();
         debug!(
             "unmap_launcher: reason={:?} open={} configured={} surface=launcher attach_none=true commit=true",
             reason,

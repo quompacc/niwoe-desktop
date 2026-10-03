@@ -9,6 +9,8 @@ fn draw_body(
     windows: &[WindowInfo],
     scroll_y: i32,
     icons: &crate::icons::IconCache,
+    hub: &crate::hub_state::HubState,
+    catalog: &[crate::launcher::DesktopApp],
     config: &niwoe_config::ThemeConfig,
 ) {
     let p = crate::ui::tokens::theme_from_config(config).palette;
@@ -31,12 +33,10 @@ fn draw_body(
         p.text_dim,
     );
     fill(pm, name, p.surface_alt, Radius::DEFAULT.sm);
-    outline(
-        pm,
-        name,
-        if edit.focus == 0 { p.accent } else { p.border },
-        Controls::BORDER,
-    );
+    outline(pm, name, p.border_control(), Controls::BORDER);
+    if edit.focus == 0 {
+        niwoe_ui::effect::paint_focus(pm, name, p.border_focus(), Radius::DEFAULT.sm);
+    }
     paint_text_left_centered(
         pm,
         &truncate_to_fit(
@@ -59,12 +59,10 @@ fn draw_body(
         p.text_dim,
     );
     fill(pm, description, p.surface_alt, Radius::DEFAULT.sm);
-    outline(
-        pm,
-        description,
-        if edit.focus == 5 { p.accent } else { p.border },
-        Controls::BORDER,
-    );
+    outline(pm, description, p.border_control(), Controls::BORDER);
+    if edit.focus == 5 {
+        niwoe_ui::effect::paint_focus(pm, description, p.border_focus(), Radius::DEFAULT.sm);
+    }
     paint_text_left_centered(
         pm,
         &truncate_to_fit(
@@ -95,44 +93,24 @@ fn draw_body(
         p.text_dim,
     );
     for (later, label, allowed) in [
-        (false, "← Früher", edit.id != 0 && edit.position > 0),
+        (false, "Früher", edit.id != 0 && edit.position > 0),
         (
             true,
-            "Später →",
+            "Später",
             edit.id != 0 && edit.position + 1 < room_count,
         ),
     ] {
         let action = order_rect(pm.width(), scroll_y, later);
-        fill(
+        super::list::control(
             pm,
             action,
-            alpha(
-                p.surface_alt,
-                if allowed {
-                    C.card_alpha
-                } else {
-                    C.disabled_alpha
-                },
-            ),
-            Radius::DEFAULT.sm,
-        );
-        let focused = edit.focus == if later { 2 } else { 1 };
-        outline(
-            pm,
-            action,
-            if focused { p.accent } else { p.border },
-            if focused {
-                Controls::FOCUS_WIDTH
-            } else {
-                Controls::BORDER
-            },
-        );
-        paint_text_centered(
-            pm,
             label,
-            action,
-            Typography::DEFAULT.caption_size as f32,
-            if allowed { p.text } else { p.text_dim },
+            super::list::ControlState {
+                enabled: allowed,
+                focused: edit.focus == if later { 2 } else { 1 },
+                ..Default::default()
+            },
+            config,
         );
     }
 
@@ -200,7 +178,11 @@ fn draw_body(
         height: preview.height - S.xxl - C.card_pad,
     };
     let draft = RoomEntry {
-        name: edit.name.clone(),
+        name: if edit.name.trim().is_empty() {
+            room.name.clone()
+        } else {
+            edit.name.clone()
+        },
         description: edit.description.clone(),
         assignment: edit.assignment,
         preferences: edit.preferences.clone(),
@@ -216,17 +198,30 @@ fn draw_body(
     }
     let context = RoomRenderContext {
         preview: true,
-        rooms: std::slice::from_ref(&draft),
         icons,
         active_workspace: room.workspace,
         window_counts: &counts,
         windows,
         hovered_room: None,
         keyboard_focus: None,
-        page: 0,
         config,
     };
-    draw_room_card(pm, viewport, &draft, &context, 0);
+    let list = crate::room_editor::list::ListUi::default();
+    super::management::draw_card(
+        pm,
+        viewport,
+        &draft,
+        &super::management::Context {
+            card: &context,
+            rooms,
+            all_rooms: rooms,
+            page: 0,
+            list: &list,
+            hub,
+            apps: catalog,
+        },
+        0,
+    );
     let note = Rect {
         x: right,
         y: preview.y + preview.height + C.card_gap,

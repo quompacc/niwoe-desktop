@@ -1,0 +1,50 @@
+[
+  {
+    "label": "r9-calm-scroll-drm-0-s1500-rooms",
+    "image_sha256": "92ca1941b5b62ffca96763603d8b2356255c5ca31b1046f2b6ff7bc5e1a5d169",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s1500-room-general",
+    "image_sha256": "2fc31556563923a1e8060b582bfc11e35766ec2b9e5097351523bc3201d03f5e",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s1500-room-general-lower",
+    "image_sha256": "586826bd4bc03170e8b0fed2794a86887102a462a9b3176c339105a526cf5f59",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s1500-room-apps",
+    "image_sha256": "450e5d07248bbb5b8d6df5d01a5591382420ea5491c1f804313f4df8b412c72a",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s2000-rooms",
+    "image_sha256": "612bc265c27b824a7c7dac81b98bea59ec61b8960723a4b40bd14b424a1e3d76",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s2000-room-general",
+    "image_sha256": "3d11bafc6fafe660810a16d89a54313247bf95126f29a0783adc36b1f802a23d",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s2000-room-general-lower",
+    "image_sha256": "768b2adf817ce0ec45abf18918ce4a0f7f1b82f95854d8aaa25649b4f4633ff2",
+    "actually_viewed": true,
+    "published": false
+  },
+  {
+    "label": "r9-calm-scroll-drm-0-s2000-room-apps",
+    "image_sha256": "77693808dbdcbdbc1fa0008110141f3edf1a7b888b3c763e1d8f476d80da77c4",
+    "actually_viewed": true,
+    "published": false
+  }
+]

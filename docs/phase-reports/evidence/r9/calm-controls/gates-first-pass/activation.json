@@ -1,0 +1,8 @@
+{
+  "shell_pid": "663841",
+  "shell_sha256": "f5de3bdcd398259dacf250ad2d1d0cb5382fc8f4bbea255ccd3079e055676448",
+  "compositor_pid": "647751",
+  "compositor_sha256": "8f1e15e3678860e9160cc00ee17e61c0650e9c15ae1ecb086fef53e48c3290e3",
+  "configuration_bytes_equal": true,
+  "shared_kde_gtk_bytes_equal": true
+}

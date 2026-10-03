@@ -16,10 +16,13 @@ impl NiwoeShell {
         self.room_configuration_id = None;
         self.room_configuration_scroll_y = 0;
         self.launcher_settings_open = false;
+        self.settings_return_to_room_management = false;
         self.hub_search_active = false;
         self.search_query.clear();
         self.hovered_bento_idx = None;
         self.room_keyboard_focus = None;
+        self.control_center_nav = Default::default();
+        self.ui_preview_widget_state = None;
         self.launcher_layer
             .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
         self.launcher_layer.set_margin(0, 0, 0, 0);
@@ -34,6 +37,10 @@ impl NiwoeShell {
     }
 
     pub(crate) fn return_to_hub(&mut self, qh: &QueueHandle<Self>) {
+        self.control_center_nav = Default::default();
+        self.ui_preview_widget_state = None;
+        self.launcher_settings_open = false;
+        self.settings_return_to_room_management = false;
         self.workspace_state.rooms.panel.open = false;
         self.panel_last_signature = None;
         self.panel_dirty = true;
@@ -56,20 +63,21 @@ impl NiwoeShell {
 
     pub(crate) fn open_system_settings_from_ipc(&mut self) {
         self.pause_first_run();
-        self.room_management_open = false;
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
-        self.launcher_settings_open = true;
-        self.settings_category = crate::settings_view::SettingsCategory::SystemOverview;
+        self.prepare_settings_category(crate::settings_view::SettingsCategory::SystemOverview);
         self.request_settings_refresh(crate::settings_view::SettingsCategory::SystemOverview);
         self.launcher_dirty = true;
         self.panel_dirty = true;
     }
 
     fn toggle_launcher(&mut self) {
-        if self.launcher_state.open { self.pause_first_run(); }
+        if self.launcher_state.open {
+            self.pause_first_run();
+        }
         self.window_picker = None;
+        self.settings_return_to_room_management = false;
         let open_before = self.launcher_state.open;
         if !open_before && self.calendar_popup_open {
             self.close_calendar_popup(CommitReason::Input);
@@ -174,19 +182,62 @@ impl NiwoeShell {
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
-        self.room_management_open = false;
-        self.room_configuration_id = None;
-        self.workspace_state.rooms.edit = None;
-        self.workspace_state.rooms.panel.open = false;
-        self.panel_last_signature = None;
-        self.launcher_settings_open = true;
-        self.settings_category = category;
+        self.prepare_settings_category(category);
         self.display_mode_dropdown_open = None;
+        self.display_pages = Default::default();
         self.request_settings_refresh(category);
         self.launcher_dirty = true;
         self.panel_dirty = true;
         self.draw_panel(qh, RepaintReason::Pointer);
         self.draw_launcher(qh, RepaintReason::Pointer);
+    }
+
+    fn prepare_settings_category(&mut self, category: crate::settings_view::SettingsCategory) {
+        if !self.launcher_settings_open {
+            self.settings_return_to_room_management = self.room_management_open;
+        }
+        if !self.room_management_open && !self.launcher_settings_open {
+            // Every settings entry uses the same full work-area layer as rooms.
+            self.launcher_layer
+                .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
+            self.launcher_layer.set_margin(0, 0, 0, 0);
+            self.launcher_layer.set_exclusive_zone(0);
+            self.launcher_layer.set_size(0, 0);
+            self.launcher_configured = false;
+            self.commit_surface(CommitSurfaceKind::Launcher, CommitReason::Input);
+        }
+        self.room_management_open = false;
+        // Keep a room/panel draft while visiting its settings; Escape restores
+        // this exact origin rather than silently discarding it.
+        self.control_center_nav = Default::default();
+        self.ui_preview_widget_state = None;
+        self.settings_search.clear();
+        self.default_apps_picker_open = None;
+        self.default_apps_page = 0;
+        self.display_mode_dropdown_open = None;
+        self.display_pages = Default::default();
+        self.launcher_settings_open = true;
+        self.settings_category = category;
+        self.wallpaper_page = 0;
+        self.provider_page = 0;
+    }
+
+    pub(crate) fn close_settings(&mut self, qh: &QueueHandle<Self>, reason: RepaintReason) {
+        self.launcher_settings_open = false;
+        self.ui_preview_widget_state = None;
+        if self.settings_return_to_room_management {
+            let configuration = self.room_configuration_id;
+            let scroll = self.room_configuration_scroll_y;
+            let page = self.room_management_page;
+            self.open_room_management(qh);
+            self.room_configuration_id = configuration;
+            self.room_configuration_scroll_y = scroll;
+            self.room_management_page = page;
+            self.draw_launcher(qh, reason);
+        } else {
+            self.return_to_hub(qh);
+        }
+        self.settings_return_to_room_management = false;
     }
 
     fn open_sound_settings_from_tray(&mut self, reason: CommitReason) {
@@ -205,8 +256,7 @@ impl NiwoeShell {
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
-        self.launcher_settings_open = true;
-        self.settings_category = crate::settings_view::SettingsCategory::Sound;
+        self.prepare_settings_category(crate::settings_view::SettingsCategory::Sound);
         self.request_settings_refresh(crate::settings_view::SettingsCategory::Sound);
         self.launcher_dirty = true;
         self.panel_dirty = true;
@@ -228,8 +278,7 @@ impl NiwoeShell {
         if !self.launcher_state.open {
             self.toggle_launcher();
         }
-        self.launcher_settings_open = true;
-        self.settings_category = crate::settings_view::SettingsCategory::Network;
+        self.prepare_settings_category(crate::settings_view::SettingsCategory::Network);
         self.request_settings_refresh(crate::settings_view::SettingsCategory::Network);
         self.launcher_dirty = true;
         self.panel_dirty = true;
@@ -256,13 +305,9 @@ impl NiwoeShell {
         }
 
         self.calendar_popup_open = true;
-        self.calendar_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
-        self.calendar_layer.set_margin(
-            crate::PANEL_POPUP_TOP_MARGIN,
-            crate::CALENDAR_POPUP_RIGHT_MARGIN,
-            0,
-            0,
-        );
+        self.calendar_layer.set_anchor(Anchor::TOP);
+        self.calendar_layer
+            .set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, 0);
         self.calendar_layer.set_exclusive_zone(0);
         self.calendar_layer.set_size(
             crate::popup_surface_w(crate::CALENDAR_POPUP_WIDTH),
@@ -322,6 +367,7 @@ impl NiwoeShell {
 
         self.workspace_state
             .select_active(self.panel_active_workspace());
+        self.close_desktop_context_menu_from_ipc();
         self.workspace_popup_open = true;
         self.workspace_hover_idx = None;
         self.workspace_layer.set_anchor(Anchor::TOP | Anchor::LEFT);
@@ -329,7 +375,7 @@ impl NiwoeShell {
             crate::PANEL_POPUP_TOP_MARGIN,
             0,
             0,
-            crate::WORKSPACE_POPUP_LEFT_MARGIN,
+            self.workspace_popup_left_margin(),
         );
         self.workspace_layer.set_exclusive_zone(0);
         self.workspace_layer.set_size(

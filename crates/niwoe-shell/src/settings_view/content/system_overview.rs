@@ -1,40 +1,38 @@
 fn build_system_overview_content(ctx: &SettingsContentContext<'_>) -> Box<dyn Widget> {
     let row_w = settings_group_inner_width(ctx.content_w);
-    let mut rows: Vec<Box<dyn Widget>> = ctx
-        .system_info
-        .rows()
-        .iter()
-        .map(|(label, value)| {
-            Box::new(SystemInfoRow {
-                label: (*label).into(),
-                value: (*value).into(),
-                row_width: row_w,
-            }) as Box<dyn Widget>
-        })
-        .collect();
-    rows.insert(0, Box::new(IntroductionButton(row_w)));
+    let values = ctx.system_info.rows().into_iter().map(|(label, value)| {
+        (
+            label.to_string(),
+            if value.is_empty() || value == "—" {
+                "Nicht verfügbar".into()
+            } else {
+                value.to_string()
+            },
+        )
+    });
+    let rows = vec![
+        readonly_settings_rows(values, row_w, None, ctx.pal),
+        Box::new(IntroductionButton(row_w)) as Box<dyn Widget>,
+    ];
     build_settings_group_page(
         ctx.content_w,
         ctx.content_h,
         "Geräteinformationen",
         "Grundlegende Daten dieser NIWOE-Installation.",
-        Box::new(Container::column(4, rows)),
+        Box::new(Container::column(SETTINGS_CHROME.option_gap, rows)),
     )
 }
 
-/// The overview has one primary action; Enter activates the visibly focused
-/// shared component. The same id dispatches pointer activation.
+/// Uses the same focus traversal and action as every other settings control.
 struct IntroductionButton(i32);
 impl IntroductionButton {
     fn component(&self) -> niwoe_ui::widget::Component<'static> {
         use niwoe_ui::widget::{Component, ComponentKind};
-        let mut component = Component::new(
+        Component::new(
             ComponentKind::Button,
-            "Einführung öffnen / fortsetzen · Enter",
+            "Einführung öffnen / fortsetzen",
             self.0,
-        );
-        component.state.focused = true;
-        component
+        )
     }
 }
 impl Widget for IntroductionButton {

@@ -26,6 +26,9 @@ pub struct BluetoothSnapshot {
     pub adapter_present: bool,
     pub powered: bool,
     pub scanning: bool,
+    /// Device, pairing and connection reads all succeeded. Unknown state must
+    /// not offer a pair action as though an existing pairing were absent.
+    pub device_status_available: bool,
     pub devices: Vec<BluetoothDevice>,
 }
 
@@ -41,42 +44,71 @@ impl BluetoothSnapshot {
         if !show.contains("Controller") {
             return Self::default();
         }
-        let powered = parse_show_flag(&show, "Powered:");
-        let scanning = parse_show_flag(&show, "Discovering:");
-        let devices = run_bluetoothctl(&["devices"])
-            .as_deref()
-            .map(|list| parse_devices(list, &paired_addresses(), &connected_addresses()))
-            .unwrap_or_default();
-        Self {
-            adapter_present: true,
-            powered,
-            scanning,
-            devices,
-        }
+        let devices = run_bluetoothctl(&["devices"]);
+        let paired = devices
+            .as_ref()
+            .and_then(|_| run_bluetoothctl(&["devices", "Paired"]));
+        let connected = devices
+            .as_ref()
+            .and_then(|_| run_bluetoothctl(&["devices", "Connected"]));
+        snapshot_from_reads(
+            &show,
+            devices.as_deref(),
+            paired.as_deref(),
+            connected.as_deref(),
+        )
     }
 }
 
-fn paired_addresses() -> Vec<String> {
-    run_bluetoothctl(&["devices", "Paired"])
-        .as_deref()
-        .map(parse_device_addresses)
-        .unwrap_or_default()
-}
-
-fn connected_addresses() -> Vec<String> {
-    run_bluetoothctl(&["devices", "Connected"])
-        .as_deref()
-        .map(parse_device_addresses)
-        .unwrap_or_default()
+fn snapshot_from_reads(
+    show: &str,
+    list: Option<&str>,
+    paired: Option<&str>,
+    connected: Option<&str>,
+) -> BluetoothSnapshot {
+    let (Some(powered), Some(scanning)) = (
+        read_show_flag(show, "Powered:"),
+        read_show_flag(show, "Discovering:"),
+    ) else {
+        return BluetoothSnapshot::default();
+    };
+    if !show.contains("Controller") {
+        return BluetoothSnapshot::default();
+    }
+    let devices = list
+        .zip(paired)
+        .zip(connected)
+        .map(|((list, paired), connected)| {
+            parse_devices(
+                list,
+                &parse_device_addresses(paired),
+                &parse_device_addresses(connected),
+            )
+        });
+    BluetoothSnapshot {
+        adapter_present: true,
+        powered,
+        scanning,
+        device_status_available: devices.is_some(),
+        devices: devices.unwrap_or_default(),
+    }
 }
 
 /// Parse a `Key: value` flag from `bluetoothctl show`, true iff value is "yes".
+#[cfg(test)]
 pub(crate) fn parse_show_flag(show: &str, key: &str) -> bool {
+    read_show_flag(show, key).unwrap_or(false)
+}
+
+fn read_show_flag(show: &str, key: &str) -> Option<bool> {
     show.lines()
         .map(str::trim)
         .find_map(|line| line.strip_prefix(key))
-        .map(|v| v.trim().eq_ignore_ascii_case("yes"))
-        .unwrap_or(false)
+        .and_then(|v| match v.trim().to_ascii_lowercase().as_str() {
+            "yes" => Some(true),
+            "no" => Some(false),
+            _ => None,
+        })
 }
 
 /// Parse `Device <ADDR> <NAME>` lines into devices, flagging paired/connected
@@ -207,6 +239,46 @@ fn run_bluetoothctl_blocking(args: &[String]) {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn failed_device_or_pairing_reads_are_unknown_and_cannot_offer_guesswork() {
+        let show = "Controller AA:BB:CC:DD:EE:FF\nPowered: yes\nDiscovering: no\n";
+        let list = "Device AA:BB:CC:DD:EE:FF Headphones\n";
+        for reads in [
+            (None, Some(""), Some("")),
+            (Some(list), None, Some("")),
+            (Some(list), Some(""), None),
+        ] {
+            let result = super::snapshot_from_reads(show, reads.0, reads.1, reads.2);
+            assert!(result.adapter_present && result.powered);
+            assert!(!result.device_status_available && result.devices.is_empty());
+        }
+        let empty = super::snapshot_from_reads(show, Some(""), Some(""), Some(""));
+        assert!(empty.device_status_available && empty.devices.is_empty());
+        let connected = super::snapshot_from_reads(show, Some(list), Some(list), Some(list));
+        assert!(
+            connected.device_status_available
+                && connected.devices[0].paired
+                && connected.devices[0].connected
+        );
+        assert!(
+            !super::snapshot_from_reads(
+                "Controller AA\nPowered: invalid\nDiscovering: no\n",
+                Some(""),
+                Some(""),
+                Some("")
+            )
+            .adapter_present
+        );
+        assert!(
+            !super::snapshot_from_reads(
+                "Controller AA\nDiscovering: no\n",
+                Some(""),
+                Some(""),
+                Some("")
+            )
+            .adapter_present
+        );
+    }
     use super::*;
 
     #[test]

@@ -5,7 +5,6 @@ use niwoe_tokens::{Interaction, Radius, WorkspaceSwitcher};
 
 use crate::{
     popup_card::{draw_card_body, draw_card_title, BODY_TOP, PAD_BOTTOM, PAD_X},
-    ui::primitives::{draw_active_indicator, ActiveIndicatorEdge},
     ClickAction, ClickZone, Painter, Rect, TextRenderer, WORKSPACE_POPUP_HEIGHT,
     WORKSPACE_POPUP_WIDTH,
 };
@@ -142,11 +141,7 @@ pub fn draw_workspace_popup(
         let is_hovered = input.hovered_idx == Some(i) || state.selected == position;
 
         let resting_bg = if is_active {
-            Interaction::DEFAULT.selection(
-                colors.surface_alt,
-                colors.accent,
-                Interaction::SELECTION_ACTIVE,
-            )
+            Interaction::DEFAULT.selected_tint(colors.surface_alt)
         } else {
             colors.surface_alt
         };
@@ -157,23 +152,13 @@ pub fn draw_workspace_popup(
         };
         painter.roundish_rect_with_radius(rect, bg, Radius::DEFAULT.sm);
         if state.selected == position {
-            let inset = niwoe_tokens::Controls::FOCUS_INSET;
-            for edge in 0..niwoe_tokens::Controls::FOCUS_WIDTH {
-                let offset = inset + edge;
-                painter.stroke_rect(
-                    Rect {
-                        x: rect.x + offset,
-                        y: rect.y + offset,
-                        w: rect.w - 2 * offset,
-                        h: rect.h - 2 * offset,
-                    },
-                    colors.text_dim,
-                );
-            }
-        }
-
-        if is_active {
-            draw_active_indicator(painter, rect, ActiveIndicatorEdge::Top, theme);
+            painter.focus(
+                rect,
+                crate::ui::tokens::theme_from_config(theme)
+                    .palette
+                    .border_focus(),
+                Radius::DEFAULT.sm,
+            );
         }
 
         let text_color = if is_active || is_occupied || is_hovered {
@@ -181,14 +166,6 @@ pub fn draw_workspace_popup(
         } else {
             colors.text_dim
         };
-        painter.text_clipped(
-            font,
-            &room.name,
-            rect.x + LAYOUT.tile_pad,
-            rect.y + LAYOUT.tile_pad + 10,
-            rect.w - 2 * LAYOUT.tile_pad,
-            text_color,
-        );
         let state_label = if is_active {
             "AKTIV"
         } else if is_occupied {
@@ -196,12 +173,16 @@ pub fn draw_workspace_popup(
         } else {
             "FREI"
         };
-        painter.text_clipped(
-            font,
+        painter.text_pair(
+            Rect {
+                x: rect.x + LAYOUT.tile_pad,
+                y: rect.y,
+                w: rect.w - 2 * LAYOUT.tile_pad,
+                h: rect.h,
+            },
+            &room.name,
             state_label,
-            rect.x + LAYOUT.tile_pad,
-            rect.y + rect.h - LAYOUT.tile_pad,
-            rect.w - 2 * LAYOUT.tile_pad,
+            text_color,
             if is_active {
                 colors.accent
             } else {

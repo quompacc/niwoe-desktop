@@ -10,6 +10,10 @@ use crate::{
 
 include!("widget_dispatch/dispatch.rs");
 include!("widget_dispatch/settings_and_context.rs");
+include!("widget_dispatch/display_paging.rs");
+include!("widget_dispatch/provider_paging.rs");
+include!("widget_dispatch/display_transform.rs");
+include!("widget_dispatch/default_apps_paging.rs");
 
 /// Map the three privileged actions to the platform session-service API. Lock
 /// and logout stay on the existing compositor IPC path.

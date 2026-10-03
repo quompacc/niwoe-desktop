@@ -9,38 +9,6 @@ const WALLPAPER_SKIP: &[&str] = &[
     "home",
 ];
 
-fn collect_images_by_dir(
-    dir: &std::path::Path,
-    out: &mut std::collections::BTreeMap<std::path::PathBuf, Vec<(u64, String)>>,
-    depth: usize,
-) {
-    if depth == 0 {
-        return;
-    }
-    let Ok(entries) = std::fs::read_dir(dir) else {
-        return;
-    };
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if path.is_dir() {
-            collect_images_by_dir(&path, out, depth - 1);
-        } else {
-            let ext = path
-                .extension()
-                .and_then(|e| e.to_str())
-                .map(|e| e.to_ascii_lowercase());
-            if matches!(ext.as_deref(), Some("png" | "jpg" | "jpeg" | "webp")) {
-                let sz = std::fs::metadata(&path).map(|m| m.len()).unwrap_or(0);
-                if let (Some(s), Some(parent)) = (path.to_str(), path.parent()) {
-                    out.entry(parent.to_path_buf())
-                        .or_default()
-                        .push((sz, s.to_string()));
-                }
-            }
-        }
-    }
-}
-
 fn wallpaper_entry_display_name(path: &str) -> String {
     let meaningful: Vec<&str> = path
         .split('/')

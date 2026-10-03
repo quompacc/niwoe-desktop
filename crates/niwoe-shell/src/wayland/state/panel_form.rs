@@ -1,6 +1,59 @@
 impl NiwoeShell {
-    pub(crate) fn panel_form_preview(&self, width: u32) -> Option<tiny_skia::Pixmap> {
+    pub(crate) fn panel_screenshot_icon(
+        icons: &crate::icons::IconCache,
+    ) -> Option<tiny_skia::Pixmap> {
+        icons
+            .lookup(
+                "camera-photo-symbolic",
+                niwoe_tokens::Panel::DEFAULT.status_icon_size as u32,
+            )
+            .and_then(crate::icons::icon_image_to_pixmap)
+    }
+    pub(crate) fn panel_form_preview(
+        &mut self,
+        width: u32,
+    ) -> Option<std::sync::Arc<tiny_skia::Pixmap>> {
+        use crate::wayland::panel_preview::{PanelPreviewCache, PreviewKey};
+        let width = PanelPreviewCache::fitted_width(width);
         let height = crate::PANEL_SURFACE_HEIGHT;
+        let key = PreviewKey {
+            width,
+            active_workspace: self.panel_active_workspace(),
+            rooms: self
+                .workspace_state
+                .rooms
+                .snapshot
+                .rooms
+                .iter()
+                .map(|room| (room.id, room.workspace, room.name.clone()))
+                .collect(),
+            occupied: self.occupied_workspaces,
+            clock: self.last_clock.clone(),
+            network_icon: self.network_controller.state().icon_name(),
+            audio_icon: self.audio_snapshot.icon_name(),
+            audio_label: self.audio_snapshot.panel_label(),
+            notifier_items: self
+                .status_notifier_items
+                .iter()
+                .map(|item| {
+                    (
+                        item.service.clone(),
+                        item.title.clone(),
+                        item.icon_name.clone(),
+                        item.menu_path.clone(),
+                    )
+                })
+                .collect(),
+            battery: self.battery_snapshot.clone(),
+            modules: self.workspace_state.rooms.panel.effective().to_vec(),
+            theme: self.theme_render_signature(),
+            icon_loader: self.icon_cache.loader_config(),
+            icon_generation: self.icon_cache.generation(),
+        };
+        if let Some(image) = self.panel_preview.get(&key) {
+            return Some(image);
+        }
+        let size = tiny_skia::IntSize::from_wh(width, height)?;
         let mut pixels = vec![0; width as usize * height as usize * 4];
         crate::panel_view::draw_panel_ui(
             &mut pixels,
@@ -21,7 +74,7 @@ impl NiwoeShell {
             &self.occupied_workspaces,
             &self.last_clock,
             &self.icon_cache,
-            None,
+            Self::panel_screenshot_icon(&self.icon_cache),
             self.workspace_state.rooms.panel.effective(),
             &self.theme,
             &|_| niwoe_ui::WidgetState::Idle,
@@ -30,7 +83,8 @@ impl NiwoeShell {
         for pixel in pixels.as_chunks_mut::<4>().0 {
             pixel.swap(0, 2);
         }
-        tiny_skia::Pixmap::from_vec(pixels, tiny_skia::IntSize::from_wh(width, height)?)
+        let image = tiny_skia::Pixmap::from_vec(pixels, size)?;
+        Some(self.panel_preview.insert(key, image))
     }
     pub(crate) fn control_center_sidebar_click(
         &mut self,
@@ -40,7 +94,6 @@ impl NiwoeShell {
         height: u32,
     ) -> bool {
         let c = niwoe_tokens::ControlCenter::DEFAULT;
-        let s = niwoe_tokens::Spacing::DEFAULT;
         if x < 0 || x >= c.sidebar_width {
             return false;
         }
@@ -49,7 +102,8 @@ impl NiwoeShell {
         {
             return true;
         }
-        if y >= height as i32 - c.config_footer_height {
+        let back = crate::control_center::back_rect(height);
+        if x >= back.x && x < back.x + back.width && y >= back.y && y < back.y + back.height {
             if self.workspace_state.rooms.panel.open {
                 self.panel_form_action(qh, 13);
             } else if self.room_configuration_id.is_some() {
@@ -57,50 +111,8 @@ impl NiwoeShell {
             } else {
                 self.return_to_hub(qh);
             }
-            return true;
-        }
-        let top = c.outer_pad + s.xxl * 2;
-        if y >= top && y < top + crate::room_management_view::sidebar_row_height(height) * 7 {
-            let index = (y - top) / crate::room_management_view::sidebar_row_height(height);
-            use crate::settings_view::SettingsCategory as Category;
-            match index {
-                0 => self.return_to_hub(qh),
-                1 => {
-                    self.workspace_state.rooms.panel.open = false;
-                    self.panel_dirty = true;
-                    self.panel_last_signature = None;
-                    self.return_to_room_management(qh);
-                }
-                2 if self.room_configuration_id.is_some() => {
-                    self.room_form_tab(1);
-                    self.draw_launcher(qh, RepaintReason::Pointer);
-                }
-                2 => self.open_settings_category(qh, Category::DefaultApps),
-                3 if self.room_configuration_id.is_some() => {
-                    self.room_form_tab(2);
-                    self.draw_launcher(qh, RepaintReason::Pointer);
-                }
-                4 => self.open_settings_category(qh, Category::Users),
-                5 => self.open_settings_category(qh, Category::SystemOverview),
-                6 => self.open_panel_form(qh),
-                _ => {}
-            }
-        } else {
-            let top = top
-                + crate::room_management_view::sidebar_row_height(height) * 7
-                + c.sidebar_section_gap
-                + s.xxl;
-            if y >= top && y < top + crate::room_management_view::sidebar_row_height(height) * 4 {
-                match (y - top) / crate::room_management_view::sidebar_row_height(height) {
-                    0 => self.open_settings_category(
-                        qh,
-                        crate::settings_view::SettingsCategory::Updates,
-                    ),
-                    3 => self
-                        .open_settings_category(qh, crate::settings_view::SettingsCategory::Cursor),
-                    _ => {}
-                }
-            }
+        } else if let Some(page) = crate::control_center::hit(height, x, y) {
+            self.navigate_control_center_page(qh, page);
         }
         true
     }
@@ -121,7 +133,7 @@ impl NiwoeShell {
     }
     pub(crate) fn panel_form_action(&mut self, qh: &QueueHandle<Self>, index: usize) {
         let state = &mut self.workspace_state.rooms.panel;
-        if state.pending.is_some() {
+        if !crate::room_management_view::panel::enabled(state, index) {
             return;
         }
         state.focus = index;
@@ -152,6 +164,7 @@ impl NiwoeShell {
             13 => {
                 state.open = false;
                 state.draft = state.saved.clone();
+                self.panel_preview.clear();
             }
             _ => {}
         }
@@ -176,7 +189,17 @@ impl NiwoeShell {
         match key {
             Keysym::Escape => self.panel_form_action(qh, 13),
             Keysym::Tab | Keysym::ISO_Left_Tab => {
-                state.focus = (state.focus + if key == Keysym::Tab { 1 } else { 13 }) % 14;
+                let order = crate::room_management_view::panel::focus_order(state);
+                if let Some(position) = order.iter().position(|index| *index == state.focus) {
+                    let next = if key == Keysym::Tab {
+                        position + 1
+                    } else {
+                        position + order.len() - 1
+                    };
+                    state.focus = order[next % order.len()];
+                } else if let Some(first) = order.first() {
+                    state.focus = *first;
+                }
                 self.draw_launcher(qh, RepaintReason::Keyboard);
             }
             Keysym::Return | Keysym::KP_Enter | Keysym::space => {

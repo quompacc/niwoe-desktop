@@ -6,6 +6,14 @@
 
 use std::fs;
 
+#[derive(Debug, Clone, Default)]
+pub(crate) enum UserState {
+    #[default]
+    Loading,
+    Ready(UserAccounts),
+    Unavailable,
+}
+
 const UNKNOWN: &str = "—";
 const MIN_HUMAN_UID: u32 = 1000;
 const MAX_HUMAN_UID: u32 = 60_000;
@@ -23,15 +31,12 @@ pub struct UserAccounts {
 }
 
 impl UserAccounts {
-    pub fn gather() -> Self {
+    pub(crate) fn gather() -> UserState {
         let current = std::env::var("USER")
             .ok()
             .filter(|s| !s.is_empty())
             .unwrap_or_else(|| UNKNOWN.to_string());
-        let accounts = fs::read_to_string("/etc/passwd")
-            .map(|s| parse_local_users(&s))
-            .unwrap_or_default();
-        Self { current, accounts }
+        state_from_source(current, fs::read_to_string("/etc/passwd"))
     }
 
     /// Label/value rows for the settings view: the current login first, then
@@ -42,15 +47,25 @@ impl UserAccounts {
             rows.push(("Konten".to_string(), "keine lokalen Benutzer".to_string()));
         } else {
             for user in &self.accounts {
-                let marker = if user.name == self.current {
-                    " (aktiv)"
+                let status = if user.name == self.current {
+                    "Angemeldetes Konto"
                 } else {
-                    ""
+                    "Lokales Konto"
                 };
-                rows.push((user.name.clone(), format!("UID {}{}", user.uid, marker)));
+                rows.push((user.name.clone(), status.to_string()));
             }
         }
         rows
+    }
+}
+
+fn state_from_source(current: String, source: std::io::Result<String>) -> UserState {
+    match source {
+        Ok(passwd) => UserState::Ready(UserAccounts {
+            current,
+            accounts: parse_local_users(&passwd),
+        }),
+        Err(_) => UserState::Unavailable,
     }
 }
 
@@ -77,6 +92,22 @@ fn parse_local_users(passwd: &str) -> Vec<LocalUser> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unreadable_accounts_are_distinct_from_a_successfully_empty_list() {
+        assert!(matches!(
+            state_from_source(
+                "user".into(),
+                Err(std::io::ErrorKind::PermissionDenied.into())
+            ),
+            UserState::Unavailable
+        ));
+        let UserState::Ready(accounts) = state_from_source("user".into(), Ok(String::new())) else {
+            panic!("empty successful source must be ready")
+        };
+        assert!(accounts.accounts.is_empty());
+        assert_eq!(accounts.current, "user");
+    }
 
     #[test]
     fn parse_filters_to_human_uids() {
@@ -129,8 +160,8 @@ mod tests {
         );
         assert!(rows
             .iter()
-            .any(|(l, v)| l == "eduard" && v == "UID 1000 (aktiv)"));
-        assert!(rows.iter().any(|(l, v)| l == "bob" && v == "UID 1001"));
+            .any(|(l, v)| l == "eduard" && v == "Angemeldetes Konto"));
+        assert!(rows.iter().any(|(l, v)| l == "bob" && v == "Lokales Konto"));
     }
 
     #[test]

@@ -16,6 +16,27 @@ fn next_focus(current: Option<usize>, count: usize, backwards: bool) -> Option<u
     })
 }
 
+fn management_focus(
+    current: Option<usize>,
+    room_count: usize,
+    total_count: usize,
+    page: usize,
+    backwards: bool,
+) -> Option<usize> {
+    let mut order: Vec<_> = (0..room_count).collect();
+    if total_count < niwoe_config::rooms::MAX_ROOMS {
+        order.push(room_count);
+    }
+    order.extend(room_count + 1..room_count + 6);
+    for action in [8, 9, 6, 7] {
+        if crate::room_management_view::pages::enabled(action, room_count, page) {
+            order.push(room_count + 2 + action);
+        }
+    }
+    let index = current.and_then(|value| order.iter().position(|item| *item == value));
+    next_focus(index, order.len(), backwards).map(|index| order[index])
+}
+
 impl NiwoeShell {
     pub(super) fn hub_navigation_key(&mut self, qh: &QueueHandle<Self>, key: Keysym) -> bool {
         let room_count = self
@@ -94,8 +115,13 @@ impl NiwoeShell {
                 | Keysym::Up
                 | Keysym::Down
         ) {
-            self.room_keyboard_focus =
-                next_focus(self.room_keyboard_focus, room_count + 6, backwards);
+            self.room_keyboard_focus = management_focus(
+                self.room_keyboard_focus,
+                room_count,
+                self.workspace_state.rooms.snapshot.rooms.len(),
+                self.room_management_page,
+                backwards,
+            );
             let focus = self.room_keyboard_focus.unwrap_or(0);
             self.workspace_state.rooms.list.search_focus = focus == room_count + 1;
             self.workspace_state.rooms.list.focus = if focus >= room_count + 2 {
@@ -103,9 +129,11 @@ impl NiwoeShell {
             } else {
                 None
             };
-            self.room_management_page = focus.min(room_count.saturating_sub(1))
-                / (niwoe_tokens::ControlCenter::DEFAULT.room_columns as usize
-                    * niwoe_tokens::ControlCenter::DEFAULT.room_page_rows as usize);
+            if focus < room_count {
+                self.room_management_page = focus
+                    / (niwoe_tokens::ControlCenter::DEFAULT.room_columns as usize
+                        * niwoe_tokens::ControlCenter::DEFAULT.room_page_rows as usize);
+            }
             self.draw_launcher(qh, RepaintReason::Keyboard);
         } else if matches!(key, Keysym::Return | Keysym::KP_Enter) {
             match self.room_keyboard_focus {
@@ -131,7 +159,7 @@ impl NiwoeShell {
 
 #[cfg(test)]
 mod tests {
-    use super::next_focus;
+    use super::{management_focus, next_focus};
 
     #[test]
     fn room_focus_cycles_and_wraps() {
@@ -140,5 +168,13 @@ mod tests {
         assert_eq!(next_focus(None, 4, true), Some(3));
         assert_eq!(next_focus(Some(0), 4, true), Some(3));
         assert_eq!(next_focus(None, 0, false), None);
+    }
+
+    #[test]
+    fn management_focus_skips_unavailable_pages_and_new_room_at_capacity() {
+        assert_eq!(management_focus(Some(20), 9, 9, 0, false), Some(18));
+        assert_eq!(management_focus(Some(20), 9, 9, 1, false), Some(17));
+        assert_eq!(management_focus(Some(63), 64, 64, 0, false), Some(65));
+        assert_eq!(management_focus(Some(11), 0, 0, 0, false), Some(0));
     }
 }

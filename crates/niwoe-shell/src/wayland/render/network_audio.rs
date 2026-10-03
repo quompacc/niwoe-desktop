@@ -54,6 +54,9 @@ impl NiwoeShell {
                         .unwrap_or(false),
                     active_tab: self.network_popup_tab,
                     wifi_networks: &self.wifi_networks,
+                    wifi_refresh_pending: self
+                        .settings_refresh_inflight
+                        .contains(&crate::settings_view::SettingsCategory::Network),
                 },
             );
         }

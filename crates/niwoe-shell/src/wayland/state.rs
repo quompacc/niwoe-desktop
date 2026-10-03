@@ -337,11 +337,20 @@ struct WallpaperPickerCommand {
 }
 
 fn wallpaper_picker_command() -> WallpaperPickerCommand {
-    const NIWOE_ARGS: &[&str] = &["--title", "Choose Wallpaper"];
+    const NIWOE_ARGS: &[&str] = &[
+        "--title",
+        "Hintergrundbild auswählen",
+        "--ok-label",
+        "Auswählen",
+        "--cancel-label",
+        "Abbrechen",
+    ];
     const ZENITY_ARGS: &[&str] = &[
         "--file-selection",
-        "--title=Choose Wallpaper",
-        "--file-filter=Images | *.jpg *.jpeg *.png *.webp",
+        "--title=Hintergrundbild auswählen",
+        "--ok-label=Auswählen",
+        "--cancel-label=Abbrechen",
+        "--file-filter=Bilder | *.jpg *.jpeg *.png *.webp",
     ];
 
     if std::path::Path::new("/usr/local/bin/niwoe-file-picker").is_file() {
@@ -392,7 +401,9 @@ fn first_minimized_pinned_app_window_id(
 }
 
 include!("state/timers.rs");
+include!("state/settings_refresh.rs");
 include!("state/ipc_events.rs");
+include!("state/launcher_workers.rs");
 include!("state/popups.rs");
 include!("state/audio_and_network_popups.rs");
 include!("state/shell_actions.rs");
@@ -405,33 +416,6 @@ fn hidden_apps_path() -> String {
         .into_owned()
 }
 
-pub(crate) fn load_wallpaper_thumbnail(
-    path: &str,
-    max_w: u32,
-    max_h: u32,
-) -> Option<(u32, u32, Vec<u8>)> {
-    let img = image::open(path).ok()?;
-    let thumb = img.thumbnail(max_w, max_h);
-    let rgba = thumb.to_rgba8();
-    let (w, h) = (rgba.width(), rgba.height());
-    let premul: Vec<u8> = rgba
-        .into_raw()
-        .as_chunks::<4>()
-        .0
-        .iter()
-        .flat_map(|c| {
-            let a = c[3] as u16;
-            [
-                ((c[0] as u16 * a) / 255) as u8,
-                ((c[1] as u16 * a) / 255) as u8,
-                ((c[2] as u16 * a) / 255) as u8,
-                c[3],
-            ]
-        })
-        .collect();
-    Some((w, h, premul))
-}
-
 #[cfg(test)]
 #[path = "state_tests.rs"]
 mod tests;
@@ -440,4 +424,5 @@ include!("state/deck_actions.rs");
 include!("state/rooms.rs");
 include!("state/room_form.rs");
 include!("state/panel_form.rs");
+include!("state/control_center.rs");
 include!("state/first_run.rs");

@@ -18,7 +18,7 @@ impl Default for CalendarDisplayPolicy {
 
 pub(crate) fn weekday_labels(week_start: WeekStart) -> [&'static str; 7] {
     match week_start {
-        WeekStart::Monday => ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+        WeekStart::Monday => ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
     }
 }
 
@@ -180,7 +180,7 @@ mod tests {
     fn weekday_labels_follow_selected_week_start() {
         assert_eq!(
             weekday_labels(WeekStart::Monday),
-            ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]
+            ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
         );
     }
 }

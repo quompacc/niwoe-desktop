@@ -97,7 +97,7 @@ pub(crate) fn draw(
     let Some(mut pm) = tiny_skia::PixmapMut::from_bytes(canvas, width, height) else {
         return;
     };
-    let p = crate::ui::tokens::theme_from_config(theme).palette;
+    let p = crate::ui::tokens::bgra_palette_from_config(theme);
     let rect = card(width, height);
     fill(&mut pm, rect, p.surface);
     if let Some(path) = rounded_rect_path(rect, Radius::DEFAULT.md) {
@@ -138,9 +138,7 @@ pub(crate) fn draw(
         };
         if index == picker.selected.min(count.saturating_sub(1)) {
             fill(&mut pm, r, p.surface_alt);
-            if let Some(path) = rounded_rect_path(r, Radius::DEFAULT.md) {
-                paint_border(&mut pm, &path, p.accent, Controls::FOCUS_WIDTH as f32);
-            }
+            niwoe_ui::effect::paint_focus(&mut pm, r, p.border_focus(), Radius::DEFAULT.md);
         }
         let (label, detail) = if picker.target_window.is_some() {
             let room = &rooms[index];
@@ -164,20 +162,16 @@ pub(crate) fn draw(
             } else {
                 0
             };
-        paint_text(
+        niwoe_ui::effect::paint_text_pair(
             &mut pm,
-            &truncate_to_fit(&label, text_width, body),
-            r.x + pad,
-            y + L::ROW_HEIGHT / 2 - pad / 2,
-            body,
+            Rect {
+                x: r.x + pad,
+                width: text_width,
+                ..r
+            },
+            &label,
+            &detail,
             p.text,
-        );
-        paint_text(
-            &mut pm,
-            &truncate_to_fit(&detail, text_width, caption),
-            r.x + pad,
-            y + L::ROW_HEIGHT - pad / 2,
-            caption,
             p.text_dim,
         );
         if picker.target_window.is_none() {
@@ -242,6 +236,43 @@ fn title(window: &WindowInfo) -> &str {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn focus_keeps_the_neutral_token_color_in_the_bgra_shell_buffer() {
+        let theme = niwoe_config::ThemeConfig::default();
+        let mut canvas = vec![0; 880 * 620 * 4];
+        let room = RoomEntry {
+            id: 1,
+            workspace: 1,
+            name: "ÄÖÜ Arbeitsraum".into(),
+            description: String::new(),
+            assignment: niwoe_ipc::RoomAssignment::Free,
+            preferences: Default::default(),
+        };
+        draw(
+            &mut canvas,
+            880,
+            620,
+            &Picker {
+                target_window: Some("window".into()),
+                ..Default::default()
+            },
+            &[],
+            &[room],
+            &theme,
+        );
+        let r = card(880, 620);
+        let x = r.x
+            + Spacing::DEFAULT.md
+            + Controls::FOCUS_INSET
+            + Radius::DEFAULT.md
+            + Spacing::DEFAULT.md;
+        let y = r.y + L::HEADER + Controls::FOCUS_INSET;
+        let offset = ((y * 880 + x) * 4) as usize;
+        let a = crate::ui::tokens::theme_from_config(&theme)
+            .palette
+            .border_focus();
+        assert_eq!(&canvas[offset..offset + 4], &[a.b, a.g, a.r, a.a]);
+    }
     #[test]
     fn pages_reach_last_window_and_room_and_clamp_after_close() {
         assert_eq!(visible(63, 64), 60..64);
@@ -315,6 +346,9 @@ mod tests {
         );
         assert!(canvas.iter().any(|v| *v != 0));
         if let Ok(path) = std::env::var("NIWOE_PICKER_PREVIEW") {
+            for pixel in canvas.as_chunks_mut::<4>().0 {
+                pixel.swap(0, 2);
+            }
             tiny_skia::Pixmap::from_vec(canvas, tiny_skia::IntSize::from_wh(880, 620).unwrap())
                 .unwrap()
                 .save_png(path)

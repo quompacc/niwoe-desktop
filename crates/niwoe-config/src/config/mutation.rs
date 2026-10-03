@@ -284,41 +284,24 @@ impl NiwoeConfig {
         }
     }
 
-    /// Scan standard wallpaper directories; group resolution variants into one entry per pack.
+    /// Scan explicit wallpaper roots, verified packages and the current selection.
     pub fn scan_wallpaper_dirs() -> Vec<WallpaperEntry> {
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
-        let top_dirs: &[std::path::PathBuf] = &[
+        let home = std::env::var("HOME").unwrap_or_default();
+        let home = std::path::PathBuf::from(home);
+        let roots = [
             std::path::PathBuf::from("/usr/share/wallpapers"),
             std::path::PathBuf::from("/usr/share/backgrounds"),
-            std::path::PathBuf::from(format!("{}/Pictures", home)),
+            home.join(".local/share/wallpapers"),
+            home.join("Pictures/Wallpapers"),
+            home.join("Bilder/Hintergründe"),
         ];
-        let mut by_dir: std::collections::BTreeMap<std::path::PathBuf, Vec<(u64, String)>> =
-            std::collections::BTreeMap::new();
-        for dir in top_dirs {
-            if dir.exists() {
-                collect_images_by_dir(dir, &mut by_dir, 5);
-            }
-        }
-        let mut entries: Vec<WallpaperEntry> = Vec::new();
-        for (dir, mut files) in by_dir {
-            if files.is_empty() {
-                continue;
-            }
-            files.sort_by_key(|(sz, _)| *sz);
-            let thumbnail_path = files[0].1.clone();
-            let apply_path = files.last().unwrap().1.clone();
-            let display_name = if files.len() == 1 {
-                wallpaper_entry_display_name(&apply_path)
-            } else {
-                wallpaper_dir_display_name(&dir)
-            };
-            entries.push(WallpaperEntry {
-                display_name,
-                apply_path,
-                thumbnail_path,
-            });
-        }
-        entries.sort_by(|a, b| a.display_name.cmp(&b.display_name));
-        entries
+        let current = Self::load().wallpaper.map(|wallpaper| {
+            wallpaper
+                .path
+                .strip_prefix("~/")
+                .map(|tail| home.join(tail).to_string_lossy().into_owned())
+                .unwrap_or(wallpaper.path)
+        });
+        wallpaper_catalog::scan(&roots, current.as_deref())
     }
 }

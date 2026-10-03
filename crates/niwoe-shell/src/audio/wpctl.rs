@@ -29,6 +29,14 @@ pub(super) fn set_default(id: u32) {
 }
 
 fn parse_wpctl_status(output: &str) -> AudioSnapshot {
+    // A successful process exit alone does not make its output a device list.
+    // Empty but structurally valid sections remain a genuine empty snapshot.
+    if !["Sinks:", "Sources:"]
+        .iter()
+        .all(|section| output.lines().any(|line| line.trim().ends_with(section)))
+    {
+        return AudioSnapshot::unavailable();
+    }
     let outputs = parse_section_devices(output, "Sinks:");
     let inputs = parse_section_devices(output, "Sources:");
     let default_output = outputs.iter().find(|device| device.is_default).cloned();
@@ -154,6 +162,19 @@ fn run_wpctl(args: &[String]) {
 #[cfg(test)]
 mod tests {
     use super::{parse_wpctl_status, set_default_args, set_mute_args, set_volume_args};
+
+    #[test]
+    fn malformed_success_is_unavailable_but_valid_empty_sections_are_running() {
+        for output in ["", "unexpected provider response", "Audio\nSinks:\n"] {
+            assert_eq!(
+                parse_wpctl_status(output),
+                super::AudioSnapshot::unavailable()
+            );
+        }
+        let empty = parse_wpctl_status("Audio\nSinks:\nSources:\nFilters:\n");
+        assert_eq!(empty.service, super::AudioServiceState::Running);
+        assert!(empty.outputs.is_empty() && empty.inputs.is_empty());
+    }
 
     #[test]
     fn parse_wpctl_status_extracts_default_sink_and_source() {

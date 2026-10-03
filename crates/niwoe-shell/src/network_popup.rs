@@ -45,6 +45,7 @@ pub struct NetworkPopupState<'a> {
     pub logout_armed: bool,
     pub active_tab: NetworkTab,
     pub wifi_networks: &'a [WifiNetwork],
+    pub wifi_refresh_pending: bool,
 }
 
 /// Top of the tab strip, just under the title rule.
@@ -99,7 +100,13 @@ pub fn draw_network_popup(
             draw_card_body(painter, theme);
             draw_card_title(painter, font, theme, "Netzwerk");
             draw_tabs(painter, font, theme, state.active_tab);
-            draw_wifi_tab(painter, font, theme, state.wifi_networks);
+            draw_wifi_tab(
+                painter,
+                font,
+                theme,
+                state.wifi_networks,
+                state.wifi_refresh_pending,
+            );
             let link_rect = draw_footer_link(
                 painter,
                 font,
@@ -117,6 +124,7 @@ fn draw_wifi_tab(
     font: &RefCell<Option<TextRenderer>>,
     theme: &ThemeConfig,
     wifi_networks: &[WifiNetwork],
+    refresh_pending: bool,
 ) {
     let width = NETWORK_POPUP_WIDTH as i32;
 
@@ -124,7 +132,11 @@ fn draw_wifi_tab(
         WIFI_ROW_RECTS.with(|r| r.borrow_mut().clear());
         painter.text_clipped(
             font,
-            "Keine WLAN-Netzwerke gefunden",
+            if refresh_pending {
+                "WLAN-Netzwerke werden gesucht …"
+            } else {
+                "Keine WLAN-Netzwerke gefunden"
+            },
             PAD_X,
             CONTENT_TOP + ROW_TEXT_BASELINE_OFFSET,
             width - 2 * PAD_X,
@@ -151,25 +163,43 @@ fn draw_wifi_tab(
             glass_dim_from_config(theme),
         );
 
-        // Left: SSID, accent-coloured when this is the connected network, plus
-        // a leading check mark; a trailing lock mark when it is secured.
-        let label = if net.secured {
-            format!("{} \u{1f512}", net.ssid)
-        } else {
-            net.ssid.clone()
-        };
-        let label = if net.in_use {
-            format!("\u{2713} {label}")
-        } else {
-            label
-        };
+        // Reserve separate symbol slots so long SSIDs cannot displace security.
+        let size = niwoe_tokens::Controls::SYMBOL_SIZE;
+        let gap = niwoe_tokens::Spacing::DEFAULT.sm;
+        let icon_y = row_y + (ROW_HEIGHT - size as i32) / 2;
         let ssid_color = if net.in_use {
             theme.colors.accent
         } else {
             glass_foreground_from_config(theme)
         };
-        let ssid_max = signal_x - PAD_X - 8;
-        painter.text_clipped(font, &label, PAD_X, baseline, ssid_max.max(0), ssid_color);
+        if net.in_use {
+            painter.symbol(
+                niwoe_ui::effect::Symbol::Check,
+                PAD_X,
+                icon_y,
+                ssid_color,
+                size,
+            );
+        }
+        let lock_x = signal_x - gap - size as i32;
+        if net.secured {
+            painter.symbol(
+                niwoe_ui::effect::Symbol::Lock,
+                lock_x,
+                icon_y,
+                glass_dim_from_config(theme),
+                size,
+            );
+        }
+        let ssid_x = PAD_X + size as i32 + gap;
+        painter.text_clipped(
+            font,
+            &net.ssid,
+            ssid_x,
+            baseline,
+            (lock_x - gap - ssid_x).max(0),
+            ssid_color,
+        );
 
         rects.push(Rect {
             x: 0,
@@ -329,6 +359,7 @@ mod tests {
                 logout_armed: false,
                 active_tab,
                 wifi_networks: nets,
+                wifi_refresh_pending: false,
             },
         );
     }

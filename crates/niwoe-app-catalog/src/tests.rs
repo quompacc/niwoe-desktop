@@ -1,6 +1,18 @@
 use super::*;
 
 #[test]
+fn mime_handler_metadata_allows_nodisplay_but_keeps_validation() {
+    let raw = "[Desktop Entry]\nType=Application\nName=Installed Handler\nExec=viewer %U\nIcon=viewer.png\nNoDisplay=true\n";
+    assert!(DesktopApp::parse(raw).is_err());
+    let app = DesktopApp::parse_mime_handler(raw).unwrap();
+    assert_eq!(app.name, "Installed Handler");
+    assert_eq!(app.icon_name.as_deref(), Some("viewer"));
+    assert!(DesktopApp::parse_mime_handler(&(raw.to_owned() + "Hidden=true\n")).is_err());
+    assert!(DesktopApp::parse_mime_handler(&raw.replace("Exec=viewer %U\n", "")).is_err());
+    assert!(DesktopApp::parse_mime_handler(&raw.replace("Type=Application", "Type=Link")).is_err());
+}
+
+#[test]
 fn parses_and_normalizes_desktop_entry() {
     let app = DesktopApp::parse("[Desktop Entry]\nType=Application\nName=Firefox\nExec=firefox --new-window %u\nCategories=Network;WebBrowser;\nIcon=firefox.png\n").unwrap();
     assert_eq!(app.name, "Firefox");

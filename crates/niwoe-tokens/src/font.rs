@@ -8,6 +8,9 @@
 /// Adwaita Sans Regular — the NIWOE desktop UI typeface.
 pub const ADWAITA_SANS_REGULAR: &[u8] = include_bytes!("../assets/fonts/AdwaitaSans-Regular.ttf");
 
+/// Noto Serif Regular 2.015, SIL OFL 1.1; only for large page headings.
+pub const NOTO_SERIF_REGULAR: &[u8] = include_bytes!("../assets/fonts/NotoSerif-Regular.ttf");
+
 /// Required desktop labels/symbols. A resolved face lacking these uses the
 /// embedded face consistently for metrics and painting in both shell paths.
 pub const REQUIRED_UI_GLYPHS: &str = "ÄÖÜ äöü ß € – … ← → ✓";

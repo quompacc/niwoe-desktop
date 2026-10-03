@@ -3,7 +3,7 @@ use super::*;
 #[test]
 fn complete_form_controls_have_visible_hits_with_shared_small_canvas() {
     for (physical_w, physical_h) in [(1920, 1032), (1366, 720), (1280, 672), (960, 492)] {
-        let (width, height) = niwoe_tokens::Hub::DEFAULT.canvas_size(physical_w, physical_h);
+        let (width, height) = C.canvas_size(physical_w, physical_h);
         for index in [9, 10, 11, 8, 12, 13] {
             let initial = form::rect(width, 0, index);
             let scroll = (initial.y + initial.height
@@ -26,6 +26,15 @@ fn complete_form_controls_have_visible_hits_with_shared_small_canvas() {
                 Some(index)
             );
         }
+        let unavailable = form::tab_rect(4);
+        assert!(unavailable.x + unavailable.width < width as i32);
+        assert_eq!(
+            form::hit_tab(
+                unavailable.x + unavailable.width / 2,
+                unavailable.y + unavailable.height / 2
+            ),
+            None
+        );
         for index in [14, 15, 16, 20, 21, 22, 23, 24, 25] {
             let r = form::app_rect(width, index);
             assert!(r.y + r.height < height as i32 - C.config_footer_height);
@@ -119,8 +128,8 @@ fn configuration_footer_and_context_have_readable_geometry() {
     assert!(row_height >= S.lg + S.xl + S.md);
     for height in [720, 1032, 1200] {
         assert_eq!(
-            preview_height(height) + C.card_gap,
-            C.config_details_height + C.config_context_height + C.card_gap * 2
+            preview_height(height),
+            C.config_preview_height.min(body_height(height))
         );
         assert_eq!(note_height(height), lower_height(height));
     }
@@ -131,8 +140,8 @@ fn configuration_renders_selected_room() {
     let creating = std::env::var_os("NIWOE_PREVIEW_CREATE").is_some();
     let room = RoomEntry {
         preferences: Default::default(),
-        id: 2,
-        workspace: 2,
+        id: if creating { 0 } else { 2 },
+        workspace: if creating { 0 } else { 2 },
         name: if creating {
             "Neuer Raum"
         } else {
@@ -152,6 +161,8 @@ fn configuration_renders_selected_room() {
         position: 1,
         name_error: String::new(),
         restore: crate::room_editor::RestoreUi {
+            ready: true,
+            revision: 1,
             open: std::env::var_os("NIWOE_PREVIEW_RESTORE").is_some(),
             message: "Beendet: 1 angeordnet, 1 nicht wiederhergestellt".into(),
             results: vec![
@@ -211,6 +222,8 @@ fn configuration_renders_selected_room() {
         false,
         scroll_y,
         &crate::icons::IconCache::new(),
+        &crate::hub_state::HubState::default(),
+        &[],
         &niwoe_config::ThemeConfig::default(),
     );
     assert!(canvas.as_chunks::<4>().0.iter().any(|pixel| pixel[3] != 0));

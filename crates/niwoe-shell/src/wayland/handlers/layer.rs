@@ -8,9 +8,9 @@ use wayland_client::{Connection, QueueHandle};
 use crate::wayland::{NiwoeShell, RepaintReason};
 use crate::{
     AUDIO_POPUP_HEIGHT, AUDIO_POPUP_RIGHT_MARGIN, AUDIO_POPUP_WIDTH, CALENDAR_POPUP_HEIGHT,
-    CALENDAR_POPUP_RIGHT_MARGIN, CALENDAR_POPUP_WIDTH, LAUNCHER_HEIGHT, LAUNCHER_WIDTH,
-    NETWORK_POPUP_HEIGHT, NETWORK_POPUP_RIGHT_MARGIN, NETWORK_POPUP_WIDTH, SNI_MENU_RIGHT_MARGIN,
-    WORKSPACE_POPUP_HEIGHT, WORKSPACE_POPUP_LEFT_MARGIN, WORKSPACE_POPUP_WIDTH,
+    CALENDAR_POPUP_WIDTH, LAUNCHER_HEIGHT, LAUNCHER_WIDTH, NETWORK_POPUP_HEIGHT,
+    NETWORK_POPUP_RIGHT_MARGIN, NETWORK_POPUP_WIDTH, SNI_MENU_RIGHT_MARGIN, WORKSPACE_POPUP_HEIGHT,
+    WORKSPACE_POPUP_WIDTH,
 };
 
 impl LayerShellHandler for NiwoeShell {
@@ -40,6 +40,7 @@ impl LayerShellHandler for NiwoeShell {
         if self.launcher_layer == *layer {
             warn!("Launcher layer surface closed by compositor; recovering launcher state");
             self.hub.clear();
+            self.panel_preview.clear();
             self.launcher_state.open = false;
             self.launcher_configured = false;
             self.launcher_dirty = false;
@@ -235,14 +236,14 @@ impl LayerShellHandler for NiwoeShell {
                     .set_anchor(Anchor::TOP | Anchor::BOTTOM | Anchor::LEFT | Anchor::RIGHT);
                 self.launcher_layer.set_margin(0, 0, 0, 0);
                 self.launcher_layer
-                    .set_exclusive_zone(if self.room_management_open { 0 } else { -1 });
+                    .set_exclusive_zone(if self.control_center_visible() { 0 } else { -1 });
                 self.launcher_layer.set_size(0, 0);
                 let w = configure.new_size.0.max(1);
                 let h = configure.new_size.1.max(1);
                 self.launcher_configured = true;
                 self.launcher_width = w;
                 self.launcher_height = h;
-                if self.room_management_open {
+                if self.control_center_visible() {
                     self.launcher_visual_x = 0;
                     self.launcher_visual_y = 0;
                 } else {
@@ -282,13 +283,9 @@ impl LayerShellHandler for NiwoeShell {
                 surface_w,
                 surface_h
             );
-            self.calendar_layer.set_anchor(Anchor::TOP | Anchor::RIGHT);
-            self.calendar_layer.set_margin(
-                crate::PANEL_POPUP_TOP_MARGIN,
-                CALENDAR_POPUP_RIGHT_MARGIN,
-                0,
-                0,
-            );
+            self.calendar_layer.set_anchor(Anchor::TOP);
+            self.calendar_layer
+                .set_margin(crate::PANEL_POPUP_TOP_MARGIN, 0, 0, 0);
             self.calendar_layer.set_exclusive_zone(0);
             self.calendar_layer.set_size(surface_w, surface_h);
             self.calendar_configured = true;
@@ -312,7 +309,7 @@ impl LayerShellHandler for NiwoeShell {
                 crate::PANEL_POPUP_TOP_MARGIN,
                 0,
                 0,
-                WORKSPACE_POPUP_LEFT_MARGIN,
+                self.workspace_popup_left_margin(),
             );
             self.workspace_layer.set_exclusive_zone(0);
             self.workspace_layer.set_size(surface_w, surface_h);

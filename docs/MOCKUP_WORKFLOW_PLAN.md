@@ -1,5 +1,11 @@
 # Verbindlicher Mockup- und Workflowplan
 
+**Aktuelle Korrektur 02.10.2026:** Frühere visuelle Bestätigungen weiter unten
+sind historische Checkpoints. Die erneute Nutzerrückmeldung und Live-Prüfung
+öffnen die betroffenen visuellen Gates P02–P12 wieder. Hub und Control Center
+sind trotz vorhandener Funktionstests nicht bildtreu fertig umgesetzt.
+[Belege und Reparaturfolge](phase-reports/UI_VISUAL_AUDIT_2026-10-02.md).
+
 Stand: 25.09.2026. Dieser Plan konkretisiert die Phasen P00–P13 in
 [`NIWOE_IMPLEMENTATION_PLAN.md`](../NIWOE_IMPLEMENTATION_PLAN.md). Maßgebliche
 visuelle Quelle sind **die letzten vier** PNGs

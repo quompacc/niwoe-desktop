@@ -1,92 +1,140 @@
 fn build_sound_content(ctx: &SettingsContentContext<'_>) -> Box<dyn Widget> {
+    let c = SETTINGS_CHROME;
     let row_w = settings_group_inner_width(ctx.content_w);
-    let mut rows: Vec<Box<dyn Widget>> = vec![Box::new(SoundSummaryCard {
-        snapshot: ctx.audio_snapshot.clone(),
-        row_width: row_w,
-        accent: ctx.pal.accent,
-    }) as Box<dyn Widget>];
-
-    // Default-output controls: volume preset chips + a mute toggle.
-    // Only meaningful when a default sink is present.
-    if let Some(default) = ctx.audio_snapshot.default_output.as_ref() {
-        let current = default.volume_percent;
-        let mut chips: Vec<Box<dyn Widget>> = VOLUME_PRESET_OPTIONS
-            .iter()
-            .map(|(pct, id, label)| {
-                let accent = if current == Some(*pct) {
-                    ctx.pal.accent
-                } else {
-                    ctx.pal.surface
-                };
-                Box::new(Button::with_id(id, label, accent, 64, 32)) as Box<dyn Widget>
-            })
-            .collect();
-        // Mute toggle accents when currently muted.
-        let mute_accent = if default.muted {
-            ctx.pal.accent
+    let half_w = (row_w - c.option_gap) / 2;
+    let snapshot = ctx.audio_snapshot;
+    let slots = provider_page_size(SettingsCategory::Sound, ctx.content_h);
+    let count = snapshot
+        .outputs
+        .len()
+        .max(snapshot.inputs.len())
+        .min(SOUND_MAX);
+    let range = provider_page_range(ctx.provider_page, slots, count);
+    let running = snapshot.service == AudioServiceState::Running;
+    let mut rows: Vec<Box<dyn Widget>> = vec![settings_text_row(
+        if running {
+            "Audio-Dienst aktiv"
         } else {
-            ctx.pal.surface
-        };
-        let mute_label = if default.muted { "Stumm: an" } else { "Stumm" };
-        chips.push(Box::new(Button::with_id(
-            "mute-toggle",
-            mute_label,
-            mute_accent,
-            96,
-            32,
-        )) as Box<dyn Widget>);
-        rows.push(Box::new(SidebarSectionLabel {
-            text: "STANDARD-AUSGABE",
-            width: row_w,
-            pad_top: 0,
-        }));
-        rows.push(Box::new(Container::row(8, chips)));
-    }
-
-    if ctx.audio_snapshot.service != AudioServiceState::Running {
-        rows.push(Box::new(SettingsPlaceholder {
-            width: row_w,
-            text: "PipeWire/WirePlumber status is not available",
-        }));
-    } else if ctx.audio_snapshot.outputs.is_empty() && ctx.audio_snapshot.inputs.is_empty() {
-        rows.push(Box::new(SettingsPlaceholder {
-            width: row_w,
-            text: "No audio devices reported",
-        }));
-    } else {
-        for (i, device) in ctx
-            .audio_snapshot
-            .outputs
-            .iter()
-            .take(SOUND_MAX)
-            .enumerate()
-        {
-            rows.push(Box::new(SoundDeviceRow {
-                label: "Output",
-                device: device.clone(),
-                index: i,
-                ids: AUDIO_OUTPUT_IDS,
-                row_width: row_w,
-                accent: ctx.pal.accent,
-            }));
+            "Audio-Status nicht verfügbar"
+        },
+        if running {
+            format!(
+                "{} Ausgabegeräte · {} Eingabegeräte",
+                snapshot.outputs.len(),
+                snapshot.inputs.len()
+            )
+        } else {
+            "Der Status der Audio-Geräte konnte nicht gelesen werden.".into()
+        },
+        row_w,
+        None,
+        false,
+        None,
+        None,
+        ctx.pal,
+    )];
+    if running {
+        if let Some(default) = snapshot.default_output.as_ref() {
+            rows.push(settings_text_row(
+                "Standard-Ausgabe",
+                default.name.as_str(),
+                row_w,
+                None,
+                false,
+                Some(niwoe_ui::effect::Symbol::Speaker),
+                None,
+                ctx.pal,
+            ));
+            rows.push(audio_volume_controls(default));
+        } else {
+            rows.push(settings_text_row(
+                "Keine Standard-Ausgabe",
+                "Es ist kein Ziel für Lautstärke und Stummschaltung bekannt.",
+                row_w,
+                None,
+                false,
+                None,
+                None,
+                ctx.pal,
+            ));
         }
-        for (i, device) in ctx.audio_snapshot.inputs.iter().take(SOUND_MAX).enumerate() {
-            rows.push(Box::new(SoundDeviceRow {
-                label: "Input",
-                device: device.clone(),
-                index: i,
-                ids: AUDIO_INPUT_IDS,
-                row_width: row_w,
-                accent: ctx.pal.accent,
-            }));
+        let mut columns = Vec::new();
+        for (label, devices, ids, symbol) in [
+            (
+                "AUSGABE",
+                &snapshot.outputs,
+                AUDIO_OUTPUT_IDS,
+                niwoe_ui::effect::Symbol::Speaker,
+            ),
+            (
+                "EINGABE",
+                &snapshot.inputs,
+                AUDIO_INPUT_IDS,
+                niwoe_ui::effect::Symbol::Microphone,
+            ),
+        ] {
+            let mut device_rows: Vec<Box<dyn Widget>> = vec![Box::new(SidebarSectionLabel {
+                text: label,
+                width: half_w,
+                pad_top: c.group_gap,
+            })];
+            if devices.is_empty() {
+                device_rows.push(settings_text_row(
+                    "Keine Geräte gemeldet",
+                    "Für diesen Bereich ist kein Gerät bekannt.",
+                    half_w,
+                    None,
+                    false,
+                    Some(symbol),
+                    None,
+                    ctx.pal,
+                ));
+            }
+            for (index, device) in devices
+                .iter()
+                .take(SOUND_MAX)
+                .enumerate()
+                .skip(range.start)
+                .take(range.len())
+            {
+                device_rows.push(audio_device_row(
+                    device,
+                    ids.get(index).copied(),
+                    symbol,
+                    half_w,
+                    ctx.pal,
+                ));
+            }
+            columns.push(Box::new(Container::column(c.option_gap, device_rows)) as Box<dyn Widget>);
+        }
+        rows.push(Box::new(Container::row(c.option_gap, columns)));
+        if let Some(footer) = provider_navigation(
+            row_w,
+            ctx.provider_page,
+            slots,
+            count,
+            format!(
+                "{} · {}",
+                provider_count_label(
+                    snapshot.outputs.len().min(SOUND_MAX),
+                    snapshot.outputs.len(),
+                    "Ausgaben"
+                ),
+                provider_count_label(
+                    snapshot.inputs.len().min(SOUND_MAX),
+                    snapshot.inputs.len(),
+                    "Eingaben"
+                )
+            ),
+        ) {
+            rows.push(footer);
         }
     }
-
     build_settings_group_page(
         ctx.content_w,
         ctx.content_h,
         "Audio-Geräte",
         "Ausgabe, Eingabe und Lautstärke für diese Sitzung.",
-        Box::new(Container::column(4, rows)),
+        Box::new(Container::column(c.option_gap, rows)),
     )
 }

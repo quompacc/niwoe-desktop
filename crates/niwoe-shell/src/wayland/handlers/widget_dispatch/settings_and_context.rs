@@ -15,13 +15,12 @@ impl NiwoeShell {
             );
             return;
         };
-        let modes: Vec<_> = output
+        let Some(next_mode) = output
             .modes
-            .iter()
+            .get(mode_index)
             .filter(|mode| mode.width > 0 && mode.height > 0)
             .cloned()
-            .collect();
-        let Some(next_mode) = modes.get(mode_index).cloned() else {
+        else {
             return;
         };
 

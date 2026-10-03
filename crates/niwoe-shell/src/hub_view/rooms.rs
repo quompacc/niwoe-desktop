@@ -20,11 +20,7 @@ fn draw_rooms(
         let rect = room_rect(index, width);
         let active = room.workspace == active_workspace;
         let fill_color = if active {
-            niwoe_tokens::Interaction::DEFAULT.selection(
-                p.surface,
-                p.accent,
-                niwoe_tokens::Interaction::SELECTION_ACTIVE,
-            )
+            niwoe_tokens::Interaction::DEFAULT.selected_tint(p.surface)
         } else if hovered_room == Some(index) {
             niwoe_tokens::Interaction::DEFAULT.neutral_hover
         } else {
@@ -34,7 +30,7 @@ fn draw_rooms(
         outline(
             pm,
             rect,
-            if active { p.accent } else { p.border },
+            if active { p.border_control() } else { p.border },
             if active {
                 Controls::FOCUS_WIDTH
             } else {
@@ -42,7 +38,7 @@ fn draw_rooms(
             },
         );
         if keyboard_focus == Some(index) {
-            outline(pm, rect, p.text, Controls::FOCUS_WIDTH);
+            niwoe_ui::effect::paint_focus(pm, rect, p.border_focus(), Radius::DEFAULT.md);
         }
         let icon = Rect {
             x: rect.x + H.card_pad,
@@ -56,26 +52,55 @@ fn draw_rooms(
             alpha(p.surface_alt, H.card_alpha),
             Radius::DEFAULT.sm,
         );
-        paint_text_centered(
-            pm,
-            "◇",
-            icon,
-            Typography::DEFAULT.title_size as f32,
+        if let Some(image) = niwoe_ui::effect::symbol_icon(
+            niwoe_ui::effect::Symbol::Room,
             if active { p.accent } else { p.text_dim },
-        );
-        if let Some(image) = room.preferences.icon.as_deref()
+            H.app_icon_size as u32,
+        ) {
+            pm.draw_pixmap(
+                icon.x + (icon.width - H.app_icon_size) / 2,
+                icon.y + (icon.height - H.app_icon_size) / 2,
+                image.as_ref().as_ref(),
+                &tiny_skia::PixmapPaint::default(),
+                tiny_skia::Transform::identity(),
+                None,
+            );
+        }
+        if let Some(image) = room
+            .preferences
+            .icon
+            .as_deref()
             .and_then(|name| icons.lookup(name, S.xxl as u32))
-            .and_then(crate::icons::icon_image_to_pixmap) {
-            fill(pm, icon, alpha(p.surface_alt, H.card_alpha), Radius::DEFAULT.sm);
-            pm.draw_pixmap(icon.x+(icon.width-image.width() as i32)/2,icon.y+(icon.height-image.height() as i32)/2,
-                image.as_ref(),&tiny_skia::PixmapPaint::default(),tiny_skia::Transform::identity(),None);
+            .and_then(crate::icons::icon_image_to_pixmap)
+        {
+            fill(
+                pm,
+                icon,
+                alpha(p.surface_alt, H.card_alpha),
+                Radius::DEFAULT.sm,
+            );
+            pm.draw_pixmap(
+                icon.x + (icon.width - image.width() as i32) / 2,
+                icon.y + (icon.height - image.height() as i32) / 2,
+                image.as_ref(),
+                &tiny_skia::PixmapPaint::default(),
+                tiny_skia::Transform::identity(),
+                None,
+            );
         }
         let name = truncate_to_fit(
             &room.name,
             rect.width - H.room_icon_size - H.card_pad * 3,
-            body,
+            Typography::DEFAULT.title_size as f32,
         );
-        paint_text_left_centered(pm, &name, icon.x + icon.width + S.md, icon, body, p.text);
+        paint_text_left_centered(
+            pm,
+            &name,
+            icon.x + icon.width + S.md,
+            icon,
+            Typography::DEFAULT.title_size as f32,
+            p.text,
+        );
         draw_room_preview(pm, rect, room, windows, hub, apps, icons, config);
         let count = window_counts
             .get(room.workspace.saturating_sub(1) as usize)

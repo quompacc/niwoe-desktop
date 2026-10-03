@@ -25,6 +25,9 @@ pub(crate) fn draw_search(
     query: &str,
     rows: &[crate::hub_state::ResultRow],
     selected: usize,
+    apps: &[crate::launcher::DesktopApp],
+    windows: &[crate::wayland::WindowInfo],
+    icons: &crate::icons::IconCache,
     config: &niwoe_config::ThemeConfig,
 ) {
     let Some(mut image) = Pixmap::new(width, height) else {
@@ -82,26 +85,20 @@ pub(crate) fn draw_search(
             Radius::DEFAULT.sm,
         );
         if start + slot == selected {
-            outline(&mut pm, r, p.accent, Controls::FOCUS_WIDTH);
+            niwoe_ui::effect::paint_focus(&mut pm, r, p.border_focus(), Radius::DEFAULT.sm);
         }
-        paint_text(
+        draw_search_icon(&mut pm, row, r, apps, windows, icons, p.text_dim);
+        let text_x = r.x + S.lg + H.app_icon_size + S.md;
+        niwoe_ui::effect::paint_text_pair(
             &mut pm,
-            &truncate_to_fit(
-                &row.title,
-                r.width - S.lg,
-                Typography::DEFAULT.body_size as f32,
-            ),
-            r.x + S.sm,
-            r.y + S.lg,
-            Typography::DEFAULT.body_size as f32,
+            Rect {
+                x: text_x,
+                width: r.x + r.width - S.lg - text_x,
+                ..r
+            },
+            &row.title,
+            &row.detail,
             p.text,
-        );
-        paint_text(
-            &mut pm,
-            &truncate_to_fit(&row.detail, r.width - S.lg, caption),
-            r.x + S.sm,
-            r.y + S.lg + S.md,
-            caption,
             p.text_dim,
         );
     }
@@ -123,5 +120,63 @@ pub(crate) fn draw_search(
         .zip(canvas.as_chunks_mut::<4>().0)
     {
         bgra.copy_from_slice(&[rgba[2], rgba[1], rgba[0], rgba[3]]);
+    }
+}
+
+fn draw_search_icon(
+    pm: &mut tiny_skia::PixmapMut<'_>,
+    row: &crate::hub_state::ResultRow,
+    rect: Rect,
+    apps: &[crate::launcher::DesktopApp],
+    windows: &[crate::wayland::WindowInfo],
+    icons: &crate::icons::IconCache,
+    color: Color,
+) {
+    use crate::hub_state::Target;
+    use niwoe_ui::effect::{symbol_icon, Symbol};
+    let app_id = match &row.target {
+        Target::App(id) => Some(id.as_str()),
+        Target::Window(id) => windows
+            .iter()
+            .find(|w| &w.id == id)
+            .and_then(|w| w.app_id.as_deref()),
+        Target::Room(_) => None,
+    };
+    let name = app_id
+        .and_then(|id| {
+            apps.iter()
+                .find(|a| a.desktop_id == id || a.startup_wm_class.as_deref() == Some(id))
+        })
+        .and_then(|a| a.icon_name.as_deref());
+    let x = rect.x + S.lg;
+    let y = rect.y + (rect.height - H.app_icon_size) / 2;
+    if let Some(image) = name
+        .and_then(|name| icons.lookup(name, H.app_icon_size as u32))
+        .and_then(crate::icons::icon_image_to_pixmap)
+    {
+        pm.draw_pixmap(
+            x,
+            y,
+            image.as_ref(),
+            &tiny_skia::PixmapPaint::default(),
+            tiny_skia::Transform::identity(),
+            None,
+        );
+    } else {
+        let symbol = match row.target {
+            Target::Room(_) => Symbol::Room,
+            Target::Window(_) => Symbol::Window,
+            Target::App(_) => Symbol::App,
+        };
+        if let Some(image) = symbol_icon(symbol, color, H.app_icon_size as u32) {
+            pm.draw_pixmap(
+                x,
+                y,
+                image.as_ref().as_ref(),
+                &tiny_skia::PixmapPaint::default(),
+                tiny_skia::Transform::identity(),
+                None,
+            );
+        }
     }
 }

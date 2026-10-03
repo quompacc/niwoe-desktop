@@ -7,18 +7,18 @@ use tiny_skia::Pixmap;
 
 use crate::ui::tokens::palette_from_config;
 
-pub(crate) const MENU_WIDTH: i32 = 236;
-pub(crate) const SUBMENU_GAP: i32 = 6;
-pub(crate) const SUBMENU_WIDTH: i32 = 188;
+pub(crate) const MENU_WIDTH: i32 = niwoe_tokens::spacing::ContextMenu::WIDTH;
+pub(crate) const SUBMENU_GAP: i32 = niwoe_tokens::spacing::ContextMenu::SUBMENU_GAP;
+pub(crate) const SUBMENU_WIDTH: i32 = niwoe_tokens::spacing::ContextMenu::SUBMENU_WIDTH;
 /// Index of the "Einstellungen ▸" item in desktop_item_list().
 pub(crate) const SETTINGS_ITEM_IDX: usize = 3;
 
-const ICON_SZ: f32 = 16.0;
-const ICON_GAP: i32 = 12;
-const ITEM_H: i32 = 36;
-const VPAD: i32 = 6;
-const PADDING_X: i32 = 14;
-const FONT_SIZE: f32 = 13.0;
+const ICON_SZ: f32 = niwoe_tokens::Controls::SYMBOL_SIZE as f32;
+const ICON_GAP: i32 = niwoe_tokens::Spacing::DEFAULT.md;
+const ITEM_H: i32 = niwoe_tokens::spacing::ContextMenu::ROW_HEIGHT;
+const VPAD: i32 = niwoe_tokens::spacing::ContextMenu::VERTICAL_PAD;
+const PADDING_X: i32 = niwoe_tokens::spacing::ContextMenu::HORIZONTAL_PAD;
+const FONT_SIZE: f32 = niwoe_tokens::Typography::DEFAULT.body_size as f32;
 fn menu_radius(theme_config: &ThemeConfig) -> i32 {
     theme_config
         .decorations
@@ -163,7 +163,7 @@ pub(crate) fn item_list(
 pub(crate) fn desktop_item_list() -> Vec<(&'static str, DesktopContextMenuAction)> {
     vec![
         ("Terminal öffnen", DesktopContextMenuAction::Terminal),
-        ("Launcher öffnen", DesktopContextMenuAction::Launcher),
+        ("Hub öffnen", DesktopContextMenuAction::Launcher),
         ("Dateimanager öffnen", DesktopContextMenuAction::FileManager),
         ("Einstellungen", DesktopContextMenuAction::Settings),
         ("Bildschirm sperren", DesktopContextMenuAction::LockScreen),
@@ -175,7 +175,7 @@ pub(crate) fn submenu_items() -> Vec<(&'static str, SettingsSubAction)> {
         ("Anzeige", SettingsSubAction::Display),
         ("Hintergrund", SettingsSubAction::Wallpaper),
         ("Mauszeiger", SettingsSubAction::Theme),
-        ("Sound", SettingsSubAction::Sound),
+        ("Audio", SettingsSubAction::Sound),
         ("Netzwerk", SettingsSubAction::Network),
         ("Energie", SettingsSubAction::Power),
     ]
@@ -339,3 +339,5 @@ include!("context_menu/overlays.rs");
 #[cfg(test)]
 #[path = "context_menu_tests.rs"]
 mod tests;
+
+include!("context_menu/selection.rs");

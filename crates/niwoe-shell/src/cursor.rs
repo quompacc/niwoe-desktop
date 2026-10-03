@@ -8,6 +8,8 @@ use std::path::PathBuf;
 
 use niwoe_config::{CursorConfig, NiwoeConfig};
 
+pub(crate) mod preview;
+
 /// Selectable cursor sizes, paired with their static widget id and chip label.
 /// The ids are matched by `widget_action::action_for_id` (the `cursor-size-`
 /// prefix) so they must stay in sync with that parser.
@@ -51,12 +53,7 @@ pub fn current_cursor_theme() -> String {
 
 /// Standard XDG icon-theme search roots that may hold cursor themes.
 fn cursor_theme_dirs() -> Vec<PathBuf> {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
-    vec![
-        PathBuf::from(format!("{}/.icons", home)),
-        PathBuf::from(format!("{}/.local/share/icons", home)),
-        PathBuf::from("/usr/share/icons"),
-    ]
+    preview::theme_roots()
 }
 
 /// Scan the icon-theme roots for installed cursor themes — a directory counts

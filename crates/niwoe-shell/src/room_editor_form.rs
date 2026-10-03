@@ -19,6 +19,46 @@ pub(crate) struct FormUi {
 }
 
 impl super::Edit {
+    /// Traverse only controls with a visible, available action in this draft.
+    pub fn focus_order(&self, room_count: usize) -> Vec<usize> {
+        let mut order = vec![30, 31];
+        if self.id != 0 {
+            order.extend([32, 33]);
+        }
+        if self.form.tab == 1 {
+            order.push(14);
+            if self.form.page > 0 {
+                order.push(15);
+            }
+            let rows = self.app_rows();
+            if (self.form.page + 1) * 6 < rows.len() {
+                order.push(16);
+            }
+            order.extend(20..20 + rows.len().saturating_sub(self.form.page * 6).min(6));
+        } else {
+            order.extend([9, 0, 5]);
+            if self.id != 0 && self.position > 0 {
+                order.push(1);
+            }
+            if self.id != 0 && self.position + 1 < room_count {
+                order.push(2);
+            }
+            order.extend([10, 11]);
+            if self.id != 0 {
+                order.push(8);
+            }
+            order.push(12);
+            if self.id != 0 {
+                order.push(13);
+                if room_count > 1 {
+                    order.extend([6, 7]);
+                }
+            }
+        }
+        order.extend([3, 4]);
+        order
+    }
+
     pub fn catalog(&mut self, apps: &[crate::launcher::DesktopApp]) {
         self.form.apps.clear();
         for app in apps.iter().take(4096) {
@@ -110,6 +150,61 @@ impl super::Edit {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn keyboard_traversal_skips_unsaved_actions_empty_rows_and_unavailable_pages() {
+        let mut ui = super::super::RoomUi::default();
+        ui.accept(ui.snapshot.clone());
+        assert!(ui.begin_create());
+        let edit = ui.edit.as_mut().unwrap();
+        let order = edit.focus_order(9);
+        for unavailable in [1, 2, 6, 7, 8, 13, 32, 33] {
+            assert!(!order.contains(&unavailable));
+        }
+        assert!(order.contains(&9) && order.contains(&12));
+        edit.form.tab = 1;
+        edit.catalog(&[]);
+        assert_eq!(edit.focus_order(9), vec![30, 31, 14, 3, 4]);
+        edit.preferences
+            .apps
+            .push(AppReference::Native("missing".into()));
+        edit.catalog(&[]);
+        assert!(edit.focus_order(9).contains(&20));
+        assert!(!edit.focus_order(9).contains(&21));
+        edit.form.query = "no-match".into();
+        assert!(!edit.focus_order(9).contains(&20));
+        assert!(ui
+            .snapshot
+            .rooms
+            .iter()
+            .all(|room| room.preferences.apps.is_empty()));
+    }
+
+    #[test]
+    fn duplicate_native_and_xwayland_choices_keep_independent_draft_selection() {
+        let mut app =
+            crate::launcher::DesktopApp::new("Editor".into(), vec!["editor".into()], false);
+        app.desktop_id = "org.example.Editor.desktop".into();
+        app.startup_wm_class = Some("EditorWindow".into());
+        let mut ui = super::super::RoomUi::default();
+        ui.accept(ui.snapshot.clone());
+        ui.begin(1);
+        let edit = ui.edit.as_mut().unwrap();
+        edit.catalog(&[app]);
+        edit.form.tab = 1;
+        assert_eq!(edit.app_rows().len(), 2);
+        assert!(edit.focus_order(9).contains(&21));
+        assert!(!edit.focus_order(9).contains(&22));
+        edit.form_action(20);
+        edit.form_action(21);
+        assert_eq!(edit.preferences.apps.len(), 2);
+        edit.form_action(20);
+        assert_eq!(
+            edit.preferences.apps,
+            vec![AppReference::Xwayland("EditorWindow".into())]
+        );
+        assert!(ui.snapshot.rooms[0].preferences.apps.is_empty());
+    }
+
     #[test]
     fn missing_catalog_entries_remain_visible_removable_and_cancelled_locally() {
         let mut ui = super::super::RoomUi::default();

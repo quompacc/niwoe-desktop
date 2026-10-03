@@ -9,18 +9,22 @@
 //! per-surface elevation (drop-shadow) scale; phase 6 the shared embedded UI
 //! font. Later phases move typography sizing here too (refactor plan).
 
+pub mod artwork;
 pub mod chrome;
 pub mod color;
 pub mod control_center;
 pub mod elevation;
+pub mod first_run;
 pub mod font;
 pub mod hub;
 pub mod interaction;
 pub mod radius;
+pub mod settings;
 pub mod spacing;
 pub mod typography;
 pub mod window_picker;
 
+pub use artwork::Artwork;
 pub use chrome::{
     Calendar, Greeter, Launcher, Mask, Panel, QuickSettings, Scrollbar, Settings, WindowChrome,
     WorkspaceSwitcher,
@@ -28,6 +32,7 @@ pub use chrome::{
 pub use color::{contrast_text, relative_luminance, Color, Palette};
 pub use control_center::ControlCenter;
 pub use elevation::Elevation;
+pub use first_run::FirstRun;
 pub use hub::Hub;
 pub use interaction::Interaction;
 pub use radius::Radius;

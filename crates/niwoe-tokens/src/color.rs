@@ -206,7 +206,7 @@ impl Palette {
         self.text_dim
     }
     pub const fn border_focus(self) -> Color {
-        self.accent
+        self.text
     }
     pub fn on_accent(self) -> Color {
         contrast_text(self.accent)

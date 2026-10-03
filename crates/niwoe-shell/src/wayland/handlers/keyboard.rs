@@ -12,6 +12,7 @@ use crate::wayland::{CommitReason, RepaintReason, SurfaceKind};
 
 use super::NiwoeShell;
 
+mod control_center_navigation;
 mod room_navigation;
 mod workspace_navigation;
 
@@ -381,6 +382,9 @@ impl KeyboardHandler for NiwoeShell {
             self.first_run_key(qh, event.keysym);
             return;
         }
+        if self.control_center_key(qh, event.keysym) {
+            return;
+        }
         if self.room_management_open {
             if self.panel_form_key(qh, event.keysym) {
                 return;
@@ -396,42 +400,25 @@ impl KeyboardHandler for NiwoeShell {
         }
 
         if self.launcher_settings_open {
-            if self.settings_category == crate::settings_view::SettingsCategory::SystemOverview
-                && self.settings_search.is_empty()
-                && matches!(
-                    event.keysym,
-                    Keysym::Return
-                        | Keysym::KP_Enter
-                        | Keysym::space
-                        | Keysym::Tab
-                        | Keysym::ISO_Left_Tab
-                )
-            {
-                if matches!(
-                    event.keysym,
-                    Keysym::Return | Keysym::KP_Enter | Keysym::space
-                ) {
-                    self.open_first_run(qh);
-                }
-                return;
-            }
             if is_escape {
                 if !self.settings_search.is_empty() {
-                    self.settings_search.clear();
+                    self.edit_settings_search(String::clear);
                 } else {
-                    self.launcher_settings_open = false;
-                    self.ui_preview_widget_state = None;
+                    self.close_settings(qh, RepaintReason::Keyboard);
+                    return;
                 }
                 self.draw_launcher(qh, RepaintReason::Keyboard);
                 return;
             }
             if event.keysym == Keysym::BackSpace {
-                self.settings_search.pop();
+                self.edit_settings_search(|query| {
+                    query.pop();
+                });
                 self.draw_launcher(qh, RepaintReason::Keyboard);
                 return;
             }
             if let Some(ch) = event.keysym.key_char().filter(|c| !c.is_control()) {
-                self.settings_search.push(ch);
+                self.edit_settings_search(|query| query.push(ch));
                 self.draw_launcher(qh, RepaintReason::Keyboard);
             }
             return;

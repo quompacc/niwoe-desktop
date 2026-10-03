@@ -40,7 +40,11 @@ impl NiwoeShell {
     pub(crate) fn tick(&mut self, qh: &QueueHandle<Self>) {
         let now = Instant::now();
         let wizard = &mut self.workspace_state.rooms.wizard;
-        if wizard.pending.as_ref().is_some_and(|(_, at)| at.elapsed() >= Duration::from_secs(10)) {
+        if wizard
+            .pending
+            .as_ref()
+            .is_some_and(|(_, at)| at.elapsed() >= Duration::from_secs(10))
+        {
             wizard.pending = None;
             wizard.complete_after_save = false;
             wizard.message = "Antwort fehlt. Gespeicherten Stand neu laden; kein automatischer Wiederholungsversuch.".into();
@@ -182,77 +186,6 @@ impl NiwoeShell {
         }
     }
 
-    pub(crate) fn request_settings_refresh(
-        &mut self,
-        category: crate::settings_view::SettingsCategory,
-    ) {
-        if !crate::settings_refresh::supports(category) {
-            return;
-        }
-        if category == crate::settings_view::SettingsCategory::Wallpaper
-            && !self.wallpaper_thumbnails.is_empty()
-        {
-            return;
-        }
-        if !self.settings_refresh_inflight.insert(category) {
-            return;
-        }
-        crate::settings_refresh::spawn(
-            category,
-            self.available_wallpapers.clone(),
-            self.settings_refresh_tx.clone(),
-        );
-    }
-
-    fn poll_settings_refresh(&mut self, qh: &QueueHandle<Self>) {
-        while let Ok(result) = self.settings_refresh_rx.try_recv() {
-            self.settings_refresh_inflight.remove(&result.category);
-            match result.data {
-                crate::settings_refresh::SettingsData::SystemInfo(value) => {
-                    self.system_info = value;
-                }
-                crate::settings_refresh::SettingsData::Printers(value) => {
-                    self.printer_snapshot = value;
-                }
-                crate::settings_refresh::SettingsData::Audio(value) => {
-                    self.audio_settled = value.is_settled();
-                    self.audio_snapshot = value;
-                }
-                crate::settings_refresh::SettingsData::Network { profiles, wifi } => {
-                    self.network_profiles = profiles;
-                    self.wifi_networks = wifi;
-                    if self.network_popup_open
-                        && self.network_popup_tab == crate::network_popup::NetworkTab::Wifi
-                    {
-                        self.draw_network_popup(qh, RepaintReason::Ipc);
-                    }
-                }
-                crate::settings_refresh::SettingsData::Bluetooth(value) => {
-                    self.bluetooth_snapshot = value;
-                    if self.network_popup_open
-                        && self.network_popup_tab == crate::network_popup::NetworkTab::Status
-                    {
-                        self.draw_network_popup(qh, RepaintReason::Ipc);
-                    }
-                }
-                crate::settings_refresh::SettingsData::DefaultApps { index, current } => {
-                    self.default_apps_index = Some(index);
-                    self.default_apps_current = current;
-                    self.default_apps_loaded = true;
-                }
-                crate::settings_refresh::SettingsData::WallpaperThumbnails(value) => {
-                    self.wallpaper_thumbnails = value;
-                }
-            }
-            if self.launcher_state.open
-                && self.launcher_settings_open
-                && self.settings_category == result.category
-            {
-                self.draw_launcher(qh, RepaintReason::Ipc);
-            }
-        }
-    }
-
     pub(crate) fn poll_ipc(&mut self) -> bool {
         let mut changed = false;
         for event in self.ipc.poll() {
@@ -263,6 +196,7 @@ impl NiwoeShell {
     }
 
     fn open_desktop_context_menu_from_ipc(&mut self, x: i32, y: i32) {
+        self.close_workspace_popup(CommitReason::Input);
         let desktop_w = self
             .desktop_width
             .max(crate::context_menu::MENU_WIDTH as u32) as i32;
@@ -293,14 +227,6 @@ impl NiwoeShell {
         self.desktop_menu_layer.set_margin(my, 0, 0, mx);
         self.desktop_menu_layer
             .set_size(self.desktop_menu_width, self.desktop_menu_height);
-    }
-
-    /// Refresh after a deliberate default-app write. Page entry itself uses
-    /// the non-blocking Settings worker above.
-    pub(crate) fn refresh_default_apps_snapshot(&mut self) {
-        self.default_apps_index = Some(crate::default_apps::MimeAppIndex::load_system());
-        self.default_apps_current = crate::default_apps::snapshot_current_defaults();
-        self.default_apps_loaded = true;
     }
 
     pub(crate) fn open_consent_modal(&mut self, request_id: String, app_id: String) {

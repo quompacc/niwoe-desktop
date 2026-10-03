@@ -1,0 +1,135 @@
+[
+  {
+    "label": "watchdog-neutral-desktop",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "be8e5ac212f5df12b269f61389632efe14af2f357f88dc0c30536946165712dc"
+  },
+  {
+    "label": "hub",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "713c6b3c6883e47669c34eadfbfa0c4f5d08a462463f25f1be0651355e476e7d"
+  },
+  {
+    "label": "hub-keyboard-focus",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "5cb9245dd05f0479cc96c4226630aad4d84d3c3bbe3b4f2c55d46ecdac098b41"
+  },
+  {
+    "label": "rooms-mouse",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "59fa52afa2c6f52c6b1761a3c3dda43d9de545e5d571a84fc9fd152ce1e76500"
+  },
+  {
+    "label": "apps-keyboard",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "f8fe12c80d3d837573fd9f9a212f9380af7c2c90a7d0fb101a3fbb230a065503"
+  },
+  {
+    "label": "appearance-keyboard",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "e62257a562dbc702c6c8961f77aa1c1f674b61273cd4a34139c7dccea0f00c56"
+  },
+  {
+    "label": "appearance-keyboard-focus",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "3bf5d5283df6b86b6a294730bb326242fdbc539deea8cdc965f970a4b5083067"
+  },
+  {
+    "label": "display-keyboard",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "b1bd83dd62f271e96cfbd696ab8e8555464a6fa82600fa40a47dea4d693ffe04"
+  },
+  {
+    "label": "cursor-mouse",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "9eba7b3b4eb9115c3f7dc7fbba052545a6607ff60df3bec566baaafda48eb08b"
+  },
+  {
+    "label": "panel-keyboard",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "1078f4309e381ecd9d4715acab1a65c19231bf82e6a457391c9c084fcd930194"
+  },
+  {
+    "label": "system-mouse",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "fe081671010e603da226a49d3b8f032e1fcc2a06f1867994ae76f19aff44fc2b"
+  },
+  {
+    "label": "sound-mouse",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "e59d808bee99ab7746dad3cbe23b7c57342170922358a405d1d537b413cdb4c2"
+  },
+  {
+    "label": "network-mouse",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "8e66b74cb965bbe70c55789396a51471af0d01fe8a449b7413dcf5f3a8253328"
+  },
+  {
+    "label": "users-keyboard",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "df7ff93dc47116d8dd875a3223a1ee7c68424a776c570e5c7d02692bd68cc11a"
+  },
+  {
+    "label": "updates-keyboard",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "b39a50dbad952d4fe23fac8d2d74c820614a7cb37405567581fe762979b7f7c0"
+  },
+  {
+    "label": "rooms-keyboard-wrap",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "0beebe5e3c2e4d9e0a0fcf65d93d1c36f612d76462e9a906aa196ab09f67a62c"
+  },
+  {
+    "label": "room-general",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "4f6aa68a9be8e61c176c41b5a3a904ba508e282dfedfa3651aa3845e436c0b8d"
+  },
+  {
+    "label": "room-apps",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "4a85118cfbf8d264f4f04ad5a0d5e80100e8f1dc260c14b88710313ed4a1e820"
+  },
+  {
+    "label": "room-files",
+    "shell_pid": "678998",
+    "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+    "scale_millis": 1000,
+    "image_sha256": "ac77cfadaffdae9b739d626434548720efe7e4ac2ba986a7b712b8f4dd17f359"
+  }
+]

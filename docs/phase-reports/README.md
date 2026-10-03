@@ -1,21 +1,26 @@
 # NIWOE-Phasenstatus
 
-Aktueller Stand 25.09.: [P06-Raummodell-Zwischenstand](P06_ROOM_MODEL_FOUNDATION.md).
-Dynamische Räume und Basis-Metadaten sind gebaut, geprüft und auf Fedora
-installiert. Die Shell läuft neu; für den Compositor ist ein NIWOE-Neulogin
-erforderlich. P06 bleibt bis zur Live-Integration und den sichtbaren
-Erzeugungs-/Löschabläufen offen. P04/P05-Berichte dokumentieren die zuvor
-installierten Hub- und Systemdeck-Stände.
+Aktueller Stand 02.10.2026: **Die visuelle Desktop-Abnahme ist wieder offen.**
+Der erneute Vergleich mit den vier verbindlichen Mockups bestätigt die
+Nutzerkritik. Technische Abschlüsse sind keine Freigabe der sichtbaren UI.
+[UI-Prüfbericht mit Screenshots und installiertem Navigationsfix](UI_VISUAL_AUDIT_2026-10-02.md).
+Die Abarbeitung folgt dem [aktiven Reparaturplan mit V01–V20 und Abnahmekriterien](../../NIWOE_IMPLEMENTATION_PLAN.md#aktiver-reparaturplan-für-die-benutzeroberfläche).
 
 | Phase | Status | Bericht |
 |---|---|---|
-| P00 | accepted | [P00.md](P00.md) |
-| P01 | accepted | [P01.md](P01.md) |
-| P02 | in-progress | [P02.md](P02.md) |
-| P03 | in-progress | [P03.md](P03.md) |
-| P04–P05 | in-progress | [Native Shell-Neubau](P03_P05_NATIVE_REBUILD.md) |
-| P06 | in-progress | [Raummodell-Zwischenstand](P06_ROOM_MODEL_FOUNDATION.md) |
-| P07–P13 | not-started | — |
+| P00 | historisch accepted | [P00.md](P00.md) |
+| P01 | historisch accepted | [P01.md](P01.md) |
+| P02 | visuelles Gate wieder offen | [P02.md](P02.md) |
+| P03 | visuelles Gate wieder offen | [P03.md](P03.md) |
+| P04–P05 | visuelle Gates wieder offen | [Hub](P04_HUB_FOUNDATION.md), [Deck](P05_DECK_COMPOSITION.md) |
+| P06 | technische Belege vorhanden, visuelle Abläufe wieder offen | [P06.md](P06.md) |
+| P07 | technische Belege vorhanden, visuelle Abläufe wieder offen | [Abnahmebericht](P07_ACCEPTANCE_REVIEW.md) |
+| P08 | technische Belege vorhanden, visuelles Gate wieder offen | [P08.md](P08.md) |
+| P09 | technische Belege vorhanden, sichtbarer Restore-Ablauf wieder offen | [P09.md](P09.md) |
+| P10 | technische Belege vorhanden, visuelles Gate wieder offen | [P10.md](P10.md) |
+| P11 | technische Belege vorhanden, visuelles Gate wieder offen | [P11.md](P11.md) |
+| P12 | Gesamtfreigabe wieder offen | [P12.md](P12.md) |
+| P13 | not-started | — |
 
 ## Historische Chronik
 

@@ -58,9 +58,13 @@ pub(crate) enum WidgetAction {
     PowerLogout,
     ToggleSettings,
     OpenFirstRun,
+    OpenControlCenter(crate::control_center::Page),
     SetSettingsCategory(crate::settings_view::SettingsCategory),
     ApplyThemeByIndex(usize),
     ApplyWallpaperByIndex(usize),
+    PageWallpaper {
+        forward: bool,
+    },
     SetWallpaperMode(niwoe_config::WallpaperMode),
     SetCursorSize(u32),
     ApplyCursorThemeByIndex(usize),
@@ -85,6 +89,13 @@ pub(crate) enum WidgetAction {
     CycleOutputScale(usize),
     CycleOutputTransform(usize),
     ToggleOutputModeDropdown(usize),
+    PageProviders {
+        forward: bool,
+    },
+    PageDisplay {
+        modes: bool,
+        forward: bool,
+    },
     SetOutputMode {
         output_index: usize,
         mode_index: usize,
@@ -101,6 +112,9 @@ pub(crate) enum WidgetAction {
     },
     /// Close the picker and return to the nine-category overview.
     DefaultAppsClosePicker,
+    PageDefaultApps {
+        forward: bool,
+    },
 }
 
 const DEFAULT_APPS_AUTO_ID: &str = "default-apps-auto";
@@ -109,6 +123,12 @@ const DEFAULT_APPS_SET_PREFIX: &str = "default-apps-set-";
 
 pub(crate) fn action_for_id(id: &str) -> Option<WidgetAction> {
     exact_action_for_id(id)
+        .or_else(|| {
+            crate::control_center::PAGES
+                .into_iter()
+                .find(|page| page.id() == id)
+                .map(WidgetAction::OpenControlCenter)
+        })
         .or_else(|| settings_category_action_for_id(id))
         .or_else(|| {
             parse_indexed_action(id, SETTINGS_THEME_PREFIX, WidgetAction::ApplyThemeByIndex)
@@ -216,6 +236,28 @@ fn exact_action_for_id(id: &str) -> Option<WidgetAction> {
         "first-run-open" => Some(WidgetAction::OpenFirstRun),
         DEFAULT_APPS_AUTO_ID => Some(WidgetAction::DefaultAppsAutoSet),
         "default-apps-back" => Some(WidgetAction::DefaultAppsClosePicker),
+        "default-apps-previous" => Some(WidgetAction::PageDefaultApps { forward: false }),
+        "default-apps-next" => Some(WidgetAction::PageDefaultApps { forward: true }),
+        "provider-page-previous" => Some(WidgetAction::PageProviders { forward: false }),
+        "provider-page-next" => Some(WidgetAction::PageProviders { forward: true }),
+        "display-outputs-previous" => Some(WidgetAction::PageDisplay {
+            modes: false,
+            forward: false,
+        }),
+        "display-outputs-next" => Some(WidgetAction::PageDisplay {
+            modes: false,
+            forward: true,
+        }),
+        "display-modes-previous" => Some(WidgetAction::PageDisplay {
+            modes: true,
+            forward: false,
+        }),
+        "display-modes-next" => Some(WidgetAction::PageDisplay {
+            modes: true,
+            forward: true,
+        }),
+        "wallpaper-page-previous" => Some(WidgetAction::PageWallpaper { forward: false }),
+        "wallpaper-page-next" => Some(WidgetAction::PageWallpaper { forward: true }),
         "wallpaper-mode-fill" => Some(WidgetAction::SetWallpaperMode(
             niwoe_config::WallpaperMode::Fill,
         )),

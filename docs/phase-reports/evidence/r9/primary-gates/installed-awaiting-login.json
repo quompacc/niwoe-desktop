@@ -1,0 +1,16 @@
+{
+    "source_files":  175,
+    "source_mismatches":  0,
+    "tests_passed":  1309,
+    "tests_failed":  0,
+    "tests_ignored":  1,
+    "installed_compositor":  "8f1e15e3678860e9160cc00ee17e61c0650e9c15ae1ecb086fef53e48c3290e3",
+    "running_compositor":  "c09985e39b77bea259fb81aaae8ab92f4933bf50a0a8971756bde146457d6f65",
+    "running_compositor_pid":  1371,
+    "installed_shell":  "010d2ac4b1afd1fe1b4f27270ee1ef1b07b019b4c97a0df9a21580031837da17",
+    "running_shell":  "98864dc2a01163b005b0bdc2ba580609fe73d19710a57d69c64a8fa6c7182c62",
+    "running_shell_pid":  621223,
+    "activation":  "NEW_LOGIN_REQUIRED",
+    "native_after_proof":  "NOT_RUN",
+    "initial_release_issue":  "Library-only build retained old root binary; corrected explicit cargo build --release -p niwoe -p niwoe-shell before final installation"
+}

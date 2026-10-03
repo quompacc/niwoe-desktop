@@ -93,3 +93,51 @@ fn font_loading_rejects_missing_glyphs_and_invalid_bytes() {
     assert!(!niwoe_ui::font_supports_text(bytes, "\u{10ffff}"));
     assert!(!niwoe_ui::font_supports_text(b"not a font", "Text"));
 }
+
+#[test]
+fn selection_is_neutral_and_keyboard_focus_remains_distinct_at_each_scale() {
+    for scale in [1.0_f32, 1.5, 2.0] {
+        for kind in [
+            ComponentKind::Button,
+            ComponentKind::Tab,
+            ComponentKind::Chip,
+            ComponentKind::Card,
+        ] {
+            let mut component = Component::new(kind, "Auswahl", 180);
+            component.state.selected = true;
+            let mut image = Pixmap::new((180.0 * scale) as u32, (48.0 * scale) as u32).unwrap();
+            let area = Rect {
+                x: 0,
+                y: 0,
+                width: 180,
+                height: 48,
+            };
+            for pointer in [
+                WidgetState::Idle,
+                WidgetState::Hovered,
+                WidgetState::Pressed,
+            ] {
+                image.fill(tiny_skia::Color::TRANSPARENT);
+                component.paint_scaled(area, &mut image.as_mut(), &Theme::DARK, pointer, scale);
+                let accent = Theme::DARK.palette.accent;
+                assert!(
+                    !image.pixels().iter().any(|pixel| {
+                        (pixel.red(), pixel.green(), pixel.blue(), pixel.alpha())
+                            == (accent.r, accent.g, accent.b, accent.a)
+                    }),
+                    "{kind:?} has an accent stripe/fill during {pointer:?} at {scale}"
+                );
+            }
+            let selected = image.data().to_vec();
+            component.state.focused = true;
+            component.paint_scaled(
+                area,
+                &mut image.as_mut(),
+                &Theme::DARK,
+                WidgetState::Pressed,
+                scale,
+            );
+            assert_ne!(selected, image.data(), "keyboard focus must remain visible");
+        }
+    }
+}

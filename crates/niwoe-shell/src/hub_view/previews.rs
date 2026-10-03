@@ -1,9 +1,9 @@
 fn preview_rect(rect: Rect) -> Rect {
     Rect {
         x: rect.x + H.card_pad,
-        y: rect.y + H.card_pad + H.room_icon_size + S.lg,
+        y: rect.y + H.card_pad + H.room_icon_size + S.xl,
         width: rect.width - H.card_pad * 2,
-        height: S.xxl * 2,
+        height: H.preview_height as i32,
     }
 }
 pub(crate) fn hit_preview(x: i32, y: i32, width: u32, slot: usize) -> bool {
@@ -101,18 +101,20 @@ fn draw_room_preview(
                 None,
             );
         } else {
-            paint_text_centered(
-                pm,
-                "□",
-                Rect {
+            if let Some(image) = niwoe_ui::effect::symbol_icon(
+                niwoe_ui::effect::Symbol::App,
+                p.text_dim,
+                H.app_icon_size as u32,
+            ) {
+                pm.draw_pixmap(
                     x,
                     y,
-                    width: H.app_icon_size,
-                    height: H.app_icon_size,
-                },
-                caption,
-                p.text_dim,
-            );
+                    image.as_ref().as_ref(),
+                    &tiny_skia::PixmapPaint::default(),
+                    tiny_skia::Transform::identity(),
+                    None,
+                );
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ pub(super) fn draw_deletion(
             pm,
             rect,
             if edit.focus == focus {
-                p.accent
+                p.border_focus()
             } else {
                 p.border
             },

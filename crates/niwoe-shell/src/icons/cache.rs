@@ -10,6 +10,7 @@ enum CacheEntry {
 pub struct IconCache {
     loader: IconLoader,
     entries: HashMap<u32, HashMap<String, CacheEntry>>,
+    generation: u64,
 }
 
 impl IconCache {
@@ -22,6 +23,7 @@ impl IconCache {
         Self {
             loader: IconLoader::new_with_symbolic_color(theme_name, symbolic_color),
             entries: HashMap::new(),
+            generation: 0,
         }
     }
 
@@ -30,6 +32,7 @@ impl IconCache {
         Self {
             loader,
             entries: HashMap::new(),
+            generation: 0,
         }
     }
 
@@ -53,6 +56,7 @@ impl IconCache {
                 None => CacheEntry::Missing,
             };
             entries_for_size.insert((*name).to_string(), entry);
+            self.generation = self.generation.wrapping_add(1);
         }
     }
 
@@ -61,6 +65,11 @@ impl IconCache {
     pub fn loader_config(&self) -> (String, String) {
         let (theme, color) = self.loader.config();
         (theme.to_string(), color.to_string())
+    }
+
+    /// Changes only when cached results are inserted, never during lookup.
+    pub(crate) fn generation(&self) -> u64 {
+        self.generation
     }
 
     /// Decode `names` at every `size` on the CALLING thread using a throwaway
@@ -91,6 +100,7 @@ impl IconCache {
     /// Insert a pre-decoded result (from `load_batch`) into the cache. Cheap;
     /// runs on the main thread. `None` records a miss so lookups don't retry.
     pub fn insert_loaded(&mut self, name: String, size: u32, image: Option<IconImage>) {
+        self.generation = self.generation.wrapping_add(1);
         let entries_for_size = self.entries.entry(size).or_default();
         entries_for_size.insert(
             name,
@@ -211,6 +221,7 @@ mod tests {
 
         let mut cache = IconCache::new_for_tests(loader);
         cache.warm(&["utilities-terminal"], 22);
+        let generation = cache.generation();
         let first = cache
             .lookup("utilities-terminal", 22)
             .expect("cached icon")
@@ -226,6 +237,19 @@ mod tests {
             .to_vec();
 
         assert_eq!(first, second);
+        assert_eq!(generation, cache.generation());
+    }
+
+    #[test]
+    fn asynchronous_results_invalidate_dependent_rasters() {
+        let (_temp, loader) = create_loader_env();
+        let mut cache = IconCache::new_for_tests(loader);
+        let before = cache.generation();
+        cache.insert_loaded("missing".into(), 22, None);
+        assert_ne!(before, cache.generation());
+        let inserted = cache.generation();
+        assert!(cache.lookup("missing", 22).is_none());
+        assert_eq!(inserted, cache.generation());
     }
 
     #[test]

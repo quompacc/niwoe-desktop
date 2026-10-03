@@ -19,6 +19,7 @@ impl NiwoeShell {
                     .as_mut()
                     .filter(|e| e.id == room_id)
                 {
+                    edit.restore.ready = true;
                     edit.restore.revision = revision;
                     edit.restore.running = running;
                     edit.restore.message = message.clone();

@@ -147,169 +147,19 @@ const DISPLAY_ROTATE_IDS: [&str; 16] = [
 /// dispatch handler that computes the next value.
 pub(crate) const DISPLAY_SCALE_CYCLE: &[f64] = &[1.0, 1.25, 1.5, 2.0];
 
-/// Selectable rotations as (config-value, short-label). `""` = normal (the
-/// transform key is removed). Cycled by the rotate button.
-pub(crate) const DISPLAY_ROTATE_CYCLE: &[(&str, &str)] =
-    &[("", "0°"), ("90", "90°"), ("180", "180°"), ("270", "270°")];
-const DISPLAY_MODE_OPTION_IDS: [[&str; DISPLAY_MODE_OPTION_MAX]; 16] = [
-    [
-        "display-mode-select-0-0",
-        "display-mode-select-0-1",
-        "display-mode-select-0-2",
-        "display-mode-select-0-3",
-        "display-mode-select-0-4",
-        "display-mode-select-0-5",
-        "display-mode-select-0-6",
-        "display-mode-select-0-7",
-    ],
-    [
-        "display-mode-select-1-0",
-        "display-mode-select-1-1",
-        "display-mode-select-1-2",
-        "display-mode-select-1-3",
-        "display-mode-select-1-4",
-        "display-mode-select-1-5",
-        "display-mode-select-1-6",
-        "display-mode-select-1-7",
-    ],
-    [
-        "display-mode-select-2-0",
-        "display-mode-select-2-1",
-        "display-mode-select-2-2",
-        "display-mode-select-2-3",
-        "display-mode-select-2-4",
-        "display-mode-select-2-5",
-        "display-mode-select-2-6",
-        "display-mode-select-2-7",
-    ],
-    [
-        "display-mode-select-3-0",
-        "display-mode-select-3-1",
-        "display-mode-select-3-2",
-        "display-mode-select-3-3",
-        "display-mode-select-3-4",
-        "display-mode-select-3-5",
-        "display-mode-select-3-6",
-        "display-mode-select-3-7",
-    ],
-    [
-        "display-mode-select-4-0",
-        "display-mode-select-4-1",
-        "display-mode-select-4-2",
-        "display-mode-select-4-3",
-        "display-mode-select-4-4",
-        "display-mode-select-4-5",
-        "display-mode-select-4-6",
-        "display-mode-select-4-7",
-    ],
-    [
-        "display-mode-select-5-0",
-        "display-mode-select-5-1",
-        "display-mode-select-5-2",
-        "display-mode-select-5-3",
-        "display-mode-select-5-4",
-        "display-mode-select-5-5",
-        "display-mode-select-5-6",
-        "display-mode-select-5-7",
-    ],
-    [
-        "display-mode-select-6-0",
-        "display-mode-select-6-1",
-        "display-mode-select-6-2",
-        "display-mode-select-6-3",
-        "display-mode-select-6-4",
-        "display-mode-select-6-5",
-        "display-mode-select-6-6",
-        "display-mode-select-6-7",
-    ],
-    [
-        "display-mode-select-7-0",
-        "display-mode-select-7-1",
-        "display-mode-select-7-2",
-        "display-mode-select-7-3",
-        "display-mode-select-7-4",
-        "display-mode-select-7-5",
-        "display-mode-select-7-6",
-        "display-mode-select-7-7",
-    ],
-    [
-        "display-mode-select-8-0",
-        "display-mode-select-8-1",
-        "display-mode-select-8-2",
-        "display-mode-select-8-3",
-        "display-mode-select-8-4",
-        "display-mode-select-8-5",
-        "display-mode-select-8-6",
-        "display-mode-select-8-7",
-    ],
-    [
-        "display-mode-select-9-0",
-        "display-mode-select-9-1",
-        "display-mode-select-9-2",
-        "display-mode-select-9-3",
-        "display-mode-select-9-4",
-        "display-mode-select-9-5",
-        "display-mode-select-9-6",
-        "display-mode-select-9-7",
-    ],
-    [
-        "display-mode-select-10-0",
-        "display-mode-select-10-1",
-        "display-mode-select-10-2",
-        "display-mode-select-10-3",
-        "display-mode-select-10-4",
-        "display-mode-select-10-5",
-        "display-mode-select-10-6",
-        "display-mode-select-10-7",
-    ],
-    [
-        "display-mode-select-11-0",
-        "display-mode-select-11-1",
-        "display-mode-select-11-2",
-        "display-mode-select-11-3",
-        "display-mode-select-11-4",
-        "display-mode-select-11-5",
-        "display-mode-select-11-6",
-        "display-mode-select-11-7",
-    ],
-    [
-        "display-mode-select-12-0",
-        "display-mode-select-12-1",
-        "display-mode-select-12-2",
-        "display-mode-select-12-3",
-        "display-mode-select-12-4",
-        "display-mode-select-12-5",
-        "display-mode-select-12-6",
-        "display-mode-select-12-7",
-    ],
-    [
-        "display-mode-select-13-0",
-        "display-mode-select-13-1",
-        "display-mode-select-13-2",
-        "display-mode-select-13-3",
-        "display-mode-select-13-4",
-        "display-mode-select-13-5",
-        "display-mode-select-13-6",
-        "display-mode-select-13-7",
-    ],
-    [
-        "display-mode-select-14-0",
-        "display-mode-select-14-1",
-        "display-mode-select-14-2",
-        "display-mode-select-14-3",
-        "display-mode-select-14-4",
-        "display-mode-select-14-5",
-        "display-mode-select-14-6",
-        "display-mode-select-14-7",
-    ],
-    [
-        "display-mode-select-15-0",
-        "display-mode-select-15-1",
-        "display-mode-select-15-2",
-        "display-mode-select-15-3",
-        "display-mode-select-15-4",
-        "display-mode-select-15-5",
-        "display-mode-select-15-6",
-        "display-mode-select-15-7",
-    ],
-];
+// At most 16 outputs × 256 modes; initialized once, stable keyboard/pointer IDs.
+fn display_mode_option_id(output: usize, mode: usize) -> Option<&'static str> {
+    static IDS: std::sync::OnceLock<[[&'static str; DISPLAY_MODE_OPTION_MAX]; DISPLAY_OUTPUT_MAX]> =
+        std::sync::OnceLock::new();
+    IDS.get_or_init(|| {
+        std::array::from_fn(|output| {
+            std::array::from_fn(|mode| {
+                let id = format!("display-mode-select-{output}-{mode}");
+                &*Box::leak(id.into_boxed_str())
+            })
+        })
+    })
+    .get(output)
+    .and_then(|ids| ids.get(mode))
+    .copied()
+}

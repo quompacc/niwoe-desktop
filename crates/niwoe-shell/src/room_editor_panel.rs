@@ -8,10 +8,10 @@ pub(crate) const MODULES: [PanelModule; 4] = [
 ];
 pub(crate) fn label(module: PanelModule) -> &'static str {
     match module {
-        PanelModule::Tray => "Tray",
+        PanelModule::Tray => "Statussymbole",
         PanelModule::Screenshot => "Bildschirmfoto",
         PanelModule::Search => "Suche",
-        PanelModule::Status => "Systemstatus (Netzwerk, Audio, verfügbarer Akku)",
+        PanelModule::Status => "Systemstatus",
     }
 }
 

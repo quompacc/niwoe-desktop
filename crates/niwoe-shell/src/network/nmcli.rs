@@ -14,8 +14,9 @@ const DEVICE_ARGS: [&str; 5] = [
     "status",
 ];
 const WIFI_ARGS: [&str; 6] = ["-t", "-f", "IN-USE,SIGNAL,SSID", "dev", "wifi", "list"];
-const CONNECTION_LIST_ARGS: [&str; 5] = ["-t", "-f", "NAME,TYPE,DEVICE", "connection", "show"];
-const WIFI_SCAN_ARGS: [&str; 6] = [
+pub(super) const CONNECTION_LIST_ARGS: [&str; 5] =
+    ["-t", "-f", "NAME,TYPE,DEVICE", "connection", "show"];
+pub(super) const WIFI_SCAN_ARGS: [&str; 6] = [
     "-t",
     "-f",
     "IN-USE,SIGNAL,SECURITY,SSID",
@@ -424,7 +425,7 @@ fn redact_nmcli_args(args: &[String]) -> Vec<String> {
 /// able to stall the whole shell (P2-1, AUDIT_2026-08-19).
 const NMCLI_READ_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(2);
 
-fn run_nmcli(args: &[&str]) -> Option<String> {
+pub(super) fn run_nmcli(args: &[&str]) -> Option<String> {
     let mut command = Command::new("nmcli");
     command.env("LC_ALL", "C").args(args);
     let output = crate::process::output_with_timeout(&mut command, NMCLI_READ_TIMEOUT)?;
@@ -434,7 +435,7 @@ fn run_nmcli(args: &[&str]) -> Option<String> {
     String::from_utf8(output.stdout).ok()
 }
 
-fn parse_terse_fields(line: &str) -> Vec<String> {
+pub(super) fn parse_terse_fields(line: &str) -> Vec<String> {
     let mut fields = Vec::new();
     let mut current = String::new();
     let mut escaped = false;

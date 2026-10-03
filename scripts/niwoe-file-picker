@@ -35,7 +35,8 @@ ok_label = get_opt('--ok-label') or (
 )
 
 dialog = Gtk.FileChooserDialog(title=title, parent=None, action=action)
-dialog.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, ok_label, Gtk.ResponseType.OK)
+cancel_label = get_opt('--cancel-label') or Gtk.STOCK_CANCEL
+dialog.add_buttons(cancel_label, Gtk.ResponseType.CANCEL, ok_label, Gtk.ResponseType.OK)
 
 if has_flag('--multiple'):
     dialog.set_select_multiple(True)

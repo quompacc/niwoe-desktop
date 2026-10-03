@@ -1,0 +1,9 @@
+   Compiling niwoe-tokens v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-tokens)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running tests/design_guard.rs (target/debug/deps/design_guard-76fb833a401458e4)
+
+running 1 test
+test no_hardcoded_design_values_outside_central_source ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

@@ -17,6 +17,11 @@ Jede Änderung an Aussehen, Farben, Geometrie oder Effekten MUSS ihr entsprechen
 Bei Konflikt schlägt das Manifest jede andere Quelle (Audits, Altcode).
 
 Daraus abgeleitete, nicht verhandelbare Invarianten:
+- Nutzerkorrektur vom 03.10.2026: Ruhigeres, flacheres Design mit mehr Platz.
+  Keine gelben Aktivitäts-/Auswahlstriche an Controls oder Navigation;
+  Hover, Auswahl und Tastaturfokus klar trennen. Globale Navigation vereinfachen,
+  alle Einstellungen im Control Center. Details im Designmanifest; diese
+  ausdrückliche Korrektur präzisiert die alten Mockup-Dichte-/Sidebarvorgaben.
 - **Eine** zentrale Design-Quelle: `niwoe-tokens` (`Palette`, `Interaction`,
   `Elevation`, `Radius`) + `niwoe-config` (`Decorations`). Jedes UI-Element
   zieht Farbe/Alpha/Geometrie/Radius/Effekt **ausschließlich** daraus.

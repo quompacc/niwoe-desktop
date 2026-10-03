@@ -1,0 +1,13 @@
+    Checking niwoe-tokens v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-tokens)
+    Checking niwoe-app-catalog v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-app-catalog)
+    Checking niwoe-config v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-config)
+    Checking niwoe-ui v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-ui)
+    Checking niwoe-freetype v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-freetype)
+    Checking niwoe-lock v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-lock)
+    Checking niwoe-compositor v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-compositor)
+    Checking niwoe-portal v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-portal)
+    Checking niwoe-login v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-login)
+    Checking niwoe-polkit v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-polkit)
+    Checking niwoe-shell v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-shell)
+    Checking niwoe v0.5.1 (/home/eduard/niwoe-desktop)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 12.22s

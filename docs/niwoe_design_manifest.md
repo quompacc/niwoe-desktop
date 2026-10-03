@@ -76,6 +76,23 @@ Kontrastgrenzen und der Zentralitätsplan bleiben verbindlich.
 
 ## Visuelle Richtung
 
+**Nutzerkorrektur 03.10.2026:** Die bisherige Umsetzung wirkt zu eng,
+gequetscht und in ihrer Menüführung zu komplex. Die Oberfläche wird ruhiger,
+flacher und eindeutiger. Gelbe Aktivitäts-/Auswahlstriche an Buttons, Tabs und
+Navigation entfallen. Auswahl verwendet eine dezente neutrale Flächentönung
+und, wo erforderlich, ein Häkchen; Hover und Tastaturfokus sind getrennte
+Zustände. Der zusätzliche sichtbare Tastaturfokus bleibt erhalten. Controls
+erhalten mehr Höhe und Innenraum; zusammengehörige Inhalte mehr Abstand.
+Die globale Control-Center-Navigation zeigt tatsächlich verfügbare Bereiche:
+Räume, Apps, Darstellung, Leiste, System & Geräte, Benutzer und Updates.
+Dateien und Wiederherstellung bleiben in der Raumkonfiguration; der Hub hat
+einen eindeutigen Rückweg. Unverfügbare Zukunftsbereiche besetzen keine
+globalen Navigationsplätze. Diese ausdrückliche Korrektur hat Vorrang vor
+den entsprechenden Akzent-, Dichte- und Sidebarvorgaben der alten Mockups.
+Die zentrale Designquelle, das dunkelgrüne Theme und native Bedienung bleiben
+verbindlich. Umsetzung schrittweise: gemeinsame Controls, Abstände/Layout,
+dann Navigation und tatsächlicher visueller Vergleich.
+
 **Historischer Light-Stand 23.09.2026:** Gedämpftes Stein- und Salbeigrau
 ersetzten damals die nahezu weißen Flächen. Diese Palette bleibt als bestehender
 Code dokumentiert und ist seit der Nutzerentscheidung vom 25.09.2026 kein
@@ -83,14 +100,17 @@ Alpha-Lieferziel.
 
 Die Oberfläche ist ruhig, präzise und materialorientiert: tiefe entsättigte
 Grünflächen, warmes Off-White und zurückhaltendes Messing/Gold. Gold markiert
-nur aktuelle Auswahl, Fokus und die wesentliche Aktion; inaktive Icons und
+nur die wesentliche Aktion; Fokusrahmen sind neutral und kontrastreich,
+inaktive Icons und
 Konturen sind neutral. Statusinformationen erhalten eigene semantische Farben
 und Text/Icon, nie allein Farbe.
 
-Feine Konturen, klare Flächen, ruhige Überschriften und kompakte sachliche
+Feine Konturen, klare Flächen, ruhige Überschriften und großzügige sachliche
 Bedienung bilden eine Familie. Die zentrale Abstandsleiter startet mit
-4/8/12/16/24/32 logischen Pixeln; Panel (48), Controls (mindestens 32),
-Formularfelder (36) sowie Radien (4/8/12) sind in P02 als Tokens definiert.
+4/8/12/16/24/32 logischen Pixeln; Panel (48), Controls (mindestens 40),
+Formularfelder (44) sowie Radien (4/8/12) sind zentrale Tokens. Die Controls
+verwenden seit der Korrektur vom 03.10.2026 mindestens 40 logische Pixel;
+die ursprünglichen P02-Messungen sind damit historische Dichtewerte.
 Sans-Schriftgrößen sind 12/14/18/28. Serif bleibt großen Überschriften
 vorbehalten und ist keine Voraussetzung für ein vollständig lesbares UI.
 Textkontrast beträgt mindestens 4,5:1 für normalen Text und

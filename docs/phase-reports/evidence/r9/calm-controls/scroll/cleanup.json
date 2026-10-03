@@ -1,0 +1,10 @@
+{
+  "config_bytes_equal": true,
+  "other_files_equal": true,
+  "state_equal": true,
+  "neutral_foyer": true,
+  "login_marker_unchanged": true,
+  "processes_unchanged": true,
+  "shell_sha256": "e9bed1136f1dc3c014a498f90b03fd56e531fae687163a0279ab7c383a703451",
+  "shell_pid": "678998"
+}

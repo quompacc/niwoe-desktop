@@ -5,7 +5,7 @@ impl NiwoeShell {
         hasher.finish()
     }
 
-    fn theme_render_signature(&self) -> ThemeRenderSignature {
+    pub(crate) fn theme_render_signature(&self) -> ThemeRenderSignature {
         let colors = [
             self.theme.colors.background,
             self.theme.colors.surface,
@@ -247,13 +247,7 @@ impl NiwoeShell {
                     _ => niwoe_ui::WidgetState::Idle,
                 }
             };
-            let screenshot_icon = self
-                .icon_cache
-                .lookup(
-                    "camera-photo-symbolic",
-                    niwoe_tokens::Panel::DEFAULT.status_icon_size as u32,
-                )
-                .and_then(crate::icons::icon_image_to_pixmap);
+            let screenshot_icon = Self::panel_screenshot_icon(&self.icon_cache);
 
             crate::panel_view::draw_panel_ui(
                 canvas,

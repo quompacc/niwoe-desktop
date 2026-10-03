@@ -102,7 +102,10 @@ macro_rules! handle_overlays_and_desktop_pointer {
         }
 
         if $shell.pointer_surface == SurfaceKind::DesktopMenu {
-            if let PointerEventKind::Motion { .. } = $event.kind {
+            if matches!(
+                $event.kind,
+                PointerEventKind::Motion { .. } | PointerEventKind::Enter { .. }
+            ) {
                 let pad = crate::POPUP_SHADOW_PAD as f64;
                 let (px, py) = ($event.position.0 - pad, $event.position.1 - pad);
                 // Wider hover region (main menu → gap → flyout) keeps
@@ -159,24 +162,32 @@ macro_rules! handle_overlays_and_desktop_pointer {
             if let PointerEventKind::Press { button: 0x110, .. } = $event.kind {
                 let pad = crate::POPUP_SHADOW_PAD as f64;
                 let (px, py) = ($event.position.0 - pad, $event.position.1 - pad);
-                let sub_action = context_menu::submenu_hit_item_local(px, py)
-                    .and_then(|idx| context_menu::submenu_items().get(idx).map(|item| item.1));
-                let main_action = if sub_action.is_none() {
-                    context_menu::desktop_hit_item_local(px, py).and_then(|idx| {
-                        context_menu::desktop_item_list()
-                            .get(idx)
-                            .map(|item| item.1)
-                    })
-                } else {
-                    None
-                };
+                let open = $shell
+                    .desktop_context_menu
+                    .as_ref()
+                    .is_some_and(|m| m.submenu_open);
+                let selection = context_menu::desktop_selection(open, px, py);
+                if selection == Some(context_menu::DesktopSelection::OpenSettings) {
+                    if let Some(menu) = $shell.desktop_context_menu.as_mut() {
+                        menu.submenu_open = true;
+                        menu.hover_idx = Some(context_menu::SETTINGS_ITEM_IDX);
+                        menu.submenu_hover_idx = Some(0);
+                    }
+                    $shell.resize_desktop_menu_surface(true);
+                    $shell.draw_desktop_menu($qh, RepaintReason::Pointer);
+                    continue;
+                }
                 $shell.desktop_context_menu = None;
                 $shell.desktop_menu_open = false;
                 $shell.unmap_desktop_menu(crate::wayland::CommitReason::Input);
-                if let Some(sub) = sub_action {
-                    $shell.handle_settings_sub_action($qh, sub);
-                } else if let Some(action) = main_action {
-                    $shell.handle_desktop_context_menu_action($qh, action);
+                match selection {
+                    Some(context_menu::DesktopSelection::Sub(sub)) => {
+                        $shell.handle_settings_sub_action($qh, sub)
+                    }
+                    Some(context_menu::DesktopSelection::Main(action)) => {
+                        $shell.handle_desktop_context_menu_action($qh, action)
+                    }
+                    _ => {}
                 }
                 continue;
             }

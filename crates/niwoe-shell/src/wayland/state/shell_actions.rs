@@ -142,6 +142,7 @@ impl NiwoeShell {
         self.launcher_state.close();
         self.window_picker = None;
         self.launcher_settings_open = false;
+        self.settings_return_to_room_management = false;
         self.workspace_state.rooms.panel.open = false;
         self.panel_last_signature = None;
         self.panel_dirty = true;
@@ -170,6 +171,7 @@ impl NiwoeShell {
     ) {
         niwoe_config::NiwoeConfig::save_wallpaper(&path, mode);
         self.wallpaper_path = Some(path);
+        self.request_settings_refresh(crate::settings_view::SettingsCategory::Wallpaper);
         self.wallpaper_mode = mode;
         self.ipc.send(&niwoe_ipc::ShellCommand::ReloadConfig);
         tracing::info!(

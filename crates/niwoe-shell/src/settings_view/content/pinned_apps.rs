@@ -128,7 +128,7 @@ fn build_pinned_apps_content(ctx: &SettingsContentContext<'_>) -> Box<dyn Widget
         ctx.content_w,
         ctx.content_h,
         "Angeheftete Anwendungen",
-        "Reihenfolge und Auswahl der Anwendungen im Panel.",
+        "Historische Schnellstartzuordnungen aus früheren Konfigurationen.",
         body,
     )
 }

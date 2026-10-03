@@ -272,6 +272,7 @@ impl NiwoeState {
         }
 
         self.sync_outputs_with_workspace_state();
+        self.reconcile_layer_shell_outputs_after_output_change("output-layout-reapplied", None);
         self.refresh_lock_focus();
         self.mark_all_outputs_dirty("output-layout-reapplied");
     }

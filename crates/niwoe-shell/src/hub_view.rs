@@ -180,38 +180,47 @@ fn draw_header(
     config: &niwoe_config::ThemeConfig,
 ) {
     let p = crate::ui::tokens::theme_from_config(config).palette;
-    let title = Typography::DEFAULT.display_size as f32;
     let body = Typography::DEFAULT.body_size as f32;
     let caption = Typography::DEFAULT.caption_size as f32;
+    let hero = Rect {
+        x: 0,
+        y: 0,
+        width: width as i32,
+        height: H.header_height - S.xxl,
+    };
+    // Opaque static artwork provides a stable heading behind light apps;
+    // compositor glass remains untouched around/between the content cards.
+    fill(pm, hero, p.background, Radius::DEFAULT.none);
+    crate::landscape::paint(pm, hero);
     paint_text(
         pm,
         "HUB",
-        H.outer_pad,
+        H.hero_text_inset,
         H.outer_pad + S.lg,
         caption,
         p.accent,
     );
-    paint_text(
+    niwoe_ui::effect::paint_display_heading(
         pm,
         "Deine Arbeit.",
-        H.outer_pad,
-        H.outer_pad + S.xxl * 2,
-        title,
+        H.hero_text_inset,
+        H.outer_pad + S.xxl * 2 + S.lg,
+        hero,
         p.text,
     );
-    paint_text(
+    niwoe_ui::effect::paint_display_heading(
         pm,
         "In ihrem Kontext.",
-        H.outer_pad,
-        H.outer_pad + S.xxl * 3,
-        title,
+        H.hero_text_inset,
+        H.outer_pad + S.xxl * 4,
+        hero,
         p.text,
     );
     paint_text(
         pm,
         "Räume für fokussiertes Arbeiten. Alles an seinem Platz.",
-        H.outer_pad,
-        H.outer_pad + S.xxl * 4,
+        H.hero_text_inset,
+        H.outer_pad + S.xxl * 5,
         body,
         p.text_dim,
     );
@@ -348,14 +357,13 @@ fn draw_shortcuts(
     rect: Rect,
     config: &niwoe_config::ThemeConfig,
 ) {
-    section_card(pm, rect, "SCHNELLHILFE", config);
+    section_card(pm, rect, "AUFGABEN IM FOKUS", config);
     let p = crate::ui::tokens::theme_from_config(config).palette;
     let caption = Typography::DEFAULT.caption_size as f32;
-    for (index, (key, description)) in [
-        ("Tippen", "Suche starten"),
-        ("↑ / ↓", "Treffer auswählen"),
-        ("Enter", "Auswahl öffnen"),
-        ("Esc", "Zurück oder schließen"),
+    for (index, text) in [
+        "Aufgabenintegration nicht verfügbar",
+        "Es ist keine Aufgabenquelle angebunden.",
+        "Hubsuche: Tippen · Auswahl: Enter",
     ]
     .into_iter()
     .enumerate()
@@ -366,15 +374,8 @@ fn draw_shortcuts(
             width: rect.width,
             height: S.xxl,
         };
-        paint_text_left_centered(pm, key, rect.x + H.card_pad, row, caption, p.text);
-        paint_text_left_centered(
-            pm,
-            description,
-            rect.x + rect.width / 3,
-            row,
-            caption,
-            p.text_dim,
-        );
+        let text = truncate_to_fit(text, rect.width - H.card_pad * 2, caption);
+        paint_text_left_centered(pm, &text, rect.x + H.card_pad, row, caption, p.text_dim);
     }
 }
 

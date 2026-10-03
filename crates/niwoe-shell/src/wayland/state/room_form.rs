@@ -12,7 +12,7 @@ impl NiwoeShell {
             return;
         }
         if self.workspace_state.rooms.panel.open {
-            if let Some(index) = view::panel::hit(x, y, width, height) {
+            if let Some(index) = view::panel::hit(&self.workspace_state.rooms.panel, x, y, width, height) {
                 self.panel_form_action(qh, index);
             }
         } else if self.room_configuration_id.is_some() {
@@ -27,6 +27,8 @@ impl NiwoeShell {
             {
                 self.room_configuration_action(qh, action);
             }
+        } else if let Some(action) = view::pages::hit(x, y, width, height) {
+            self.room_list_action(qh, action);
         } else if let Some(action) = view::list::hit_list(x, y, width) {
             self.room_list_action(qh, action);
         } else if view::hit_new_room(x, y, width) {
@@ -35,9 +37,15 @@ impl NiwoeShell {
             self.return_to_hub(qh);
         } else {
             let rooms = self.visible_rooms();
-            if let Some(index) =
-                view::hit_room(x, y, width, height, rooms.len(), self.room_management_page)
-            {
+            if let Some(index) = view::hit_room(
+                x,
+                y,
+                width,
+                height,
+                rooms.len(),
+                self.room_management_page,
+                self.workspace_state.rooms.list.list_view,
+            ) {
                 self.open_room_configuration(qh, rooms[index].id);
             }
         }
@@ -54,15 +62,40 @@ impl NiwoeShell {
             self.open_new_room(qh);
             return;
         }
+        if matches!(action, 6 | 7) {
+            let count = self.visible_rooms().len();
+            if !crate::room_management_view::pages::enabled(
+                action,
+                count,
+                self.room_management_page,
+            ) {
+                return;
+            }
+            self.room_management_page = if action == 6 {
+                self.room_management_page.saturating_sub(1)
+            } else {
+                self.room_management_page.saturating_add(1)
+            };
+            self.workspace_state.rooms.list.search_focus = false;
+            self.workspace_state.rooms.list.focus = Some(action);
+            self.room_keyboard_focus = None;
+            self.hovered_bento_idx = None;
+            self.draw_launcher(qh, RepaintReason::Pointer);
+            return;
+        }
         let list = &mut self.workspace_state.rooms.list;
         list.search_focus = action == 4;
         list.focus = Some(action);
         match action {
             0..=2 => list.filter = action,
             3 => list.alphabetical = !list.alphabetical,
+            8 => list.list_view = false,
+            9 => list.list_view = true,
             _ => {}
         }
-        self.room_management_page = 0;
+        if action <= 4 {
+            self.room_management_page = 0;
+        }
         self.room_keyboard_focus = None;
         self.hovered_bento_idx = None;
         self.draw_launcher(qh, RepaintReason::Pointer);
@@ -87,15 +120,6 @@ impl NiwoeShell {
                         "Bitte den neuen Raum zuerst speichern.".into();
                 } else {
                     self.open_layout_panel();
-                    if tab == 2 {
-                        self.workspace_state
-                            .rooms
-                            .edit
-                            .as_mut()
-                            .unwrap()
-                            .restore
-                            .focus = 6;
-                    }
                 }
             }
         }
@@ -155,11 +179,7 @@ impl NiwoeShell {
         }
         let focus = edit.focus;
         if matches!(key, Keysym::Tab | Keysym::ISO_Left_Tab) {
-            let order: &[usize] = if edit.form.tab == 1 {
-                &[30, 31, 32, 33, 14, 15, 16, 20, 21, 22, 23, 24, 25, 3, 4]
-            } else {
-                &[30, 31, 32, 33, 9, 0, 5, 1, 2, 10, 11, 8, 12, 13, 6, 7, 3, 4]
-            };
+            let order = edit.focus_order(self.workspace_state.rooms.snapshot.rooms.len());
             let index = order.iter().position(|i| *i == focus).unwrap_or(0);
             let next = order[(index
                 + if key == Keysym::Tab {

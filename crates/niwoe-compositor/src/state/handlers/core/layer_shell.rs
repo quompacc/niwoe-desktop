@@ -14,6 +14,8 @@ use smithay::{
 use super::super::super::NiwoeState;
 use crate::state::OutputInfo;
 
+mod assignment;
+
 fn select_layer_output_info<'a>(
     infos: &'a [OutputInfo],
     requested_output_name: Option<&str>,
@@ -65,6 +67,8 @@ impl NiwoeState {
             );
             return;
         }
+
+        self.reassign_layer_output_targets();
 
         if action == "output-removed" {
             let fallback = select_layer_recovery_output_info(self.output_registry.list(), None)
@@ -148,6 +152,11 @@ impl WlrLayerShellHandler for NiwoeState {
         layer: WlrLayer,
         namespace: String,
     ) {
+        let assignment = if output.is_none() {
+            assignment::Assignment::Primary
+        } else {
+            assignment::Assignment::Current
+        };
         let requested_output_name = output
             .as_ref()
             .and_then(Output::from_resource)
@@ -208,6 +217,7 @@ impl WlrLayerShellHandler for NiwoeState {
         );
 
         let layer = DesktopLayerSurface::new(surface, namespace);
+        layer.user_data().insert_if_missing(|| assignment);
         let map_result = {
             let mut map = layer_map_for_output(&output);
             map.map_layer(&layer)

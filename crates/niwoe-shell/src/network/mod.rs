@@ -2,6 +2,8 @@
 // nmcli, while FreeBSD derives state from ifconfig (NetworkManager is Linux-
 // only). Both backends expose the same surface so the panel/settings UI below
 // is backend-agnostic.
+mod lists;
+pub(crate) use lists::{ListStatus, NetworkLists};
 #[cfg(target_os = "linux")]
 mod nmcli;
 #[cfg(target_os = "linux")]

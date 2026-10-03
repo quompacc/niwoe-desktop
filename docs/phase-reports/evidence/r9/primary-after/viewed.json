@@ -1,0 +1,56 @@
+[
+    {
+        "image":  "r9-primary-after-before-second-output.png",
+        "sha256":  "27ad9ce6649bb0786cae53acfd7a84eff49a29349e245478a13a01d0e4cd598a",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-primary-after-first-output-selected-on-second-primary.png",
+        "sha256":  "802aca29a0e9583683e40e436ff8f934ccf79eb17395830d82f6a2a06830d9d7",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-primary-after-first-primary-restored.png",
+        "sha256":  "2a584b9d36de50fba6a931f55a16438682fedaa0e6a33a28654b6ae51bba1cae",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-primary-after-fresh-login-hub.png",
+        "sha256":  "1c3d9a576c50fcf94b797550e2e71e0e135c01306539da615c5eaf90e50907dc",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-primary-after-old-output-after-save.png",
+        "sha256":  "f791223cb1fe38a20357cf9e14626627df20bf6999eb218c1d1df2d56a75f658",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-primary-after-second-output-after-return.png",
+        "sha256":  "80266ddc118121a4a3b6dac1c37c32a2f6cd5c68cecce433b87417e2d44c16aa",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-primary-after-second-primary-saved.png",
+        "sha256":  "dc32904c526e7f999dfa892da98740b5e94d98d047f95907fa229c1a0d8d3ec9",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-session-tail-regular-hub-after-watchdog.png",
+        "sha256":  "14fdc94860ca42de69a64bb34e9e410033ab7f5006b003537b8e77d89d106fb7",
+        "actually_viewed":  true,
+        "published":  false
+    },
+    {
+        "image":  "r9-session-tail-watchdog-neutral-desktop.png",
+        "sha256":  "99e14594fc6acc28c0717bad91f831cea12f15698872d611ab51fd5ed4e6a8dc",
+        "actually_viewed":  true,
+        "published":  false
+    }
+]

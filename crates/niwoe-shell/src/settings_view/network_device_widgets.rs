@@ -1,369 +1,141 @@
-struct NetworkProfileRow {
+fn bluetooth_adapter_controls(snapshot: &BluetoothSnapshot) -> Box<dyn Widget> {
+    let c = SETTINGS_CHROME;
+    let control_w = c.device_control_width;
+    Box::new(Container::row(
+        c.option_gap,
+        vec![
+            Box::new(SettingsControl {
+                id: Some("bt-power-toggle"),
+                kind: niwoe_ui::widget::ComponentKind::Chip,
+                disabled: false,
+                label: if snapshot.powered {
+                    "Bluetooth: an"
+                } else {
+                    "Bluetooth: aus"
+                }
+                .into(),
+                selected: snapshot.powered,
+                width: control_w,
+            }) as Box<dyn Widget>,
+            Box::new(SettingsControl {
+                id: Some("bt-scan-toggle"),
+                kind: niwoe_ui::widget::ComponentKind::Button,
+                disabled: !snapshot.powered || snapshot.scanning,
+                label: if snapshot.scanning {
+                    "Suche läuft"
+                } else {
+                    "Geräte suchen"
+                }
+                .into(),
+                selected: false,
+                width: control_w,
+            }) as Box<dyn Widget>,
+        ],
+    ))
+}
+
+// Prepare text and cached functional artwork once when building the tree.
+// IDs continue to refer to the original provider snapshot, including inert
+// connected rows; no sorting/filtering changes the dispatch index.
+fn network_profile_row(
     index: usize,
-    name: Box<str>,
-    type_label: Box<str>,
-    active: bool,
-    accent: Color,
-    row_width: i32,
+    profile: &ConnectionProfile,
+    width: i32,
+    pal: &niwoe_ui::style::Palette,
+) -> Box<dyn Widget> {
+    use niwoe_ui::effect::Symbol;
+    let kind = if profile.type_label == "Bridge" {
+        "Netzwerkbrücke"
+    } else {
+        &profile.type_label
+    };
+    let status = if profile.active {
+        "Verbunden"
+    } else {
+        "Zum Verbinden auswählen"
+    };
+    settings_text_row(
+        profile.name.as_str(),
+        format!("{kind} · {status}"),
+        width,
+        (!profile.active)
+            .then(|| NETWORK_PROFILE_IDS.get(index).copied())
+            .flatten(),
+        profile.active,
+        Some(match profile.type_label.as_str() {
+            "WLAN" => Symbol::Network,
+            "VPN" => Symbol::Lock,
+            _ => Symbol::NetworkWired,
+        }),
+        profile.active.then_some(Symbol::Check),
+        pal,
+    )
 }
 
-impl Widget for NetworkProfileRow {
-    fn id(&self) -> Option<&'static str> {
-        if self.active {
-            None
-        } else {
-            NETWORK_PROFILE_IDS.get(self.index).copied()
-        }
-    }
-
-    fn style(&self) -> WidgetStyle {
-        WidgetStyle {
-            size: UiSize {
-                width: ui_length(self.row_width as f32),
-                height: ui_length(NETWORK_PROFILE_ROW_H as f32),
-            },
-            ..Default::default()
-        }
-    }
-
-    fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
-        let bg = if self.active {
-            theme.palette.surface
-        } else {
-            match state {
-                WidgetState::Idle => theme.palette.surface,
-                WidgetState::Hovered => Interaction::DEFAULT.hover(theme.palette.surface),
-                WidgetState::Pressed => Interaction::DEFAULT.pressed(theme.palette.surface),
-            }
-        };
-        if let Some(path) = rounded_rect_path(area, THEME_ROW_CORNER) {
-            paint_fill(canvas, &path, bg);
-        }
-        if self.active {
-            let strip = Rect {
-                x: area.x,
-                y: area.y + 8,
-                width: 3,
-                height: area.height - 16,
-            };
-            if let Some(path) = rounded_rect_path(strip, 1) {
-                paint_fill(canvas, &path, self.accent);
-            }
-        }
-        paint_text(
-            canvas,
-            &fit_text(&self.name, 36),
-            area.x + 18,
-            area.y + 24,
-            13.5,
-            theme.palette.text,
-        );
-        paint_text(
-            canvas,
-            &self.type_label,
-            area.x + 18,
-            area.y + 44,
-            11.5,
-            theme.palette.text_dim,
-        );
-        if self.active {
-            paint_text(
-                canvas,
-                "VERBUNDEN",
-                area.x + area.width - 104,
-                area.y + 24,
-                10.5,
-                self.accent,
-            );
-        } else if state != WidgetState::Idle {
-            paint_text(
-                canvas,
-                "Verbinden",
-                area.x + area.width - 96,
-                area.y + 24,
-                10.5,
-                theme.palette.text_dim,
-            );
-        }
-    }
-}
-
-/// A clickable scanned Wi-Fi row. The in-use network shows a "VERBUNDEN" badge
-/// and is inert; others are clickable to connect. Secured networks show a lock
-/// glyph and the signal strength; clicking a secured unknown network opens the
-/// password prompt (handled in the dispatch).
-struct WifiRow {
+fn wifi_row(
     index: usize,
-    ssid: Box<str>,
-    signal: u8,
-    secured: bool,
-    in_use: bool,
-    accent: Color,
-    row_width: i32,
+    network: &WifiNetwork,
+    width: i32,
+    pal: &niwoe_ui::style::Palette,
+) -> Box<dyn Widget> {
+    use niwoe_ui::effect::Symbol;
+    let security = if network.secured {
+        "Gesichert"
+    } else {
+        "Offenes WLAN"
+    };
+    let status = if network.in_use {
+        "Verbunden"
+    } else {
+        "Zum Verbinden auswählen"
+    };
+    settings_text_row(
+        network.ssid.as_str(),
+        format!("{security} · Signal {} % · {status}", network.signal),
+        width,
+        (!network.in_use)
+            .then(|| WIFI_NETWORK_IDS.get(index).copied())
+            .flatten(),
+        network.in_use,
+        Some(if network.secured {
+            Symbol::Lock
+        } else {
+            Symbol::Network
+        }),
+        network.in_use.then_some(Symbol::Check),
+        pal,
+    )
 }
 
-impl Widget for WifiRow {
-    fn id(&self) -> Option<&'static str> {
-        if self.in_use {
-            None
-        } else {
-            WIFI_NETWORK_IDS.get(self.index).copied()
-        }
-    }
-
-    fn style(&self) -> WidgetStyle {
-        WidgetStyle {
-            size: UiSize {
-                width: ui_length(self.row_width as f32),
-                height: ui_length(NETWORK_PROFILE_ROW_H as f32),
-            },
-            ..Default::default()
-        }
-    }
-
-    fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
-        let bg = if self.in_use {
-            theme.palette.surface
-        } else {
-            match state {
-                WidgetState::Idle => theme.palette.surface,
-                WidgetState::Hovered => Interaction::DEFAULT.hover(theme.palette.surface),
-                WidgetState::Pressed => Interaction::DEFAULT.pressed(theme.palette.surface),
-            }
-        };
-        if let Some(path) = rounded_rect_path(area, THEME_ROW_CORNER) {
-            paint_fill(canvas, &path, bg);
-        }
-        if self.in_use {
-            let strip = Rect {
-                x: area.x,
-                y: area.y + 8,
-                width: 3,
-                height: area.height - 16,
-            };
-            if let Some(path) = rounded_rect_path(strip, 1) {
-                paint_fill(canvas, &path, self.accent);
-            }
-        }
-        paint_text(
-            canvas,
-            &fit_text(&self.ssid, 32),
-            area.x + 18,
-            area.y + 24,
-            13.5,
-            theme.palette.text,
-        );
-        // Sub-line: security + signal strength (text marker, not emoji — the
-        // shell font has no emoji glyphs).
-        let lock = if self.secured { "gesichert" } else { "offen" };
-        paint_text(
-            canvas,
-            &format!("{} · Signal {}%", lock, self.signal),
-            area.x + 18,
-            area.y + 44,
-            11.5,
-            theme.palette.text_dim,
-        );
-        if self.in_use {
-            paint_text(
-                canvas,
-                "VERBUNDEN",
-                area.x + area.width - 104,
-                area.y + 24,
-                10.5,
-                self.accent,
-            );
-        } else if state != WidgetState::Idle {
-            paint_text(
-                canvas,
-                "Verbinden",
-                area.x + area.width - 96,
-                area.y + 24,
-                10.5,
-                theme.palette.text_dim,
-            );
-        }
-    }
-}
-
-/// A clickable Bluetooth device row. A connected device shows a "VERBUNDEN"
-/// badge and is inert; a paired-but-disconnected device shows "Gekoppelt" and
-/// connects on click; an unknown device shows its address and pairs on click.
-struct BluetoothDeviceRow {
+fn bluetooth_device_row(
     index: usize,
-    name: Box<str>,
-    address: Box<str>,
-    paired: bool,
-    connected: bool,
-    accent: Color,
-    row_width: i32,
-}
-
-impl Widget for BluetoothDeviceRow {
-    fn id(&self) -> Option<&'static str> {
-        if self.connected {
-            None
-        } else {
-            BT_DEVICE_IDS.get(self.index).copied()
-        }
-    }
-
-    fn style(&self) -> WidgetStyle {
-        WidgetStyle {
-            size: UiSize {
-                width: ui_length(self.row_width as f32),
-                height: ui_length(NETWORK_PROFILE_ROW_H as f32),
-            },
-            ..Default::default()
-        }
-    }
-
-    fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, state: WidgetState) {
-        let bg = if self.connected {
-            theme.palette.surface
-        } else {
-            match state {
-                WidgetState::Idle => theme.palette.surface,
-                WidgetState::Hovered => Interaction::DEFAULT.hover(theme.palette.surface),
-                WidgetState::Pressed => Interaction::DEFAULT.pressed(theme.palette.surface),
-            }
-        };
-        if let Some(path) = rounded_rect_path(area, THEME_ROW_CORNER) {
-            paint_fill(canvas, &path, bg);
-        }
-        if self.connected {
-            let strip = Rect {
-                x: area.x,
-                y: area.y + 8,
-                width: 3,
-                height: area.height - 16,
-            };
-            if let Some(path) = rounded_rect_path(strip, 1) {
-                paint_fill(canvas, &path, self.accent);
-            }
-        }
-        let title = if self.name.is_empty() {
-            self.address.clone()
-        } else {
-            self.name.clone()
-        };
-        paint_text(
-            canvas,
-            &fit_text(&title, 32),
-            area.x + 18,
-            area.y + 24,
-            13.5,
-            theme.palette.text,
-        );
-        let sub = if self.paired { "gekoppelt" } else { "neu" };
-        paint_text(
-            canvas,
-            &format!("{} · {}", sub, self.address),
-            area.x + 18,
-            area.y + 44,
-            11.5,
-            theme.palette.text_dim,
-        );
-        if self.connected {
-            paint_text(
-                canvas,
-                "VERBUNDEN",
-                area.x + area.width - 104,
-                area.y + 24,
-                10.5,
-                self.accent,
-            );
-        } else if state != WidgetState::Idle {
-            let hint = if self.paired { "Verbinden" } else { "Koppeln" };
-            paint_text(
-                canvas,
-                hint,
-                area.x + area.width - 96,
-                area.y + 24,
-                10.5,
-                theme.palette.text_dim,
-            );
-        }
-    }
-}
-
-struct PrinterRow {
-    printer: PrinterInfo,
-    row_width: i32,
-    accent: Color,
-}
-
-impl Widget for PrinterRow {
-    fn style(&self) -> WidgetStyle {
-        WidgetStyle {
-            size: UiSize {
-                width: ui_length(self.row_width as f32),
-                height: ui_length(PRINTER_ROW_H as f32),
-            },
-            ..Default::default()
-        }
-    }
-
-    fn paint(&self, area: Rect, canvas: &mut PixmapMut<'_>, theme: &Theme, _state: WidgetState) {
-        if let Some(path) = rounded_rect_path(area, THEME_ROW_CORNER) {
-            paint_fill(canvas, &path, theme.palette.surface);
-        }
-        if self.printer.is_default {
-            let strip = Rect {
-                x: area.x,
-                y: area.y + 8,
-                width: 3,
-                height: area.height - 16,
-            };
-            if let Some(path) = rounded_rect_path(strip, 1) {
-                paint_fill(canvas, &path, self.accent);
-            }
-        }
-
-        let title = fit_text(&self.printer.name, 42);
-        paint_text(
-            canvas,
-            &title,
-            area.x + 18,
-            area.y + 26,
-            13.5,
-            theme.palette.text,
-        );
-        if self.printer.is_default {
-            paint_text(
-                canvas,
-                "DEFAULT",
-                area.x + area.width - 88,
-                area.y + 26,
-                10.5,
-                self.accent,
-            );
-        }
-
-        let accepting = match self.printer.accepting {
-            Some(true) => "accepting",
-            Some(false) => "not accepting",
-            None => "accepting unknown",
-        };
-        let state = if self.printer.enabled {
-            "enabled"
-        } else {
-            "disabled"
-        };
-        let detail = format!(
-            "{} / {} / {} jobs / {}",
-            state,
-            accepting,
-            self.printer.job_count,
-            fit_text(&self.printer.status, 48)
-        );
-        paint_text(
-            canvas,
-            &detail,
-            area.x + 18,
-            area.y + 52,
-            12.0,
-            theme.palette.text_dim,
-        );
-    }
+    device: &crate::bluetooth::BluetoothDevice,
+    width: i32,
+    pal: &niwoe_ui::style::Palette,
+) -> Box<dyn Widget> {
+    use niwoe_ui::effect::Symbol;
+    let title = if device.name.is_empty() {
+        device.address.as_str()
+    } else {
+        device.name.as_str()
+    };
+    let status = if device.connected {
+        "Verbunden"
+    } else if device.paired {
+        "Gekoppelt · Zum Verbinden auswählen"
+    } else {
+        "Nicht gekoppelt · Zum Koppeln auswählen"
+    };
+    settings_text_row(
+        title,
+        status,
+        width,
+        (!device.connected)
+            .then(|| BT_DEVICE_IDS.get(index).copied())
+            .flatten(),
+        device.connected,
+        Some(Symbol::Bluetooth),
+        device.connected.then_some(Symbol::Check),
+        pal,
+    )
 }

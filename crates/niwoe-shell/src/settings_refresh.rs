@@ -1,23 +1,21 @@
 //! One-shot Settings data refreshes kept off the Wayland event loop.
 
+pub(crate) mod wallpaper;
+
 use std::sync::mpsc::Sender;
 
 use crate::settings_view::SettingsCategory;
 
 pub(crate) enum SettingsData {
     SystemInfo(crate::sysinfo::SystemInfo),
+    Users(crate::users::UserState),
     Printers(crate::printers::PrinterSnapshot),
     Audio(crate::audio::AudioSnapshot),
-    Network {
-        profiles: Vec<crate::network::ConnectionProfile>,
-        wifi: Vec<crate::network::WifiNetwork>,
-    },
+    Network(crate::network::NetworkLists),
     Bluetooth(crate::bluetooth::BluetoothSnapshot),
-    DefaultApps {
-        index: crate::default_apps::MimeAppIndex,
-        current: std::collections::HashMap<crate::default_apps::DefaultAppCategory, String>,
-    },
-    WallpaperThumbnails(Vec<Option<(u32, u32, Vec<u8>)>>),
+    DefaultApps(crate::default_apps::refresh::RefreshData),
+    Wallpaper(wallpaper::WallpaperData),
+    Cursor(crate::cursor::preview::CursorPreviews),
 }
 
 pub(crate) struct SettingsRefreshResult {
@@ -29,18 +27,23 @@ pub(crate) fn supports(category: SettingsCategory) -> bool {
     matches!(
         category,
         SettingsCategory::SystemOverview
+            | SettingsCategory::Users
             | SettingsCategory::Printers
             | SettingsCategory::Sound
             | SettingsCategory::Network
             | SettingsCategory::Bluetooth
             | SettingsCategory::DefaultApps
             | SettingsCategory::Wallpaper
+            | SettingsCategory::Cursor
     )
 }
 
 pub(crate) fn spawn(
     category: SettingsCategory,
-    wallpapers: Vec<niwoe_config::WallpaperEntry>,
+    wallpaper: wallpaper::WallpaperRequest,
+    cursor: crate::cursor::preview::CursorRequest,
+    icon_config: (String, String),
+    default_apps_change: Option<crate::default_apps::refresh::ChangeRequest>,
     tx: Sender<SettingsRefreshResult>,
 ) {
     if !supports(category) {
@@ -51,35 +54,29 @@ pub(crate) fn spawn(
             SettingsCategory::SystemOverview => {
                 SettingsData::SystemInfo(crate::sysinfo::SystemInfo::gather())
             }
+            SettingsCategory::Users => SettingsData::Users(crate::users::UserAccounts::gather()),
             SettingsCategory::Printers => {
                 SettingsData::Printers(crate::printers::PrinterSnapshot::poll())
             }
             SettingsCategory::Sound => SettingsData::Audio(crate::audio::AudioSnapshot::poll()),
-            SettingsCategory::Network => SettingsData::Network {
-                profiles: crate::network::list_saved_connections(),
-                wifi: crate::network::scan_wifi_networks(),
-            },
+            SettingsCategory::Network => {
+                SettingsData::Network(crate::network::NetworkLists::poll())
+            }
             SettingsCategory::Bluetooth => {
                 SettingsData::Bluetooth(crate::bluetooth::BluetoothSnapshot::poll())
             }
-            SettingsCategory::DefaultApps => SettingsData::DefaultApps {
-                index: crate::default_apps::MimeAppIndex::load_system(),
-                current: crate::default_apps::snapshot_current_defaults(),
-            },
+            SettingsCategory::DefaultApps => SettingsData::DefaultApps(
+                crate::default_apps::refresh::RefreshData::load(&icon_config, default_apps_change),
+            ),
             SettingsCategory::Wallpaper => {
-                let settings = niwoe_tokens::Settings::DEFAULT;
-                SettingsData::WallpaperThumbnails(
-                    wallpapers
-                        .iter()
-                        .map(|entry| {
-                            crate::wayland::load_wallpaper_thumbnail(
-                                &entry.thumbnail_path,
-                                settings.wallpaper_thumbnail_width,
-                                settings.wallpaper_thumbnail_height,
-                            )
-                        })
-                        .collect(),
-                )
+                SettingsData::Wallpaper(wallpaper::WallpaperData::load(wallpaper))
+            }
+            SettingsCategory::Cursor => {
+                SettingsData::Cursor(crate::cursor::preview::CursorPreviews::load(
+                    cursor.themes,
+                    cursor.size,
+                    cursor.previous,
+                ))
             }
             _ => return,
         };
@@ -94,6 +91,7 @@ mod tests {
     #[test]
     fn only_io_backed_pages_request_a_refresh() {
         assert!(supports(SettingsCategory::SystemOverview));
+        assert!(supports(SettingsCategory::Users));
         assert!(supports(SettingsCategory::Printers));
         assert!(supports(SettingsCategory::Sound));
         assert!(supports(SettingsCategory::Network));
@@ -101,7 +99,7 @@ mod tests {
         assert!(supports(SettingsCategory::DefaultApps));
         assert!(supports(SettingsCategory::Wallpaper));
         assert!(!supports(SettingsCategory::Theme));
-        assert!(!supports(SettingsCategory::Cursor));
+        assert!(supports(SettingsCategory::Cursor));
         assert!(!supports(SettingsCategory::Display));
     }
 }

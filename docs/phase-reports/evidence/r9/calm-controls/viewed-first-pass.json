@@ -1,0 +1,121 @@
+[
+    {
+        "image":  "r9-calm-appearance-keyboard.png",
+        "sha256":  "dad43e6023877034cb232089971427486b601a2e2459868016c5687c9016f1d7",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-appearance-keyboard-focus.png",
+        "sha256":  "f25cc04fbd4dbdc3b53007a2f3c5ee932aae95d04e88c0287cb71405dd063a7d",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-apps-keyboard.png",
+        "sha256":  "c2daacf4605c7eddf93daee6145ba0f9991fc0b8c3b4efb5b352b8c597055123",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-cursor-mouse.png",
+        "sha256":  "33f9b5d99ce0ddc01420895bcedf1241a00faff2238d350011903e7f11a241ab",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-display-keyboard.png",
+        "sha256":  "189f789ce5c4d6c0053b446d66be1444c8eb91ef6214a98d02329adaef7bef0f",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-network-mouse.png",
+        "sha256":  "fd3599903655901ba499d6b5dc8c05f0e5203e526261fbed897e73fb9eeb66c0",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-panel-keyboard.png",
+        "sha256":  "52049c8a5adaf275b116ce4dc97a2b1fb8d5144a21335eeb987e660bb55e7147",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-room-apps.png",
+        "sha256":  "13fe4d8c0ae7ce3cbe6d6be723c4b34f18a6b8c7ff04fae7ed009dfb9a241586",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-room-files.png",
+        "sha256":  "ef640f6302be42bd2fd5f030c252c0b34367f9bd0948366ba7dd4f8ddc787915",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-room-general.png",
+        "sha256":  "a2f74bec51d06fc4779876f737488783759700053abfbb4b4cf05efa196b1f67",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-rooms-keyboard-wrap.png",
+        "sha256":  "24030dd003230707166f140b1695a0a859c71a7570f320064e4968ad87b2be6c",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-rooms-mouse.png",
+        "sha256":  "acff77f080acd8cce04be9d1ce41d19f27840b86721bed9c15cc0925c0d66628",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-sound-mouse.png",
+        "sha256":  "02adff79afd4baad576bfc69cbe7ddb4177e60c3c589a6457fcf2206211b2858",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-system-mouse.png",
+        "sha256":  "49721efee66677cb524489703ca54867d49b0c0a9e130d9a4930d3b5e516a65d",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-updates-keyboard.png",
+        "sha256":  "193b7a36841a58a018fbf5e9d9ba24922b7e650f508f9ba2100638ca4f84743d",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-users-keyboard.png",
+        "sha256":  "bd26e5f32a97833ae76e4397b5e4a153dd9c3099d5979a4cbf9700a5922780a9",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    },
+    {
+        "image":  "r9-calm-watchdog-neutral-desktop.png",
+        "sha256":  "8aeff4af291be24c4a6618c70c4ddbcc77876093319b36e17ade023fc20d318f",
+        "actually_viewed":  true,
+        "published":  false,
+        "stand":  "first-pass-f5de3bdc"
+    }
+]

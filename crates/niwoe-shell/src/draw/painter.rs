@@ -31,8 +31,81 @@ impl<'a> Painter<'a> {
         }
     }
 
+    /// Shared native icon cache; channel swap matches this painter's BGRA canvas.
+    pub fn symbol(
+        &mut self,
+        symbol: niwoe_ui::effect::Symbol,
+        x: i32,
+        y: i32,
+        color: Color,
+        size: u32,
+    ) {
+        let color = crate::ui::tokens::bgra_color(color);
+        let Some(icon) = niwoe_ui::effect::symbol_icon(symbol, color, size) else {
+            return;
+        };
+        let Some(mut target) =
+            tiny_skia::PixmapMut::from_bytes(self.data, self.width as u32, self.height as u32)
+        else {
+            return;
+        };
+        target.draw_pixmap(
+            x,
+            y,
+            icon.as_ref().as_ref(),
+            &tiny_skia::PixmapPaint::default(),
+            tiny_skia::Transform::identity(),
+            None,
+        );
+    }
+
     pub fn roundish_rect(&mut self, rect: Rect, color: Color) {
         self.fill_rounded_rect(rect, color, DEFAULT_ROUNDISH_RADIUS);
+    }
+
+    pub fn focus(&mut self, rect: Rect, color: Color, radius: i32) {
+        if let Some(mut target) =
+            tiny_skia::PixmapMut::from_bytes(self.data, self.width as u32, self.height as u32)
+        {
+            niwoe_ui::effect::paint_focus(
+                &mut target,
+                niwoe_ui::Rect {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.w,
+                    height: rect.h,
+                },
+                crate::ui::tokens::bgra_color(color),
+                radius,
+            );
+        }
+    }
+
+    pub fn text_pair(
+        &mut self,
+        rect: Rect,
+        title: &str,
+        detail: &str,
+        title_color: Color,
+        detail_color: Color,
+    ) {
+        if let Some(mut target) =
+            tiny_skia::PixmapMut::from_bytes(self.data, self.width as u32, self.height as u32)
+        {
+            niwoe_ui::effect::paint_text_pair(
+                &mut target,
+                niwoe_ui::Rect {
+                    x: rect.x,
+                    y: rect.y,
+                    width: rect.w,
+                    height: rect.h,
+                },
+                title,
+                detail,
+                crate::ui::tokens::bgra_color(title_color),
+                crate::ui::tokens::bgra_color(detail_color),
+            );
+        }
     }
 
     pub fn roundish_rect_with_radius(&mut self, rect: Rect, color: Color, radius: i32) {

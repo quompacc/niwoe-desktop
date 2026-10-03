@@ -36,7 +36,9 @@ fn build_theme_content(ctx: &SettingsContentContext<'_>) -> Box<dyn Widget> {
             Box::new(SettingsGroupHeading {
                 width: options_w,
                 title: "Oberfläche",
-                description: "Helle und dunkle Darstellung verwenden dieselben Proportionen und Effekte.",
+                description:
+                    "Helle und dunkle Darstellung verwenden dieselben Proportionen und Effekte."
+                        .into(),
             }) as Box<dyn Widget>,
             options,
         ],

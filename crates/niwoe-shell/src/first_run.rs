@@ -33,6 +33,15 @@ pub(crate) struct Wizard {
 }
 
 impl Wizard {
+    pub fn report_error(&mut self, error: String) {
+        self.complete_after_save = false;
+        self.message = if self.state.is_none() {
+            "Die Einführung konnte nicht geladen werden. Zustand neu laden; vorhandene Einstellungen bleiben erhalten.".into()
+        } else {
+            error
+        };
+    }
+
     pub fn busy(&self) -> bool {
         self.pending.is_some()
     }
@@ -45,6 +54,7 @@ impl Wizard {
             .iter()
             .any(|r| matches!(r, RoomChange::Configure { name: n, .. } if n == name))
     }
+    #[cfg(test)]
     pub fn controls(&self) -> Vec<String> {
         let mut controls = match self.draft.step {
             0 => vec![],
@@ -225,6 +235,40 @@ impl Wizard {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unreadable_state_preserves_local_draft_and_only_offers_exit_or_reload() {
+        let mut wizard = Wizard::default();
+        wizard.draft.profile = niwoe_ipc::InteractionProfile::Keyboard;
+        wizard.draft.step = 3;
+        wizard.complete_after_save = true;
+        let original = wizard.draft.clone();
+        wizard.report_error("expected value at line 1 column 1".into());
+        assert_eq!(wizard.draft, original);
+        assert!(!wizard.complete_after_save);
+        assert!(wizard
+            .message
+            .starts_with("Die Einführung konnte nicht geladen werden."));
+        assert!(!wizard.message.contains("expected value"));
+        let base = wizard.control_count() - 5;
+        for index in 0..wizard.control_count() {
+            assert_eq!(
+                wizard.enabled(index),
+                index == base + 3 || index == base + 4
+            );
+        }
+        wizard.state = Some(FirstRunSnapshot {
+            revision: 5,
+            fresh: false,
+            completed: false,
+            applying: true,
+            draft: Some(original),
+        });
+        let conflict = "Konflikt: Einführung wurde geändert. Zustand neu laden.";
+        wizard.report_error(conflict.into());
+        assert_eq!(wizard.message, conflict);
+        assert!(wizard.enabled(base + 1));
+    }
 
     #[test]
     fn practice_shortcut_target_survives_room_reordering() {

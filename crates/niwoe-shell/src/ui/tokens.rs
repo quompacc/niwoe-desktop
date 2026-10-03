@@ -8,6 +8,29 @@ pub(crate) fn color_from_config(color: Color) -> UiColor {
     UiColor::rgba(color.r, color.g, color.b, color.a)
 }
 
+/// Pixel-format adaptation, with no change to the design color itself.
+pub(crate) fn bgra_color(color: Color) -> Color {
+    Color::rgba(color.b, color.g, color.r, color.a)
+}
+
+/// For tiny-skia controls drawn directly into the shell's BGRA buffer.
+pub(crate) fn bgra_palette_from_config(config: &ThemeConfig) -> UiPalette {
+    let p = palette_from_config(config);
+    UiPalette {
+        background: bgra_color(p.background),
+        surface: bgra_color(p.surface),
+        surface_alt: bgra_color(p.surface_alt),
+        accent: bgra_color(p.accent),
+        accent_alt: bgra_color(p.accent_alt),
+        text: bgra_color(p.text),
+        text_dim: bgra_color(p.text_dim),
+        border: bgra_color(p.border),
+        error: bgra_color(p.error),
+        warning: bgra_color(p.warning),
+        success: bgra_color(p.success),
+    }
+}
+
 pub(crate) fn color_with_alpha(color: Color, alpha: u8) -> Color {
     Color::rgba(color.r, color.g, color.b, alpha)
 }

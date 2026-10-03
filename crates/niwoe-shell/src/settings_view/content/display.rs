@@ -1,126 +1,162 @@
 fn build_display_content(ctx: &SettingsContentContext<'_>) -> Box<dyn Widget> {
+    use niwoe_ui::effect::Symbol;
+    let c = SETTINGS_CHROME;
     let row_w = settings_group_inner_width(ctx.content_w);
     let mut rows: Vec<Box<dyn Widget>> = Vec::new();
-    if ctx.output_workspaces.is_empty() {
-        rows.push(Box::new(SettingsPlaceholder {
-            width: row_w,
-            text: "No output snapshot received yet",
-        }));
+    let outputs = ctx.output_workspaces.len().min(DISPLAY_OUTPUT_MAX);
+    if outputs == 0 {
+        rows.push(settings_text_row(
+            "Keine Bildschirme verfügbar",
+            "Die Anzeigeinformationen wurden noch nicht empfangen.",
+            row_w,
+            None,
+            false,
+            Some(Symbol::Monitor),
+            None,
+            ctx.pal,
+        ));
     } else {
-        for (idx, output) in ctx
-            .output_workspaces
-            .iter()
-            .take(DISPLAY_OUTPUT_MAX)
-            .enumerate()
-        {
-            let name = output
-                .output_name
-                .as_deref()
-                .map(str::to_string)
-                .unwrap_or_else(|| format!("Output {}", output.output_id));
-            let identity = Box::new(DisplayOutputRow {
-                output_id: output.output_id,
-                name: name.into(),
-                workspace: output.active_workspace,
-                primary: output.primary,
-                focused: output.focused,
-                x: output.x,
-                y: output.y,
-                width: output.width,
-                height: output.height,
-                scale_millis: output.scale_millis,
-                transform: output.transform.as_deref().map(Into::into),
-                refresh_millihz: output.refresh_millihz,
-                mode_count: output.modes.len(),
-                row_width: row_w,
-                accent: ctx.pal.accent,
-            }) as Box<dyn Widget>;
-            let combo_label = selected_display_mode(output)
-                .map(display_mode_label)
-                .unwrap_or_else(|| "No modes".to_string());
-            let expanded = ctx.display_mode_dropdown_open == Some(idx);
-            let mode_combo = Box::new(DisplayModeComboButton {
-                index: idx,
-                label: combo_label.into(),
-                expanded,
-                enabled: !output.modes.is_empty(),
-                accent: ctx.pal.accent,
-                width: row_w,
-            }) as Box<dyn Widget>;
-            let primary_button = Box::new(DisplayPrimaryButton {
-                index: idx,
-                active: output.primary,
-                accent: ctx.pal.accent,
-                width: (row_w - SETTINGS_CHROME.display_control_gap * 2) / 3,
-            }) as Box<dyn Widget>;
-            // Current scale label, e.g. "1.5×".
-            let scale_label = {
-                let s = output.scale_millis as f64 / 1000.0;
-                if (s - s.round()).abs() < f64::EPSILON {
-                    format!("{}×", s.round() as i64)
-                } else {
-                    format!("{}×", s)
-                }
-            };
-            let scale_button = DISPLAY_SCALE_IDS.get(idx).map(|id| {
-                Box::new(DisplayCycleButton {
-                    id,
-                    caption: "Skalierung",
-                    value: scale_label.into(),
-                    accent: ctx.pal.accent,
-                    width: (row_w - SETTINGS_CHROME.display_control_gap * 2) / 3,
-                }) as Box<dyn Widget>
-            });
-            // Current rotation label from the transform string.
-            let rotate_label = match output.transform.as_deref() {
-                Some("90") => "90°",
-                Some("180") => "180°",
-                Some("270") => "270°",
-                _ => "0°",
-            };
-            let rotate_button = DISPLAY_ROTATE_IDS.get(idx).map(|id| {
-                Box::new(DisplayCycleButton {
-                    id,
-                    caption: "Drehung",
-                    value: rotate_label.into(),
-                    accent: ctx.pal.accent,
-                    width: (row_w - SETTINGS_CHROME.display_control_gap * 2) / 3,
-                }) as Box<dyn Widget>
-            });
-            rows.push(identity);
-            rows.push(mode_combo);
-            let mut control_items: Vec<Box<dyn Widget>> = vec![primary_button];
-            control_items.extend(scale_button);
-            control_items.extend(rotate_button);
-            rows.push(Box::new(Container::row(
-                SETTINGS_CHROME.display_control_gap,
-                control_items,
-            )));
-
-            if expanded {
-                for (mode_idx, mode) in output
-                    .modes
-                    .iter()
-                    .take(DISPLAY_MODE_OPTION_MAX)
-                    .enumerate()
-                {
-                    rows.push(Box::new(DisplayModeOptionRow {
-                        output_index: idx,
-                        mode_index: mode_idx,
-                        label: display_mode_label(mode).into(),
-                        selected: mode.current,
-                        row_width: row_w,
-                        accent: ctx.pal.accent,
-                    }));
-                }
+        let idx = ctx.display_pages.output.min(outputs - 1);
+        let output = &ctx.output_workspaces[idx];
+        rows.push(display_navigation(
+            row_w, idx, outputs, false, outputs, outputs,
+        ));
+        let title = format!(
+            "Bildschirm {}{}",
+            idx + 1,
+            if output.primary {
+                " · Primäranzeige"
+            } else {
+                ""
             }
+        );
+        let subtitle = selected_display_mode(output)
+            .map(display_mode_label)
+            .unwrap_or_else(|| "Aktueller Modus nicht verfügbar".into());
+        rows.push(settings_text_row(
+            title,
+            subtitle,
+            row_w,
+            None,
+            false,
+            Some(Symbol::Monitor),
+            None,
+            ctx.pal,
+        ));
+        let indices = display_mode_indices(output);
+        let expanded = ctx.display_mode_dropdown_open == Some(idx);
+        let combo_label = selected_display_mode(output)
+            .map(display_mode_label)
+            .unwrap_or_else(|| "Keine Modi verfügbar".into());
+        rows.push(settings_text_row(
+            "Auflösung und Bildwiederholrate",
+            combo_label,
+            row_w,
+            (!indices.is_empty()).then(|| DISPLAY_MODE_TOGGLE_IDS[idx]),
+            false,
+            None,
+            Some(if expanded {
+                Symbol::ChevronUp
+            } else {
+                Symbol::ChevronDown
+            }),
+            ctx.pal,
+        ));
+        let width = (row_w - c.display_control_gap * 2) / 3;
+        let scale = format!("{:.1} %", output.scale_millis as f64 / 10.0).replace('.', ",");
+        let rotation = match output.transform.as_deref() {
+            Some("90" | "_90") => "90°",
+            Some("180" | "_180") => "180°",
+            Some("270" | "_270") => "270°",
+            Some("Flipped") => "Gespiegelt",
+            Some("Flipped90") => "Gespiegelt · 90°",
+            Some("Flipped180") => "Gespiegelt · 180°",
+            Some("Flipped270") => "Gespiegelt · 270°",
+            Some("Normal" | "") => "0°",
+            _ => "Ausrichtung unbekannt",
+        };
+        rows.push(Box::new(Container::row(
+            c.display_control_gap,
+            vec![
+                settings_text_row(
+                    "Primäranzeige",
+                    if output.primary {
+                        "Ausgewählt"
+                    } else {
+                        "Als primär setzen"
+                    },
+                    width,
+                    (!output.primary).then(|| DISPLAY_PRIMARY_IDS[idx]),
+                    output.primary,
+                    None,
+                    output.primary.then_some(Symbol::Check),
+                    ctx.pal,
+                ),
+                settings_text_row(
+                    "Skalierung",
+                    scale,
+                    width,
+                    Some(DISPLAY_SCALE_IDS[idx]),
+                    false,
+                    None,
+                    None,
+                    ctx.pal,
+                ),
+                settings_text_row(
+                    "Drehung",
+                    rotation,
+                    width,
+                    Some(DISPLAY_ROTATE_IDS[idx]),
+                    false,
+                    None,
+                    None,
+                    ctx.pal,
+                ),
+            ],
+        )));
+        if expanded {
+            let slots = display_mode_page_size(ctx.content_h);
+            let pages = indices.len().div_ceil(slots).max(1);
+            let page = ctx.display_pages.modes.min(pages - 1);
+            for mode_idx in indices.iter().skip(page * slots).take(slots) {
+                let mode = &output.modes[*mode_idx];
+                let subtitle = match (mode.current, mode.preferred) {
+                    (true, true) => "Aktuell · Bevorzugter Modus",
+                    (true, false) => "Aktuell",
+                    (false, true) => "Bevorzugter Modus",
+                    (false, false) => "Verfügbarer Modus",
+                };
+                rows.push(settings_text_row(
+                    display_mode_label(mode),
+                    subtitle,
+                    row_w,
+                    display_mode_option_id(idx, *mode_idx),
+                    mode.current,
+                    None,
+                    mode.current.then_some(Symbol::Check),
+                    ctx.pal,
+                ));
+            }
+            let total = output
+                .modes
+                .iter()
+                .filter(|mode| mode.width > 0 && mode.height > 0)
+                .count();
+            rows.push(display_navigation(
+                row_w,
+                page,
+                pages,
+                true,
+                indices.len(),
+                total,
+            ));
         }
     }
     build_settings_group_page(
         ctx.content_w,
         ctx.content_h,
         "Bildschirme",
-        "Auflösung, Skalierung, Ausrichtung und primäre Anzeige.",
-        Box::new(Container::column(4, rows)),
+        "Bildschirm wählen und Auflösung, Skalierung oder Ausrichtung anpassen.",
+        Box::new(Container::column(c.option_gap, rows)),
     )
 }

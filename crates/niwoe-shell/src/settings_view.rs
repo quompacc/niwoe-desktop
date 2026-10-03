@@ -6,10 +6,9 @@ use niwoe_ui::{
     style::Color,
     ui_length,
     widget::{Button, Container, Widget},
-    AlignItems, FlexDirection, JustifyContent, Rect, TaffyRect, Theme, UiSize, WidgetState,
-    WidgetStyle,
+    AlignItems, FlexDirection, Rect, TaffyRect, Theme, UiSize, WidgetState, WidgetStyle,
 };
-use tiny_skia::{Pixmap, PixmapMut, PixmapPaint, PixmapRef, Transform};
+use tiny_skia::{Pixmap, PixmapMut, PixmapPaint, Transform};
 
 use crate::audio::{AudioDevice, AudioServiceState, AudioSnapshot};
 use crate::icons::{icon_image_to_pixmap, IconCache};
@@ -27,10 +26,6 @@ use crate::ui::tokens::theme_from_config;
 
 // Settings-local design constants. Shared design values live in `niwoe_tokens`;
 // these are single-purpose to this view (named once instead of inline magic).
-/// Tint pulling the "not set" handler label toward the theme error colour.
-const NOT_SET_ERROR_TINT: f32 = 0.15;
-/// Blend of the per-monitor preview colour into the display-preview body.
-const MONITOR_PREVIEW_MIX: f32 = 0.18;
 // ─── SettingsCategory ────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
@@ -56,8 +51,7 @@ impl SettingsCategory {
     pub const APPEARANCE: &'static [SettingsCategory] =
         &[SettingsCategory::Wallpaper, SettingsCategory::Cursor];
 
-    pub const DESKTOP_APPS: &'static [SettingsCategory] =
-        &[SettingsCategory::PinnedApps, SettingsCategory::DefaultApps];
+    pub const DESKTOP_APPS: &'static [SettingsCategory] = &[SettingsCategory::DefaultApps];
 
     pub const DEVICES: &'static [SettingsCategory] = &[
         SettingsCategory::Display,
@@ -265,19 +259,12 @@ impl SettingsCategory {
 // ─── Widget-based launcher sub-page ─────────────────────────────────────────
 
 const SETTINGS_CHROME: Settings = Settings::DEFAULT;
-const THEME_ROW_H: i32 = 44;
-const THEME_ROW_CORNER: i32 = 4;
 const PINNED_ROW_H: i32 = 44;
 const PINNED_BTN_W: i32 = 30;
 const PINNED_MAX: usize = 16;
-const DISPLAY_MODE_OPTION_H: i32 = 34;
-const DISPLAY_MODE_OPTION_MAX: usize = 8;
+const DISPLAY_MODE_OPTION_MAX: usize = 256;
 const DISPLAY_OUTPUT_MAX: usize = 16;
-const PRINTER_SUMMARY_H: i32 = 92;
-const PRINTER_ROW_H: i32 = 72;
 const PRINTER_MAX: usize = 8;
-const SOUND_SUMMARY_H: i32 = 92;
-const SOUND_ROW_H: i32 = 72;
 const SOUND_MAX: usize = 8;
 
 /// Selectable idle screen-blank timeouts for the Power page, each paired with
@@ -450,12 +437,30 @@ include!("settings_view/ids.rs");
 include!("settings_view/basic_widgets.rs");
 include!("settings_view/group_widgets.rs");
 include!("settings_view/appearance_widgets.rs");
+include!("settings_view/option_widgets.rs");
+include!("settings_view/wallpaper_widgets.rs");
 include!("settings_view/audio_system_widgets.rs");
+include!("settings_view/default_apps_widgets.rs");
 include!("settings_view/network_device_widgets.rs");
 include!("settings_view/display_widgets.rs");
 include!("settings_view/display_controls.rs");
+include!("settings_view/display_paging.rs");
+include!("settings_view/provider_paging.rs");
+include!("settings_view/navigation.rs");
 include!("settings_view/content_builders.rs");
 include!("settings_view/draw.rs");
+
+#[cfg(test)]
+#[path = "settings_view/layout_tests.rs"]
+mod layout_tests;
+
+#[cfg(test)]
+#[path = "settings_view/network_tests.rs"]
+mod network_tests;
+
+#[cfg(test)]
+#[path = "settings_view/provider_tests.rs"]
+mod provider_tests;
 
 #[cfg(test)]
 mod tests {
@@ -469,28 +474,11 @@ mod tests {
             .collect();
         let unique: std::collections::HashSet<_> = categories.iter().copied().collect();
 
-        assert_eq!(categories.len(), 13);
+        assert_eq!(categories.len(), 12);
         assert!(!categories.contains(&SettingsCategory::Theme));
+        assert!(!categories.contains(&SettingsCategory::PinnedApps));
         assert!(categories.contains(&SettingsCategory::Cursor));
         assert!(categories.contains(&SettingsCategory::Wallpaper));
         assert_eq!(unique.len(), categories.len());
-    }
-
-    #[test]
-    fn settings_navigation_fits_launcher_height() {
-        let group_count = SettingsCategory::ALL.len() as i32;
-        let category_count = SettingsCategory::ALL
-            .iter()
-            .map(|group| group.len() as i32)
-            .sum::<i32>();
-        let required = SETTINGS_CHROME.sidebar_top_pad
-            + SETTINGS_CHROME.sidebar_back_height
-            + SETTINGS_CHROME.sidebar_brand_height
-            + group_count * SETTINGS_CHROME.sidebar_section_height
-            + (group_count - 1) * SETTINGS_CHROME.sidebar_group_gap
-            + category_count * SETTINGS_CHROME.sidebar_row_height;
-        let available = niwoe_tokens::Launcher::DEFAULT.height;
-
-        assert!(required <= available, "navigation requires {required}px");
     }
 }

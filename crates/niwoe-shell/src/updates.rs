@@ -56,11 +56,77 @@ pub fn updates_rows() -> Vec<(String, String)> {
 }
 
 fn query_blocking() -> Vec<(String, String)> {
-    match Command::new("apt").args(["list", "--upgradable"]).output() {
+    #[cfg(target_os = "linux")]
+    let provider = std::fs::read_to_string("/etc/os-release")
+        .map(|value| provider_for(&value))
+        .unwrap_or(Provider::Unsupported);
+    #[cfg(not(target_os = "linux"))]
+    let provider = Provider::Unsupported;
+    if provider != Provider::Apt {
+        return vec![
+            (
+                "Paketintegration".into(),
+                if provider == Provider::Fedora {
+                    "Für Fedora/RPM-Systeme noch nicht verfügbar"
+                } else {
+                    "Für dieses System noch nicht verfügbar"
+                }
+                .into(),
+            ),
+            (
+                "Aktualisierungsstatus".into(),
+                "Kann derzeit nicht ermittelt werden".into(),
+            ),
+        ];
+    }
+    match Command::new("apt")
+        .env("LC_ALL", "C")
+        .args(["list", "--upgradable"])
+        .output()
+    {
         Ok(out) if out.status.success() => {
             rows_from(&parse_upgradable(&String::from_utf8_lossy(&out.stdout)))
         }
-        _ => vec![("Status".to_string(), "apt nicht verfügbar".to_string())],
+        _ => vec![(
+            "Paketstatus nicht verfügbar".into(),
+            "Die lokale Paketliste konnte nicht gelesen werden.".into(),
+        )],
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Provider {
+    Apt,
+    Fedora,
+    Unsupported,
+}
+
+fn provider_for(os_release: &str) -> Provider {
+    let value = |key: &str| {
+        os_release
+            .lines()
+            .filter_map(|line| line.split_once('='))
+            .find(|(name, _)| *name == key)
+            .map(|(_, value)| value.trim().trim_matches(['\'', '"']))
+            .unwrap_or("")
+    };
+    match value("ID") {
+        "debian" | "ubuntu" => Provider::Apt,
+        "fedora" | "rhel" | "centos" => Provider::Fedora,
+        "" => Provider::Unsupported,
+        _ => {
+            let like = value("ID_LIKE").split_whitespace().collect::<Vec<_>>();
+            if like
+                .iter()
+                .any(|id| matches!(*id, "fedora" | "rhel" | "centos"))
+            {
+                Provider::Fedora
+            } else if like.contains(&"debian") || like.contains(&"ubuntu") {
+                Provider::Apt
+            } else {
+                Provider::Unsupported
+            }
+        }
     }
 }
 
@@ -76,7 +142,10 @@ fn parse_upgradable(stdout: &str) -> Vec<String> {
 
 fn rows_from(packages: &[String]) -> Vec<(String, String)> {
     if packages.is_empty() {
-        return vec![("Status".to_string(), "System ist aktuell".to_string())];
+        return vec![(
+            "Lokale Paketliste".into(),
+            "Keine Aktualisierungen in dieser Liste gemeldet".into(),
+        )];
     }
     let mut rows = vec![("Verfügbare Updates".to_string(), packages.len().to_string())];
     for pkg in packages.iter().take(MAX_LISTED) {
@@ -93,7 +162,33 @@ fn rows_from(packages: &[String]) -> Vec<(String, String)> {
 
 #[cfg(test)]
 mod tests {
-    use super::{parse_upgradable, rows_from};
+    use super::{parse_upgradable, provider_for, rows_from, Provider};
+
+    #[test]
+    fn provider_uses_distribution_identity_and_never_apt_for_fedora() {
+        for input in [
+            "ID=fedora\nID_LIKE=debian",
+            "ID=rhel",
+            "ID=custom\nID_LIKE=\"fedora rhel\"",
+        ] {
+            assert_eq!(provider_for(input), Provider::Fedora);
+        }
+        for input in [
+            "ID=debian",
+            "ID=ubuntu",
+            "ID=mint\nID_LIKE=\"ubuntu debian\"",
+        ] {
+            assert_eq!(provider_for(input), Provider::Apt);
+        }
+        for input in [
+            "",
+            "PRETTY_NAME=Ubuntu",
+            "ID=arch",
+            "ID=custom\nID_LIKE=notdebian",
+        ] {
+            assert_eq!(provider_for(input), Provider::Unsupported);
+        }
+    }
 
     #[test]
     fn parse_extracts_package_names() {
@@ -115,7 +210,10 @@ mod tests {
     fn rows_up_to_date_when_empty() {
         assert_eq!(
             rows_from(&[]),
-            vec![("Status".to_string(), "System ist aktuell".to_string())]
+            vec![(
+                "Lokale Paketliste".into(),
+                "Keine Aktualisierungen in dieser Liste gemeldet".into()
+            )]
         );
     }
 

@@ -131,8 +131,7 @@ impl NiwoeShell {
         }
         let wizard = &mut self.workspace_state.rooms.wizard;
         if let Some(error) = error {
-            wizard.message = error;
-            wizard.complete_after_save = false;
+            wizard.report_error(error);
         } else if id.starts_with("first-run-complete-") {
             wizard.unsaved = false;
             wizard.message =

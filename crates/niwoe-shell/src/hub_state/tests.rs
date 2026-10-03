@@ -56,6 +56,49 @@ fn output_window_end_and_invalid_dimensions_invalidate() {
     hub.prepare(&rooms, &[], "scale2".into());
     assert!(!hub.accept(&pending[0].0, "one", 1, 1, &[0; 4]));
 }
+
+#[test]
+fn management_previews_are_bounded_and_reject_other_pages_minimized_and_ended_windows() {
+    let rooms = rooms();
+    let mut windows: Vec<_> = (1..=64).map(|i| window(&i.to_string(), i)).collect();
+    let c = niwoe_tokens::ControlCenter::DEFAULT;
+    let mut page = PreviewPage {
+        index: 0,
+        count: (c.room_columns * c.room_page_rows) as usize,
+        max_width: c.room_preview_width,
+        max_height: c.room_preview_height,
+    };
+    let mut state = HubState::default();
+    let first = state.prepare_page(&rooms, &windows, "rooms".into(), page);
+    assert_eq!(first.len(), 6);
+    assert!(state
+        .prepare_page(&rooms, &windows, "rooms".into(), page)
+        .is_empty());
+    assert!(state.accept(&first[0].0, &first[0].1, 1, 1, &[10, 20, 30, 0]));
+    assert_eq!(state.images[&first[0].1].data(), &[30, 20, 10, 255]);
+    for index in 1..=10 {
+        page.index = index;
+        let requests = state.prepare_page(&rooms, &windows, "rooms".into(), page);
+        assert!(requests.len() <= 6);
+        assert!(state.images.is_empty());
+        assert!(!state.accept(&first[1].0, &first[1].1, 1, 1, &[0; 4]));
+    }
+    page.index = 0;
+    let pending = state.prepare_page(&rooms, &windows, "rooms".into(), page);
+    windows[0].minimized = true;
+    state.prepare_page(&rooms, &windows, "rooms".into(), page);
+    assert!(!state.accept(&pending[0].0, &pending[0].1, 1, 1, &[0; 4]));
+    windows.clear();
+    assert!(state
+        .prepare_page(&rooms, &windows, "rooms".into(), page)
+        .is_empty());
+    assert!(state.images.is_empty());
+    page.count = 7;
+    assert!(state
+        .prepare_page(&rooms, &windows, "rooms".into(), page)
+        .is_empty());
+    assert!(state.signature.is_none());
+}
 #[test]
 fn search_preserves_room_ids_and_minimized_window_identity() {
     let mut rooms = rooms();
@@ -68,6 +111,65 @@ fn search_preserves_room_ids_and_minimized_window_identity() {
     let rows = search(&rooms, &[w], &[], "NOTES", &hidden);
     assert_eq!(rows[0].target, Target::Window("notes".into()));
     assert!(rows[0].detail.contains("Minimiert"));
+}
+
+#[test]
+fn configuration_preview_selects_only_edited_room_and_rejects_previous_surface_generations() {
+    let rooms = rooms();
+    let mut windows = vec![window("first", 1), window("second", 2)];
+    let c = niwoe_tokens::ControlCenter::DEFAULT;
+    let mut state = HubState::default();
+    let mut page = PreviewPage {
+        index: 0,
+        count: 6,
+        max_width: c.room_preview_width,
+        max_height: c.room_preview_height,
+    };
+    let management = state.prepare_page(&rooms, &windows, "output-1".into(), page);
+    assert_eq!(management.len(), 2);
+    page.count = 1;
+    page.max_height = c.config_preview_capture_height;
+    let selected = std::slice::from_ref(&rooms[1]);
+    let configuration = state.prepare_page(selected, &windows, "output-1".into(), page);
+    assert_eq!(configuration.len(), 1);
+    assert_eq!(configuration[0].1, "second");
+    assert!(state
+        .prepare_page(selected, &windows, "output-1".into(), page)
+        .is_empty());
+    assert!(!state.accept(&management[1].0, "second", 1, 1, &[0; 4]));
+    let pixels =
+        [10, 20, 30, 0].repeat((c.room_preview_width * c.config_preview_capture_height) as usize);
+    assert!(state.accept(
+        &configuration[0].0,
+        "second",
+        c.room_preview_width,
+        c.config_preview_capture_height,
+        &pixels
+    ));
+    assert_eq!(state.images.len(), 1);
+    assert_eq!(&state.images["second"].data()[..4], &[30, 20, 10, 255]);
+    assert_eq!(state.images["second"].data().len(), pixels.len());
+    windows[1].minimized = true;
+    assert!(state
+        .prepare_page(selected, &windows, "output-1".into(), page)
+        .is_empty());
+    assert!(state.images.is_empty());
+    windows[1].minimized = false;
+    let restored = state.prepare_page(selected, &windows, "output-1".into(), page);
+    assert_eq!(restored.len(), 1);
+    windows[1].workspace = 1;
+    assert!(state
+        .prepare_page(selected, &windows, "output-1".into(), page)
+        .is_empty());
+    assert!(!state.accept(&restored[0].0, "second", 1, 1, &[0; 4]));
+    state.clear();
+    assert!(state.images.is_empty());
+    assert!(state.pending.is_empty());
+    page.count = 6;
+    assert!(state
+        .prepare_page(&rooms, &windows, "output-1".into(), page)
+        .is_empty());
+    assert!(state.signature.is_none());
 }
 
 #[test]

@@ -24,7 +24,7 @@ fn build_settings_group_page(
     content_width: u32,
     content_height: u32,
     title: &'static str,
-    description: &'static str,
+    description: impl Into<std::borrow::Cow<'static, str>>,
     body: Box<dyn Widget>,
 ) -> Box<dyn Widget> {
     let group_width = settings_group_width(content_width);
@@ -36,7 +36,7 @@ fn build_settings_group_page(
             Box::new(SettingsGroupHeading {
                 width: inner_width,
                 title,
-                description,
+                description: description.into(),
             }) as Box<dyn Widget>,
             body,
         ],
@@ -89,7 +89,7 @@ impl Widget for SettingsGroupPanel {
 struct SettingsGroupHeading {
     width: i32,
     title: &'static str,
-    description: &'static str,
+    description: std::borrow::Cow<'static, str>,
 }
 
 impl Widget for SettingsGroupHeading {
@@ -114,7 +114,7 @@ impl Widget for SettingsGroupHeading {
         );
         paint_text(
             canvas,
-            self.description,
+            &self.description,
             area.x,
             area.y + SETTINGS_CHROME.group_heading_height,
             Typography::DEFAULT.caption_size as f32,
@@ -163,7 +163,11 @@ impl Widget for ThemeOption {
             paint_border(
                 canvas,
                 &path,
-                if self.is_selected { self.accent } else { theme.palette.border },
+                if self.is_selected {
+                    self.accent
+                } else {
+                    theme.palette.border
+                },
                 1.0,
             );
         }

@@ -20,21 +20,28 @@ struct SettingsContentContext<'a> {
     available_themes: &'a [String],
     current_theme: &'a str,
     available_wallpapers: &'a [WallpaperEntry],
-    wallpaper_thumbnails: &'a [Option<(u32, u32, Vec<u8>)>],
+    wallpaper_thumbnails: &'a [crate::settings_refresh::wallpaper::WallpaperPreview],
+    wallpaper_page: usize,
     current_wallpaper: Option<&'a str>,
     wallpaper_mode: WallpaperMode,
     cursor_size: u32,
+    cursor_previews: &'a crate::cursor::preview::CursorPreviews,
     available_cursor_themes: &'a [String],
     current_cursor_theme: &'a str,
     idle_timeout_secs: Option<u64>,
     pinned_apps: &'a [PinnedApp],
     output_workspaces: &'a [OutputWorkspaceState],
     display_mode_dropdown_open: Option<usize>,
+    display_pages: DisplayPages,
+    provider_page: usize,
     printer_snapshot: &'a PrinterSnapshot,
     audio_snapshot: &'a AudioSnapshot,
     system_info: &'a SystemInfo,
+    user_accounts: &'a crate::users::UserState,
+    armed_power: Option<(&'a str, f32)>,
     network_state: &'a NetworkState,
     network_profiles: &'a [ConnectionProfile],
+    network_list_status: crate::network::ListStatus,
     bluetooth_snapshot: &'a BluetoothSnapshot,
     wifi_networks: &'a [WifiNetwork],
     pinned_adding: bool,
@@ -44,6 +51,8 @@ struct SettingsContentContext<'a> {
     default_apps_current:
         &'a std::collections::HashMap<crate::default_apps::DefaultAppCategory, String>,
     default_apps_picker_open: Option<crate::default_apps::DefaultAppCategory>,
+    default_apps_page: usize,
+    default_apps_status: &'a crate::default_apps::refresh::UiState,
     pal: &'a niwoe_ui::style::Palette,
 }
 
@@ -53,139 +62,67 @@ pub(crate) fn build_settings_widget_tree(
     height: u32,
     selected: SettingsCategory,
     search: &str,
+    back_to_rooms: bool,
     available_themes: &[String],
     current_theme: &str,
     available_wallpapers: &[WallpaperEntry],
-    wallpaper_thumbnails: &[Option<(u32, u32, Vec<u8>)>],
+    wallpaper_thumbnails: &[crate::settings_refresh::wallpaper::WallpaperPreview],
+    wallpaper_page: usize,
     current_wallpaper: Option<&str>,
     wallpaper_mode: WallpaperMode,
     cursor_size: u32,
+    cursor_previews: &crate::cursor::preview::CursorPreviews,
     available_cursor_themes: &[String],
     current_cursor_theme: &str,
     idle_timeout_secs: Option<u64>,
     pinned_apps: &[PinnedApp],
     output_workspaces: &[OutputWorkspaceState],
     display_mode_dropdown_open: Option<usize>,
+    display_pages: DisplayPages,
+    provider_page: usize,
     printer_snapshot: &PrinterSnapshot,
     audio_snapshot: &AudioSnapshot,
     system_info: &SystemInfo,
+    user_accounts: &crate::users::UserState,
     network_state: &NetworkState,
     network_profiles: &[ConnectionProfile],
+    network_list_status: crate::network::ListStatus,
     bluetooth_snapshot: &BluetoothSnapshot,
     wifi_networks: &[WifiNetwork],
     pinned_adding: bool,
     all_apps: &[DesktopApp],
     icon_cache: &IconCache,
-    _armed_power: Option<(&str, f32)>,
+    armed_power: Option<(&str, f32)>,
     default_apps_index: Option<&crate::default_apps::MimeAppIndex>,
     default_apps_current: &std::collections::HashMap<
         crate::default_apps::DefaultAppCategory,
         String,
     >,
     default_apps_picker_open: Option<crate::default_apps::DefaultAppCategory>,
+    default_apps_page: usize,
+    default_apps_status: &crate::default_apps::refresh::UiState,
     theme: &Theme,
 ) -> Box<dyn Widget> {
     let pal = theme.palette;
 
-    let divider_color = Color::rgba(
-        pal.accent.r,
-        pal.accent.g,
-        pal.accent.b,
-        SETTINGS_CHROME.divider_alpha,
-    );
-    // No root tabs anymore — the two groups live as labelled sections inside
-    // one full-height sidebar.
-    let content_h = height.saturating_sub(SETTINGS_CHROME.header_height as u32);
-    let content_w = width.saturating_sub(
-        (SETTINGS_CHROME.sidebar_width + SETTINGS_CHROME.divider_size) as u32,
-    );
-
-    // Left sidebar — grouped sections (Darstellung / System), all categories
-    // listed, anchored to the top.
+    let c = niwoe_tokens::ControlCenter::DEFAULT;
+    let content_w = width.saturating_sub(c.sidebar_width as u32);
     let query = search.trim().to_lowercase();
-    // Widened match: category label, static keywords, and dynamic content
-    // (theme / wallpaper names) so the search reflects intent.
-    let cat_matches = |cat: &SettingsCategory| -> bool {
-        settings_category_matches(*cat, &query, available_themes, available_wallpapers)
-    };
-    // While searching, preview the first matching category if the stored
-    // selection was filtered out — the whole view follows the query.
-    let effective_selected = if query.is_empty() || cat_matches(&selected) {
-        selected
-    } else {
-        SettingsCategory::ALL
-            .iter()
-            .flat_map(|categories| categories.iter())
-            .copied()
-            .find(|cat| cat_matches(cat))
-            .unwrap_or(selected)
-    };
-    let mut sidebar_children: Vec<Box<dyn Widget>> = vec![
-        Box::new(SettingsBackButton {
-            width: SETTINGS_CHROME.sidebar_width,
-        }) as Box<dyn Widget>,
-        Box::new(SettingsSidebarBrand {
-            width: SETTINGS_CHROME.sidebar_width,
-        }) as Box<dyn Widget>,
-    ];
-    let groups: [(&str, &[SettingsCategory], i32); 4] = [
-        ("ERSCHEINUNGSBILD", SettingsCategory::APPEARANCE, 0),
-        (
-            "DESKTOP & APPS",
-            SettingsCategory::DESKTOP_APPS,
-            SETTINGS_CHROME.sidebar_group_gap,
-        ),
-        (
-            "GERÄTE",
-            SettingsCategory::DEVICES,
-            SETTINGS_CHROME.sidebar_group_gap,
-        ),
-        (
-            "SYSTEM",
-            SettingsCategory::SYSTEM,
-            SETTINGS_CHROME.sidebar_group_gap,
-        ),
-    ];
-    let mut any_match = false;
-    for (title, cats, pad_top) in groups {
-        let matching: Vec<&SettingsCategory> = cats.iter().filter(|cat| cat_matches(cat)).collect();
-        if matching.is_empty() {
-            continue;
-        }
-        any_match = true;
-        sidebar_children.push(Box::new(SidebarSectionLabel {
-            text: title,
-            width: SETTINGS_CHROME.sidebar_width,
-            pad_top,
-        }) as Box<dyn Widget>);
-        for cat in matching {
-            sidebar_children.push(Box::new(SettingsSidebarRow {
-                cat: *cat,
-                is_selected: *cat == effective_selected,
-                accent: pal.accent,
-                row_width: SETTINGS_CHROME.sidebar_width,
-            }) as Box<dyn Widget>);
-        }
-    }
-    if !any_match {
-        sidebar_children.push(Box::new(SidebarSectionLabel {
-            text: "KEINE TREFFER",
-            width: SETTINGS_CHROME.sidebar_width,
-            pad_top: 8,
-        }) as Box<dyn Widget>);
-    }
-    let sidebar = Box::new(SidebarPanel {
-        width: SETTINGS_CHROME.sidebar_width,
-        height: height as i32,
-        bg: pal.surface_alt,
-        children: sidebar_children,
-    }) as Box<dyn Widget>;
-
-    let vsep = Box::new(VerticalDivider {
-        height: height as i32,
-        color: divider_color,
-    }) as Box<dyn Widget>;
-
+    let effective_selected =
+        effective_settings_category(selected, search, available_themes, available_wallpapers);
+    let page = crate::control_center::Page::for_settings(effective_selected);
+    let content_h = height.saturating_sub(
+        (SETTINGS_CHROME.header_height + category_navigation_height(effective_selected)) as u32,
+    );
+    let sidebar = Box::new(crate::control_center::Sidebar::new(
+        height,
+        page,
+        if back_to_rooms {
+            "‹ Zurück"
+        } else {
+            "‹ Zurück zum Hub"
+        },
+    )) as Box<dyn Widget>;
     let content_ctx = SettingsContentContext {
         content_h,
         content_w,
@@ -194,20 +131,27 @@ pub(crate) fn build_settings_widget_tree(
         current_theme,
         available_wallpapers,
         wallpaper_thumbnails,
+        wallpaper_page,
         current_wallpaper,
         wallpaper_mode,
         cursor_size,
+        cursor_previews,
         available_cursor_themes,
         current_cursor_theme,
         idle_timeout_secs,
         pinned_apps,
         output_workspaces,
         display_mode_dropdown_open,
+        display_pages,
+        provider_page,
         printer_snapshot,
         audio_snapshot,
         system_info,
+        user_accounts,
+        armed_power,
         network_state,
         network_profiles,
+        network_list_status,
         bluetooth_snapshot,
         wifi_networks,
         pinned_adding,
@@ -216,6 +160,8 @@ pub(crate) fn build_settings_widget_tree(
         default_apps_index,
         default_apps_current,
         default_apps_picker_open,
+        default_apps_page,
+        default_apps_status,
         pal: &pal,
     };
 
@@ -245,7 +191,7 @@ pub(crate) fn build_settings_widget_tree(
         children: vec![
             Box::new(SettingsTitle {
                 width: title_width,
-                label: effective_selected.label().into(),
+                label: page.label().into(),
             }) as Box<dyn Widget>,
             Box::new(SettingsSearchField {
                 width: SETTINGS_CHROME.search_width,
@@ -253,8 +199,28 @@ pub(crate) fn build_settings_widget_tree(
             }) as Box<dyn Widget>,
         ],
     }) as Box<dyn Widget>;
-    let content_column =
-        Box::new(Container::column(0, vec![header, content])) as Box<dyn Widget>;
-
-    Box::new(Container::row(0, vec![sidebar, vsep, content_column]))
+    let navigation = build_category_navigation(content_w, effective_selected);
+    let content_column = Box::new(Container::new(
+        WidgetStyle {
+            flex_direction: FlexDirection::Column,
+            flex_shrink: 0.0,
+            size: UiSize {
+                width: ui_length(content_w as f32),
+                height: ui_length(height as f32),
+            },
+            ..Default::default()
+        },
+        vec![header, navigation, content],
+    )) as Box<dyn Widget>;
+    Box::new(Container::new(
+        WidgetStyle {
+            flex_direction: FlexDirection::Row,
+            size: UiSize {
+                width: ui_length(width as f32),
+                height: ui_length(height as f32),
+            },
+            ..Default::default()
+        },
+        vec![sidebar, content_column],
+    ))
 }

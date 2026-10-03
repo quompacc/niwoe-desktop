@@ -5,8 +5,10 @@ use std::process::Command;
 pub(crate) struct PrinterSnapshot {
     pub(crate) service: PrinterServiceState,
     pub(crate) default_printer: Option<String>,
+    pub(crate) list_available: bool,
+    pub(crate) default_available: bool,
     pub(crate) printers: Vec<PrinterInfo>,
-    pub(crate) job_count: usize,
+    pub(crate) job_count: Option<usize>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,7 +25,7 @@ pub(crate) struct PrinterInfo {
     pub(crate) accepting: Option<bool>,
     pub(crate) status: String,
     pub(crate) is_default: bool,
-    pub(crate) job_count: usize,
+    pub(crate) job_count: Option<usize>,
 }
 
 impl PrinterSnapshot {
@@ -37,7 +39,14 @@ impl PrinterSnapshot {
             }) if stdout.to_ascii_lowercase().contains("scheduler is running") => {
                 PrinterServiceState::Running
             }
-            Some(_) => PrinterServiceState::Stopped,
+            Some(CommandOutput { stdout, .. })
+                if stdout
+                    .to_ascii_lowercase()
+                    .contains("scheduler is not running") =>
+            {
+                PrinterServiceState::Stopped
+            }
+            Some(_) => PrinterServiceState::Unavailable,
             None => PrinterServiceState::Unavailable,
         };
 
@@ -45,36 +54,59 @@ impl PrinterSnapshot {
             return Self {
                 service,
                 default_printer: None,
+                list_available: false,
+                default_available: false,
                 printers: Vec::new(),
-                job_count: 0,
+                job_count: None,
             };
         }
 
         let printer_output = run_lpstat(&["-p"])
             .filter(|out| out.success)
-            .map(|out| out.stdout)
-            .unwrap_or_default();
+            .map(|out| out.stdout);
         let default_output = run_lpstat(&["-d"])
             .filter(|out| out.success)
-            .map(|out| out.stdout)
-            .unwrap_or_default();
+            .map(|out| out.stdout);
         let accepting_output = run_lpstat(&["-a"])
             .filter(|out| out.success)
-            .map(|out| out.stdout)
-            .unwrap_or_default();
+            .map(|out| out.stdout);
         let jobs_output = run_lpstat(&["-o"])
             .filter(|out| out.success)
-            .map(|out| out.stdout)
-            .unwrap_or_default();
+            .map(|out| out.stdout);
 
-        parse_snapshot(
+        snapshot_from_reads(
             service,
-            &printer_output,
-            &default_output,
-            &accepting_output,
-            &jobs_output,
+            printer_output.as_deref(),
+            default_output.as_deref(),
+            accepting_output.as_deref(),
+            jobs_output.as_deref(),
         )
     }
+}
+
+fn snapshot_from_reads(
+    service: PrinterServiceState,
+    printers: Option<&str>,
+    default: Option<&str>,
+    accepting: Option<&str>,
+    jobs: Option<&str>,
+) -> PrinterSnapshot {
+    let mut snapshot = parse_snapshot(
+        service,
+        printers.unwrap_or_default(),
+        default.unwrap_or_default(),
+        accepting.unwrap_or_default(),
+        jobs.unwrap_or_default(),
+    );
+    snapshot.list_available = printers.is_some();
+    snapshot.default_available = default.is_some();
+    if jobs.is_none() {
+        snapshot.job_count = None;
+        for printer in &mut snapshot.printers {
+            printer.job_count = None;
+        }
+    }
+    snapshot
 }
 
 pub(crate) fn parse_snapshot(
@@ -106,8 +138,10 @@ pub(crate) fn parse_snapshot(
     PrinterSnapshot {
         service,
         default_printer: default_name,
+        list_available: true,
+        default_available: true,
         printers: rows,
-        job_count,
+        job_count: Some(job_count),
     }
 }
 
@@ -140,7 +174,7 @@ fn parse_printer_line(
         accepting: accepting_by_name.get(name).copied(),
         status,
         is_default: default_name.as_deref() == Some(name),
-        job_count: jobs,
+        job_count: Some(jobs),
     })
 }
 
@@ -219,6 +253,36 @@ mod tests {
     use super::{parse_snapshot, PrinterServiceState};
 
     #[test]
+    fn failed_reads_remain_unknown_while_successful_empty_job_lists_are_zero() {
+        let printer = "printer Test is idle. enabled since Mon 01 Jan 2024\n";
+        let failed = super::snapshot_from_reads(
+            PrinterServiceState::Running,
+            Some(printer),
+            None,
+            None,
+            None,
+        );
+        assert!(failed.list_available && !failed.default_available);
+        assert_eq!(failed.job_count, None);
+        assert_eq!(failed.printers[0].job_count, None);
+        assert_eq!(failed.printers[0].accepting, None);
+        let empty = super::snapshot_from_reads(
+            PrinterServiceState::Running,
+            Some(printer),
+            Some(""),
+            Some(""),
+            Some(""),
+        );
+        assert!(empty.list_available && empty.default_available);
+        assert_eq!(empty.job_count, Some(0));
+        assert_eq!(empty.printers[0].job_count, Some(0));
+        let unavailable =
+            super::snapshot_from_reads(PrinterServiceState::Running, None, None, None, None);
+        assert!(!unavailable.list_available && unavailable.printers.is_empty());
+        assert_eq!(unavailable.job_count, None);
+    }
+
+    #[test]
     fn parse_snapshot_extracts_default_status_and_jobs() {
         let snapshot = parse_snapshot(
             PrinterServiceState::Running,
@@ -229,13 +293,13 @@ mod tests {
         );
 
         assert_eq!(snapshot.default_printer.as_deref(), Some("Office"));
-        assert_eq!(snapshot.job_count, 3);
+        assert_eq!(snapshot.job_count, Some(3));
         assert_eq!(snapshot.printers.len(), 2);
         assert_eq!(snapshot.printers[0].name, "Office");
         assert!(snapshot.printers[0].is_default);
         assert!(snapshot.printers[0].enabled);
         assert_eq!(snapshot.printers[0].accepting, Some(true));
-        assert_eq!(snapshot.printers[0].job_count, 2);
+        assert_eq!(snapshot.printers[0].job_count, Some(2));
         assert_eq!(snapshot.printers[1].accepting, Some(false));
         assert!(!snapshot.printers[1].enabled);
     }
@@ -252,6 +316,6 @@ mod tests {
 
         assert!(snapshot.default_printer.is_none());
         assert!(snapshot.printers.is_empty());
-        assert_eq!(snapshot.job_count, 0);
+        assert_eq!(snapshot.job_count, Some(0));
     }
 }

@@ -1,4 +1,5 @@
 use super::*;
+use crate::room_management_view::restore::{self, Page};
 use crate::wayland::RepaintReason;
 use smithay_client_toolkit::seat::keyboard::Keysym;
 use wayland_client::QueueHandle;
@@ -15,11 +16,7 @@ impl NiwoeShell {
             return;
         };
         edit.restore.open = true;
-        edit.restore.focus = match edit.preferences.restore {
-            niwoe_ipc::RoomRestore::Disabled => 0,
-            niwoe_ipc::RoomRestore::LayoutOnly => 1,
-            niwoe_ipc::RoomRestore::RelaunchApps => 2,
-        };
+        edit.restore.focus = 30 + edit.form.tab;
         if let Some(LayoutNotice::Status {
             revision,
             running,
@@ -28,6 +25,7 @@ impl NiwoeShell {
             ..
         }) = self.workspace_state.rooms.layouts.get(&edit.id)
         {
+            edit.restore.ready = true;
             edit.restore.revision = *revision;
             edit.restore.running = *running;
             edit.restore.message = message.clone();
@@ -44,12 +42,20 @@ impl NiwoeShell {
             return;
         };
         let room_id = edit.id;
+        let page = Page::from_tab(edit.form.tab);
         let state = &mut edit.restore;
-        if !crate::room_management_view::restore::enabled(state, control, width, height) {
+        if !restore::enabled(state, page, control, width, height) {
             return;
         }
         state.focus = control;
-        let count = crate::room_management_view::restore::page_size(width, height);
+        if control == 7 {
+            if let Some(error) = restore::file_error(state) {
+                state.message = error.into();
+                return;
+            }
+        }
+        state.page = restore::page_index(state, page, width, height);
+        let count = restore::page_size(page, width, height);
         let action = match control {
             0 => Some(LayoutAction::Save {
                 room_id,
@@ -74,7 +80,7 @@ impl NiwoeShell {
                 key,
                 path: (!state.file.is_empty()).then(|| state.file.clone()),
             }),
-            i if i >= 8 => {
+            i if i >= 8 && page == Page::Files => {
                 state.file_key = state.results.get(state.page * count + i - 8).map(|r| r.key);
                 state.file = state
                     .results
@@ -116,30 +122,38 @@ impl NiwoeShell {
         else {
             return false;
         };
+        let page = Page::from_tab(edit.form.tab);
         let state = &mut edit.restore;
-        let count = crate::room_management_view::restore::page_size(width, height);
-        let controls = 8 + state
-            .results
-            .len()
-            .saturating_sub(state.page * count)
-            .min(count);
+        let order = restore::focus_order(state, page, width, height);
+        let editable = restore::enabled(state, page, 6, width, height);
         match key {
             Keysym::Escape => {
                 state.open = false;
                 edit.form.tab = 0;
+                edit.focus = 30;
             }
             Keysym::Tab | Keysym::ISO_Left_Tab => {
-                state.focus =
-                    (state.focus + if key == Keysym::Tab { 1 } else { controls - 1 }) % controls
+                let current = order.iter().position(|i| *i == state.focus);
+                let next = match (current, key == Keysym::Tab) {
+                    (Some(i), true) => (i + 1) % order.len(),
+                    (Some(i), false) => (i + order.len() - 1) % order.len(),
+                    (None, true) => 0,
+                    (None, false) => order.len() - 1,
+                };
+                state.focus = order[next];
             }
             Keysym::Return | Keysym::KP_Enter => {
                 let focus = state.focus;
-                self.layout_control(focus, width, height);
+                if (30..34).contains(&focus) {
+                    self.room_form_tab(focus - 30);
+                } else {
+                    self.layout_control(focus, width, height);
+                }
             }
-            Keysym::BackSpace if state.focus == 6 => {
+            Keysym::BackSpace if state.focus == 6 && editable => {
                 state.file.pop();
             }
-            _ if state.focus == 6 => {
+            _ if state.focus == 6 && editable => {
                 if let Some(ch) = key.key_char().filter(|c| !c.is_control()) {
                     if state.file.len() + ch.len_utf8() <= 4096 {
                         state.file.push(ch);
@@ -176,7 +190,15 @@ impl NiwoeShell {
         {
             return true;
         }
-        if let Some(control) = crate::room_management_view::restore::hit(x, y, width, height) {
+        let edit = self.workspace_state.rooms.edit.as_ref().unwrap();
+        if let Some(control) = restore::hit(
+            &edit.restore,
+            Page::from_tab(edit.form.tab),
+            x,
+            y,
+            width,
+            height,
+        ) {
             self.layout_control(control, width, height);
         }
         self.draw_launcher(qh, RepaintReason::Pointer);

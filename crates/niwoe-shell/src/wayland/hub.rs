@@ -58,7 +58,23 @@ impl NiwoeShell {
         )
     }
     pub(crate) fn prepare_hub(&mut self) {
-        if !self.hub_visible() || self.hub_search_active {
+        let rooms_visible = self.room_management_previews_visible();
+        let configuration_room = self
+            .room_configuration_previews_visible()
+            .then(|| {
+                self.workspace_state
+                    .rooms
+                    .snapshot
+                    .rooms
+                    .iter()
+                    .find(|room| Some(room.id) == self.room_configuration_id)
+                    .cloned()
+            })
+            .flatten();
+        if !rooms_visible
+            && configuration_room.is_none()
+            && (!self.hub_visible() || self.hub_search_active)
+        {
             self.hub.clear();
             return;
         }
@@ -67,20 +83,93 @@ impl NiwoeShell {
             self.launcher_content_size(),
             self.focused_output_id
         );
-        for (request_id, id) in self.hub.prepare(
-            &self.workspace_state.rooms.snapshot.rooms,
-            &self.windows,
-            context,
-        ) {
+        let (requests, max_width, max_height) = if let Some(room) = configuration_room {
+            let c = niwoe_tokens::ControlCenter::DEFAULT;
+            (
+                self.hub.prepare_page(
+                    std::slice::from_ref(&room),
+                    &self.windows,
+                    context,
+                    hub_state::PreviewPage {
+                        index: 0,
+                        count: 1,
+                        max_width: c.room_preview_width,
+                        max_height: c.config_preview_capture_height,
+                    },
+                ),
+                c.room_preview_width,
+                c.config_preview_capture_height,
+            )
+        } else if rooms_visible {
+            let c = niwoe_tokens::ControlCenter::DEFAULT;
+            let rooms = self.visible_rooms();
+            (
+                self.hub.prepare_page(
+                    &rooms,
+                    &self.windows,
+                    context,
+                    hub_state::PreviewPage {
+                        index: self.room_management_page,
+                        count: (c.room_columns * c.room_page_rows) as usize,
+                        max_width: c.room_preview_width,
+                        max_height: c.room_preview_height,
+                    },
+                ),
+                c.room_preview_width,
+                c.room_preview_height,
+            )
+        } else {
             let h = niwoe_tokens::Hub::DEFAULT;
+            (
+                self.hub.prepare(
+                    &self.workspace_state.rooms.snapshot.rooms,
+                    &self.windows,
+                    context,
+                ),
+                h.preview_width,
+                h.preview_height,
+            )
+        };
+        for (request_id, id) in requests {
             self.ipc
                 .send(&niwoe_ipc::ShellCommand::CaptureWindowThumbnail {
                     request_id: Some(request_id),
                     id,
-                    max_width: h.preview_width,
-                    max_height: h.preview_height,
+                    max_width,
+                    max_height,
                 });
         }
+    }
+    fn room_preview_surface_visible(&self) -> bool {
+        self.launcher_state.open
+            && self.room_management_open
+            && !self.launcher_settings_open
+            && !self.workspace_state.rooms.panel.open
+            && !self.workspace_state.rooms.wizard.open
+    }
+    fn room_management_previews_visible(&self) -> bool {
+        self.room_preview_surface_visible() && self.room_configuration_id.is_none()
+    }
+    fn room_configuration_previews_visible(&self) -> bool {
+        self.room_preview_surface_visible()
+            && self
+                .workspace_state
+                .rooms
+                .edit
+                .as_ref()
+                .is_some_and(|edit| {
+                    edit.id != 0
+                        && Some(edit.id) == self.room_configuration_id
+                        && edit.form.tab == 0
+                        && !edit.restore.open
+                        && self
+                            .workspace_state
+                            .rooms
+                            .snapshot
+                            .rooms
+                            .iter()
+                            .any(|room| room.id == edit.id)
+                })
     }
     pub(crate) fn activate_hub_target(&mut self, qh: &QueueHandle<Self>, target: Target) {
         use niwoe_ipc::ShellCommand;
@@ -402,7 +491,11 @@ impl NiwoeShell {
         };
         if let Some(data) = data {
             if let Some(request) = request {
-                if self.hub_visible() && self.hub.accept(&request, &id, width, height, &data) {
+                if (self.hub_visible()
+                    || self.room_management_previews_visible()
+                    || self.room_configuration_previews_visible())
+                    && self.hub.accept(&request, &id, width, height, &data)
+                {
                     self.launcher_dirty = true;
                 }
             } else if wanted.contains(&id)

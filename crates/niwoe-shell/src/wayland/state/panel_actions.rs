@@ -150,15 +150,15 @@ impl NiwoeShell {
                 self.open_region_picker_local(qh);
             }
             ClickAction::ToggleSettings => {
-                self.launcher_settings_open = true;
-                self.toggle_launcher();
+                self.open_settings_category(qh, self.settings_category);
             }
         }
     }
 
     pub(crate) fn handle_workspace_click(&mut self, qh: &QueueHandle<Self>, action: ClickAction) {
         if let ClickAction::WorkspacePage(step) = action {
-            self.workspace_state.select_relative(step as isize * crate::workspaces::page_size() as isize);
+            self.workspace_state
+                .select_relative(step as isize * crate::workspaces::page_size() as isize);
             self.workspace_hover_idx = None;
             self.draw_workspace_popup(qh, RepaintReason::Pointer);
             return;
@@ -258,8 +258,7 @@ impl NiwoeShell {
             ClickAction::TakeScreenshot => {}
             ClickAction::CyclePowerProfile => {}
             ClickAction::ToggleSettings => {
-                self.launcher_settings_open = true;
-                self.draw_launcher(qh, RepaintReason::Pointer);
+                self.open_settings_category(qh, self.settings_category);
             }
         }
     }
