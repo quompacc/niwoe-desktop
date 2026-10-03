@@ -1,0 +1,4 @@
+PASS real restore-tab cycles 0 20
+PASS real restore-tab cycles 1 20
+PASS real restore-tab cycles 2 20
+PASS P12 after 3x20 real restore-tab cycles; exact baseline state preserved

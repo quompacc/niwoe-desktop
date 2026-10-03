@@ -1,0 +1,53 @@
+[
+  {
+    "run": 0,
+    "seconds": 300.0091362479998,
+    "gpu_engine_percent": 0.007907528849517885,
+    "processes": {
+      "niwoe": {
+        "cpu_percent": 1.056634487750916,
+        "rss_before": 148766720,
+        "rss_after": 148766720
+      },
+      "niwoe-shell": {
+        "cpu_percent": 0.1899942138858114,
+        "rss_before": 91283456,
+        "rss_after": 91283456
+      }
+    }
+  },
+  {
+    "run": 1,
+    "seconds": 300.00896572499914,
+    "gpu_engine_percent": 0.007243138200049224,
+    "processes": {
+      "niwoe": {
+        "cpu_percent": 1.049968620900291,
+        "rss_before": 148766720,
+        "rss_after": 148766720
+      },
+      "niwoe-shell": {
+        "cpu_percent": 0.1733281532914766,
+        "rss_before": 91283456,
+        "rss_after": 91283456
+      }
+    }
+  },
+  {
+    "run": 2,
+    "seconds": 300.00808345400037,
+    "gpu_engine_percent": 0.0072504356381234555,
+    "processes": {
+      "niwoe": {
+        "cpu_percent": 1.0499717086733042,
+        "rss_before": 148766720,
+        "rss_after": 148766720
+      },
+      "niwoe-shell": {
+        "cpu_percent": 0.1799951500582807,
+        "rss_before": 91283456,
+        "rss_after": 91414528
+      }
+    }
+  }
+]

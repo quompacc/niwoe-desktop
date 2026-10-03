@@ -1,0 +1,362 @@
+[
+  {
+    "case": "fresh",
+    "first": {
+      "type": "first-run",
+      "request_id": "p11-1790513409206743739",
+      "snapshot": {
+        "revision": 0,
+        "fresh": true,
+        "completed": false,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    },
+    "complete": {
+      "type": "first-run",
+      "request_id": "p11-1790513413583999537",
+      "snapshot": {
+        "revision": 3,
+        "fresh": true,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    },
+    "repeated": {
+      "type": "first-run",
+      "request_id": "p11-1790513413588006828",
+      "snapshot": {
+        "revision": 3,
+        "fresh": true,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": "Konflikt: Einf\u00fchrung wurde ge\u00e4ndert. Zustand neu laden."
+    }
+  },
+  {
+    "case": "existing",
+    "first": {
+      "type": "first-run",
+      "request_id": "p11-1790513414123540580",
+      "snapshot": {
+        "revision": 0,
+        "fresh": false,
+        "completed": false,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    },
+    "complete": {
+      "type": "first-run",
+      "request_id": "p11-1790513418403153733",
+      "snapshot": {
+        "revision": 3,
+        "fresh": false,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    },
+    "repeated": {
+      "type": "first-run",
+      "request_id": "p11-1790513418506627639",
+      "snapshot": {
+        "revision": 3,
+        "fresh": false,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": "Konflikt: Einf\u00fchrung wurde ge\u00e4ndert. Zustand neu laden."
+    }
+  },
+  {
+    "case": "legacy",
+    "first": {
+      "type": "first-run",
+      "request_id": "p11-1790513419053562593",
+      "snapshot": {
+        "revision": 0,
+        "fresh": false,
+        "completed": false,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    },
+    "complete": {
+      "type": "first-run",
+      "request_id": "p11-1790513423434374419",
+      "snapshot": {
+        "revision": 3,
+        "fresh": false,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    },
+    "repeated": {
+      "type": "first-run",
+      "request_id": "p11-1790513423437909673",
+      "snapshot": {
+        "revision": 3,
+        "fresh": false,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": "Konflikt: Einf\u00fchrung wurde ge\u00e4ndert. Zustand neu laden."
+    }
+  },
+  {
+    "case": "before-writes",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513424325758496",
+      "snapshot": {
+        "revision": 3,
+        "fresh": true,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    }
+  },
+  {
+    "case": "after-rooms",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513424902546363",
+      "snapshot": {
+        "revision": 3,
+        "fresh": true,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    }
+  },
+  {
+    "case": "after-panel",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513425482315440",
+      "snapshot": {
+        "revision": 3,
+        "fresh": true,
+        "completed": true,
+        "applying": false,
+        "draft": null
+      },
+      "error": null
+    }
+  },
+  {
+    "case": "conflict",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513426059190555",
+      "snapshot": {
+        "revision": 2,
+        "fresh": true,
+        "completed": false,
+        "applying": true,
+        "draft": {
+          "step": 4,
+          "profile": "preserve",
+          "rooms_revision": 0,
+          "rooms": [
+            {
+              "operation": "configure",
+              "id": null,
+              "name": "P11 isolated",
+              "description": "explicit draft",
+              "assignment": "free",
+              "preferences": {
+                "icon": null,
+                "apps": [],
+                "layout": "tiling",
+                "restore": "disabled"
+              },
+              "position": 9
+            }
+          ],
+          "panel_revision": 0,
+          "panel": [
+            "status",
+            "search"
+          ],
+          "practiced": [
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "error": "Konflikt im Teilabschluss: gespeicherte R\u00e4ume/Leiste weichen ab. Originale und Journal bleiben erhalten."
+    }
+  },
+  {
+    "case": "write-denied",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513426352728460",
+      "snapshot": {
+        "revision": 1,
+        "fresh": true,
+        "completed": false,
+        "applying": false,
+        "draft": {
+          "step": 4,
+          "profile": "preserve",
+          "rooms_revision": 0,
+          "rooms": [
+            {
+              "operation": "configure",
+              "id": null,
+              "name": "P11 isolated",
+              "description": "explicit draft",
+              "assignment": "free",
+              "preferences": {
+                "icon": null,
+                "apps": [],
+                "layout": "tiling",
+                "restore": "disabled"
+              },
+              "position": 9
+            }
+          ],
+          "panel_revision": 0,
+          "panel": [
+            "status",
+            "search"
+          ],
+          "practiced": [
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "error": "Permission denied (os error 13)"
+    }
+  },
+  {
+    "case": "panel-conflict",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513426659372547",
+      "snapshot": {
+        "revision": 1,
+        "fresh": true,
+        "completed": false,
+        "applying": false,
+        "draft": {
+          "step": 4,
+          "profile": "preserve",
+          "rooms_revision": 0,
+          "rooms": [
+            {
+              "operation": "configure",
+              "id": null,
+              "name": "P11 isolated",
+              "description": "explicit draft",
+              "assignment": "free",
+              "preferences": {
+                "icon": null,
+                "apps": [],
+                "layout": "tiling",
+                "restore": "disabled"
+              },
+              "position": 9
+            }
+          ],
+          "panel_revision": 0,
+          "panel": [
+            "status",
+            "search"
+          ],
+          "practiced": [
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "error": "Konflikt: Leiste wurde ge\u00e4ndert. Entwurf bleibt erhalten."
+    }
+  },
+  {
+    "case": "room-conflict",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513427323533838",
+      "snapshot": {
+        "revision": 1,
+        "fresh": true,
+        "completed": false,
+        "applying": false,
+        "draft": {
+          "step": 4,
+          "profile": "preserve",
+          "rooms_revision": 0,
+          "rooms": [
+            {
+              "operation": "configure",
+              "id": null,
+              "name": "P11 isolated",
+              "description": "explicit draft",
+              "assignment": "free",
+              "preferences": {
+                "icon": null,
+                "apps": [],
+                "layout": "tiling",
+                "restore": "disabled"
+              },
+              "position": 9
+            }
+          ],
+          "panel_revision": 0,
+          "panel": [
+            "status",
+            "search"
+          ],
+          "practiced": [
+            false,
+            false,
+            false
+          ]
+        }
+      },
+      "error": "Konflikt: R\u00e4ume wurden ge\u00e4ndert. Entwurf bleibt erhalten."
+    }
+  },
+  {
+    "case": "invalid-state",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513427617845617",
+      "snapshot": null,
+      "error": "Einf\u00fchrungszustand besch\u00e4digt: TOML parse error at line 1, column 11\n  |\n1 | broken = [\n  |           ^\ninvalid array\nexpected `]`\n"
+    }
+  },
+  {
+    "case": "invalid-state",
+    "result": {
+      "type": "first-run",
+      "request_id": "p11-1790513427816839318",
+      "snapshot": null,
+      "error": "Unbekannte Version des Einf\u00fchrungszustands; Datei bleibt erhalten"
+    }
+  }
+]

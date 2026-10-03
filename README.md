@@ -1,135 +1,104 @@
-# Meridian Desktop
+# NIWOE Desktop
 
-Meridian is an experimental Wayland desktop and compositor written in Rust.
-Its long-term direction is a polished BSD-capable desktop: native Rust where
-system ownership, security and performance matter; WebKit-based UI where HTML
-and CSS make a coherent modern interface practical for a small team.
+**Deine Arbeit. In ihrem Kontext.**
 
-> **Strategy status (2026-08-19):** the current Rust compositor and native shell
-> remain the working implementation. The new WebKit UI platform is the active
-> direction, but has not yet replaced the shell. OpenBSD is the next hardware
-> evaluation target; FreeBSD remains the supported BSD fallback.
+NIWOE ist ein experimenteller nativer Linux-Desktop und Wayland-Compositor
+in Rust. Räume bündeln Anwendungen, Fenster und Dateiverweise zu einem
+Arbeitskontext. Ein gemeinsamer Hub verbindet Raumwahl, Suche und Überblick;
+das Control Center führt Verwaltung und Einstellungen zusammen.
 
-## Product direction
+> **In Entwicklung — noch keine fertige Desktop-Alpha.** Die Aufnahmen zeigen
+> den tatsächlich laufenden nativen Desktop auf Fedora vom **03.10.2026**.
+> Funktionen, Integration und visuelle Qualität werden weiter überarbeitet.
 
-Rust continues to own:
+[![Der native NIWOE-Hub mit dunkelgrünen Raumkarten, Landschaftskopf und transparenter Oberfläche](assets/screenshots/hub.png)](assets/screenshots/hub.png)
 
-- Wayland/XWayland, DRM/KMS and input
-- window and workspace management
-- IPC, system services and platform integration
-- privileged helpers, policy and security boundaries
-- compositor-level effects and final surface composition
+*Der Hub: Räume wählen, Anwendungen suchen und den aktuellen Kontext sehen.*
 
-Meridian-owned desktop surfaces will converge on a shared UI platform:
+## Das Raumkonzept
 
-- a small WebKit runtime, not a general Tauri clone
-- HTML, CSS and Web Components
-- a deliberately small TypeScript/JavaScript layer
-- a typed, capability-scoped Rust bridge
-- CSS generated from `meridian-tokens` and `meridian-config`
-- shared components, icons, typography and interaction primitives
+Eine neue Sitzung beginnt in der neutralen **Loge**. Der Willkommens-Hub
+führt in einen Raum; später ist er mit **Super+Space** erreichbar. Jeder Raum
+kann eigene App-Zuordnungen, Dateiverweise und ein manuell wiederherstellbares
+Fensterlayout erhalten. Die Loge bleibt der Einstieg und zählt nicht als Raum.
 
-The first proof is deliberately narrow: runtime and bridge, then panel,
-launcher and Quick Settings. Settings and other Meridian system tools follow
-only after that vertical slice proves visual quality, responsiveness, security
-and BSD viability.
+Das obere Panel hält Raumwechsel, Uhr und Systemzugang bereit. Im gemeinsamen
+**Control Center** geht der Weg vom Überblick in die Raumdetails und zu den
+Einstellungen. Dunkelgrüne Flächen, warme Akzente und eine gemeinsame native
+Komponentenbasis verbinden diese Ansichten.
 
-External GTK, Qt, Firefox, Chromium/Electron and wxWidgets applications remain
-ordinary Wayland or XWayland clients. Meridian does not render or replace them.
+## Einblicke in den aktuellen Desktop
 
-## Current implementation
+Die Raumvorschauen zeigen ein wirklich geöffnetes KWrite-Fenster mit einem
+Beispieldokument. Alle Bilder sind unveränderte Screenshots der laufenden
+Oberfläche. Ein Klick öffnet die jeweilige Aufnahme in voller Größe.
 
-The repository already contains:
+| Räume verwalten | Raum konfigurieren |
+| --- | --- |
+| [![Raumverwaltung im Control Center mit echten Fenstervorschauen, Filtern und Raumkarten](assets/screenshots/rooms.png)](assets/screenshots/rooms.png) | [![Raumkonfiguration mit App-Zuordnung, Wiederherstellung und echter Raumvorschau](assets/screenshots/room-configuration.png)](assets/screenshots/room-configuration.png) |
+| Räume, Belegung und Fenster im Überblick. | Apps, Dateiverweise und Wiederherstellung im Kontext eines Raums. |
 
-- a Smithay-based Wayland compositor with DRM/KMS and Winit backends
-- XDG Shell, Layer Shell, XWayland and compositor IPC
-- a separate native Rust shell with panel, launcher, popups and settings
-- login, lock, portal and polkit processes
-- multi-monitor/workspace infrastructure and diagnostics
-- centralized design tokens guarded against render-code hardcodes
-- Linux installation support and a FreeBSD installer path
+| Einstellungen im Control Center | Die Leiste gestalten |
+| --- | --- |
+| [![Hintergrundeinstellungen mit Bildvorschauen innerhalb der gemeinsamen Control-Center-Sidebar](assets/screenshots/appearance.png)](assets/screenshots/appearance.png) | [![Native Leistenkonfiguration mit Modulauswahl und Vorschau in Originalgröße](assets/screenshots/panel-configuration.png)](assets/screenshots/panel-configuration.png) |
+| Hintergrund, Mauszeiger und Anzeige im gemeinsamen Rahmen. | Module und Reihenfolge mit einer Vorschau in Originalgröße. |
 
-This implementation is retained as the behavioral reference while the new UI
-platform is proven incrementally. No big feature expansion should precede the
-vertical slice.
+Aufnahmedaten und Buildidentitäten: [Screenshot-Herkunft](assets/screenshots/README.md).
 
-## Platform strategy
+## Produktziel
 
-- **OpenBSD:** next real-hardware evaluation on an Acer laptop using only its
-  Intel HD 620. The NVIDIA 940MX is intentionally ignored.
-- **FreeBSD:** maintained alternative when OpenBSD hardware, WebKit or desktop
-  compatibility is insufficient. Existing installer work remains valuable.
-- **Linux:** current development and compatibility platform; no longer the only
-  product assumption.
-- **VMs:** fast and reproducible regression checks, never the final authority
-  for DRM/KMS, input, suspend/resume or performance.
+Zuerst entsteht ein kohärenter Desktop auf einer bestehenden Linux-
+Distribution. Ein eigenes Linux-basiertes NIWOE OS wird erst nach einer
+brauchbaren Desktop-Alpha entschieden und geplant. NIWOE-Oberflächen bleiben
+nativ in Rust; der archivierte WebKit-Prototyp ist ausschließlich eine visuelle
+Referenz. Frühere NIWOE-/BSD-Strategien sind historische Evidenz.
 
-See [the roadmap](ROADMAP.md), [the active master plan](MERIDIAN_OS_PLAN.md),
-[the UI platform design](docs/UI_PLATFORM.md), and
-[the OpenBSD evaluation guide](docs/OPENBSD.md).
+## Architektur
 
-## Design system
+- Der Smithay-basierte Compositor verantwortet Wayland/XWayland, DRM/KMS,
+  Input, Fensterverwaltung, Fokus, Stacking und Policy.
+- Die separate native Shell verantwortet Produktkomposition, lokale Eingabe und
+  Oberflächenlebenszyklen.
+- `niwoe-tokens`, `niwoe-config` und `niwoe-ui` sind die zentrale
+  Design- und Komponentenbasis.
+- Privilegierte Aktionen liegen weiterhin hinter kleinen, typisierten
+  Services/Helpern; die Shell bleibt unprivilegiert.
 
-[The Meridian Design Manifest](docs/meridian_design_manifest.md) is binding.
-There are exactly two themes, light and dark, identical except for colors.
-`meridian-tokens` plus `meridian-config` remain the single source of truth;
-Web UI consumes generated CSS variables rather than defining a second token
-system.
+Externe Anwendungen bleiben normale Wayland- oder XWayland-Clients. NIWOE
+rendert oder ersetzt ihre Toolkit-Oberflächen nicht.
 
-## Build and test
+## Aktiver Plan und Design
 
-The current implementation is a Rust workspace. On a supported Unix build host:
+Die verbindliche Reihenfolge und Phasenabnahme steht in
+[NIWOE_IMPLEMENTATION_PLAN.md](NIWOE_IMPLEMENTATION_PLAN.md). Der
+[NIWOE Design-Brief](docs/NIWOE_DESIGN_BRIEF.md) präzisiert das
+[Designmanifest](docs/niwoe_design_manifest.md). Für die Desktop-Alpha ist
+ein dunkelgrünes Theme verbindlich; alle aktiven Designwerte kommen aus
+zentralen Tokens und Config. Die Oberflächen arbeiten eventgetrieben.
 
-```bash
-cargo build --workspace
-cargo test --workspace
-cargo check --workspace
-```
+Die empfohlene Linux-Werkbank ist Fedora KDE. Der konkrete,
+reproduzierbare Einrichtungs- und Messablauf steht in
+[docs/NIWOE_LINUX_BASELINE.md](docs/NIWOE_LINUX_BASELINE.md). Ubuntu-CI bleibt
+als Buildbasis bestehen. Windows dient der Bearbeitung, nicht als Linux-Nachweis.
 
-Before a patch is considered ready:
+## Build und Test
+
+Auf einem dokumentierten Linux-Host:
 
 ```bash
 cargo fmt --all -- --check
+cargo check --workspace
 cargo clippy --workspace --all-targets -- -D warnings
 cargo test --workspace
-cargo test -p meridian-tokens --test design_guard
+cargo test -p niwoe-tokens --test design_guard
+cargo test -p niwoe-tokens --test source_size_guard
+cargo test -p niwoe-shell --test centralization_guard
+git diff --check
 ```
 
-Platform-specific prerequisites and installation paths are documented in
-[INSTALL.md](INSTALL.md) and [docs/FREEBSD.md](docs/FREEBSD.md). OpenBSD does
-not yet have a turnkey installer; its first phase is evidence gathering.
+## Historische Dokumentation
 
-## Documentation map
-
-Use this precedence when documents disagree:
-
-1. [current BSD handoff](Meridian%20-%20BSD%20%E2%80%93%20%C3%9Cbergabe%20f%C3%BCr%20ChatGPT%20Desktop.md)
-2. [active master plan](MERIDIAN_OS_PLAN.md) and [roadmap](ROADMAP.md)
-3. [design manifest](docs/meridian_design_manifest.md) for every visual decision
-4. [architecture](docs/ARCHITECTURE.md) and [project status](docs/PROJECT_STATUS.md)
-5. focused technical documents
-6. dated audits and superseded plans, which are historical evidence only
-
-Important references:
-
-- [UI platform](docs/UI_PLATFORM.md)
-- [OpenBSD evaluation](docs/OPENBSD.md)
-- [FreeBSD support](docs/FREEBSD.md)
-- [external application compatibility](docs/APP_STACK.md)
-- [testing](docs/TESTING.md)
-- [configuration](docs/CONFIGURATION.md)
-- [debugging](docs/DEBUGGING.md)
-- [technical design guidelines](docs/technical-design-guidelines.md)
-
-## Philosophy
-
-**Native where it matters. Web where it shines.**
-
-Meridian values protocol correctness, a small and understandable trusted base,
-real-hardware performance, coherent design and bounded maintenance cost. It is
-not trying to replace third-party application toolkits or rebuild a general web
-application framework.
-
-## License
-
-Meridian is licensed under GPL-3.0-or-later.
+`NIWOE_OS_PLAN.md`, `ROADMAP.md`, `PLAN.md`, `docs/UI_PLATFORM.md` sowie
+OpenBSD-/FreeBSD-spezifische Berichte bleiben für Herkunft und technische
+Belege erhalten, sind aber keine aktive Produktstrategie. Sie dürfen den
+NIWOE-Plan nicht überstimmen.

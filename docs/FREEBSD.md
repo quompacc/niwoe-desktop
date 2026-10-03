@@ -1,4 +1,4 @@
-# Meridian on FreeBSD
+# NIWOE on FreeBSD
 
 > **Platform position (2026-08-19):** this is the existing, implemented BSD
 > path and remains maintained. OpenBSD is evaluated next, but FreeBSD is the
@@ -6,7 +6,7 @@
 > here. The installer below deploys the current native Rust shell; the planned
 > WebKit runtime has no FreeBSD packaging claim yet.
 
-Meridian builds and runs as a full desktop on FreeBSD (verified on 15.1-RELEASE,
+NIWOE builds and runs as a full desktop on FreeBSD (verified on 15.1-RELEASE,
 amd64, Intel KMS): boot → login manager → PAM login → compositor + shell +
 panel + launcher + apps. FreeBSD has no systemd or logind, so the systemd units,
 `pam_systemd`/logind PAM stacks, and `install-local.sh` boot wiring in
@@ -31,7 +31,7 @@ module, adds the user to the `video`/`operator` groups, and enables the login
 manager at boot.
 
 > **Keep an SSH session open the first time you enable boot.** Starting the
-> desktop takes over the GPU and console. Recover with `service meridian_login
+> desktop takes over the GPU and console. Recover with `service niwoe_login
 > stop`. Verify recovery before you reboot.
 
 That is the whole install. The sections below explain what each step does and
@@ -48,11 +48,11 @@ Sub-targets: `build` (toolchain + headers), `runtime` (libraries, `drm-kmod`,
 `xdg-utils`), `apps` (`foot`, `pcmanfm`, `firefox`), `hardware-test` (DRM/PCI/USB
 inspection tools).
 
-`papirus-icon-theme` matches Meridian's default icon theme (`Papirus-Dark`) and
+`papirus-icon-theme` matches NIWOE's default icon theme (`Papirus-Dark`) and
 `plasma6-breeze` provides the default `Breeze_Light` Xcursor, so the shipped
 defaults resolve out of the box with no config edits. `plasma6-breeze` pulls KDE
 dependencies — if you want a lean install, drop it from `runtime_pkgs` and
-Meridian falls back to its embedded cursor.
+NIWOE falls back to its embedded cursor.
 
 ## 2. Install
 
@@ -65,18 +65,18 @@ Options:
 | Flag | Effect |
 | --- | --- |
 | `--build` | `cargo build --release --workspace` first (sets `LIBRARY_PATH=/usr/local/lib` so the linker finds pkg libraries) |
-| `--enable-boot` | enable `meridian_login` at boot, switch to `background_dhclient`, load the GPU module now |
+| `--enable-boot` | enable `niwoe_login` at boot, switch to `background_dhclient`, load the GPU module now |
 | `--quiet-boot` | also enable console muting for a silent boot (best-effort) |
-| `--user NAME` | desktop user — owns `/var/lib/meridian` and becomes `meridian_user` (default: `$SUDO_USER`) |
+| `--user NAME` | desktop user — owns `/var/lib/niwoe` and becomes `niwoe_user` (default: `$SUDO_USER`) |
 | `--gpu auto\|intel\|amd\|none` | KMS module; `auto` reads the PCI vendor (default) |
 | `--prefix PATH` | install prefix (default `/usr/local`) |
 
 It installs binaries to `/usr/local/bin`, themes to
-`/usr/local/share/meridian/themes`, PAM stacks to `/etc/pam.d/meridian-login*`,
+`/usr/local/share/niwoe/themes`, PAM stacks to `/etc/pam.d/niwoe-login*`,
 and the rc.d services to `/usr/local/etc/rc.d/`. It always enables and starts
 `seatd` + `dbus` (harmless prerequisites) and persists the GPU module in
 `kld_list`. Without `--enable-boot` nothing that affects the next boot is
-touched — test ad-hoc with `service meridian_login onestart`.
+touched — test ad-hoc with `service niwoe_login onestart`.
 
 **Release builds matter.** The compositor and shell do heavy CPU work (scene and
 damage management, tiny-skia panel/launcher rendering); a debug build is 10–50×
@@ -100,15 +100,15 @@ sysrc kld_list+=i915kms && kldload i915kms
 # Boot-to-greeter: enable the login manager, disable the direct-compositor
 # service (they are mutually exclusive), and background dhclient so networking
 # does not block / spam the boot.
-sysrc meridian_login_enable=YES
-sysrc meridian_enable=NO
+sysrc niwoe_login_enable=YES
+sysrc niwoe_enable=NO
 sysrc background_dhclient=YES
 ```
 
-The `meridian-login` rc.d service authenticates the user through PAM
-(`/etc/pam.d/meridian-login-password`) and spawns the compositor as that user.
+The `niwoe-login` rc.d service authenticates the user through PAM
+(`/etc/pam.d/niwoe-login-password`) and spawns the compositor as that user.
 It sets `XKB_DEFAULT_RULES=evdev` and `XCURSOR_PATH`, aliases `/run`→`/var/run`
-(the login IPC socket lives at `/run/meridian-login.sock`), and the compositor
+(the login IPC socket lives at `/run/niwoe-login.sock`), and the compositor
 it spawns wraps itself in `dbus-run-session` for the per-session bus.
 
 ### Why these specific knobs
@@ -122,12 +122,12 @@ it spawns wraps itself in `dbus-run-session` for the per-session bus.
   files and icon themes there, not just `/usr/share`. The compositor sets this
   for the session; without it the launcher (which hides icon-less apps) is empty.
 - **Session D-Bus via `dbus-run-session`** — FreeBSD has no systemd user bus, so
-  GTK/Qt apps and Meridian's own notification/status-notifier services need one.
+  GTK/Qt apps and NIWOE's own notification/status-notifier services need one.
 
 ## 4. Native boot logo and silent boot (optional)
 
 `--quiet-boot` installs `assets/bsd_bootlogo-loader.png` as
-`/boot/images/meridian-bootlogo.png` and configures FreeBSD's native
+`/boot/images/niwoe-bootlogo.png` and configures FreeBSD's native
 `boot_mute` framebuffer splash. This replaces the stock FreeBSD logo without a
 userspace bootsplash:
 
@@ -144,18 +144,18 @@ loader_logo="none"
 loader_brand="none"
 boot_mute="YES"
 kern.consmute="1"
-splash="/boot/images/meridian-bootlogo.png"
-shutdown_splash="/boot/images/meridian-bootlogo.png"
+splash="/boot/images/niwoe-bootlogo.png"
+shutdown_splash="/boot/images/niwoe-bootlogo.png"
 ```
 
-It also sets `rc_startmsgs=NO` and enables `rc.d/meridian_quiet`, which re-mutes
+It also sets `rc_startmsgs=NO` and enables `rc.d/niwoe_quiet`, which re-mutes
 the console before `devmatch` and networking. Recover console output over SSH
 with `conscontrol mute off`.
 
 ## 5. Known gaps on FreeBSD
 
 - **Chromium** does not start — its sandbox/GPU broker is broken on FreeBSD
-  (a Chromium issue, not Meridian). `firefox` is the working default browser.
+  (a Chromium issue, not NIWOE). `firefox` is the working default browser.
 - **Greeter cursor lag** — the login screen redraws the full frame on the CPU on
   every mouse move; smooth but slightly laggy. (Caching the static layer and
   redrawing only the cursor region is the fix.)
@@ -174,5 +174,5 @@ with `conscontrol mute off`.
 | Login fails with PAM error | wrong PAM stack — `session` must use `pam_permit` (no `pam_unix` session on FreeBSD) |
 | `permission denied` on `/dev/dri/cardN` | user not in `video` group — `pw groupmod video -m youruser`, re-login |
 
-Logs: `/var/log/meridian-login.log` (greeter + compositor), `/var/log/meridian.log`
+Logs: `/var/log/niwoe-login.log` (greeter + compositor), `/var/log/niwoe.log`
 (direct-compositor service).

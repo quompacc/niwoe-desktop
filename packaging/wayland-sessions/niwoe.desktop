@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=NIWOE (development)
+Comment=Native NIWOE Wayland desktop
+Exec=@PREFIX@/bin/niwoe-session
+TryExec=@PREFIX@/bin/niwoe-session
+Type=Application
+DesktopNames=NIWOE;

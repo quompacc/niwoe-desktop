@@ -1,0 +1,5 @@
+PASS explicit UI draft prepared; productive documents unchanged
+CAPTURE p11-real-partial-error
+PASS real second-document rename denied after rooms committed; active journal, no false new completion
+CAPTURE p11-partial-discard-confirm
+PASS explicit two-click partial abandonment retains all already published documents and previous completion

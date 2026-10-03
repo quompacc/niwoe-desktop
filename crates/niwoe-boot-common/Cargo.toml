@@ -1,0 +1,9 @@
+[package]
+name = "niwoe-boot-common"
+version.workspace = true
+edition = "2021"
+license = "GPL-3.0-or-later"
+description = "Shared boot-chain helpers for bootsplash and niwoe-login"
+
+[dependencies]
+drm = "0.15"

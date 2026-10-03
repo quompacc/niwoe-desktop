@@ -1,0 +1,236 @@
+use std::{
+    fs, io,
+    os::unix::fs::{FileTypeExt, MetadataExt, PermissionsExt},
+    path::Path,
+};
+
+#[cfg(target_os = "openbsd")]
+pub const BOOTSPLASH_SOCKET_PATH: &str = "/var/run/bootsplash.sock";
+#[cfg(not(target_os = "openbsd"))]
+pub const BOOTSPLASH_SOCKET_PATH: &str = "/run/bootsplash.sock";
+
+#[cfg(target_os = "openbsd")]
+pub const LOGIN_SOCKET_PATH: &str = "/var/run/niwoe-login.sock";
+#[cfg(not(target_os = "openbsd"))]
+pub const LOGIN_SOCKET_PATH: &str = "/run/niwoe-login.sock";
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SocketIdentity {
+    dev: u64,
+    ino: u64,
+}
+
+pub fn secure_socket_permissions(path: &Path) -> io::Result<SocketIdentity> {
+    fs::set_permissions(path, fs::Permissions::from_mode(0o600))?;
+    socket_identity_for_path(path)
+}
+
+pub fn socket_identity_for_path(path: &Path) -> io::Result<SocketIdentity> {
+    let metadata = fs::metadata(path)?;
+    Ok(SocketIdentity {
+        dev: metadata.dev(),
+        ino: metadata.ino(),
+    })
+}
+
+pub fn cleanup_socket_path(path: &Path, expected: SocketIdentity) -> io::Result<bool> {
+    let metadata = match fs::symlink_metadata(path) {
+        Ok(metadata) => metadata,
+        Err(err) if err.kind() == io::ErrorKind::NotFound => return Ok(false),
+        Err(err) => return Err(err),
+    };
+
+    if !metadata.file_type().is_socket() {
+        return Ok(false);
+    }
+
+    let actual = SocketIdentity {
+        dev: metadata.dev(),
+        ino: metadata.ino(),
+    };
+    if actual != expected {
+        return Ok(false);
+    }
+
+    fs::remove_file(path)?;
+    Ok(true)
+}
+
+// Prefer a sensible mid-range mode during boot: largest where the longer side
+// stays <= 2560 px. This keeps bootsplash and niwoe-login visually aligned.
+pub fn select_boot_mode(modes: &[drm::control::Mode]) -> Option<drm::control::Mode> {
+    let mut filtered: Vec<_> = modes
+        .iter()
+        .copied()
+        .filter(|m| {
+            let (w, h) = m.size();
+            w.max(h) <= 2560 && w >= 1280 && h >= 720
+        })
+        .collect();
+    filtered.sort_by_key(|m| {
+        let (w, h) = m.size();
+        std::cmp::Reverse(w as u32 * h as u32)
+    });
+    filtered.first().copied().or_else(|| modes.first().copied())
+}
+
+/// Persisted desktop appearance, read by the boot chain (bootsplash, login) so
+/// the compass and login chrome match the active desktop theme. Written by the
+/// compositor when the theme is (re)loaded. Defaults to Dark when absent.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Appearance {
+    #[default]
+    Dark,
+    Light,
+}
+
+impl Appearance {
+    pub fn is_light(self) -> bool {
+        matches!(self, Appearance::Light)
+    }
+
+    fn as_str(self) -> &'static str {
+        match self {
+            Appearance::Dark => "dark",
+            Appearance::Light => "light",
+        }
+    }
+
+    fn parse(s: &str) -> Appearance {
+        match s.trim() {
+            "light" => Appearance::Light,
+            _ => Appearance::Dark,
+        }
+    }
+}
+
+/// System-wide appearance marker. Under /var/lib so it survives reboots and is
+/// readable by the (root) boot chain regardless of which user logs in.
+pub const APPEARANCE_PATH: &str = "/var/lib/niwoe/appearance";
+
+/// Read the persisted appearance; Dark on any error (missing/unreadable).
+pub fn read_appearance() -> Appearance {
+    read_appearance_from(Path::new(APPEARANCE_PATH))
+}
+
+pub fn read_appearance_from(path: &Path) -> Appearance {
+    match fs::read_to_string(path) {
+        Ok(contents) => Appearance::parse(&contents),
+        Err(_) => Appearance::Dark,
+    }
+}
+
+/// Persist the appearance (best-effort). Creates the parent dir if needed.
+pub fn write_appearance(appearance: Appearance) -> io::Result<()> {
+    write_appearance_to(Path::new(APPEARANCE_PATH), appearance)
+}
+
+pub fn write_appearance_to(path: &Path, appearance: Appearance) -> io::Result<()> {
+    if let Some(parent) = path.parent() {
+        let _ = fs::create_dir_all(parent);
+    }
+    fs::write(path, appearance.as_str())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::{
+        fs,
+        os::unix::net::UnixListener,
+        time::{SystemTime, UNIX_EPOCH},
+    };
+
+    use super::{cleanup_socket_path, secure_socket_permissions};
+
+    fn unique_test_dir(prefix: &str) -> std::path::PathBuf {
+        std::env::temp_dir().join(format!(
+            "{}-{}-{}",
+            prefix,
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("clock")
+                .as_nanos()
+        ))
+    }
+
+    #[test]
+    fn cleanup_removes_original_socket() {
+        let dir = unique_test_dir("niwoe-boot-common-cleanup");
+        fs::create_dir_all(&dir).expect("test dir");
+        let path = dir.join("boot.sock");
+        let listener = UnixListener::bind(&path).expect("bind socket");
+        let identity = secure_socket_permissions(&path).expect("socket identity");
+
+        assert!(cleanup_socket_path(&path, identity).expect("cleanup"));
+        assert!(!path.exists());
+
+        drop(listener);
+        let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn cleanup_rejects_replaced_non_socket() {
+        let dir = unique_test_dir("niwoe-boot-common-replaced");
+        fs::create_dir_all(&dir).expect("test dir");
+        let path = dir.join("boot.sock");
+        let listener = UnixListener::bind(&path).expect("bind socket");
+        let identity = secure_socket_permissions(&path).expect("socket identity");
+        drop(listener);
+        fs::remove_file(&path).expect("remove socket");
+        fs::write(&path, b"not a socket").expect("write replacement");
+
+        assert!(!cleanup_socket_path(&path, identity).expect("cleanup"));
+        assert!(path.exists());
+
+        let _ = fs::remove_file(&path);
+        let _ = fs::remove_dir_all(dir);
+    }
+}
+
+#[cfg(test)]
+mod appearance_tests {
+    use super::*;
+
+    #[test]
+    fn parse_defaults_to_dark() {
+        assert_eq!(Appearance::parse("nonsense"), Appearance::Dark);
+        assert_eq!(Appearance::parse(""), Appearance::Dark);
+        assert_eq!(Appearance::parse(" light\n"), Appearance::Light);
+    }
+
+    #[test]
+    fn roundtrip_via_file() {
+        let path = std::env::temp_dir().join(format!(
+            "niwoe-appearance-test-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        assert_eq!(read_appearance_from(&path), Appearance::Dark);
+        write_appearance_to(&path, Appearance::Light).unwrap();
+        assert_eq!(read_appearance_from(&path), Appearance::Light);
+        let _ = fs::remove_file(&path);
+    }
+}
+
+#[cfg(test)]
+mod platform_path_tests {
+    use super::{BOOTSPLASH_SOCKET_PATH, LOGIN_SOCKET_PATH};
+
+    #[test]
+    fn boot_sockets_use_the_native_runtime_directory() {
+        #[cfg(target_os = "openbsd")]
+        {
+            assert_eq!(BOOTSPLASH_SOCKET_PATH, "/var/run/bootsplash.sock");
+            assert_eq!(LOGIN_SOCKET_PATH, "/var/run/niwoe-login.sock");
+        }
+        #[cfg(not(target_os = "openbsd"))]
+        {
+            assert_eq!(BOOTSPLASH_SOCKET_PATH, "/run/bootsplash.sock");
+            assert_eq!(LOGIN_SOCKET_PATH, "/run/niwoe-login.sock");
+        }
+    }
+}

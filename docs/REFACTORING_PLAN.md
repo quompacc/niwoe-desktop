@@ -1,4 +1,4 @@
-# Meridian — Refactoring Plan
+# NIWOE — Refactoring Plan
 
 > **Status 2026-08-19: umgesetzt.** Sämtliche Rust-Quelldateien liegen bei
 > höchstens 600 physischen Zeilen. Die Aufteilung ist verhaltensgleich und folgt
@@ -14,18 +14,18 @@ future edit. This document now records the completed refactor and its seams.
    blocks / free functions, occasionally bumping a helper from private to
    `pub(super)` / `pub(crate)`. No struct/field reshaping.
 2. **Follow the convention already in the tree.** The project already splits one
-   concern across many files, each containing its own `impl MeridianShell {}`
+   concern across many files, each containing its own `impl NiwoeShell {}`
    (`state/`, `state/ipc/`, `backend/drm/`, `wayland/handlers/`). Every split
    below mirrors that, so diffs stay mostly mechanical and low-risk.
 3. **Green gates are the definition of done** (CLAUDE.md): after each step,
    `cargo test --workspace`, `cargo clippy -- -D warnings`, and
-   `cargo test -p meridian-tokens --test design_guard` must stay green.
+   `cargo test -p niwoe-tokens --test design_guard` must stay green.
 4. **Update `docs/CODE_INDEX.md`** after each move: `scripts/gen_code_index.sh`.
 
 > ⚠️ **design_guard gotcha:** the guard test scans `crates/*/src/**` and several
 > hand-written checks key off file *paths* (e.g. `settings_view.rs`). When colour
 > /alpha-bearing code moves out of a guarded file, re-check
-> `crates/meridian-tokens/tests/design_guard.rs` so coverage moves with it
+> `crates/niwoe-tokens/tests/design_guard.rs` so coverage moves with it
 > (it currently scans by directory walk, so most moves are fine — but verify).
 
 ## Priority order (highest value first)
@@ -38,7 +38,7 @@ future edit. This document now records the completed refactor and its seams.
 | Login/lock | Runtime, state, animation, rendering, controls and IPC are separated. |
 | Config/IPC/tests | Mutation, TOML output, wallpapers and test groups are separated. |
 | Compass/Polkit | Rendering phases and Wayland state/dispatch are separated. |
-| Regression gate | `cargo test -p meridian-tokens --test source_size_guard`. |
+| Regression gate | `cargo test -p niwoe-tokens --test source_size_guard`. |
 
 ---
 
@@ -70,10 +70,10 @@ settings_view/
 to `settings_view/mod.rs` (or `layout.rs`) and re-export. The builder arms capture
 a lot of `&self`; extracted fns take a small context borrow. Verify design_guard.
 
-## 2. `MeridianShell` impls → `state/`, `dispatch/`, `render/` directories
+## 2. `NiwoeShell` impls → `state/`, `dispatch/`, `render/` directories
 
 Do **not** reshape the ~205-field struct (high blast radius). Instead split the
-three giant `impl MeridianShell {}` blocks by concern, mirroring the compositor's
+three giant `impl NiwoeShell {}` blocks by concern, mirroring the compositor's
 `state/` layout:
 ```
 wayland/state/        # struct stays in shell.rs; lifecycle (tick, poll_ipc, apply_ipc_event) in mod.rs
@@ -89,10 +89,10 @@ wayland/dispatch/     # widget_dispatch.rs split: one file per dispatch_* fn
 **Risk:** low–med. Multiple `impl` blocks across files are native Rust; only
 friction is bumping a few private helpers to `pub(super)`.
 
-## 3. `meridian-login/src/main.rs` → modules
+## 3. `niwoe-login/src/main.rs` → modules
 
 ```
-meridian-login/src/
+niwoe-login/src/
   drm.rs          # Card + open_display_card + card_drives_a_display
   ui_state.rs     # LoginUiState + enums + apply/auth/tick logic
   security_key.rs # yubikey/smartcard detection + uevent parsers (+ their tests)
@@ -139,7 +139,7 @@ xwayland/
 
 `with_alpha` and `blit_rgba_to_argb` are copy-pasted across `settings_view.rs`,
 `panel_view.rs`, `app_view.rs` (and a blit variant in DRM). Extract one copy into
-`meridian-ui` or a shared `meridian-shell/src/draw/util.rs` and delete the rest.
+`niwoe-ui` or a shared `niwoe-shell/src/draw/util.rs` and delete the rest.
 
 ---
 
@@ -151,4 +151,4 @@ xwayland/
   `wpctl get-volume`), OPEN-4 (`pick_file_manager` honour the user's
   `inode/directory` default), the unified desktop-entry parser (one parser for
   `launcher.rs` + `default_apps.rs`), and the Dolphin→Gwenview launch behaviour
-  (KIO-side, not a Meridian code path).
+  (KIO-side, not a NIWOE code path).

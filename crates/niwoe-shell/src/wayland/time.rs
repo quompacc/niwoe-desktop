@@ -1,0 +1,61 @@
+use std::{
+    ffi::{CStr, CString},
+    ptr,
+};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(super) struct LocalDate {
+    pub(super) year: i32,
+    pub(super) month: u8,
+    pub(super) day: u8,
+}
+
+pub(super) fn local_date() -> Option<LocalDate> {
+    // SAFETY: libc time APIs are called with valid pointers and outputs are validated before use.
+    unsafe {
+        let now = libc::time(ptr::null_mut());
+        let mut tm = std::mem::zeroed::<libc::tm>();
+        if libc::localtime_r(&now, &mut tm).is_null() {
+            return None;
+        }
+
+        let year = tm.tm_year + 1900;
+        let month = (tm.tm_mon + 1) as u8;
+        let day = tm.tm_mday as u8;
+        if !(1..=12).contains(&month) || day == 0 {
+            return None;
+        }
+
+        Some(LocalDate { year, month, day })
+    }
+}
+
+pub(super) fn formatted_time() -> String {
+    // SAFETY: libc time/strftime calls use valid buffers and checked return values.
+    unsafe {
+        let now = libc::time(ptr::null_mut());
+        let mut tm = std::mem::zeroed::<libc::tm>();
+        if libc::localtime_r(&now, &mut tm).is_null() {
+            return String::new();
+        }
+        let mut out = [0_i8; 64];
+        let weekday = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+            .get(tm.tm_wday as usize)
+            .copied()
+            .unwrap_or("");
+        let month = [
+            "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez",
+        ]
+        .get(tm.tm_mon as usize)
+        .copied()
+        .unwrap_or("");
+        let fmt =
+            CString::new(format!("%H:%M  {weekday}, %d. {month}")).expect("valid strftime format");
+        let len = libc::strftime(out.as_mut_ptr(), out.len(), fmt.as_ptr(), &tm);
+        if len == 0 {
+            String::new()
+        } else {
+            CStr::from_ptr(out.as_ptr()).to_string_lossy().into_owned()
+        }
+    }
+}

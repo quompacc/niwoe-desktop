@@ -1,0 +1,122 @@
+[
+  {
+    "scale": 1.0,
+    "logical": [
+      1920,
+      1080
+    ],
+    "output": {
+      "output_id": 1,
+      "output_name": "drm-0",
+      "active_workspace": 1,
+      "primary": true,
+      "focused": true,
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "transform": "Normal",
+      "refresh_millihz": 60000,
+      "modes": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "refresh_millihz": 60000,
+          "current": true,
+          "preferred": true
+        }
+      ]
+    }
+  },
+  {
+    "scale": 1.4055636896046853,
+    "logical": [
+      1366,
+      768
+    ],
+    "output": {
+      "output_id": 1,
+      "output_name": "drm-0",
+      "active_workspace": 1,
+      "primary": true,
+      "focused": true,
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1406,
+      "transform": "Normal",
+      "refresh_millihz": 60000,
+      "modes": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "refresh_millihz": 60000,
+          "current": true,
+          "preferred": true
+        }
+      ]
+    }
+  },
+  {
+    "scale": 1.5,
+    "logical": [
+      1280,
+      720
+    ],
+    "output": {
+      "output_id": 1,
+      "output_name": "drm-0",
+      "active_workspace": 1,
+      "primary": true,
+      "focused": true,
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1500,
+      "transform": "Normal",
+      "refresh_millihz": 60000,
+      "modes": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "refresh_millihz": 60000,
+          "current": true,
+          "preferred": true
+        }
+      ]
+    }
+  },
+  {
+    "scale": 2.0,
+    "logical": [
+      960,
+      540
+    ],
+    "output": {
+      "output_id": 1,
+      "output_name": "drm-0",
+      "active_workspace": 1,
+      "primary": true,
+      "focused": true,
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 2000,
+      "transform": "Normal",
+      "refresh_millihz": 60000,
+      "modes": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "refresh_millihz": 60000,
+          "current": true,
+          "preferred": true
+        }
+      ]
+    }
+  }
+]

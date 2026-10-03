@@ -1,0 +1,10 @@
+/etc/plasmalogin.conf: OK
+Warnung: Option --restore=file ist ohne der Option -P (--physical) unsicher, weil sie symbolische Verknüpfungen in Pfadnamen verfolgt
+PASS original display-manager config and uinput ACL restored; temporary autologin/session removed
+PASS isolated profile and protocol fixture directories removed
+PASS temporary binary backups and source archive removed
+active
+d6a70f16e58c9ee7fe4c71eab065f3fa6758a0f9bab40598dbaf69671736ab56  /usr/local/bin/niwoe
+8cb3e937ef02dae9729fedf73721a62dca78b29a9e521210ded6948549b9d4b3  /usr/local/bin/niwoe-shell
+d6a70f16e58c9ee7fe4c71eab065f3fa6758a0f9bab40598dbaf69671736ab56  /proc/132150/exe
+8cb3e937ef02dae9729fedf73721a62dca78b29a9e521210ded6948549b9d4b3  /proc/132163/exe

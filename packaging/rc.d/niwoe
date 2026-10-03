@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# PROVIDE: niwoe
+# REQUIRE: seatd dbus bootsplash
+# KEYWORD: shutdown
+#
+# NIWOE Wayland desktop session for FreeBSD.
+#
+# This is the FreeBSD analogue of the systemd niwoe-login.service used on
+# Linux. FreeBSD has no logind; the compositor acquires its seat and DRM master
+# through libseat/seatd directly, so seatd and dbus are the only prerequisites.
+#
+# Enable in /etc/rc.conf only AFTER verifying SSH recovery -- starting this
+# takes over the GPU and the console:
+#
+#   niwoe_enable="YES"
+#   niwoe_user="youruser"   # must be in the "video" group; defaults to root
+#
+# Then: service niwoe start   (or reboot)
+# Recover over SSH with: service niwoe stop
+
+. /etc/rc.subr
+
+name=niwoe
+desc="NIWOE Wayland desktop"
+rcvar=niwoe_enable
+
+load_rc_config $name
+
+: ${niwoe_enable:="NO"}
+: ${niwoe_user:="root"}
+: ${niwoe_prefix:="/usr/local"}
+: ${niwoe_bootsplash_socket:="/var/run/bootsplash.sock"}
+
+pidfile="/var/run/${name}.pid"
+niwoe_bin="${niwoe_prefix}/bin/niwoe"
+
+start_cmd="niwoe_start"
+stop_cmd="niwoe_stop"
+status_cmd="niwoe_status"
+
+niwoe_stop()
+{
+	if [ -f "${pidfile}" ] && kill -0 "$(cat "${pidfile}")" 2>/dev/null; then
+		_pid=$(cat "${pidfile}")
+		echo "Stopping niwoe (pid ${_pid})."
+		kill -TERM "${_pid}"
+		wait_for_pids "${_pid}"
+	else
+		echo "niwoe not running."
+	fi
+	# The compositor restarts niwoe-shell itself, but reap any stragglers.
+	pkill -f "${niwoe_prefix}/bin/niwoe-shell" 2>/dev/null || true
+	rm -f "${pidfile}"
+}
+
+niwoe_status()
+{
+	if [ -f "${pidfile}" ] && kill -0 "$(cat "${pidfile}")" 2>/dev/null; then
+		echo "niwoe is running as pid $(cat "${pidfile}")."
+	else
+		echo "niwoe is not running."
+		return 1
+	fi
+}
+
+niwoe_start()
+{
+	if [ ! -x "${niwoe_bin}" ]; then
+		echo "niwoe: ${niwoe_bin} not found or not executable" >&2
+		return 1
+	fi
+
+	# Hand the boot splash off before we grab DRM master. "handover" makes the
+	# splash freeze its last frame and drop master, then acks once master is
+	# released, so the compositor's first modeset has no black flash and no
+	# EACCES race. Best-effort: skip cleanly if no splash is running.
+	if [ -S "${niwoe_bootsplash_socket}" ]; then
+		echo "niwoe: handing over from bootsplash."
+		printf 'handover\n' | \
+			nc -UN -w 5 "${niwoe_bootsplash_socket}" >/dev/null 2>&1 || true
+	fi
+
+	_uid=$(id -u "${niwoe_user}") || return 1
+	_home=$(eval echo "~${niwoe_user}")
+	_runtime="/var/run/user/${_uid}"
+
+	# /run does not exist on FreeBSD by default; create the XDG runtime dir the
+	# wayland socket lives in, owned by the session user.
+	install -d -o "${niwoe_user}" -g "$(id -gn "${niwoe_user}")" \
+		-m 0700 "${_runtime}"
+
+	echo "Starting niwoe (user=${niwoe_user})."
+	# Xcursor themes from pkg live under ${prefix}/share/icons, which is not in
+	# the default XCURSOR search path on FreeBSD. XKB_DEFAULT_RULES=evdev is
+	# required: libinput feeds evdev keycodes, and only the evdev ruleset maps
+	# them (incl. the multimedia/volume keys) to the right keysyms.
+	# -o redirects the session's stdout/stderr to a log so daemon detaches fully
+	# (otherwise an interactive `service start` over SSH never returns).
+	/usr/sbin/daemon -p "${pidfile}" -o /var/log/niwoe.log \
+		-u "${niwoe_user}" -- \
+		/usr/bin/env \
+			XDG_RUNTIME_DIR="${_runtime}" \
+			XDG_SESSION_TYPE=wayland \
+			XDG_CURRENT_DESKTOP=NIWOE \
+			XDG_SESSION_DESKTOP=niwoe \
+			DESKTOP_SESSION=niwoe \
+			XKB_DEFAULT_RULES=evdev \
+			XCURSOR_PATH="${_home}/.icons:${_home}/.local/share/icons:${niwoe_prefix}/share/icons:${niwoe_prefix}/lib/X11/icons" \
+			"${niwoe_bin}"
+}
+
+run_rc_command "$1"

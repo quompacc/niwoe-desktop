@@ -1,0 +1,334 @@
+use niwoe_wm::WorkspaceMode;
+use smithay::{
+    backend::renderer::utils::{on_commit_buffer_handler, RendererSurfaceStateUserData},
+    desktop::{layer_map_for_output, WindowSurfaceType},
+    reexports::wayland_server::{
+        protocol::{wl_buffer::WlBuffer, wl_surface::WlSurface},
+        Client,
+    },
+    utils::SERIAL_COUNTER,
+    wayland::{
+        buffer::BufferHandler,
+        compositor::{
+            get_parent, is_sync_subsurface, with_states, CompositorHandler, CompositorState,
+        },
+        seat::WaylandFocus,
+        shell::wlr_layer::{KeyboardInteractivity, Layer as WlrLayer, LayerSurfaceData},
+    },
+};
+
+use crate::protocols::xdg_shell::handle_commit;
+
+use super::super::super::{client_compositor_state, NiwoeState};
+
+fn layer_surface_has_buffer(surface: &WlSurface) -> bool {
+    with_states(surface, |states| {
+        states
+            .data_map
+            .get::<RendererSurfaceStateUserData>()
+            .map(|renderer_state| renderer_state.lock().unwrap().buffer().is_some())
+            .unwrap_or(false)
+    })
+}
+
+fn should_send_layer_configure(
+    initial_configure_sent: bool,
+    had_buffer_before_commit: bool,
+    has_buffer_after_commit: bool,
+    remap_requested: bool,
+) -> bool {
+    !initial_configure_sent
+        || (remap_requested && !had_buffer_before_commit && !has_buffer_after_commit)
+}
+
+impl BufferHandler for NiwoeState {
+    fn buffer_destroyed(&mut self, _buffer: &WlBuffer) {}
+}
+
+impl CompositorHandler for NiwoeState {
+    fn compositor_state(&mut self) -> &mut CompositorState {
+        &mut self.compositor_state
+    }
+
+    fn client_compositor_state<'a>(
+        &self,
+        client: &'a Client,
+    ) -> &'a smithay::wayland::compositor::CompositorClientState {
+        client_compositor_state(client)
+    }
+
+    fn commit(&mut self, surface: &WlSurface) {
+        let had_buffer_before_commit = layer_surface_has_buffer(surface);
+        on_commit_buffer_handler::<Self>(surface);
+        self.mark_all_outputs_dirty("surface-commit");
+
+        let mut committed_toplevel_root = None;
+        let mut committed_workspace = self.workspaces.active;
+        if !is_sync_subsurface(surface) {
+            let mut root = surface.clone();
+            while let Some(parent) = get_parent(&root) {
+                root = parent;
+            }
+            if let Some((index, window)) = (0..self.workspaces.count()).find_map(|index| {
+                self.workspaces
+                    .space_at(index)
+                    .elements()
+                    .find(|window| {
+                        window
+                            .wl_surface()
+                            .is_some_and(|wl_surface| *wl_surface == root)
+                    })
+                    .cloned()
+                    .map(|window| (index, window))
+            }) {
+                window.on_commit();
+                committed_workspace = index;
+                committed_toplevel_root = Some(root);
+            }
+        }
+
+        if let Some(root) = committed_toplevel_root {
+            self.center_pending_xdg_toplevel(&root);
+            if layer_surface_has_buffer(&root) {
+                self.present_assigned_window(&root);
+            }
+        }
+
+        handle_commit(
+            &mut self.popups,
+            self.workspaces.space_at(committed_workspace),
+            surface,
+        );
+        crate::grabs::resize_grab::handle_commit(self.workspaces.active_space_mut(), surface);
+
+        if let Some(output) = self
+            .outputs
+            .iter()
+            .find(|output| {
+                let map = layer_map_for_output(output);
+                map.layer_for_surface(surface, WindowSurfaceType::ALL)
+                    .is_some()
+            })
+            .cloned()
+        {
+            let output_name = output.name();
+            let initial_configure_sent = with_states(surface, |states| {
+                states
+                    .data_map
+                    .get::<LayerSurfaceData>()
+                    .and_then(|data| data.lock().ok().map(|data| data.initial_configure_sent))
+            });
+            let Some(initial_configure_sent) = initial_configure_sent else {
+                // A layer client may disappear while its final wl_surface
+                // commit is still queued. The layer map can retain the surface
+                // for that transaction even though Smithay has already
+                // removed its role data. Treat this as teardown, not a fatal
+                // compositor invariant violation.
+                tracing::debug!(
+                    "Ignoring layer surface commit without live role data: output={}",
+                    output_name
+                );
+                return;
+            };
+            let has_buffer_after_commit = layer_surface_has_buffer(surface);
+
+            if initial_configure_sent {
+                tracing::trace!(
+                    "Layer surface commit: output={}, initial_configure_sent={}",
+                    output_name,
+                    initial_configure_sent
+                );
+            } else {
+                tracing::debug!(
+                    "Layer surface commit: output={}, initial_configure_sent={}",
+                    output_name,
+                    initial_configure_sent
+                );
+            }
+
+            let mut map = layer_map_for_output(&output);
+            map.arrange();
+            self.mark_output_dirty_by_name(&output_name, "layer-surface-commit");
+            let focus_target =
+                map.layer_for_surface(surface, WindowSurfaceType::ALL)
+                    .map(|layer| {
+                        let cached = layer.cached_state();
+                        let layer_geometry = map.layer_geometry(layer);
+                        (
+                            layer.namespace().to_string(),
+                            layer.layer(),
+                            cached.keyboard_interactivity,
+                            cached.anchor,
+                            cached.margin,
+                            cached.exclusive_zone,
+                            cached.size,
+                            layer_geometry.map(|geo| format!("{:?}", geo)),
+                            has_buffer_after_commit,
+                        )
+                    });
+            let remap_requested = focus_target.as_ref().is_some_and(
+                |(_, _, keyboard_interactivity, _, _, _, _, _, _)| {
+                    *keyboard_interactivity == KeyboardInteractivity::Exclusive
+                },
+            );
+
+            if let Some((
+                namespace,
+                layer_kind,
+                keyboard_interactivity,
+                anchor,
+                margin,
+                exclusive_zone,
+                requested_size,
+                layer_geometry,
+                has_buffer,
+            )) = focus_target
+            {
+                // Per zwlr_layer_shell spec: KeyboardInteractivity::Exclusive
+                // means the surface must receive keyboard focus as soon as it
+                // is mapped (has_buffer). This logic was previously
+                // hard-scoped to the launcher namespace, which left other
+                // Exclusive-interactive layer surfaces (e.g. the polkit auth
+                // popup) typing into whichever window happened to be focused
+                // before they opened.
+                let wants_focus =
+                    keyboard_interactivity == KeyboardInteractivity::Exclusive && has_buffer;
+                if namespace == "niwoe-launcher" {
+                    tracing::debug!(
+                        "launcher layer cached state: output={} layer={:?} anchor={:?} margin={:?} exclusive_zone={:?} requested_size={:?} geometry={:?} keyboard_interactivity={:?} has_buffer={}",
+                        output_name,
+                        layer_kind,
+                        anchor,
+                        margin,
+                        exclusive_zone,
+                        requested_size,
+                        layer_geometry,
+                        keyboard_interactivity,
+                        has_buffer
+                    );
+                }
+                if wants_focus && has_buffer {
+                    if matches!(layer_kind, WlrLayer::Background) {
+                        tracing::debug!(
+                            "launcher focus using namespace fallback because cached layer is Background: namespace={} output={} keyboard_interactivity={:?}",
+                            namespace,
+                            output_name,
+                            keyboard_interactivity
+                        );
+                    }
+                    tracing::debug!(
+                        "layer keyboard focus requested: namespace={} layer={:?} output={} keyboard_interactivity={:?}",
+                        namespace,
+                        layer_kind,
+                        output_name,
+                        keyboard_interactivity
+                    );
+                    let should_set_focus = self
+                        .seat
+                        .get_keyboard()
+                        .map(|keyboard| {
+                            keyboard
+                                .current_focus()
+                                .map(|target| target.into_surface())
+                                .as_ref()
+                                != Some(surface)
+                        })
+                        .unwrap_or(false);
+                    if should_set_focus {
+                        let serial = SERIAL_COUNTER.next_serial();
+                        self.set_keyboard_focus_with_decorations(Some(surface.clone()), serial);
+                        tracing::debug!(
+                            "layer keyboard focus set: namespace={} layer={:?} output={}",
+                            namespace,
+                            layer_kind,
+                            output_name
+                        );
+                    }
+                } else if (keyboard_interactivity == KeyboardInteractivity::Exclusive
+                    && !has_buffer)
+                    || (matches!(
+                        namespace.as_str(),
+                        "niwoe-launcher" | "niwoe-quick-settings"
+                    ) && keyboard_interactivity == KeyboardInteractivity::None)
+                {
+                    // Release focus when an exclusive layer unmaps or when a
+                    // persistent Web popup enters its mapped-but-hidden mode.
+                    let should_clear_focus = self
+                        .seat
+                        .get_keyboard()
+                        .map(|keyboard| {
+                            keyboard
+                                .current_focus()
+                                .map(|target| target.into_surface())
+                                .as_ref()
+                                == Some(surface)
+                        })
+                        .unwrap_or(false);
+                    if should_clear_focus {
+                        let serial = SERIAL_COUNTER.next_serial();
+                        self.set_keyboard_focus_with_decorations(Option::<WlSurface>::None, serial);
+                        self.broadcast_toplevel_focus_cleared();
+                        tracing::debug!(
+                            "layer keyboard focus cleared: namespace={} layer={:?} output={} reason=hidden-or-unmapped",
+                            namespace,
+                            layer_kind,
+                            output_name
+                        );
+                    }
+                } else if namespace == "niwoe-launcher" {
+                    tracing::debug!(
+                        "layer keyboard focus skipped: namespace={} layer={:?} output={} keyboard_interactivity={:?} has_buffer={} wants_focus={}",
+                        namespace,
+                        layer_kind,
+                        output_name,
+                        keyboard_interactivity,
+                        has_buffer,
+                        wants_focus
+                    );
+                }
+            }
+
+            // A null-buffer commit unmaps a layer surface. Smithay keeps
+            // `initial_configure_sent` set across that cycle, so a later
+            // bufferless commit must explicitly trigger the configure needed
+            // to remap the persistent shell surface.
+            if should_send_layer_configure(
+                initial_configure_sent,
+                had_buffer_before_commit,
+                has_buffer_after_commit,
+                remap_requested,
+            ) {
+                if let Some(layer) = map.layer_for_surface(surface, WindowSurfaceType::ALL) {
+                    tracing::info!("Sending layer surface configure: output={}", output_name);
+                    layer.layer_surface().send_configure();
+                    self.mark_output_dirty_by_name(&output_name, "layer-surface-configure");
+                } else {
+                    tracing::warn!(
+                        "Layer surface commit matched output={} but layer_for_surface returned None",
+                        output_name
+                    );
+                }
+            }
+        }
+
+        let active = self.workspaces.active;
+        if self.wm_workspaces[active].mode == WorkspaceMode::Tiling {
+            self.tile_workspace(active);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::should_send_layer_configure;
+
+    #[test]
+    fn configures_new_and_remapping_layer_surfaces() {
+        assert!(should_send_layer_configure(false, false, false, false));
+        assert!(should_send_layer_configure(true, false, false, true));
+        assert!(!should_send_layer_configure(true, false, false, false));
+        assert!(!should_send_layer_configure(true, true, false, true));
+        assert!(!should_send_layer_configure(true, false, true, true));
+        assert!(!should_send_layer_configure(true, true, true, true));
+    }
+}

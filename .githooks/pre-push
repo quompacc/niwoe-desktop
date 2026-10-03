@@ -1,5 +1,5 @@
 #!/bin/sh
-# Meridian pre-push-Gate: Formatierung, Lints und Tests muessen gruen sein,
+# NIWOE pre-push-Gate: Formatierung, Lints und Tests muessen gruen sein,
 # bevor gepusht wird. Spiegelt die Pflichtchecks aus CLAUDE.md/AGENTS.md.
 #
 # Im Notfall umgehbar mit:  git push --no-verify

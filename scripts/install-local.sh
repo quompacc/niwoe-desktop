@@ -3,23 +3,28 @@ set -euo pipefail
 
 PREFIX="/usr/local"
 BUILD=0
+PROFILE="release"
 ENABLE_BOOT=0
 WITH_BOOT_SPLASH=""
+DESTDIR=""
 DESKTOP_USER="${SUDO_USER:-${USER}}"
 
 usage() {
   cat <<'EOF'
 Usage: scripts/install-local.sh [options]
 
-Installs the Meridian binaries, PAM files, themes, portal metadata, and autostart
+Installs the NIWOE binaries, PAM files, themes, portal metadata, and autostart
 metadata from this checkout. It does not install OS packages; run
-scripts/install-deps.sh first on Arch/pacman or apt-based systems.
+scripts/install-deps.sh first on pacman, dnf or apt-based systems.
+Adds an NIWOE development session to the existing display manager.
 
 Options:
   --build                 Run cargo build --release --workspace before install
+  --debug                 Use development binaries from target/debug
   --prefix PATH           Install prefix for binaries/data (default: /usr/local)
-  --desktop-user USER     User that owns /var/lib/meridian (default: sudo user)
-  --enable-boot           Enable meridian-login.service and disable getty@tty1
+  --destdir PATH          Stage a fresh/migrated installation without activating services
+  --desktop-user USER     User that owns /var/lib/niwoe (default: sudo user)
+  --enable-boot           Enable niwoe-login.service and disable getty@tty1
   --bootsplash PATH       Also install sibling bootsplash checkout from PATH
   -h, --help              Show this help
 
@@ -35,12 +40,21 @@ while [[ $# -gt 0 ]]; do
       BUILD=1
       shift
       ;;
+    --debug)
+      PROFILE="dev"
+      shift
+      ;;
     --prefix)
       PREFIX="${2:?missing value for --prefix}"
       shift 2
       ;;
     --desktop-user)
       DESKTOP_USER="${2:?missing value for --desktop-user}"
+      shift 2
+      ;;
+    --destdir)
+      DESTDIR="${2:?missing value for --destdir}"
+      [[ "$DESTDIR" == /* && "$DESTDIR" != / ]] || { echo 'destdir must be an absolute staging directory'; exit 2; }
       shift 2
       ;;
     --enable-boot)
@@ -64,65 +78,75 @@ while [[ $# -gt 0 ]]; do
 done
 
 SUDO=()
-if [[ "${EUID}" -ne 0 ]]; then
+if [[ "${EUID}" -ne 0 && -z "$DESTDIR" ]]; then
   SUDO=(sudo)
 fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
+source "$SCRIPT_DIR/migrate-legacy-install.sh"
+legacy_preflight
 
 if [[ "${BUILD}" -eq 1 ]]; then
-  cargo build --release --workspace
+  cargo build --profile "${PROFILE}" --workspace --locked
 fi
+build_dir="target/release"
+[[ "${PROFILE}" != dev ]] || build_dir="target/debug"
 
 require_file() {
   if [[ ! -e "$1" ]]; then
     echo "install-local: missing required file: $1" >&2
-    echo "install-local: run with --build or build the release workspace first" >&2
+    echo "install-local: run with --build for the selected profile first" >&2
     exit 1
   fi
 }
 
-bindir="${PREFIX}/bin"
-datadir="${PREFIX}/share"
-libdir="${PREFIX}/lib"
+bindir="${DESTDIR}${PREFIX}/bin"
+datadir="${DESTDIR}${PREFIX}/share"
+libdir="${DESTDIR}${PREFIX}/lib"
 
 binaries=(
-  meridian
-  meridian-shell
-  meridian-login
-  meridian-lock
-  meridian-portal
-  meridian-polkit-agent
+  niwoe
+  niwoe-shell
+  niwoe-login
+  niwoe-lock
+  niwoe-portal
+  niwoe-polkit-agent
 )
 
 for bin in "${binaries[@]}"; do
-  require_file "target/release/${bin}"
-  "${SUDO[@]}" install -Dm755 "target/release/${bin}" "${bindir}/${bin}"
+  require_file "${build_dir}/${bin}"
+done
+for bin in "${binaries[@]}"; do
+  "${SUDO[@]}" install -Dm755 "${build_dir}/${bin}" "${bindir}/${bin}"
 done
 
 if [[ "$(uname -s)" == "OpenBSD" ]]; then
-  drm_bridge="libmeridian_xwayland_drm_bridge.so"
-  require_file "target/release/${drm_bridge}"
+  drm_bridge="libniwoe_xwayland_drm_bridge.so"
+  require_file "${build_dir}/${drm_bridge}"
   # The compositor resolves the bridge beside its own executable. Keep this
   # OpenBSD-only artifact out of global loader configuration.
-  "${SUDO[@]}" install -Dm755 "target/release/${drm_bridge}" "${bindir}/${drm_bridge}"
+  "${SUDO[@]}" install -Dm755 "${build_dir}/${drm_bridge}" "${bindir}/${drm_bridge}"
 fi
-"${SUDO[@]}" install -Dm755 scripts/meridian-file-picker "${bindir}/meridian-file-picker"
+"${SUDO[@]}" install -Dm755 scripts/niwoe-file-picker "${bindir}/niwoe-file-picker"
 
-"${SUDO[@]}" install -d "${datadir}/meridian/themes"
+"${SUDO[@]}" install -d "${datadir}/niwoe/themes"
 for theme in themes/*; do
   [[ -d "${theme}" ]] || continue
   name="$(basename "${theme}")"
-  "${SUDO[@]}" install -d "${datadir}/meridian/themes/${name}"
-  "${SUDO[@]}" cp -a "${theme}/." "${datadir}/meridian/themes/${name}/"
+  "${SUDO[@]}" install -d "${datadir}/niwoe/themes/${name}"
+  "${SUDO[@]}" cp -a "${theme}/." "${datadir}/niwoe/themes/${name}/"
 done
 
-"${SUDO[@]}" install -d -o "${DESKTOP_USER}" -g "${DESKTOP_USER}" -m 0755 /var/lib/meridian
-"${SUDO[@]}" install -Dm644 crates/meridian-login/config/meridian-login.service /etc/systemd/system/meridian-login.service
-"${SUDO[@]}" install -Dm644 crates/meridian-login/config/meridian-login.pam /etc/pam.d/meridian-login
-"${SUDO[@]}" install -Dm644 packaging/pam/meridian-login-password /etc/pam.d/meridian-login-password
+"${SUDO[@]}" install -d -m 0755 "$DESTDIR/var/lib/niwoe"
+if [[ -z "$DESTDIR" ]]; then
+  "${SUDO[@]}" chown "${DESKTOP_USER}:${DESKTOP_USER}" /var/lib/niwoe
+fi
+"${SUDO[@]}" install -Dm644 crates/niwoe-login/config/niwoe-login.service "$DESTDIR/etc/systemd/system/niwoe-login.service"
+"${SUDO[@]}" install -Dm644 crates/niwoe-login/config/niwoe-login.pam "$DESTDIR/etc/pam.d/niwoe-login"
+"${SUDO[@]}" install -Dm644 packaging/pam/niwoe-login-password "$DESTDIR/etc/pam.d/niwoe-login-password"
+"${SUDO[@]}" install -Dm644 packaging/pam/niwoe-lock "$DESTDIR/etc/pam.d/niwoe-lock"
 
 install_template() {
   local src="$1"
@@ -130,19 +154,24 @@ install_template() {
   local tmp
   tmp="$(mktemp)"
   sed "s#@PREFIX@#${PREFIX}#g" "${src}" > "${tmp}"
-  "${SUDO[@]}" install -Dm644 "${tmp}" "${dest}"
+  "${SUDO[@]}" install -Dm"${3:-644}" "${tmp}" "${dest}"
   rm -f "${tmp}"
 }
 
-install_template packaging/xdg-autostart/meridian-polkit-agent.desktop /etc/xdg/autostart/meridian-polkit-agent.desktop
-install_template packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service "${datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service"
-install_template packaging/systemd-user/meridian-portal.service "${libdir}/systemd/user/meridian-portal.service"
-# meridian-session.target pulls graphical-session.target up at login (started by
-# the shell) so xdg-desktop-portal + meridian-portal run and apps follow the
-# theme. Without it the portal services never start in a Meridian session.
-install_template packaging/systemd-user/meridian-session.target "${libdir}/systemd/user/meridian-session.target"
-"${SUDO[@]}" install -Dm644 packaging/xdg-desktop-portal/portals/meridian.portal "${datadir}/xdg-desktop-portal/portals/meridian.portal"
-"${SUDO[@]}" install -Dm644 packaging/xdg-desktop-portal/meridian-portals.conf "${datadir}/xdg-desktop-portal/meridian-portals.conf"
+install_template packaging/niwoe-session "${bindir}/niwoe-session" 755
+"${SUDO[@]}" install -Dm644 packaging/session-config/autostart/org.kde.xwaylandvideobridge.desktop "${datadir}/niwoe/session-config/autostart/org.kde.xwaylandvideobridge.desktop"
+# Display managers normally discover sessions in /usr/share, independently of
+# the prefix used for development binaries under /usr/local.
+install_template packaging/wayland-sessions/niwoe.desktop "$DESTDIR/usr/share/wayland-sessions/niwoe.desktop"
+install_template packaging/xdg-autostart/niwoe-polkit-agent.desktop "$DESTDIR/etc/xdg/autostart/niwoe-polkit-agent.desktop"
+install_template packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service "${datadir}/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service"
+install_template packaging/systemd-user/niwoe-portal.service "${libdir}/systemd/user/niwoe-portal.service"
+# niwoe-session.target pulls graphical-session.target up at login (started by
+# the shell) so xdg-desktop-portal + niwoe-portal run and apps follow the
+# theme. Without it the portal services never start in a NIWOE session.
+install_template packaging/systemd-user/niwoe-session.target "${libdir}/systemd/user/niwoe-session.target"
+"${SUDO[@]}" install -Dm644 packaging/xdg-desktop-portal/portals/niwoe.portal "${datadir}/xdg-desktop-portal/portals/niwoe.portal"
+"${SUDO[@]}" install -Dm644 packaging/xdg-desktop-portal/niwoe-portals.conf "${datadir}/xdg-desktop-portal/niwoe-portals.conf"
 
 if [[ -n "${WITH_BOOT_SPLASH}" ]]; then
   boot_root="$(cd "${WITH_BOOT_SPLASH}" && pwd)"
@@ -152,9 +181,14 @@ if [[ -n "${WITH_BOOT_SPLASH}" ]]; then
   require_file "${boot_root}/target/release/bootsplash"
   require_file "${boot_root}/systemd/bootsplash.service"
   "${SUDO[@]}" install -Dm755 "${boot_root}/target/release/bootsplash" "${bindir}/bootsplash"
-  "${SUDO[@]}" install -Dm644 "${boot_root}/systemd/bootsplash.service" /etc/systemd/system/bootsplash.service
+  "${SUDO[@]}" install -Dm644 "${boot_root}/systemd/bootsplash.service" "$DESTDIR/etc/systemd/system/bootsplash.service"
 fi
 
+legacy_retire
+if [[ -n "$DESTDIR" ]]; then
+  echo "install-local: staged installation in $DESTDIR; no services activated"
+  exit 0
+fi
 "${SUDO[@]}" systemctl daemon-reload
 if command -v systemctl >/dev/null 2>&1; then
   systemctl --user daemon-reload >/dev/null 2>&1 || true
@@ -165,18 +199,18 @@ if [[ "${ENABLE_BOOT}" -eq 1 ]]; then
   if [[ -n "${WITH_BOOT_SPLASH}" ]]; then
     "${SUDO[@]}" systemctl enable bootsplash.service
   fi
-  "${SUDO[@]}" systemctl enable meridian-login.service
+  "${SUDO[@]}" systemctl enable niwoe-login.service
 else
   cat <<'EOF'
 install-local: installed files but did not enable the boot login service.
 To enable after verifying recovery access:
   sudo systemctl disable getty@tty1.service
-  sudo systemctl enable meridian-login.service
+  sudo systemctl enable niwoe-login.service
   # plus bootsplash.service if installed
 EOF
 fi
 
 cat <<EOF
-install-local: installed Meridian to ${PREFIX}
-install-local: desktop user for /var/lib/meridian: ${DESKTOP_USER}
+install-local: installed NIWOE to ${PREFIX}
+install-local: desktop user for /var/lib/niwoe: ${DESKTOP_USER}
 EOF

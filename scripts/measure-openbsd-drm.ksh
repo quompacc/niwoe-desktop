@@ -4,8 +4,8 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd -- "${SCRIPT_DIR}/.." && pwd)
 STAMP=$(date -u +%Y%m%dT%H%M%SZ)
-RESULT_DIR=${MERIDIAN_PERF_RESULT_DIR:-/tmp/meridian-perf-${STAMP}}
-RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/meridian-runtime-$(id -u)}
+RESULT_DIR=${NIWOE_PERF_RESULT_DIR-${MERIDIAN_PERF_RESULT_DIR-/tmp/niwoe-perf-${STAMP}}}
+RUNTIME_DIR=${XDG_RUNTIME_DIR:-/tmp/niwoe-runtime-$(id -u)}
 BENCH_BIN=${RESULT_DIR}/x11-motion-bench
 
 mkdir -p "${RESULT_DIR}" "${RUNTIME_DIR}"
@@ -19,8 +19,8 @@ export LIBRARY_PATH=${LIBRARY_PATH:-/usr/X11R6/lib:/usr/local/lib}
 cc -O2 -I/usr/X11R6/include -L/usr/X11R6/lib \
     "${SCRIPT_DIR}/x11-motion-bench.c" -lX11 -o "${BENCH_BIN}"
 
-if pgrep -x meridian >/dev/null; then
-    echo "A Meridian process is already running; stop it before measuring." >&2
+if pgrep -x niwoe >/dev/null; then
+    echo "A NIWOE process is already running; stop it before measuring." >&2
     exit 1
 fi
 
@@ -33,9 +33,9 @@ stop_case() {
     # dbus-run-session can exit before its children. Stop only the exact
     # processes started by this harness so seatd and the DRM device are free
     # before the next case begins.
-    pkill -x meridian-shell 2>/dev/null || true
+    pkill -x niwoe-shell 2>/dev/null || true
     pkill -x Xwayland 2>/dev/null || true
-    pkill -x meridian 2>/dev/null || true
+    pkill -x niwoe 2>/dev/null || true
     RUN_PID=
     sleep 2
 }
@@ -69,14 +69,14 @@ run_case() {
 
     echo "[perf] case=${case_name} shell=${shell_mode} workload=${workload}"
     if [ "${shell_mode}" = "off" ]; then
-        shell_env=MERIDIAN_DRM_DISABLE_SHELL=1
+        shell_env=NIWOE_DRM_DISABLE_SHELL=1
     else
-        shell_env=MERIDIAN_DRM_DISABLE_SHELL=0
+        shell_env=NIWOE_DRM_DISABLE_SHELL=0
     fi
 
-    env "${shell_env}" MERIDIAN_DRM_TIMING=1 MERIDIAN_DIRTY_STATS=1 \
-        MERIDIAN_SHELL_RENDER_STATS=0 RUST_LOG=info \
-        dbus-run-session -- "${REPO_ROOT}/target/release/meridian" \
+    env "${shell_env}" NIWOE_DRM_TIMING=1 NIWOE_DIRTY_STATS=1 \
+        NIWOE_SHELL_RENDER_STATS=0 RUST_LOG=info \
+        dbus-run-session -- "${REPO_ROOT}/target/release/niwoe" \
         >"${compositor_log}" 2>&1 &
     RUN_PID=$!
 

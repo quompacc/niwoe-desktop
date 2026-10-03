@@ -1,0 +1,12 @@
+PASS fresh origin, separate draft, real restart/reconnect, persisted completion, repeat without duplicates
+PASS existing origin, separate draft, real restart/reconnect, persisted completion, repeat without duplicates
+PASS legacy origin, separate draft, real restart/reconnect, persisted completion, repeat without duplicates
+PASS persisted journal fixture before-writes checked against actual documents
+PASS persisted journal fixture after-rooms checked against actual documents
+PASS persisted journal fixture after-panel checked against actual documents
+PASS persisted journal fixture conflict checked against actual documents
+PASS actual storage rejection/conflict preserves productive data and draft: write-denied
+PASS actual storage rejection/conflict preserves productive data and draft: panel-conflict
+PASS actual storage rejection/conflict preserves productive data and draft: room-conflict
+PASS damaged/unknown state: visible protocol error, original retained
+PASS damaged/unknown state: visible protocol error, original retained

@@ -1,0 +1,34 @@
+[package]
+name = "niwoe-shell"
+version.workspace = true
+edition = "2021"
+
+[[bin]]
+name = "niwoe-shell"
+path = "src/main.rs"
+
+[dependencies]
+libc = "0.2"
+niwoe-app-catalog = { path = "../niwoe-app-catalog" }
+niwoe-config = { path = "../niwoe-config" }
+niwoe-freetype = { path = "../niwoe-freetype" }
+niwoe-ipc = { path = "../niwoe-ipc" }
+niwoe-ui = { path = "../niwoe-ui" }
+niwoe-tokens = { path = "../niwoe-tokens" }
+png = { version = "0.17", default-features = false }
+resvg = { version = "0.45", default-features = false }
+ruzstd = "0.7"
+serde_json = "1"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+smithay-client-toolkit = "0.19"
+tiny-skia = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+wayland-client = "0.31"
+wayland-protocols = { version = "0.32", features = ["client", "staging"] }
+# Phase A1 — notification daemon (org.freedesktop.Notifications dbus).
+# Tokio is the smallest async runtime that zbus v5 ships an executor
+# binding for; we only use it on the dbus thread, the shell's main
+# event loop stays calloop-based.
+zbus = { version = "5", default-features = false, features = ["tokio"] }
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "sync", "macros"] }

@@ -1,0 +1,284 @@
+use smithay::{
+    backend::renderer::{
+        element::{
+            surface::render_elements_from_surface_tree, surface::WaylandSurfaceRenderElement,
+            AsRenderElements, Kind,
+        },
+        gles::GlesRenderer,
+    },
+    desktop::{space::SpaceRenderElements, PopupManager, Window, WindowSurface},
+    output::Output,
+    utils::Scale,
+    wayland::seat::WaylandFocus,
+};
+
+use crate::{
+    state::{LockPhase, NiwoeState},
+    wallpaper::WallpaperGpuCache,
+};
+
+use super::{WinitRenderElements, WinitRenderScratch};
+
+fn render_window_popup_elements<C>(
+    renderer: &mut GlesRenderer,
+    window: &Window,
+    window_loc: smithay::utils::Point<i32, smithay::utils::Logical>,
+    scale: Scale<f64>,
+    out: &mut Vec<C>,
+) where
+    C: From<SpaceRenderElements<GlesRenderer, WaylandSurfaceRenderElement<GlesRenderer>>>,
+{
+    let WindowSurface::Wayland(toplevel) = window.underlying_surface() else {
+        return;
+    };
+
+    let surface = toplevel.wl_surface();
+    let location = window_loc.to_physical_precise_round(scale);
+    out.extend(
+        PopupManager::popups_for_surface(surface)
+            .flat_map(|(popup, popup_offset)| {
+                let offset = (window.geometry().loc + popup_offset - popup.geometry().loc)
+                    .to_physical_precise_round(scale);
+                render_elements_from_surface_tree::<
+                    GlesRenderer,
+                    WaylandSurfaceRenderElement<GlesRenderer>,
+                >(
+                    renderer,
+                    popup.wl_surface(),
+                    location + offset,
+                    scale,
+                    1.0,
+                    Kind::Unspecified,
+                )
+            })
+            .map(SpaceRenderElements::from)
+            .map(C::from),
+    );
+}
+
+fn render_window_toplevel_elements<C>(
+    renderer: &mut GlesRenderer,
+    window: &Window,
+    window_loc: smithay::utils::Point<i32, smithay::utils::Logical>,
+    scale: Scale<f64>,
+    clip: Option<(
+        smithay::backend::renderer::gles::GlesTexProgram,
+        smithay::utils::Rectangle<f64, smithay::utils::Logical>,
+        [u8; 4],
+    )>,
+    out: &mut Vec<C>,
+) where
+    C: From<SpaceRenderElements<GlesRenderer, WaylandSurfaceRenderElement<GlesRenderer>>>
+        + From<crate::backend::clipped_surface::ClippedSurfaceRenderElement>,
+{
+    match window.underlying_surface() {
+        WindowSurface::Wayland(toplevel) => {
+            let elements = render_elements_from_surface_tree::<
+                GlesRenderer,
+                WaylandSurfaceRenderElement<GlesRenderer>,
+            >(
+                renderer,
+                toplevel.wl_surface(),
+                window_loc.to_physical_precise_round(scale),
+                scale,
+                1.0,
+                Kind::Unspecified,
+            );
+            match clip {
+                Some((prog, geo, radius)) => {
+                    out.extend(elements.into_iter().map(|e| {
+                        C::from(
+                            crate::backend::clipped_surface::ClippedSurfaceRenderElement::new(
+                                prog.clone(),
+                                e,
+                                scale,
+                                geo,
+                                radius,
+                            ),
+                        )
+                    }));
+                }
+                None => {
+                    out.extend(
+                        elements
+                            .into_iter()
+                            .map(SpaceRenderElements::from)
+                            .map(C::from),
+                    );
+                }
+            }
+        }
+        WindowSurface::X11(_) => {
+            out.extend(
+                window
+                    .render_elements::<WaylandSurfaceRenderElement<GlesRenderer>>(
+                        renderer,
+                        window_loc.to_physical_precise_round(scale),
+                        scale,
+                        1.0,
+                    )
+                    .into_iter()
+                    .map(SpaceRenderElements::from)
+                    .map(C::from),
+            );
+        }
+    }
+}
+
+// Keep explicit render inputs to make frame wiring and ordering dependencies obvious.
+// A context struct here would be mostly mechanical churn on a hot render path.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn render_elements_for_output(
+    state: &mut NiwoeState,
+    renderer: &mut GlesRenderer,
+    output: &Output,
+    wallpaper_cache: &mut Option<WallpaperGpuCache>,
+    out_w: u32,
+    out_h: u32,
+    scratch: &mut WinitRenderScratch,
+) {
+    state
+        .wallpaper_manager
+        .apply_theme(state.theme_manager.current());
+
+    WallpaperGpuCache::update(
+        renderer,
+        wallpaper_cache,
+        &mut state.wallpaper_manager,
+        out_w,
+        out_h,
+    );
+
+    let theme = &state.theme_manager.current().config;
+    let scale = Scale::from(1.0f64);
+    scratch.normal.clear();
+    scratch.final_elements.clear();
+    scratch.windows.clear();
+
+    if state.lock_manager.is_locked_or_pending() {
+        scratch.lower_layer_data.clear();
+        scratch.upper_layer_data.clear();
+        scratch.lower_layer_elements.clear();
+        scratch.upper_layer_elements.clear();
+        let output_name = output.name();
+        if let Some(lock_surface) = state.lock_manager.surface_for_output(&output_name) {
+            scratch.normal.extend(render_elements_from_surface_tree::<
+                GlesRenderer,
+                WinitRenderElements,
+            >(
+                renderer,
+                lock_surface.wl_surface(),
+                (0, 0),
+                scale,
+                1.0,
+                Kind::Unspecified,
+            ));
+            scratch.final_elements.append(&mut scratch.normal);
+        }
+        if matches!(state.lock_manager.phase(), LockPhase::Pending) {
+            let maybe_ready_locker = state.lock_manager.record_pending_frame(&output_name);
+            if let Some(locker) = maybe_ready_locker {
+                locker.lock();
+                let _ = state.lock_manager.confirm_locked();
+                state.refresh_lock_focus();
+                tracing::info!("session lock confirmed after cleared frames");
+            }
+        }
+        return;
+    }
+
+    if !state.lobby_active {
+        scratch
+            .windows
+            .extend(state.workspaces.active_space().elements().cloned());
+    }
+
+    for window in scratch.windows.iter().rev() {
+        let loc = match state.workspaces.active_space().element_location(window) {
+            Some(l) => l,
+            None => continue,
+        };
+        let geometry = window.geometry();
+        let render_loc =
+            smithay::utils::Point::from((loc.x - geometry.loc.x, loc.y - geometry.loc.y));
+
+        render_window_popup_elements(renderer, window, render_loc, scale, &mut scratch.normal);
+
+        let mut content_clip = None;
+        if let Some(wl_surf) = window.wl_surface().map(|s| s.into_owned()) {
+            let metrics = state.decoration_manager.ssd_render_metrics(
+                &wl_surf,
+                loc,
+                geometry.size,
+                &theme.decorations,
+            );
+            let window_deco_elements = state.decoration_manager.render_elements(
+                renderer,
+                &wl_surf,
+                metrics.frame_origin,
+                metrics.client_size,
+                &theme.decorations,
+                &theme.colors,
+                scale,
+            );
+            scratch
+                .normal
+                .extend(
+                    window_deco_elements
+                        .into_iter()
+                        .filter_map(|element| match element {
+                            crate::decoration::DecorationRenderElement::Solid(solid) => {
+                                Some(WinitRenderElements::Decoration(solid))
+                            }
+                            crate::decoration::DecorationRenderElement::Icon(icon) => {
+                                Some(WinitRenderElements::DecorationIcon(icon.into()))
+                            }
+                            crate::decoration::DecorationRenderElement::PixelShader(s) => {
+                                Some(WinitRenderElements::Shadow(s))
+                            }
+                            crate::decoration::DecorationRenderElement::DropShadow(s) => {
+                                Some(WinitRenderElements::Shadow(s))
+                            }
+                            // Winit dev backend has no blur pass; skip glass.
+                            crate::decoration::DecorationRenderElement::Glass(_) => None,
+                        }),
+                );
+
+            if let Some(r) = state
+                .decoration_manager
+                .content_corner_radius(&wl_surf, &theme.decorations)
+            {
+                if let Some(prog) = crate::backend::clipped_surface::clip_shader(renderer) {
+                    let r8 = r.min(255) as u8;
+                    content_clip = Some((prog, metrics.client_rect.to_f64(), [r8, 0, r8, 0]));
+                }
+            }
+        }
+
+        render_window_toplevel_elements(
+            renderer,
+            window,
+            render_loc,
+            scale,
+            content_clip,
+            &mut scratch.normal,
+        );
+    }
+
+    let wallpaper_elem = wallpaper_cache
+        .as_ref()
+        .map(WallpaperGpuCache::render_element);
+
+    scratch.final_elements.extend(
+        wallpaper_elem
+            .into_iter()
+            .map(WinitRenderElements::Wallpaper),
+    );
+    scratch
+        .final_elements
+        .append(&mut scratch.lower_layer_elements);
+    scratch.final_elements.append(&mut scratch.normal);
+    scratch
+        .final_elements
+        .append(&mut scratch.upper_layer_elements);
+}

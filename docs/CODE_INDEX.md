@@ -1,4 +1,4 @@
-# Meridian — Code Index
+# NIWOE — Code Index
 
 > **Migration note (2026-08-19):** this indexes the current native
 > implementation. It is the source map for behavior that the WebKit vertical
@@ -7,7 +7,7 @@
 A navigational map of the workspace: **which crate/file/function owns what**, so a
 contributor (or an AI assistant) can jump straight to the right place instead of
 grepping blind. The codebase has several files >1500 lines and one ~205-field
-god-object (`MeridianShell`) whose behaviour is spread across many files — this
+god-object (`NiwoeShell`) whose behaviour is spread across many files — this
 index exists to make that navigable.
 
 - The **hand-written** sections below ("Crate map", "Concern map") carry the
@@ -26,7 +26,7 @@ index exists to make that navigable.
 
 See also: [`ARCHITECTURE.md`](ARCHITECTURE.md) (prose overview),
 [`REFACTORING_PLAN.md`](REFACTORING_PLAN.md) (how to break up the big files),
-[`meridian_design_manifest.md`](meridian_design_manifest.md) (binding design spec).
+[`niwoe_design_manifest.md`](niwoe_design_manifest.md) (binding design spec).
 
 ---
 
@@ -34,33 +34,33 @@ See also: [`ARCHITECTURE.md`](ARCHITECTURE.md) (prose overview),
 
 | Crate | Binary? | Purpose |
 |---|---|---|
-| `meridian` (root, `src/main.rs`) | bin | Thin entry that boots the compositor. |
-| `meridian-compositor` | lib | The Wayland/Smithay compositor: backends (DRM/winit), input, decorations, XWayland, output layout, IPC server, render. |
-| `meridian-shell` | bin | The desktop shell: panel, launcher, settings, popups, tray (SNI), notifications, audio/network/bluetooth, default-apps, **theme export**. A `wlr-layer-shell` client. |
-| `meridian-login` | bin | Greeter / display manager (root): DRM card probe, PAM auth, UI + animation. |
-| `meridian-lock` | bin | Lock screen. |
-| `meridian-portal` | bin | `xdg-desktop-portal` backend: FileChooser, Screenshot, Settings (appearance/color-scheme), Access. |
-| `meridian-polkit` | bin | Polkit authentication agent. |
-| `meridian-config` | lib | Config + theme model (`ThemeConfig`, `ThemeColors`), TOML load/save, keybinds, output layout. |
-| `meridian-tokens` | lib | **Single source of truth** for the palette/radius/elevation/interaction design tokens. Hosts the `design_guard` test. |
-| `meridian-ui` | lib | Widget/style system (`Theme` is `Copy`), primitives, effects. |
-| `meridian-ipc` | lib | Shell↔compositor IPC protocol (`ShellCommand`, events). |
-| `meridian-freetype` | lib | Font rasterization glue. |
-| `meridian-compass-render` | lib | The compass brand widget (login/bootsplash only). |
-| `meridian-boot-common` | lib | Shared boot/splash helpers. |
+| `niwoe` (root, `src/main.rs`) | bin | Thin entry that boots the compositor. |
+| `niwoe-compositor` | lib | The Wayland/Smithay compositor: backends (DRM/winit), input, decorations, XWayland, output layout, IPC server, render. |
+| `niwoe-shell` | bin | The desktop shell: panel, launcher, settings, popups, tray (SNI), notifications, audio/network/bluetooth, default-apps, **theme export**. A `wlr-layer-shell` client. |
+| `niwoe-login` | bin | Greeter / display manager (root): DRM card probe, PAM auth, UI + animation. |
+| `niwoe-lock` | bin | Lock screen. |
+| `niwoe-portal` | bin | `xdg-desktop-portal` backend: FileChooser, Screenshot, Settings (appearance/color-scheme), Access. |
+| `niwoe-polkit` | bin | Polkit authentication agent. |
+| `niwoe-config` | lib | Config + theme model (`ThemeConfig`, `ThemeColors`), TOML load/save, keybinds, output layout. |
+| `niwoe-tokens` | lib | **Single source of truth** for the palette/radius/elevation/interaction design tokens. Hosts the `design_guard` test. |
+| `niwoe-ui` | lib | Widget/style system (`Theme` is `Copy`), primitives, effects. |
+| `niwoe-ipc` | lib | Shell↔compositor IPC protocol (`ShellCommand`, events). |
+| `niwoe-freetype` | lib | Font rasterization glue. |
+| `niwoe-compass-render` | lib | The compass brand widget (login/bootsplash only). |
+| `niwoe-boot-common` | lib | Shared boot/splash helpers. |
 
 ---
 
 ## Concern map — "where does feature X live?"
 
 References are `file::function` (line numbers live in the generated appendix, so
-this map survives edits). All shell paths are under `crates/meridian-shell/src/`.
+this map survives edits). All shell paths are under `crates/niwoe-shell/src/`.
 
 ### Shell lifecycle & event loop
 - Entry / event loop: `main.rs::main` (single-threaded `calloop`; `event_loop.dispatch` at ~500 ms).
-- Session/portal bring-up: `main.rs::activate_user_session` (imports env, starts `meridian-session.target`).
+- Session/portal bring-up: `main.rs::activate_user_session` (imports env, starts `niwoe-session.target`).
 - Per-tick work (clock, battery, **audio re-poll**, **launcher refresh swap-in**): `wayland/state/timers.rs::tick`.
-- Shell state struct (the ~205-field god-object): `wayland/state.rs` → `wayland/shell.rs` (`struct MeridianShell`).
+- Shell state struct (the ~205-field god-object): `wayland/state.rs` → `wayland/shell.rs` (`struct NiwoeShell`).
 - Shell construction / startup polls: `wayland/init.rs`.
 
 ### Panel
@@ -87,8 +87,8 @@ this map survives edits). All shell paths are under `crates/meridian-shell/src/`
 ### Theming  *(THEME-1 fix)*
 - **Legacy theme export** (kdeglobals / GTK `settings.ini` / gsettings): `theme_export.rs::export_theme`
   — called from `main.rs::main` (startup) and `wayland/state.rs::apply_theme` (live switch).
-- Theme model: `meridian-config/src/theme/types/config.rs` (`ThemeConfig`, `ThemeColors`, `appearance_is_light`).
-- Portal appearance/color-scheme: `meridian-portal/src/settings.rs`, signal watcher `meridian-portal/src/lib.rs`.
+- Theme model: `niwoe-config/src/theme/types/config.rs` (`ThemeConfig`, `ThemeColors`, `appearance_is_light`).
+- Portal appearance/color-scheme: `niwoe-portal/src/settings.rs`, signal watcher `niwoe-portal/src/lib.rs`.
 
 ### Default apps / open  *(OPEN-2 fix)*
 - MIME index + queries: `default_apps.rs` (`MimeAppIndex`, `query_default`, `desktop_app_dirs`).
@@ -102,7 +102,7 @@ this map survives edits). All shell paths are under `crates/meridian-shell/src/`
 - Network (NetworkManager `nmcli`, cfg-gated): `network/nmcli.rs`; FreeBSD: `network/freebsd.rs`; popup `network_popup.rs`.
 - Bluetooth: `bluetooth.rs`.
 
-### Compositor (`crates/meridian-compositor/src/`)
+### Compositor (`crates/niwoe-compositor/src/`)
 - State: `state/` (struct in `state/mod.rs`, IPC server `state/ipc/`, output layout `state/output_layout.rs`).
 - Input: `input/pointer/` (hover/decoration feedback `input/pointer/mod.rs::update_hover_cursor_feedback` — **LOG-1 fix**), `input/keyboard.rs`.
 - Window decorations (SSD): `decoration/` (`DecorationManager`, `clear_hover_buttons_except` — **LOG-1**), render `decoration/render/`.
@@ -131,7 +131,7 @@ layout is captured in the generated symbol map below and the rationale remains
 in [`REFACTORING_PLAN.md`](REFACTORING_PLAN.md). CI/local verification:
 
 ```sh
-cargo test -p meridian-tokens --test source_size_guard
+cargo test -p niwoe-tokens --test source_size_guard
 ```
 
 ---
@@ -140,9 +140,9 @@ cargo test -p meridian-tokens --test source_size_guard
 
 _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
-### `meridian-boot-common`
+### `niwoe-boot-common`
 
-<details><summary><code>crates/meridian-boot-common/src/lib.rs</code> &mdash; 207 lines</summary>
+<details><summary><code>crates/niwoe-boot-common/src/lib.rs</code> &mdash; 207 lines</summary>
 
 ```rust
 8:pub struct SocketIdentity
@@ -168,16 +168,16 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-compass-render`
+### `niwoe-compass-render`
 
-<details><summary><code>crates/meridian-compass-render/src/assets.rs</code> &mdash; 7 lines</summary>
+<details><summary><code>crates/niwoe-compass-render/src/assets.rs</code> &mdash; 7 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compass-render/src/lib.rs</code> &mdash; 407 lines</summary>
+<details><summary><code>crates/niwoe-compass-render/src/lib.rs</code> &mdash; 407 lines</summary>
 
 ```rust
 41:pub struct Fonts<'a>
@@ -214,20 +214,20 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compass-render/src/lib/background_and_scale.rs</code> &mdash; 253 lines</summary>
+<details><summary><code>crates/niwoe-compass-render/src/lib/background_and_scale.rs</code> &mdash; 253 lines</summary>
 
 ```rust
 8:pub fn needle_angle_deg
 23:fn color_with_alpha
 32:fn draw_background
 77:fn draw_compass_shadow
-125:fn draw_meridian_lines
+125:fn draw_niwoe_lines
 147:fn draw_scale_ring
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compass-render/src/lib/rose_and_needle.rs</code> &mdash; 305 lines</summary>
+<details><summary><code>crates/niwoe-compass-render/src/lib/rose_and_needle.rs</code> &mdash; 305 lines</summary>
 
 ```rust
 3:fn draw_sweep_glint
@@ -240,7 +240,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compass-render/src/lib/text.rs</code> &mdash; 142 lines</summary>
+<details><summary><code>crates/niwoe-compass-render/src/lib/text.rs</code> &mdash; 142 lines</summary>
 
 ```rust
 3:fn draw_signature
@@ -254,7 +254,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compass-render/src/lib_tests.rs</code> &mdash; 234 lines</summary>
+<details><summary><code>crates/niwoe-compass-render/src/lib_tests.rs</code> &mdash; 234 lines</summary>
 
 ```rust
 5:fn quompacc_fonts_construct_a_painter
@@ -275,9 +275,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-compositor`
+### `niwoe-compositor`
 
-<details><summary><code>crates/meridian-compositor/src/backend/clipped_surface.rs</code> &mdash; 265 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/clipped_surface.rs</code> &mdash; 265 lines</summary>
 
 ```rust
 34:struct ClippingShader
@@ -304,7 +304,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/glass.rs</code> &mdash; 364 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/glass.rs</code> &mdash; 364 lines</summary>
 
 ```rust
 34:struct GlassShader
@@ -351,7 +351,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/gpu.rs</code> &mdash; 156 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/gpu.rs</code> &mdash; 156 lines</summary>
 
 ```rust
 21:pub
@@ -371,7 +371,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init.rs</code> &mdash; 596 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init.rs</code> &mdash; 596 lines</summary>
 
 ```rust
 71:struct DrmConnectorReconfigureCandidate
@@ -384,7 +384,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init/build.rs</code> &mdash; 57 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init/build.rs</code> &mdash; 57 lines</summary>
 
 ```rust
 1:pub
@@ -392,7 +392,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init/event_sources.rs</code> &mdash; 137 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init/event_sources.rs</code> &mdash; 137 lines</summary>
 
 ```rust
 1:fn configure_repaint_interval
@@ -403,7 +403,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init/hotplug.rs</code> &mdash; 545 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init/hotplug.rs</code> &mdash; 545 lines</summary>
 
 ```rust
 1:fn scan_drm_connectors_for_h5b
@@ -414,7 +414,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init/layout.rs</code> &mdash; 97 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init/layout.rs</code> &mdash; 97 lines</summary>
 
 ```rust
 1:fn sync_primary_flags_from_resolved_layout
@@ -425,7 +425,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init_diagnostics.rs</code> &mdash; 133 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init_diagnostics.rs</code> &mdash; 133 lines</summary>
 
 ```rust
 12:pub
@@ -436,7 +436,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/init_env.rs</code> &mdash; 126 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/init_env.rs</code> &mdash; 126 lines</summary>
 
 ```rust
 5:pub
@@ -453,7 +453,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/login_ipc.rs</code> &mdash; 77 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/login_ipc.rs</code> &mdash; 77 lines</summary>
 
 ```rust
 30:pub fn send_handover
@@ -463,7 +463,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/mod.rs</code> &mdash; 228 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/mod.rs</code> &mdash; 228 lines</summary>
 
 ```rust
 39:pub type GbmDrmCompositor =
@@ -480,7 +480,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/mode_selection.rs</code> &mdash; 461 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/mode_selection.rs</code> &mdash; 461 lines</summary>
 
 ```rust
 9:pub
@@ -508,7 +508,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/openbsd_privsep.rs</code> &mdash; 102 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/openbsd_privsep.rs</code> &mdash; 102 lines</summary>
 
 ```rust
 24:pub
@@ -518,7 +518,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/render.rs</code> &mdash; 495 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/render.rs</code> &mdash; 495 lines</summary>
 
 ```rust
 60:fn render_window_toplevel_elements<C>
@@ -527,7 +527,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/render/capture.rs</code> &mdash; 495 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/render/capture.rs</code> &mdash; 495 lines</summary>
 
 ```rust
 1:fn serve_screencopy_frames
@@ -545,7 +545,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/render/layers.rs</code> &mdash; 229 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/render/layers.rs</code> &mdash; 229 lines</summary>
 
 ```rust
 22:struct LayerRenderState
@@ -563,14 +563,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/render/scene_composition.rs</code> &mdash; 411 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/render/scene_composition.rs</code> &mdash; 411 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/render/scene_helpers.rs</code> &mdash; 244 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/render/scene_helpers.rs</code> &mdash; 244 lines</summary>
 
 ```rust
 1:fn themed_layer_glass_info
@@ -586,7 +586,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/render/stack.rs</code> &mdash; 113 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/render/stack.rs</code> &mdash; 113 lines</summary>
 
 ```rust
 4:pub enum RenderStackRole
@@ -602,7 +602,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/stats.rs</code> &mdash; 472 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/stats.rs</code> &mdash; 472 lines</summary>
 
 ```rust
 2:struct DurationStats
@@ -635,7 +635,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/drm/wscons.rs</code> &mdash; 508 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/drm/wscons.rs</code> &mdash; 508 lines</summary>
 
 ```rust
 55:struct WsconsEvent
@@ -719,14 +719,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/mod.rs</code> &mdash; 3 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/mod.rs</code> &mdash; 3 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/winit/layers.rs</code> &mdash; 119 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/winit/layers.rs</code> &mdash; 119 lines</summary>
 
 ```rust
 16:pub
@@ -740,7 +740,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/winit/mod.rs</code> &mdash; 254 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/winit/mod.rs</code> &mdash; 254 lines</summary>
 
 ```rust
 46:pub
@@ -749,7 +749,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/backend/winit/scene.rs</code> &mdash; 282 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/backend/winit/scene.rs</code> &mdash; 282 lines</summary>
 
 ```rust
 22:fn render_window_popup_elements<C>
@@ -759,7 +759,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/cursor/embedded.rs</code> &mdash; 247 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/cursor/embedded.rs</code> &mdash; 247 lines</summary>
 
 ```rust
 17:pub
@@ -776,7 +776,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/cursor/image.rs</code> &mdash; 245 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/cursor/image.rs</code> &mdash; 245 lines</summary>
 
 ```rust
 18:pub struct CursorImage
@@ -796,14 +796,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/cursor/mod.rs</code> &mdash; 8 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/cursor/mod.rs</code> &mdash; 8 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/cursor/tests.rs</code> &mdash; 242 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/cursor/tests.rs</code> &mdash; 242 lines</summary>
 
 ```rust
 14:fn env_lock
@@ -829,7 +829,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/cursor/xcursor.rs</code> &mdash; 84 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/cursor/xcursor.rs</code> &mdash; 84 lines</summary>
 
 ```rust
 11:fn build_xcursor_path
@@ -840,7 +840,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/icons.rs</code> &mdash; 181 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/icons.rs</code> &mdash; 181 lines</summary>
 
 ```rust
 2:pub enum WindowIcon
@@ -859,7 +859,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/mod.rs</code> &mdash; 235 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/mod.rs</code> &mdash; 235 lines</summary>
 
 ```rust
 34:pub enum DecorationRenderElement
@@ -886,7 +886,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/model.rs</code> &mdash; 131 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/model.rs</code> &mdash; 131 lines</summary>
 
 ```rust
 5:pub enum HoveredButton
@@ -908,7 +908,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/buffers.rs</code> &mdash; 145 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/buffers.rs</code> &mdash; 145 lines</summary>
 
 ```rust
 11:pub
@@ -921,7 +921,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/elements.rs</code> &mdash; 472 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/elements.rs</code> &mdash; 472 lines</summary>
 
 ```rust
 24:impl DecorationManager
@@ -932,14 +932,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/elements/glass_buttons.rs</code> &mdash; 57 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/elements/glass_buttons.rs</code> &mdash; 57 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/elements/shaders.rs</code> &mdash; 194 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/elements/shaders.rs</code> &mdash; 194 lines</summary>
 
 ```rust
 1:fn shadow_uniform_names
@@ -951,7 +951,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/geometry.rs</code> &mdash; 418 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/geometry.rs</code> &mdash; 418 lines</summary>
 
 ```rust
 10:pub
@@ -985,7 +985,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/hit.rs</code> &mdash; 274 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/hit.rs</code> &mdash; 274 lines</summary>
 
 ```rust
 11:pub
@@ -1008,7 +1008,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/icon_cache.rs</code> &mdash; 85 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/icon_cache.rs</code> &mdash; 85 lines</summary>
 
 ```rust
 11:pub
@@ -1022,25 +1022,25 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/decoration/render/mod.rs</code> &mdash; 5 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/decoration/render/mod.rs</code> &mdash; 5 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/mod.rs</code> &mdash; 2 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/mod.rs</code> &mdash; 2 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/move_grab.rs</code> &mdash; 273 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/move_grab.rs</code> &mdash; 273 lines</summary>
 
 ```rust
 29:pub struct MoveSurfaceGrab
-43:impl PointerGrab<MeridianState> for MoveSurfaceGrab
+43:impl PointerGrab<NiwoeState> for MoveSurfaceGrab
 44:    fn motion
 129:    fn relative_motion
 139:    fn button
@@ -1060,7 +1060,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/move_grab/release.rs</code> &mdash; 310 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/move_grab/release.rs</code> &mdash; 310 lines</summary>
 
 ```rust
 1:fn is_pointer_near_output_top_edge
@@ -1084,7 +1084,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/move_grab/restore.rs</code> &mdash; 290 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/move_grab/restore.rs</code> &mdash; 290 lines</summary>
 
 ```rust
 1:fn half_snap_restore_geometry_source
@@ -1107,7 +1107,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/move_grab_tests.rs</code> &mdash; 341 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/move_grab_tests.rs</code> &mdash; 341 lines</summary>
 
 ```rust
 18:fn point
@@ -1135,14 +1135,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/resize_grab/grab.rs</code> &mdash; 284 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/resize_grab/grab.rs</code> &mdash; 284 lines</summary>
 
 ```rust
 23:enum ResizeSurfaceTarget
 28:pub struct ResizeSurfaceGrab
 36:impl ResizeSurfaceGrab
 37:    pub fn start
-66:impl PointerGrab<MeridianState> for ResizeSurfaceGrab
+66:impl PointerGrab<NiwoeState> for ResizeSurfaceGrab
 67:    fn motion
 147:    fn relative_motion
 157:    fn button
@@ -1162,7 +1162,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/resize_grab/mod.rs</code> &mdash; 28 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/resize_grab/mod.rs</code> &mdash; 28 lines</summary>
 
 ```rust
 12:    pub struct ResizeEdge: u32
@@ -1172,7 +1172,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/grabs/resize_grab/state.rs</code> &mdash; 91 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/grabs/resize_grab/state.rs</code> &mdash; 91 lines</summary>
 
 ```rust
 13:pub
@@ -1184,7 +1184,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/keyboard.rs</code> &mdash; 296 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/keyboard.rs</code> &mdash; 296 lines</summary>
 
 ```rust
 14:struct KeyMatch
@@ -1200,16 +1200,16 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/mod.rs</code> &mdash; 54 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/mod.rs</code> &mdash; 54 lines</summary>
 
 ```rust
-8:impl MeridianState
+8:impl NiwoeState
 9:    pub fn process_input_event<I: InputBackend>
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/pointer/button.rs</code> &mdash; 569 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/pointer/button.rs</code> &mdash; 569 lines</summary>
 
 ```rust
 33:pub fn handle_pointer_button<I: InputBackend>
@@ -1217,7 +1217,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/pointer/button/helpers.rs</code> &mdash; 190 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/pointer/button/helpers.rs</code> &mdash; 190 lines</summary>
 
 ```rust
 1:type HitInfo =
@@ -1233,7 +1233,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/pointer/button_tests.rs</code> &mdash; 146 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/pointer/button_tests.rs</code> &mdash; 146 lines</summary>
 
 ```rust
 6:fn click_point_on_output_one
@@ -1245,7 +1245,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/pointer/mod.rs</code> &mdash; 496 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/pointer/mod.rs</code> &mdash; 496 lines</summary>
 
 ```rust
 25:pub fn handle_pointer_motion_absolute<I: InputBackend>
@@ -1267,7 +1267,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/input/pointer/mod_tests.rs</code> &mdash; 192 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/input/pointer/mod_tests.rs</code> &mdash; 192 lines</summary>
 
 ```rust
 5:fn reg
@@ -1285,21 +1285,21 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/lib.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/lib.rs</code> &mdash; 9 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/mod.rs</code> &mdash; 2 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/mod.rs</code> &mdash; 2 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xdg_shell.rs</code> &mdash; 47 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xdg_shell.rs</code> &mdash; 47 lines</summary>
 
 ```rust
 9:pub fn handle_commit
@@ -1307,7 +1307,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland.rs</code> &mdash; 375 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland.rs</code> &mdash; 375 lines</summary>
 
 ```rust
 43:trait DecorationSyncTarget
@@ -1329,15 +1329,15 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 181:pub
 246:pub
 282:pub fn start_xwayland
-328:impl XWaylandShellHandler for MeridianState
+328:impl XWaylandShellHandler for NiwoeState
 329:    fn xwayland_shell_state
 333:    fn surface_associated
-366:impl XwmHandler for MeridianState
+366:impl XwmHandler for NiwoeState
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland/configure.rs</code> &mdash; 301 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland/configure.rs</code> &mdash; 301 lines</summary>
 
 ```rust
 3:    fn configure_request
@@ -1346,7 +1346,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland/helpers.rs</code> &mdash; 273 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland/helpers.rs</code> &mdash; 273 lines</summary>
 
 ```rust
 1:fn select_output_geometry_for_rect
@@ -1372,7 +1372,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland/input_selection.rs</code> &mdash; 267 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland/input_selection.rs</code> &mdash; 267 lines</summary>
 
 ```rust
 3:    fn property_notify
@@ -1387,7 +1387,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland/state_requests.rs</code> &mdash; 243 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland/state_requests.rs</code> &mdash; 243 lines</summary>
 
 ```rust
 3:        fn maximize_request
@@ -1400,7 +1400,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland/window_lifecycle.rs</code> &mdash; 318 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland/window_lifecycle.rs</code> &mdash; 318 lines</summary>
 
 ```rust
 3:    fn xwm_state
@@ -1415,7 +1415,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/protocols/xwayland_tests.rs</code> &mdash; 261 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/protocols/xwayland_tests.rs</code> &mdash; 261 lines</summary>
 
 ```rust
 12:struct MockDecorationSyncTarget
@@ -1448,7 +1448,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/client.rs</code> &mdash; 13 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/client.rs</code> &mdash; 13 lines</summary>
 
 ```rust
 5:pub struct ClientState
@@ -1459,12 +1459,12 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/core/compositor.rs</code> &mdash; 246 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/core/compositor.rs</code> &mdash; 246 lines</summary>
 
 ```rust
-24:impl BufferHandler for MeridianState
+24:impl BufferHandler for NiwoeState
 25:    fn buffer_destroyed
-28:impl CompositorHandler for MeridianState
+28:impl CompositorHandler for NiwoeState
 29:    fn compositor_state
 33:    fn client_compositor_state<'a>
 40:    fn commit
@@ -1472,7 +1472,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/core/grab.rs</code> &mdash; 24 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/core/grab.rs</code> &mdash; 24 lines</summary>
 
 ```rust
 9:pub
@@ -1480,14 +1480,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/core/layer_shell.rs</code> &mdash; 341 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/core/layer_shell.rs</code> &mdash; 341 lines</summary>
 
 ```rust
 17:fn select_layer_output_info<'a>
 39:fn select_layer_recovery_output_info<'a>
-54:impl MeridianState
+54:impl NiwoeState
 55:    pub fn reconcile_layer_shell_outputs_after_output_change
-139:impl WlrLayerShellHandler for MeridianState
+139:impl WlrLayerShellHandler for NiwoeState
 140:    fn shell_state
 144:    fn new_layer_surface
 224:    fn new_popup
@@ -1506,70 +1506,70 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/core/mod.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/core/mod.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/core/shm.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/core/shm.rs</code> &mdash; 9 lines</summary>
 
 ```rust
-5:impl ShmHandler for MeridianState
+5:impl ShmHandler for NiwoeState
 6:    fn shm_state
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/dmabuf.rs</code> &mdash; 37 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/dmabuf.rs</code> &mdash; 37 lines</summary>
 
 ```rust
-8:impl DmabufHandler for MeridianState
+8:impl DmabufHandler for NiwoeState
 9:    fn dmabuf_state
 13:    fn dmabuf_imported
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/idle.rs</code> &mdash; 34 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/idle.rs</code> &mdash; 34 lines</summary>
 
 ```rust
-11:impl IdleNotifierHandler for MeridianState
+11:impl IdleNotifierHandler for NiwoeState
 12:    fn idle_notifier_state
-17:impl IdleInhibitHandler for MeridianState
+17:impl IdleInhibitHandler for NiwoeState
 18:    fn inhibit
 28:    fn uninhibit
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/misc.rs</code> &mdash; 355 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/misc.rs</code> &mdash; 355 lines</summary>
 
 ```rust
 26:fn clamp_client_loc_for_visible_frame
 70:fn find_mapped_xdg_window
 89:fn reposition_xdg_window_for_visible_frame
-131:impl SeatHandler for MeridianState
+131:impl SeatHandler for NiwoeState
 132:    type KeyboardFocus = WlSurface;
 133:    type PointerFocus = WlSurface;
 134:    type TouchFocus = WlSurface;
 136:    fn seat_state
 140:    fn focus_changed
 147:    fn cursor_image
-156:impl smithay::wayland::tablet_manager::TabletSeatHandler for MeridianState
-158:impl OutputHandler for MeridianState
-160:impl SelectionHandler for MeridianState
+156:impl smithay::wayland::tablet_manager::TabletSeatHandler for NiwoeState
+158:impl OutputHandler for NiwoeState
+160:impl SelectionHandler for NiwoeState
 161:    type SelectionUserData =
 163:    fn new_selection
 180:    fn send_selection
-200:impl PrimarySelectionHandler for MeridianState
+200:impl PrimarySelectionHandler for NiwoeState
 201:    fn primary_selection_state
-206:impl WaylandDndGrabHandler for MeridianState
-208:impl DataDeviceHandler for MeridianState
+206:impl WaylandDndGrabHandler for NiwoeState
+208:impl DataDeviceHandler for NiwoeState
 209:    fn data_device_state
-214:impl DndGrabHandler for MeridianState
-216:impl XdgDecorationHandler for MeridianState
+214:impl DndGrabHandler for NiwoeState
+216:impl XdgDecorationHandler for NiwoeState
 217:    fn new_decoration
 235:    fn request_mode
 257:    fn unset_mode
@@ -1577,21 +1577,21 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 293:    fn moves_client_right_when_left_border_would_be_offscreen
 303:    fn keeps_location_when_frame_is_already_fully_visible
 312:    fn oversized_window_keeps_top_left_reachable
-321:impl MeridianState
+321:impl NiwoeState
 322:    pub fn update_focus_decoration
 331:    pub fn set_keyboard_focus_with_decorations
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/mod.rs</code> &mdash; 11 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/mod.rs</code> &mdash; 11 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/output_power.rs</code> &mdash; 202 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/output_power.rs</code> &mdash; 202 lines</summary>
 
 ```rust
 14:pub struct OutputPowerData
@@ -1599,7 +1599,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 19:    fn bind
 31:impl Dispatch<ZwlrOutputPowerManagerV1,
 32:    fn request
-81:impl Dispatch<ZwlrOutputPowerV1, OutputPowerData> for MeridianState
+81:impl Dispatch<ZwlrOutputPowerV1, OutputPowerData> for NiwoeState
 82:    fn request
 170:    fn destroyed
 189:fn power_mode_to_wire
@@ -1608,15 +1608,15 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/screencopy.rs</code> &mdash; 107 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/screencopy.rs</code> &mdash; 107 lines</summary>
 
 ```rust
-19:impl ImageCaptureSourceHandler for MeridianState
+19:impl ImageCaptureSourceHandler for NiwoeState
 20:    fn source_destroyed
-23:impl OutputCaptureSourceHandler for MeridianState
+23:impl OutputCaptureSourceHandler for NiwoeState
 24:    fn output_capture_source_state
 28:    fn output_source_created
-33:impl ImageCopyCaptureHandler for MeridianState
+33:impl ImageCopyCaptureHandler for NiwoeState
 34:    fn image_copy_capture_state
 38:    fn capture_constraints
 48:    fn new_session
@@ -1627,10 +1627,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/session_lock.rs</code> &mdash; 86 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/session_lock.rs</code> &mdash; 86 lines</summary>
 
 ```rust
-11:impl SessionLockHandler for MeridianState
+11:impl SessionLockHandler for NiwoeState
 12:    fn lock_state
 16:    fn lock
 49:    fn unlock
@@ -1639,25 +1639,25 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/syncobj.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/syncobj.rs</code> &mdash; 9 lines</summary>
 
 ```rust
-5:impl DrmSyncobjHandler for MeridianState
+5:impl DrmSyncobjHandler for NiwoeState
 6:    fn drm_syncobj_state
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/wayland_extra.rs</code> &mdash; 53 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/wayland_extra.rs</code> &mdash; 53 lines</summary>
 
 ```rust
-15:impl XdgActivationHandler for MeridianState
+15:impl XdgActivationHandler for NiwoeState
 16:    fn activation_state
 20:    fn token_created
 29:    fn request_activation
-39:impl FractionalScaleHandler for MeridianState
+39:impl FractionalScaleHandler for NiwoeState
 40:    fn new_fractional_scale
-43:impl InputMethodHandler for MeridianState
+43:impl InputMethodHandler for NiwoeState
 44:    fn new_popup
 46:    fn popup_repositioned
 48:    fn dismiss_popup
@@ -1666,7 +1666,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/xdg/lifecycle.rs</code> &mdash; 120 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/xdg/lifecycle.rs</code> &mdash; 120 lines</summary>
 
 ```rust
 15:fn initial_maximized_client_origin
@@ -1678,14 +1678,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/xdg/mod.rs</code> &mdash; 320 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/xdg/mod.rs</code> &mdash; 320 lines</summary>
 
 ```rust
 22:fn popup_parent_window_loc_and_size
 40:fn popup_parent_workarea
 58:pub
 74:pub
-91:impl XdgShellHandler for MeridianState
+91:impl XdgShellHandler for NiwoeState
 92:    fn xdg_shell_state
 96:    fn new_toplevel
 100:    fn new_popup
@@ -1710,7 +1710,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/xdg/requests/grab.rs</code> &mdash; 113 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/xdg/requests/grab.rs</code> &mdash; 113 lines</summary>
 
 ```rust
 21:pub
@@ -1719,14 +1719,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/xdg/requests/mod.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/xdg/requests/mod.rs</code> &mdash; 9 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/xdg/requests/state.rs</code> &mdash; 432 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/xdg/requests/state.rs</code> &mdash; 432 lines</summary>
 
 ```rust
 16:pub
@@ -1751,7 +1751,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/handlers/xdg/requests/window.rs</code> &mdash; 19 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/handlers/xdg/requests/window.rs</code> &mdash; 19 lines</summary>
 
 ```rust
 5:pub
@@ -1759,7 +1759,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/idle.rs</code> &mdash; 115 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/idle.rs</code> &mdash; 115 lines</summary>
 
 ```rust
 11:pub struct IdleInhibitorSet<K>
@@ -1780,11 +1780,11 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/broadcast.rs</code> &mdash; 290 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/broadcast.rs</code> &mdash; 290 lines</summary>
 
 ```rust
 13:fn build_output_workspace_snapshot
-54:impl MeridianState
+54:impl NiwoeState
 55:    pub fn broadcast_workspace
 61:    pub fn broadcast_window_snapshot
 109:    pub fn broadcast_output_workspace_changed
@@ -1804,10 +1804,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/commands.rs</code> &mdash; 549 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/commands.rs</code> &mdash; 549 lines</summary>
 
 ```rust
-14:impl MeridianState
+14:impl NiwoeState
 15:    pub fn poll_ipc
 99:    fn handle_shell_command
 192:    fn reject_pending_screenshot_consent_without_shell
@@ -1824,7 +1824,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/conversions.rs</code> &mdash; 30 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/conversions.rs</code> &mdash; 30 lines</summary>
 
 ```rust
 4:pub
@@ -1835,7 +1835,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/launch.rs</code> &mdash; 212 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/launch.rs</code> &mdash; 212 lines</summary>
 
 ```rust
 3:pub
@@ -1852,14 +1852,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/mod.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/mod.rs</code> &mdash; 9 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/screenshot.rs</code> &mdash; 228 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/screenshot.rs</code> &mdash; 228 lines</summary>
 
 ```rust
 10:pub
@@ -1877,7 +1877,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/screenshot_policy.rs</code> &mdash; 296 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/screenshot_policy.rs</code> &mdash; 296 lines</summary>
 
 ```rust
 3:pub
@@ -1902,7 +1902,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/server.rs</code> &mdash; 474 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/server.rs</code> &mdash; 474 lines</summary>
 
 ```rust
 20:pub struct IpcServer
@@ -1933,7 +1933,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/ipc/server_tests.rs</code> &mdash; 219 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/ipc/server_tests.rs</code> &mdash; 219 lines</summary>
 
 ```rust
 14:fn same_uid_is_allowed
@@ -1953,28 +1953,28 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/layout/focus.rs</code> &mdash; 50 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/layout/focus.rs</code> &mdash; 50 lines</summary>
 
 ```rust
-8:impl MeridianState
+8:impl NiwoeState
 9:    pub fn focused_window
 23:    pub fn move_focused_window_to_workspace
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/layout/mod.rs</code> &mdash; 4 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/layout/mod.rs</code> &mdash; 4 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/layout/surface.rs</code> &mdash; 245 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/layout/surface.rs</code> &mdash; 245 lines</summary>
 
 ```rust
 11:fn select_surface_output_info
-35:impl MeridianState
+35:impl NiwoeState
 36:    pub fn surface_under
 149:    fn reg
 165:    fn point_on_output_one_is_selected
@@ -1986,10 +1986,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/layout/tiling.rs</code> &mdash; 160 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/layout/tiling.rs</code> &mdash; 160 lines</summary>
 
 ```rust
-13:impl MeridianState
+13:impl NiwoeState
 14:    pub fn tile_workspace
 65:    pub fn toggle_tiling
 78:struct SelectedTilingOutput
@@ -2003,12 +2003,12 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/layout/workspace.rs</code> &mdash; 457 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/layout/workspace.rs</code> &mdash; 457 lines</summary>
 
 ```rust
 9:enum MoveRequestGuard
 15:fn validate_workspace_move_request
-32:impl MeridianState
+32:impl NiwoeState
 33:    pub fn current_workspace_index_for_focused_output
 37:    pub fn current_workspace_index
 41:    pub fn focused_output
@@ -2029,7 +2029,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/lock.rs</code> &mdash; 317 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/lock.rs</code> &mdash; 317 lines</summary>
 
 ```rust
 11:pub enum LockPhase
@@ -2053,7 +2053,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 148:    pub fn drop_surface
 154:impl LockManager
 157:    pub fn begin_pending_for_test
-168:impl MeridianState
+168:impl NiwoeState
 169:    pub fn refresh_lock_focus
 207:    fn default_is_unlocked
 215:    fn begin_lock_from_unlocked_transitions_to_pending
@@ -2070,7 +2070,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/mod.rs</code> &mdash; 510 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/mod.rs</code> &mdash; 510 lines</summary>
 
 ```rust
 88:pub struct MaximizeRestoreGeometry
@@ -2100,8 +2100,8 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 320:pub
 328:pub struct ThumbnailRequest
 337:pub struct PendingScreenshotRequest
-342:pub struct MeridianState
-430:impl MeridianState
+342:pub struct NiwoeState
+430:impl NiwoeState
 431:    pub fn resolve_output_layout
 437:    pub
 460:    pub fn clear_window_runtime_state
@@ -2110,7 +2110,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/mod_tests.rs</code> &mdash; 236 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/mod_tests.rs</code> &mdash; 236 lines</summary>
 
 ```rust
 12:fn capture_known_loc_and_size_preserves_client_size
@@ -2132,7 +2132,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_hotplug_tests.rs</code> &mdash; 542 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_hotplug_tests.rs</code> &mdash; 542 lines</summary>
 
 ```rust
 40:struct TestSpaceElement
@@ -2173,7 +2173,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_hotplug_tests/basic.rs</code> &mdash; 253 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_hotplug_tests/basic.rs</code> &mdash; 253 lines</summary>
 
 ```rust
 2:fn single_output_add_yields_zero_origin_primary
@@ -2196,7 +2196,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_hotplug_tests/reload.rs</code> &mdash; 179 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_hotplug_tests/reload.rs</code> &mdash; 179 lines</summary>
 
 ```rust
 2:fn reload_layout_changes_primary_assignment
@@ -2213,7 +2213,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_hotplug_tests/windows.rs</code> &mdash; 269 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_hotplug_tests/windows.rs</code> &mdash; 269 lines</summary>
 
 ```rust
 2:fn window_on_removed_output_stays_at_logical_position
@@ -2234,7 +2234,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_layout.rs</code> &mdash; 301 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_layout.rs</code> &mdash; 301 lines</summary>
 
 ```rust
 5:pub enum OutputPosition
@@ -2259,14 +2259,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_layout_tests.rs</code> &mdash; 12 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_layout_tests.rs</code> &mdash; 12 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_layout_tests/config_and_diff.rs</code> &mdash; 265 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_layout_tests/config_and_diff.rs</code> &mdash; 265 lines</summary>
 
 ```rust
 2:fn from_config_entries_builds_layout_in_order
@@ -2295,7 +2295,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_layout_tests/fixtures.rs</code> &mdash; 73 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_layout_tests/fixtures.rs</code> &mdash; 73 lines</summary>
 
 ```rust
 1:fn placement
@@ -2308,7 +2308,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_layout_tests/resolution.rs</code> &mdash; 347 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_layout_tests/resolution.rs</code> &mdash; 347 lines</summary>
 
 ```rust
 2:fn empty_layout_two_outputs_chains_horizontally
@@ -2333,7 +2333,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_power.rs</code> &mdash; 205 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_power.rs</code> &mdash; 205 lines</summary>
 
 ```rust
 4:pub enum OutputPowerMode
@@ -2363,7 +2363,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_registry.rs</code> &mdash; 223 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_registry.rs</code> &mdash; 223 lines</summary>
 
 ```rust
 6:pub struct OutputId
@@ -2399,7 +2399,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/output_registry_tests.rs</code> &mdash; 388 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/output_registry_tests.rs</code> &mdash; 388 lines</summary>
 
 ```rust
 7:fn reg
@@ -2429,7 +2429,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/session_lock_tests.rs</code> &mdash; 97 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/session_lock_tests.rs</code> &mdash; 97 lines</summary>
 
 ```rust
 4:fn default_phase_is_unlocked
@@ -2447,7 +2447,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/setup.rs</code> &mdash; 196 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/setup.rs</code> &mdash; 196 lines</summary>
 
 ```rust
 63:pub
@@ -2461,10 +2461,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/setup/dirty_and_construction.rs</code> &mdash; 281 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/setup/dirty_and_construction.rs</code> &mdash; 281 lines</summary>
 
 ```rust
-1:impl MeridianState
+1:impl NiwoeState
 2:    pub fn mark_all_outputs_dirty
 25:    pub fn mark_output_dirty
 48:    pub fn mark_output_dirty_by_name
@@ -2474,20 +2474,20 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/setup/layout.rs</code> &mdash; 440 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/setup/layout.rs</code> &mdash; 440 lines</summary>
 
 ```rust
-1:impl MeridianState
+1:impl NiwoeState
 9:    pub fn reapply_output_layout
 277:    fn build_and_register_disabled_output
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/setup/output_lifecycle.rs</code> &mdash; 216 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/setup/output_lifecycle.rs</code> &mdash; 216 lines</summary>
 
 ```rust
-1:impl MeridianState
+1:impl NiwoeState
 2:    pub fn handle_output_added_or_updated
 60:    fn reclamp_windows_to_live_outputs
 81:    pub fn handle_output_removed
@@ -2499,7 +2499,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/setup_tests.rs</code> &mdash; 64 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/setup_tests.rs</code> &mdash; 64 lines</summary>
 
 ```rust
 6:fn apply_config_overrides_marks_cursor_change_when_cursor_override_differs
@@ -2509,7 +2509,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/utils.rs</code> &mdash; 111 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/utils.rs</code> &mdash; 111 lines</summary>
 
 ```rust
 13:pub
@@ -2523,7 +2523,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/state/workspace_output_state.rs</code> &mdash; 411 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/state/workspace_output_state.rs</code> &mdash; 411 lines</summary>
 
 ```rust
 6:pub struct WorkspaceOutputState
@@ -2556,7 +2556,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/wallpaper/compose.rs</code> &mdash; 159 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/wallpaper/compose.rs</code> &mdash; 159 lines</summary>
 
 ```rust
 7:pub
@@ -2571,7 +2571,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/wallpaper/gpu.rs</code> &mdash; 77 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/wallpaper/gpu.rs</code> &mdash; 77 lines</summary>
 
 ```rust
 19:pub struct WallpaperGpuCache
@@ -2583,7 +2583,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/wallpaper/manager.rs</code> &mdash; 82 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/wallpaper/manager.rs</code> &mdash; 82 lines</summary>
 
 ```rust
 13:pub struct WallpaperManager
@@ -2599,14 +2599,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/wallpaper/mod.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/wallpaper/mod.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-compositor/src/workspace.rs</code> &mdash; 324 lines</summary>
+<details><summary><code>crates/niwoe-compositor/src/workspace.rs</code> &mdash; 324 lines</summary>
 
 ```rust
 14:pub struct WorkspaceManager<E: SpaceElement = Window>
@@ -2650,9 +2650,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-config`
+### `niwoe-config`
 
-<details><summary><code>crates/meridian-config/src/config.rs</code> &mdash; 286 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config.rs</code> &mdash; 286 lines</summary>
 
 ```rust
 17:pub struct GeneralConfig
@@ -2667,8 +2667,8 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 67:pub struct PinnedAppConfig
 74:pub struct PanelConfig
 81:pub struct WallpaperEntry
-90:pub struct MeridianConfig
-99:impl MeridianConfig
+90:pub struct NiwoeConfig
+99:impl NiwoeConfig
 100:    pub fn load
 105:    pub fn reload
 110:    pub fn reload_from_path
@@ -2678,7 +2678,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 197:fn config_directory
 204:struct PinnedAppToml
 213:struct PanelToml
-219:struct MeridianToml
+219:struct NiwoeToml
 230:struct GeneralToml
 236:impl Default for GeneralToml
 237:    fn default
@@ -2692,10 +2692,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config/mutation.rs</code> &mdash; 324 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config/mutation.rs</code> &mdash; 324 lines</summary>
 
 ```rust
-1:impl MeridianConfig
+1:impl NiwoeConfig
 4:    pub fn save_theme
 67:    pub fn save_wallpaper
 105:    pub fn save_cursor
@@ -2710,7 +2710,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config/output_toml.rs</code> &mdash; 349 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config/output_toml.rs</code> &mdash; 349 lines</summary>
 
 ```rust
 1:fn strip_toml_section
@@ -2731,7 +2731,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config/wallpapers.rs</code> &mdash; 166 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config/wallpapers.rs</code> &mdash; 166 lines</summary>
 
 ```rust
 12:fn collect_images_by_dir
@@ -2745,14 +2745,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config_tests.rs</code> &mdash; 8 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config_tests.rs</code> &mdash; 8 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config_tests/output_updates.rs</code> &mdash; 277 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config_tests/output_updates.rs</code> &mdash; 277 lines</summary>
 
 ```rust
 2:fn outputs_section_parses_two_outputs_with_relative_position
@@ -2771,7 +2771,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config_tests/parsing.rs</code> &mdash; 323 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config_tests/parsing.rs</code> &mdash; 323 lines</summary>
 
 ```rust
 2:fn panel_pinned_apps_parse_from_toml
@@ -2797,7 +2797,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/config_tests/wallpaper_and_idle.rs</code> &mdash; 257 lines</summary>
+<details><summary><code>crates/niwoe-config/src/config_tests/wallpaper_and_idle.rs</code> &mdash; 257 lines</summary>
 
 ```rust
 2:fn outputs_section_missing_keeps_empty_vec
@@ -2819,7 +2819,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/keybind/defaults.rs</code> &mdash; 37 lines</summary>
+<details><summary><code>crates/niwoe-config/src/keybind/defaults.rs</code> &mdash; 37 lines</summary>
 
 ```rust
 3:pub
@@ -2827,7 +2827,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/keybind/mod.rs</code> &mdash; 185 lines</summary>
+<details><summary><code>crates/niwoe-config/src/keybind/mod.rs</code> &mdash; 185 lines</summary>
 
 ```rust
 11:    pub struct Modifiers: u8
@@ -2854,7 +2854,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/keybind/parse.rs</code> &mdash; 182 lines</summary>
+<details><summary><code>crates/niwoe-config/src/keybind/parse.rs</code> &mdash; 182 lines</summary>
 
 ```rust
 3:pub
@@ -2865,14 +2865,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/lib.rs</code> &mdash; 15 lines</summary>
+<details><summary><code>crates/niwoe-config/src/lib.rs</code> &mdash; 15 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/output.rs</code> &mdash; 206 lines</summary>
+<details><summary><code>crates/niwoe-config/src/output.rs</code> &mdash; 206 lines</summary>
 
 ```rust
 4:pub enum OutputPositionConfig
@@ -2898,7 +2898,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/theme/manager.rs</code> &mdash; 366 lines</summary>
+<details><summary><code>crates/niwoe-config/src/theme/manager.rs</code> &mdash; 366 lines</summary>
 
 ```rust
 12:pub struct Theme
@@ -2947,21 +2947,21 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/theme/mod.rs</code> &mdash; 8 lines</summary>
+<details><summary><code>crates/niwoe-config/src/theme/mod.rs</code> &mdash; 8 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/theme/types/color.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-config/src/theme/types/color.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/theme/types/config.rs</code> &mdash; 478 lines</summary>
+<details><summary><code>crates/niwoe-config/src/theme/types/config.rs</code> &mdash; 478 lines</summary>
 
 ```rust
 9:pub struct ThemeColors
@@ -3009,7 +3009,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/theme/types/error.rs</code> &mdash; 32 lines</summary>
+<details><summary><code>crates/niwoe-config/src/theme/types/error.rs</code> &mdash; 32 lines</summary>
 
 ```rust
 4:pub enum ThemeError
@@ -3024,16 +3024,16 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-config/src/theme/types/mod.rs</code> &mdash; 10 lines</summary>
+<details><summary><code>crates/niwoe-config/src/theme/types/mod.rs</code> &mdash; 10 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-### `meridian-freetype`
+### `niwoe-freetype`
 
-<details><summary><code>crates/meridian-freetype/src/lib.rs</code> &mdash; 242 lines</summary>
+<details><summary><code>crates/niwoe-freetype/src/lib.rs</code> &mdash; 242 lines</summary>
 
 ```rust
 9:type FtError = c_int;
@@ -3067,9 +3067,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-ipc`
+### `niwoe-ipc`
 
-<details><summary><code>crates/meridian-ipc/src/lib.rs</code> &mdash; 362 lines</summary>
+<details><summary><code>crates/niwoe-ipc/src/lib.rs</code> &mdash; 362 lines</summary>
 
 ```rust
 9:pub struct WindowSnapshotEntry
@@ -3104,7 +3104,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ipc/src/lib_tests.rs</code> &mdash; 431 lines</summary>
+<details><summary><code>crates/niwoe-ipc/src/lib_tests.rs</code> &mdash; 431 lines</summary>
 
 ```rust
 11:fn window_snapshot_entry_contains_workspace_id_and_title
@@ -3134,9 +3134,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-lock`
+### `niwoe-lock`
 
-<details><summary><code>crates/meridian-lock/src/auth.rs</code> &mdash; 217 lines</summary>
+<details><summary><code>crates/niwoe-lock/src/auth.rs</code> &mdash; 217 lines</summary>
 
 ```rust
 35:struct ConvData
@@ -3152,7 +3152,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-lock/src/main.rs</code> &mdash; 454 lines</summary>
+<details><summary><code>crates/niwoe-lock/src/main.rs</code> &mdash; 454 lines</summary>
 
 ```rust
 26:struct LockStyle
@@ -3183,7 +3183,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-lock/src/main/render.rs</code> &mdash; 210 lines</summary>
+<details><summary><code>crates/niwoe-lock/src/main/render.rs</code> &mdash; 210 lines</summary>
 
 ```rust
 1:fn render_frame
@@ -3194,7 +3194,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-lock/src/main/render_helpers.rs</code> &mdash; 233 lines</summary>
+<details><summary><code>crates/niwoe-lock/src/main/render_helpers.rs</code> &mdash; 233 lines</summary>
 
 ```rust
 1:fn create_anonymous_shm
@@ -3212,7 +3212,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-lock/src/main/runtime.rs</code> &mdash; 125 lines</summary>
+<details><summary><code>crates/niwoe-lock/src/main/runtime.rs</code> &mdash; 125 lines</summary>
 
 ```rust
 1:fn main
@@ -3220,7 +3220,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-lock/src/main_tests.rs</code> &mdash; 137 lines</summary>
+<details><summary><code>crates/niwoe-lock/src/main_tests.rs</code> &mdash; 137 lines</summary>
 
 ```rust
 5:fn us_keymap_state
@@ -3238,9 +3238,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-login`
+### `niwoe-login`
 
-<details><summary><code>crates/meridian-login/src/auth.rs</code> &mdash; 497 lines</summary>
+<details><summary><code>crates/niwoe-login/src/auth.rs</code> &mdash; 497 lines</summary>
 
 ```rust
 69:pub enum AuthResult
@@ -3268,7 +3268,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/auth/openbsd_backend.rs</code> &mdash; 153 lines</summary>
+<details><summary><code>crates/niwoe-login/src/auth/openbsd_backend.rs</code> &mdash; 153 lines</summary>
 
 ```rust
 12:    fn auth_userokay
@@ -3287,7 +3287,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/input.rs</code> &mdash; 534 lines</summary>
+<details><summary><code>crates/niwoe-login/src/input.rs</code> &mdash; 534 lines</summary>
 
 ```rust
 21:pub enum KeyAction
@@ -3327,7 +3327,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main.rs</code> &mdash; 304 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main.rs</code> &mdash; 304 lines</summary>
 
 ```rust
 83:type Rect =
@@ -3356,7 +3356,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/animation.rs</code> &mdash; 266 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/animation.rs</code> &mdash; 266 lines</summary>
 
 ```rust
 1:struct AnimFrame
@@ -3368,7 +3368,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/controls.rs</code> &mdash; 378 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/controls.rs</code> &mdash; 378 lines</summary>
 
 ```rust
 1:fn caret_x
@@ -3386,7 +3386,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/geometry_and_buttons.rs</code> &mdash; 298 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/geometry_and_buttons.rs</code> &mdash; 298 lines</summary>
 
 ```rust
 1:fn click_target_at
@@ -3417,7 +3417,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/handover_ipc.rs</code> &mdash; 126 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/handover_ipc.rs</code> &mdash; 126 lines</summary>
 
 ```rust
 1:fn bootsplash_handover
@@ -3431,7 +3431,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/runtime.rs</code> &mdash; 329 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/runtime.rs</code> &mdash; 329 lines</summary>
 
 ```rust
 1:fn main
@@ -3439,7 +3439,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/state.rs</code> &mdash; 357 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/state.rs</code> &mdash; 357 lines</summary>
 
 ```rust
 1:impl LoginUiState
@@ -3472,7 +3472,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main/ui.rs</code> &mdash; 259 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main/ui.rs</code> &mdash; 259 lines</summary>
 
 ```rust
 1:fn draw_card
@@ -3481,7 +3481,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/main_tests.rs</code> &mdash; 506 lines</summary>
+<details><summary><code>crates/niwoe-login/src/main_tests.rs</code> &mdash; 506 lines</summary>
 
 ```rust
 3:fn smartcard_ready_state
@@ -3528,7 +3528,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/session.rs</code> &mdash; 304 lines</summary>
+<details><summary><code>crates/niwoe-login/src/session.rs</code> &mdash; 304 lines</summary>
 
 ```rust
 21:pub enum SessionError
@@ -3548,7 +3548,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-login/src/visual.rs</code> &mdash; 224 lines</summary>
+<details><summary><code>crates/niwoe-login/src/visual.rs</code> &mdash; 224 lines</summary>
 
 ```rust
 13:pub
@@ -3566,9 +3566,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-polkit`
+### `niwoe-polkit`
 
-<details><summary><code>crates/meridian-polkit/src/auth.rs</code> &mdash; 183 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/auth.rs</code> &mdash; 183 lines</summary>
 
 ```rust
 43:fn find_helper
@@ -3577,7 +3577,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-polkit/src/dbus.rs</code> &mdash; 313 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/dbus.rs</code> &mdash; 313 lines</summary>
 
 ```rust
 29:pub struct Identity
@@ -3604,7 +3604,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-polkit/src/main.rs</code> &mdash; 154 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/main.rs</code> &mdash; 154 lines</summary>
 
 ```rust
 24:fn install_panic_logger
@@ -3614,7 +3614,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-polkit/src/ui.rs</code> &mdash; 392 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/ui.rs</code> &mdash; 392 lines</summary>
 
 ```rust
 19:pub enum Status
@@ -3640,7 +3640,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-polkit/src/wayland.rs</code> &mdash; 125 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/wayland.rs</code> &mdash; 125 lines</summary>
 
 ```rust
 33:fn create_anonymous_shm
@@ -3653,7 +3653,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-polkit/src/wayland/dispatch.rs</code> &mdash; 202 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/wayland/dispatch.rs</code> &mdash; 202 lines</summary>
 
 ```rust
 1:impl Dispatch<wl_registry::WlRegistry,
@@ -3671,7 +3671,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-polkit/src/wayland/state.rs</code> &mdash; 328 lines</summary>
+<details><summary><code>crates/niwoe-polkit/src/wayland/state.rs</code> &mdash; 328 lines</summary>
 
 ```rust
 1:impl AppState
@@ -3689,9 +3689,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-portal`
+### `niwoe-portal`
 
-<details><summary><code>crates/meridian-portal/src/access.rs</code> &mdash; 44 lines</summary>
+<details><summary><code>crates/niwoe-portal/src/access.rs</code> &mdash; 44 lines</summary>
 
 ```rust
 6:type Asv = HashMap<String, OwnedValue>;
@@ -3703,7 +3703,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-portal/src/file_chooser.rs</code> &mdash; 221 lines</summary>
+<details><summary><code>crates/niwoe-portal/src/file_chooser.rs</code> &mdash; 221 lines</summary>
 
 ```rust
 6:type Asv = HashMap<String, OwnedValue>;
@@ -3727,7 +3727,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-portal/src/lib.rs</code> &mdash; 65 lines</summary>
+<details><summary><code>crates/niwoe-portal/src/lib.rs</code> &mdash; 65 lines</summary>
 
 ```rust
 12:pub async fn run
@@ -3735,7 +3735,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-portal/src/main.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-portal/src/main.rs</code> &mdash; 9 lines</summary>
 
 ```rust
 2:async fn main
@@ -3743,7 +3743,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-portal/src/screenshot.rs</code> &mdash; 260 lines</summary>
+<details><summary><code>crates/niwoe-portal/src/screenshot.rs</code> &mdash; 260 lines</summary>
 
 ```rust
 18:type Asv = HashMap<String, OwnedValue>;
@@ -3768,7 +3768,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-portal/src/settings.rs</code> &mdash; 104 lines</summary>
+<details><summary><code>crates/niwoe-portal/src/settings.rs</code> &mdash; 104 lines</summary>
 
 ```rust
 17:type Asv = HashMap<String, OwnedValue>;
@@ -3787,9 +3787,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-shell`
+### `niwoe-shell`
 
-<details><summary><code>crates/meridian-shell/src/app_view.rs</code> &mdash; 365 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/app_view.rs</code> &mdash; 365 lines</summary>
 
 ```rust
 83:fn cp_settings_btn_x
@@ -3808,7 +3808,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/app_view/header_and_grid.rs</code> &mdash; 318 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/app_view/header_and_grid.rs</code> &mdash; 318 lines</summary>
 
 ```rust
 1:fn draw_header
@@ -3819,7 +3819,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/app_view/rows_and_helpers.rs</code> &mdash; 381 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/app_view/rows_and_helpers.rs</code> &mdash; 381 lines</summary>
 
 ```rust
 1:fn draw_app_row_content
@@ -3840,7 +3840,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/app_view_tests.rs</code> &mdash; 74 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/app_view_tests.rs</code> &mdash; 74 lines</summary>
 
 ```rust
 4:fn blit_rgba_to_argb_swaps_red_and_blue
@@ -3854,7 +3854,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/audio/mixer.rs</code> &mdash; 213 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/audio/mixer.rs</code> &mdash; 213 lines</summary>
 
 ```rust
 11:pub
@@ -3878,7 +3878,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/audio/mod.rs</code> &mdash; 189 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/audio/mod.rs</code> &mdash; 189 lines</summary>
 
 ```rust
 14:pub
@@ -3909,7 +3909,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/audio/wpctl.rs</code> &mdash; 219 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/audio/wpctl.rs</code> &mdash; 219 lines</summary>
 
 ```rust
 7:pub
@@ -3934,7 +3934,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/audio_popup.rs</code> &mdash; 234 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/audio_popup.rs</code> &mdash; 234 lines</summary>
 
 ```rust
 15:pub enum AudioPopupHit
@@ -3953,7 +3953,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/autostart.rs</code> &mdash; 160 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/autostart.rs</code> &mdash; 160 lines</summary>
 
 ```rust
 3:pub fn launch_autostart_apps
@@ -3966,7 +3966,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/battery.rs</code> &mdash; 172 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/battery.rs</code> &mdash; 172 lines</summary>
 
 ```rust
 9:pub enum ChargeState
@@ -3985,7 +3985,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/bluetooth.rs</code> &mdash; 254 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/bluetooth.rs</code> &mdash; 254 lines</summary>
 
 ```rust
 15:pub struct BluetoothDevice
@@ -4015,7 +4015,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/buffer.rs</code> &mdash; 78 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/buffer.rs</code> &mdash; 78 lines</summary>
 
 ```rust
 5:pub fn shm_buffer_format
@@ -4029,7 +4029,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/context_menu.rs</code> &mdash; 341 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/context_menu.rs</code> &mdash; 341 lines</summary>
 
 ```rust
 22:fn menu_radius
@@ -4068,7 +4068,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/context_menu/icons.rs</code> &mdash; 215 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/context_menu/icons.rs</code> &mdash; 215 lines</summary>
 
 ```rust
 1:fn draw_menu_icon
@@ -4078,7 +4078,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/context_menu/overlays.rs</code> &mdash; 319 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/context_menu/overlays.rs</code> &mdash; 319 lines</summary>
 
 ```rust
 5:fn draw_overlay_with_background
@@ -4089,7 +4089,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/context_menu_tests.rs</code> &mdash; 236 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/context_menu_tests.rs</code> &mdash; 236 lines</summary>
 
 ```rust
 3:fn state
@@ -4116,7 +4116,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/cursor.rs</code> &mdash; 126 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/cursor.rs</code> &mdash; 126 lines</summary>
 
 ```rust
 43:pub fn current_cursor_theme
@@ -4130,7 +4130,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/default_apps.rs</code> &mdash; 576 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/default_apps.rs</code> &mdash; 576 lines</summary>
 
 ```rust
 29:pub enum DefaultAppCategory
@@ -4160,7 +4160,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/draw/bitmap.rs</code> &mdash; 76 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/draw/bitmap.rs</code> &mdash; 76 lines</summary>
 
 ```rust
 5:pub
@@ -4169,14 +4169,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/draw/mod.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/draw/mod.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/draw/painter.rs</code> &mdash; 343 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/draw/painter.rs</code> &mdash; 343 lines</summary>
 
 ```rust
 12:pub struct Painter<'a>
@@ -4201,7 +4201,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/draw/painter_tests.rs</code> &mdash; 324 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/draw/painter_tests.rs</code> &mdash; 324 lines</summary>
 
 ```rust
 8:fn pixel_at
@@ -4224,7 +4224,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/draw/text.rs</code> &mdash; 120 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/draw/text.rs</code> &mdash; 120 lines</summary>
 
 ```rust
 16:pub struct TextRenderer
@@ -4239,7 +4239,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/font_resolve.rs</code> &mdash; 148 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/font_resolve.rs</code> &mdash; 148 lines</summary>
 
 ```rust
 19:type FcChar8 = c_uchar;
@@ -4262,7 +4262,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/cache.rs</code> &mdash; 321 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/cache.rs</code> &mdash; 321 lines</summary>
 
 ```rust
 5:enum CacheEntry
@@ -4298,7 +4298,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/loader.rs</code> &mdash; 483 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/loader.rs</code> &mdash; 483 lines</summary>
 
 ```rust
 21:pub
@@ -4333,7 +4333,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/loader/decode.rs</code> &mdash; 127 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/loader/decode.rs</code> &mdash; 127 lines</summary>
 
 ```rust
 1:fn decode_to_rgba8
@@ -4343,7 +4343,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/loader/filesystem.rs</code> &mdash; 119 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/loader/filesystem.rs</code> &mdash; 119 lines</summary>
 
 ```rust
 1:impl IconLoader
@@ -4361,7 +4361,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/loader_tests.rs</code> &mdash; 521 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/loader_tests.rs</code> &mdash; 521 lines</summary>
 
 ```rust
 11:struct TempDir
@@ -4397,7 +4397,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/mod.rs</code> &mdash; 61 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/mod.rs</code> &mdash; 61 lines</summary>
 
 ```rust
 10:pub struct IconImage
@@ -4409,7 +4409,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/rcc.rs</code> &mdash; 281 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/rcc.rs</code> &mdash; 281 lines</summary>
 
 ```rust
 14:pub
@@ -4435,7 +4435,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/rcc_tests.rs</code> &mdash; 342 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/rcc_tests.rs</code> &mdash; 342 lines</summary>
 
 ```rust
 9:struct TestNode
@@ -4457,7 +4457,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/svg.rs</code> &mdash; 264 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/svg.rs</code> &mdash; 264 lines</summary>
 
 ```rust
 8:pub fn decode_svg
@@ -4483,7 +4483,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/icons/theme_index.rs</code> &mdash; 228 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/icons/theme_index.rs</code> &mdash; 228 lines</summary>
 
 ```rust
 4:pub
@@ -4500,7 +4500,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/launcher.rs</code> &mdash; 553 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/launcher.rs</code> &mdash; 553 lines</summary>
 
 ```rust
 16:pub struct DesktopApp
@@ -4537,7 +4537,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/launcher_tests.rs</code> &mdash; 214 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/launcher_tests.rs</code> &mdash; 214 lines</summary>
 
 ```rust
 12:struct TempDir
@@ -4549,7 +4549,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 43:fn make_executable
 52:fn parses_valid_desktop_entry
 73:fn rejects_hidden_nodisplay_and_non_application_entries
-91:fn desktop_visibility_respects_meridian_environment_keys
+91:fn desktop_visibility_respects_niwoe_environment_keys
 111:fn exec_field_codes_are_removed
 119:fn exec_quotes_are_handled
 127:fn parses_categories_and_normalizes_icon_names
@@ -4560,7 +4560,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/main.rs</code> &mdash; 552 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/main.rs</code> &mdash; 552 lines</summary>
 
 ```rust
 125:pub
@@ -4581,7 +4581,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/network/freebsd.rs</code> &mdash; 584 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/network/freebsd.rs</code> &mdash; 584 lines</summary>
 
 ```rust
 17:pub struct ConnectionProfile
@@ -4626,7 +4626,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/network/mod.rs</code> &mdash; 184 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/network/mod.rs</code> &mdash; 184 lines</summary>
 
 ```rust
 22:pub enum NetworkState
@@ -4640,7 +4640,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/network/nmcli.rs</code> &mdash; 470 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/network/nmcli.rs</code> &mdash; 470 lines</summary>
 
 ```rust
 30:pub struct ConnectionProfile
@@ -4671,7 +4671,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/network/nmcli_tests.rs</code> &mdash; 195 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/network/nmcli_tests.rs</code> &mdash; 195 lines</summary>
 
 ```rust
 8:fn parse_state_returns_offline_for_unparsable_general
@@ -4692,7 +4692,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/network_popup.rs</code> &mdash; 411 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/network_popup.rs</code> &mdash; 411 lines</summary>
 
 ```rust
 17:pub enum NetworkTab
@@ -4715,7 +4715,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/notification_popup.rs</code> &mdash; 106 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/notification_popup.rs</code> &mdash; 106 lines</summary>
 
 ```rust
 17:pub fn draw_notification
@@ -4723,7 +4723,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/notifications/dbus.rs</code> &mdash; 170 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/notifications/dbus.rs</code> &mdash; 170 lines</summary>
 
 ```rust
 30:pub enum DbusEvent
@@ -4739,14 +4739,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/notifications/mod.rs</code> &mdash; 15 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/notifications/mod.rs</code> &mdash; 15 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/notifications/state.rs</code> &mdash; 139 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/notifications/state.rs</code> &mdash; 139 lines</summary>
 
 ```rust
 17:pub enum Urgency
@@ -4766,7 +4766,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel.rs</code> &mdash; 29 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel.rs</code> &mdash; 29 lines</summary>
 
 ```rust
 3:pub struct PanelState
@@ -4778,7 +4778,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view.rs</code> &mdash; 302 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view.rs</code> &mdash; 302 lines</summary>
 
 ```rust
 82:fn build_launcher_icon
@@ -4789,7 +4789,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view/chips.rs</code> &mdash; 165 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view/chips.rs</code> &mdash; 165 lines</summary>
 
 ```rust
 1:struct PanelDivider;
@@ -4807,7 +4807,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view/layout.rs</code> &mdash; 309 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view/layout.rs</code> &mdash; 309 lines</summary>
 
 ```rust
 1:fn draw_circle
@@ -4818,7 +4818,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view/pinned.rs</code> &mdash; 158 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view/pinned.rs</code> &mdash; 158 lines</summary>
 
 ```rust
 1:struct PanelPinnedChip
@@ -4832,7 +4832,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view/render.rs</code> &mdash; 228 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view/render.rs</code> &mdash; 228 lines</summary>
 
 ```rust
 1:fn collect_click_zones
@@ -4843,7 +4843,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view/windows.rs</code> &mdash; 86 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view/windows.rs</code> &mdash; 86 lines</summary>
 
 ```rust
 5:struct PanelWindowChip
@@ -4856,7 +4856,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/panel_view_tests.rs</code> &mdash; 172 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/panel_view_tests.rs</code> &mdash; 172 lines</summary>
 
 ```rust
 7:fn panel_chip_style_returns_correct_size
@@ -4872,7 +4872,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/popup_card.rs</code> &mdash; 521 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/popup_card.rs</code> &mdash; 521 lines</summary>
 
 ```rust
 21:fn card_radius
@@ -4893,7 +4893,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/power_profile.rs</code> &mdash; 86 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/power_profile.rs</code> &mdash; 86 lines</summary>
 
 ```rust
 8:pub enum PowerProfile
@@ -4909,7 +4909,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/printers.rs</code> &mdash; 257 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/printers.rs</code> &mdash; 257 lines</summary>
 
 ```rust
 5:pub
@@ -4930,7 +4930,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/region_picker.rs</code> &mdash; 342 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/region_picker.rs</code> &mdash; 342 lines</summary>
 
 ```rust
 44:pub
@@ -4951,7 +4951,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/screenshot_consent.rs</code> &mdash; 259 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/screenshot_consent.rs</code> &mdash; 259 lines</summary>
 
 ```rust
 29:pub
@@ -4967,7 +4967,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view.rs</code> &mdash; 459 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view.rs</code> &mdash; 459 lines</summary>
 
 ```rust
 40:pub enum SettingsCategory
@@ -4979,7 +4979,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/appearance_widgets.rs</code> &mdash; 245 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/appearance_widgets.rs</code> &mdash; 245 lines</summary>
 
 ```rust
 1:struct WallpaperRow
@@ -5005,7 +5005,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/audio_system_widgets.rs</code> &mdash; 488 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/audio_system_widgets.rs</code> &mdash; 488 lines</summary>
 
 ```rust
 1:struct SoundSummaryCard
@@ -5041,7 +5041,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/basic_widgets.rs</code> &mdash; 414 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/basic_widgets.rs</code> &mdash; 414 lines</summary>
 
 ```rust
 1:fn with_alpha
@@ -5092,7 +5092,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/bluetooth.rs</code> &mdash; 101 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/bluetooth.rs</code> &mdash; 101 lines</summary>
 
 ```rust
 1:fn build_bluetooth_content
@@ -5100,7 +5100,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/cursor.rs</code> &mdash; 60 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/cursor.rs</code> &mdash; 60 lines</summary>
 
 ```rust
 1:fn build_cursor_content
@@ -5108,7 +5108,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/default_apps.rs</code> &mdash; 111 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/default_apps.rs</code> &mdash; 111 lines</summary>
 
 ```rust
 1:fn build_default_apps_content
@@ -5116,7 +5116,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/display.rs</code> &mdash; 118 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/display.rs</code> &mdash; 118 lines</summary>
 
 ```rust
 1:fn build_display_content
@@ -5124,7 +5124,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/network.rs</code> &mdash; 85 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/network.rs</code> &mdash; 85 lines</summary>
 
 ```rust
 1:fn build_network_content
@@ -5132,7 +5132,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/pinned_apps.rs</code> &mdash; 140 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/pinned_apps.rs</code> &mdash; 140 lines</summary>
 
 ```rust
 1:fn build_pinned_apps_content
@@ -5140,7 +5140,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/power.rs</code> &mdash; 47 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/power.rs</code> &mdash; 47 lines</summary>
 
 ```rust
 1:fn build_power_content
@@ -5148,7 +5148,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/printers.rs</code> &mdash; 37 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/printers.rs</code> &mdash; 37 lines</summary>
 
 ```rust
 1:fn build_printers_content
@@ -5156,7 +5156,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/sound.rs</code> &mdash; 93 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/sound.rs</code> &mdash; 93 lines</summary>
 
 ```rust
 1:fn build_sound_content
@@ -5164,7 +5164,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/system_overview.rs</code> &mdash; 23 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/system_overview.rs</code> &mdash; 23 lines</summary>
 
 ```rust
 1:fn build_system_overview_content
@@ -5172,7 +5172,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/theme.rs</code> &mdash; 35 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/theme.rs</code> &mdash; 35 lines</summary>
 
 ```rust
 1:fn build_theme_content
@@ -5180,7 +5180,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/updates.rs</code> &mdash; 21 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/updates.rs</code> &mdash; 21 lines</summary>
 
 ```rust
 1:fn build_updates_content
@@ -5188,7 +5188,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/users.rs</code> &mdash; 22 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/users.rs</code> &mdash; 22 lines</summary>
 
 ```rust
 1:fn build_users_content
@@ -5196,7 +5196,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content/wallpaper.rs</code> &mdash; 81 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content/wallpaper.rs</code> &mdash; 81 lines</summary>
 
 ```rust
 1:fn build_wallpaper_content
@@ -5204,7 +5204,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/content_builders.rs</code> &mdash; 257 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/content_builders.rs</code> &mdash; 257 lines</summary>
 
 ```rust
 16:struct SettingsContentContext<'a>
@@ -5213,7 +5213,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/display_controls.rs</code> &mdash; 373 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/display_controls.rs</code> &mdash; 373 lines</summary>
 
 ```rust
 1:struct DisplayModeComboButton
@@ -5249,7 +5249,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/display_widgets.rs</code> &mdash; 213 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/display_widgets.rs</code> &mdash; 213 lines</summary>
 
 ```rust
 1:fn fit_text
@@ -5264,7 +5264,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/draw.rs</code> &mdash; 113 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/draw.rs</code> &mdash; 113 lines</summary>
 
 ```rust
 2:pub
@@ -5274,14 +5274,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/ids.rs</code> &mdash; 317 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/ids.rs</code> &mdash; 317 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/settings_view/network_device_widgets.rs</code> &mdash; 369 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/settings_view/network_device_widgets.rs</code> &mdash; 369 lines</summary>
 
 ```rust
 1:struct NetworkProfileRow
@@ -5307,7 +5307,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/soft_shadow.rs</code> &mdash; 167 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/soft_shadow.rs</code> &mdash; 167 lines</summary>
 
 ```rust
 20:pub
@@ -5318,7 +5318,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/status_notifier.rs</code> &mdash; 316 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/status_notifier.rs</code> &mdash; 316 lines</summary>
 
 ```rust
 12:type DbusMenuProperties = std::collections::HashMap<String, OwnedValue>;
@@ -5365,7 +5365,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/status_notifier/activation_and_menu.rs</code> &mdash; 318 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/status_notifier/activation_and_menu.rs</code> &mdash; 318 lines</summary>
 
 ```rust
 1:fn forward_item_activation
@@ -5388,7 +5388,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/status_notifier_popup.rs</code> &mdash; 189 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/status_notifier_popup.rs</code> &mdash; 189 lines</summary>
 
 ```rust
 16:pub fn menu_height
@@ -5403,7 +5403,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/status_notifier_tests.rs</code> &mdash; 154 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/status_notifier_tests.rs</code> &mdash; 154 lines</summary>
 
 ```rust
 10:fn text_value
@@ -5419,7 +5419,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/sysinfo.rs</code> &mdash; 221 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/sysinfo.rs</code> &mdash; 221 lines</summary>
 
 ```rust
 12:pub struct SystemInfo
@@ -5443,7 +5443,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/theme_export.rs</code> &mdash; 396 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/theme_export.rs</code> &mdash; 396 lines</summary>
 
 ```rust
 32:pub
@@ -5467,17 +5467,17 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 309:    fn readable_on_picks_contrasting_role
 316:    fn kdeglobals_dark_has_scheme_groups_and_breeze
 325:    fn kdeglobals_light_switches_scheme_name
-330:    fn gtk_ini_selects_meridian_theme_and_dark_flag
+330:    fn gtk_ini_selects_niwoe_theme_and_dark_flag
 341:    fn gtk_ini_light_clears_dark_flag
 348:    fn gtk_css_substitutes_all_tokens_with_hex
 363:    fn config_gtk_css_carries_libadwaita_named_colours
-374:    fn index_theme_names_meridian
+374:    fn index_theme_names_niwoe
 381:    fn app_icon_theme_maps_papirus_to_dark_light_variant
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/thumbnail_popup.rs</code> &mdash; 198 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/thumbnail_popup.rs</code> &mdash; 198 lines</summary>
 
 ```rust
 10:pub
@@ -5491,14 +5491,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/ui/mod.rs</code> &mdash; 2 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/ui/mod.rs</code> &mdash; 2 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/ui/primitives.rs</code> &mdash; 25 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/ui/primitives.rs</code> &mdash; 25 lines</summary>
 
 ```rust
 5:pub enum ActiveIndicatorEdge
@@ -5507,7 +5507,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/ui/tokens.rs</code> &mdash; 86 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/ui/tokens.rs</code> &mdash; 86 lines</summary>
 
 ```rust
 7:pub
@@ -5526,7 +5526,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/updates.rs</code> &mdash; 132 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/updates.rs</code> &mdash; 132 lines</summary>
 
 ```rust
 17:type UpdateRows = Vec<
@@ -5544,7 +5544,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/users.rs</code> &mdash; 146 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/users.rs</code> &mdash; 146 lines</summary>
 
 ```rust
 14:pub struct LocalUser
@@ -5561,7 +5561,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/calendar.rs</code> &mdash; 186 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/calendar.rs</code> &mdash; 186 lines</summary>
 
 ```rust
 2:pub
@@ -5589,10 +5589,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/compositor.rs</code> &mdash; 85 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/compositor.rs</code> &mdash; 85 lines</summary>
 
 ```rust
-10:impl CompositorHandler for MeridianShell
+10:impl CompositorHandler for NiwoeShell
 11:    fn scale_factor_changed
 20:    fn transform_changed
 29:    fn frame
@@ -5602,10 +5602,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/keyboard.rs</code> &mdash; 458 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/keyboard.rs</code> &mdash; 458 lines</summary>
 
 ```rust
-15:impl KeyboardHandler for MeridianShell
+15:impl KeyboardHandler for NiwoeShell
 16:    fn enter
 49:    fn leave
 66:    fn press_key
@@ -5615,32 +5615,32 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/layer.rs</code> &mdash; 564 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/layer.rs</code> &mdash; 564 lines</summary>
 
 ```rust
-16:impl LayerShellHandler for MeridianShell
+16:impl LayerShellHandler for NiwoeShell
 17:    fn closed
 132:    fn configure
-528:impl MeridianShell
+528:impl NiwoeShell
 529:    fn panel_output_width_fallback
 547:    fn output_height_fallback
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/mod.rs</code> &mdash; 38 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/mod.rs</code> &mdash; 38 lines</summary>
 
 ```rust
-32:impl ProvidesRegistryState for MeridianShell
+32:impl ProvidesRegistryState for NiwoeShell
 33:    fn registry
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/output.rs</code> &mdash; 34 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/output.rs</code> &mdash; 34 lines</summary>
 
 ```rust
-6:impl OutputHandler for MeridianShell
+6:impl OutputHandler for NiwoeShell
 7:    fn output_state
 11:    fn new_output
 19:    fn update_output
@@ -5649,42 +5649,42 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/pointer.rs</code> &mdash; 35 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/pointer.rs</code> &mdash; 35 lines</summary>
 
 ```rust
-21:impl PointerHandler for MeridianShell
+21:impl PointerHandler for NiwoeShell
 22:    fn pointer_frame
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/pointer/launcher.rs</code> &mdash; 502 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/pointer/launcher.rs</code> &mdash; 502 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/pointer/overlays_and_desktop.rs</code> &mdash; 192 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/pointer/overlays_and_desktop.rs</code> &mdash; 192 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/pointer/panel_and_popups.rs</code> &mdash; 357 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/pointer/panel_and_popups.rs</code> &mdash; 357 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/pointer_state.rs</code> &mdash; 342 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/pointer_state.rs</code> &mdash; 342 lines</summary>
 
 ```rust
 7:pub
 35:pub
-55:impl MeridianShell
+55:impl NiwoeShell
 60:    pub
 95:    pub
 122:    pub
@@ -5711,7 +5711,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/pointer_translate.rs</code> &mdash; 212 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/pointer_translate.rs</code> &mdash; 212 lines</summary>
 
 ```rust
 8:fn translate_pointer_button
@@ -5734,10 +5734,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/seat.rs</code> &mdash; 48 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/seat.rs</code> &mdash; 48 lines</summary>
 
 ```rust
-6:impl SeatHandler for MeridianShell
+6:impl SeatHandler for NiwoeShell
 7:    fn seat_state
 11:    fn new_seat
 13:    fn new_capability
@@ -5747,16 +5747,16 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/shm.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/shm.rs</code> &mdash; 9 lines</summary>
 
 ```rust
-5:impl ShmHandler for MeridianShell
+5:impl ShmHandler for NiwoeShell
 6:    fn shm_state
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/widget_dispatch.rs</code> &mdash; 59 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/widget_dispatch.rs</code> &mdash; 59 lines</summary>
 
 ```rust
 20:fn power_action_command
@@ -5767,10 +5767,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/widget_dispatch/dispatch.rs</code> &mdash; 468 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/widget_dispatch/dispatch.rs</code> &mdash; 468 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 71:    fn dispatch_launch_action
 91:    fn dispatch_popup_action
@@ -5779,10 +5779,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/handlers/widget_dispatch/settings_and_context.rs</code> &mdash; 285 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/handlers/widget_dispatch/settings_and_context.rs</code> &mdash; 285 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    fn apply_output_mode_selection
 51:    fn dispatch_power_action
 82:    fn dispatch_pinned_action
@@ -5795,7 +5795,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/init.rs</code> &mdash; 593 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/init.rs</code> &mdash; 593 lines</summary>
 
 ```rust
 34:pub
@@ -5803,7 +5803,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/init/assets.rs</code> &mdash; 79 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/init/assets.rs</code> &mdash; 79 lines</summary>
 
 ```rust
 5:pub
@@ -5811,7 +5811,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/init/commit.rs</code> &mdash; 30 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/init/commit.rs</code> &mdash; 30 lines</summary>
 
 ```rust
 6:pub
@@ -5819,7 +5819,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/init/flags.rs</code> &mdash; 20 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/init/flags.rs</code> &mdash; 20 lines</summary>
 
 ```rust
 1:pub
@@ -5828,7 +5828,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/ipc.rs</code> &mdash; 289 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/ipc.rs</code> &mdash; 289 lines</summary>
 
 ```rust
 13:pub struct IpcClient
@@ -5852,14 +5852,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/mod.rs</code> &mdash; 19 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/mod.rs</code> &mdash; 19 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render.rs</code> &mdash; 84 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render.rs</code> &mdash; 84 lines</summary>
 
 ```rust
 31:fn german_month_name
@@ -5868,10 +5868,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render/calendar_workspace.rs</code> &mdash; 306 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render/calendar_workspace.rs</code> &mdash; 306 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 202:    pub
 212:    pub
@@ -5880,10 +5880,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render/core.rs</code> &mdash; 310 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render/core.rs</code> &mdash; 310 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    fn signature_hash<T: Hash>
 8:    fn theme_render_signature
 36:    pub
@@ -5897,10 +5897,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render/desktop_overlays.rs</code> &mdash; 339 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render/desktop_overlays.rs</code> &mdash; 339 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 4:    pub
 21:    pub
 134:    pub
@@ -5914,20 +5914,20 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render/launcher.rs</code> &mdash; 250 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render/launcher.rs</code> &mdash; 250 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 239:    pub
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render/network_audio.rs</code> &mdash; 263 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render/network_audio.rs</code> &mdash; 263 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 79:    pub
 94:    pub
@@ -5937,10 +5937,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/render/notifications.rs</code> &mdash; 320 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/render/notifications.rs</code> &mdash; 320 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 89:    pub
 103:    pub
@@ -5952,7 +5952,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/screencopy.rs</code> &mdash; 444 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/screencopy.rs</code> &mdash; 444 lines</summary>
 
 ```rust
 24:fn create_screenshot_shm
@@ -5986,7 +5986,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/shell.rs</code> &mdash; 481 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/shell.rs</code> &mdash; 481 lines</summary>
 
 ```rust
 30:pub
@@ -6020,7 +6020,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state.rs</code> &mdash; 419 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state.rs</code> &mdash; 419 lines</summary>
 
 ```rust
 17:fn workspace_idx
@@ -6051,10 +6051,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state/audio_and_network_popups.rs</code> &mdash; 255 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state/audio_and_network_popups.rs</code> &mdash; 255 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 19:    pub
 77:    pub
@@ -6067,10 +6067,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state/ipc_events.rs</code> &mdash; 374 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state/ipc_events.rs</code> &mdash; 374 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    fn apply_ipc_event
 199:    fn handle_config_reloaded
 259:    fn update_focused_title
@@ -6082,10 +6082,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state/panel_actions.rs</code> &mdash; 357 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state/panel_actions.rs</code> &mdash; 357 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 148:    pub
 164:    pub
@@ -6101,10 +6101,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state/popups.rs</code> &mdash; 345 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state/popups.rs</code> &mdash; 345 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    fn toggle_launcher
 70:    pub
 110:    fn open_sound_settings_from_tray
@@ -6118,10 +6118,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state/shell_actions.rs</code> &mdash; 289 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state/shell_actions.rs</code> &mdash; 289 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 15:    pub
 72:    pub
@@ -6140,10 +6140,10 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state/timers.rs</code> &mdash; 465 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state/timers.rs</code> &mdash; 465 lines</summary>
 
 ```rust
-1:impl MeridianShell
+1:impl NiwoeShell
 2:    pub
 10:    pub
 18:    fn needs_fast_tick
@@ -6170,14 +6170,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state_tests.rs</code> &mdash; 13 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state_tests.rs</code> &mdash; 13 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state_tests/output_events.rs</code> &mdash; 283 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state_tests/output_events.rs</code> &mdash; 283 lines</summary>
 
 ```rust
 2:fn output_workspace_changed_updates_known_output
@@ -6195,7 +6195,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/state_tests/workspaces.rs</code> &mdash; 347 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/state_tests/workspaces.rs</code> &mdash; 347 lines</summary>
 
 ```rust
 2:fn workspace_changed_clamps_workspace_range
@@ -6219,7 +6219,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/time.rs</code> &mdash; 50 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/time.rs</code> &mdash; 50 lines</summary>
 
 ```rust
 7:pub
@@ -6229,7 +6229,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wayland/types.rs</code> &mdash; 88 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wayland/types.rs</code> &mdash; 88 lines</summary>
 
 ```rust
 2:pub
@@ -6245,7 +6245,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/widget_action.rs</code> &mdash; 445 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/widget_action.rs</code> &mdash; 445 lines</summary>
 
 ```rust
 45:pub
@@ -6273,7 +6273,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/widget_traversal.rs</code> &mdash; 64 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/widget_traversal.rs</code> &mdash; 64 lines</summary>
 
 ```rust
 3:pub
@@ -6284,7 +6284,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/wifi_password_modal.rs</code> &mdash; 315 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/wifi_password_modal.rs</code> &mdash; 315 lines</summary>
 
 ```rust
 34:pub
@@ -6302,7 +6302,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-shell/src/workspaces.rs</code> &mdash; 177 lines</summary>
+<details><summary><code>crates/niwoe-shell/src/workspaces.rs</code> &mdash; 177 lines</summary>
 
 ```rust
 15:pub struct WorkspacePopupState
@@ -6318,9 +6318,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-tokens`
+### `niwoe-tokens`
 
-<details><summary><code>crates/meridian-tokens/src/chrome.rs</code> &mdash; 109 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/chrome.rs</code> &mdash; 109 lines</summary>
 
 ```rust
 11:pub struct Scrollbar
@@ -6341,7 +6341,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-tokens/src/color.rs</code> &mdash; 330 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/color.rs</code> &mdash; 330 lines</summary>
 
 ```rust
 17:pub struct Color
@@ -6379,7 +6379,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-tokens/src/elevation.rs</code> &mdash; 84 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/elevation.rs</code> &mdash; 84 lines</summary>
 
 ```rust
 14:pub struct Elevation
@@ -6390,14 +6390,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-tokens/src/font.rs</code> &mdash; 9 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/font.rs</code> &mdash; 9 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-tokens/src/interaction.rs</code> &mdash; 167 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/interaction.rs</code> &mdash; 167 lines</summary>
 
 ```rust
 18:pub struct Interaction
@@ -6422,14 +6422,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-tokens/src/lib.rs</code> &mdash; 23 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/lib.rs</code> &mdash; 23 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-tokens/src/radius.rs</code> &mdash; 87 lines</summary>
+<details><summary><code>crates/niwoe-tokens/src/radius.rs</code> &mdash; 87 lines</summary>
 
 ```rust
 10:pub struct Radius
@@ -6443,9 +6443,9 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-ui`
+### `niwoe-ui`
 
-<details><summary><code>crates/meridian-ui/src/effect/border.rs</code> &mdash; 86 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/border.rs</code> &mdash; 86 lines</summary>
 
 ```rust
 8:pub fn paint_border
@@ -6456,7 +6456,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/effect/dominant_color.rs</code> &mdash; 115 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/dominant_color.rs</code> &mdash; 115 lines</summary>
 
 ```rust
 9:pub fn dominant_color
@@ -6470,7 +6470,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/effect/fill.rs</code> &mdash; 75 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/fill.rs</code> &mdash; 75 lines</summary>
 
 ```rust
 8:pub fn paint_fill
@@ -6481,7 +6481,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/effect/metro_surface.rs</code> &mdash; 77 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/metro_surface.rs</code> &mdash; 77 lines</summary>
 
 ```rust
 14:pub fn paint_metro_surface
@@ -6490,14 +6490,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/effect/mod.rs</code> &mdash; 24 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/mod.rs</code> &mdash; 24 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/effect/radius.rs</code> &mdash; 119 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/radius.rs</code> &mdash; 119 lines</summary>
 
 ```rust
 9:pub fn rounded_rect_path
@@ -6510,7 +6510,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/effect/text.rs</code> &mdash; 367 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/effect/text.rs</code> &mdash; 367 lines</summary>
 
 ```rust
 22:fn srgb_to_linear
@@ -6539,7 +6539,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/event/hit_test.rs</code> &mdash; 315 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/event/hit_test.rs</code> &mdash; 315 lines</summary>
 
 ```rust
 5:pub fn hit_test
@@ -6557,7 +6557,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/event/mod.rs</code> &mdash; 76 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/event/mod.rs</code> &mdash; 76 lines</summary>
 
 ```rust
 6:pub enum WidgetState
@@ -6576,7 +6576,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/lib.rs</code> &mdash; 75 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/lib.rs</code> &mdash; 75 lines</summary>
 
 ```rust
 38:    fn taffy_computes_basic_flex_layout
@@ -6585,7 +6585,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/paint/layout.rs</code> &mdash; 163 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/paint/layout.rs</code> &mdash; 163 lines</summary>
 
 ```rust
 12:pub struct LayoutNode
@@ -6600,7 +6600,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/paint/mod.rs</code> &mdash; 26 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/paint/mod.rs</code> &mdash; 26 lines</summary>
 
 ```rust
 14:pub struct Rect
@@ -6609,7 +6609,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/paint/render.rs</code> &mdash; 455 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/paint/render.rs</code> &mdash; 455 lines</summary>
 
 ```rust
 8:pub enum RenderError
@@ -6632,14 +6632,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/style/color.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/style/color.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/style/mod.rs</code> &mdash; 52 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/style/mod.rs</code> &mdash; 52 lines</summary>
 
 ```rust
 16:pub struct Theme
@@ -6651,14 +6651,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/style/radius.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/style/radius.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/style/spacing.rs</code> &mdash; 40 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/style/spacing.rs</code> &mdash; 40 lines</summary>
 
 ```rust
 4:pub struct Spacing
@@ -6669,7 +6669,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/widget/base.rs</code> &mdash; 540 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/widget/base.rs</code> &mdash; 540 lines</summary>
 
 ```rust
 12:pub trait Widget
@@ -6709,7 +6709,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/widget/button.rs</code> &mdash; 352 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/widget/button.rs</code> &mdash; 352 lines</summary>
 
 ```rust
 24:pub struct Button
@@ -6737,14 +6737,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/widget/mod.rs</code> &mdash; 14 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/widget/mod.rs</code> &mdash; 14 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-ui/src/widget/tile.rs</code> &mdash; 333 lines</summary>
+<details><summary><code>crates/niwoe-ui/src/widget/tile.rs</code> &mdash; 333 lines</summary>
 
 ```rust
 38:pub enum TileSize
@@ -6776,23 +6776,23 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian-wm`
+### `niwoe-wm`
 
-<details><summary><code>crates/meridian-wm/src/floating.rs</code> &mdash; 2 lines</summary>
-
-```rust
-```
-
-</details>
-
-<details><summary><code>crates/meridian-wm/src/lib.rs</code> &mdash; 7 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/floating.rs</code> &mdash; 2 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-wm/src/tiling/layout.rs</code> &mdash; 90 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/lib.rs</code> &mdash; 7 lines</summary>
+
+```rust
+```
+
+</details>
+
+<details><summary><code>crates/niwoe-wm/src/tiling/layout.rs</code> &mdash; 90 lines</summary>
 
 ```rust
 13:pub struct TilingLayout
@@ -6810,14 +6810,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-wm/src/tiling/mod.rs</code> &mdash; 6 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/tiling/mod.rs</code> &mdash; 6 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-wm/src/tiling/tree.rs</code> &mdash; 454 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/tiling/tree.rs</code> &mdash; 454 lines</summary>
 
 ```rust
 5:pub
@@ -6849,7 +6849,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-wm/src/tiling/types.rs</code> &mdash; 29 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/tiling/types.rs</code> &mdash; 29 lines</summary>
 
 ```rust
 2:pub enum SplitDir
@@ -6861,14 +6861,14 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-<details><summary><code>crates/meridian-wm/src/window.rs</code> &mdash; 1 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/window.rs</code> &mdash; 1 lines</summary>
 
 ```rust
 ```
 
 </details>
 
-<details><summary><code>crates/meridian-wm/src/workspace.rs</code> &mdash; 159 lines</summary>
+<details><summary><code>crates/niwoe-wm/src/workspace.rs</code> &mdash; 159 lines</summary>
 
 ```rust
 9:pub enum WorkspaceMode
@@ -6894,7 +6894,7 @@ _Generated by `scripts/gen_code_index.sh`. Do not edit by hand._
 
 </details>
 
-### `meridian (root binary)`
+### `niwoe (root binary)`
 
 <details><summary><code>src/main.rs</code> &mdash; 232 lines</summary>
 

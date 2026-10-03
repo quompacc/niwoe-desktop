@@ -1,0 +1,16 @@
+PASS drm-0 [1920, 1080] [1920, 1080]
+FAIL drm-1 [1600, 900] [1920, 1080]
+PASS None [1920, 1080] [1920, 1080]
+Traceback (most recent call last):
+  File "/home/eduard/niwoe-desktop/scripts/test-p12-screenshot-output.py", line 68, in <module>
+    assert all(r['passed'] for r in records), records
+           ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: [{'output': 'drm-0', 'expected': [1920, 1080], 'actual': [1920, 1080], 'passed': True}, {'output': 'drm-1', 'expected': [1600, 900], 'actual': [1920, 1080], 'passed': False}, {'output': None, 'expected': [1920, 1080], 'actual': [1920, 1080], 'passed': True}]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/eduard/niwoe-desktop/scripts/test-p12-screenshot-output.py", line 76, in <module>
+    assert [[o[k] for k in fields] for o in restored] == [[o[k] for k in fields] for o in baseline]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,22 +1,25 @@
 # Project Status
 
-Stand: 2026-08-21 auf Branch `codex/openbsd-native`.
+> **Historischer Snapshot:** Die folgenden Angaben und offenen Aufgaben beziehen
+> sich auf den Meridian-Stand vom August 2026. Sie definieren keine aktive
+> BSD-/WebKit-Strategie. Seit 21.09.2026 gelten `../NIWOE_IMPLEMENTATION_PLAN.md`
+> und `phase-reports/README.md` für Richtung und tatsächlich verifizierten Fortschritt.
 
-Dieses Dokument beschreibt den **implementierten Ist-Stand**. Die aktive
-Zielrichtung steht in `../MERIDIAN_OS_PLAN.md`, `../ROADMAP.md` und
-`UI_PLATFORM.md`. Zielarchitektur ist nicht automatisch implementierter Stand.
+Stand: 2026-08-26 auf Branch `codex/openbsd-native`.
+
+Dieses Dokument beschreibt den damaligen implementierten Stand. Die früheren
+Verweise auf Meridian-Roadmaps und BSD-Evaluationen sind abgelöst.
 
 ## Strategische Einordnung
 
 - Meridian bleibt ein eigener Rust-Wayland-Compositor.
 - OpenBSD wird als nächste reale BSD-Referenz auf dem Acer/Intel-HD-620 geprüft;
   FreeBSD bleibt die ernsthafte Alternative und der vorhandene Supportpfad.
-- Meridian-eigene Alltags-UI wechselt schrittweise auf eine gemeinsame
-  WebKit/HTML/CSS/Web-Components-Plattform.
-- Der erste Slice ist Runtime/Bridge → Panel → Launcher → Quick Settings;
-  Runtime, Bridge, Panel und Launcher sind als erster Live-Pfad implementiert.
-- Der unten dokumentierte native `meridian-shell` bleibt bis zum bewiesenen
-  Slice Referenz und Fallback.
+- Meridian-eigene Alltags-UI bleibt vollständig nativ in Rust und verwendet
+  `meridian-ui`, `meridian-tokens` und `meridian-config` als gemeinsame Basis.
+- Die aktive Qualitätsrunde arbeitet Panel → Launcher → Quick Settings ab.
+- Der WebKit-Prototyp hat Machbarkeit und Gestaltung gezeigt, ist aber kein
+  produktiver, optionaler oder zukünftiger Laufzeitpfad mehr.
 - Externe GTK-/Qt-/Browser-/wxWidgets-Apps bleiben Wayland/XWayland-Clients.
 
 ### OpenBSD-Acer-Baseline (2026-08-19)
@@ -29,9 +32,11 @@ Zielrichtung steht in `../MERIDIAN_OS_PLAN.md`, `../ROADMAP.md` und
 - Systempatches `001` bis `009` sind eingespielt. Rust/Cargo 1.94.1,
   Wayland/libinput/xkbcommon/seatd, XWayland und WebKitGTK 4.1 sind installiert;
   `seatd` und D-Bus laufen und starten beim Boot.
-- WebKitGTK 4.1 kompiliert, linkt und rendert nativ (2.52.5) als echte
+- Historischer Prototyp-Nachweis: WebKitGTK 4.1 kompilierte, linkte und renderte
+  nativ (2.52.5) als echte
   Layer-Shell-Oberflaeche in der DRM-Sitzung.
-- Der WebKit-Tokenvertrag hat mit `meridian-config::web_tokens` begonnen:
+- Der inzwischen entfernte WebKit-Tokenvertrag begann mit
+  `meridian-config::web_tokens`:
   Schema v1 exportiert die beiden zentralen Farbtabellen und die gemeinsamen
   Geometrie-/Material-/Interaktionswerte deterministisch als CSS Custom
   Properties. `meridian-ui-runtime` stellt den ersten separaten GTK3/
@@ -68,6 +73,14 @@ Zielrichtung steht in `../MERIDIAN_OS_PLAN.md`, `../ROADMAP.md` und
   interaktiver Test offen. Der OpenBSD-Sessionstart nutzt ein besitzgeprueftes
   `/tmp/meridian-runtime-<uid>` und findet XWayland ueber `/usr/X11R6/bin`.
 - Vollständige Evidenz und offene Tests: `OPENBSD.md`.
+- Suspend/Resume ist auf dem Acer als OpenBSD-`pms(4)`-/Elantech-Blocker
+  klassifiziert. Ein direkter `zzz`-Kontrolllauf mit null Meridian-Prozessen
+  reproduzierte dieselben Disable-/Enable-/Reset-Fehler und den Ausfall der
+  Zeigerbewegung; Tastatur und Klicks blieben aktiv. Sämtliche erfolglosen
+  wscons-Reopen-/Timing-Workarounds wurden verworfen. Meridian behält nur den
+  korrekten ConsoleKit-Delay-Inhibitor, das typisierte Prepare-Acknowledge und
+  den ereignisgesteuerten DRM-Resume-Reset. Details:
+  `OPENBSD_SUSPEND_INPUT_2026-08-26.md`.
 
 ## Validierter Basisstand
 - Remote-Stand: `origin/freebsd-port` bei `24177fe`; lokal zusätzlich
@@ -101,7 +114,11 @@ Zielrichtung steht in `../MERIDIAN_OS_PLAN.md`, `../ROADMAP.md` und
   subtil in Login/Bootsplash, nie in Alltags-UI; der Panel-Startbutton verwendet
   ein neutrales Launcher-Symbol aus dem zentralen Icon-System.
 
-### WebKit-Vertical-Slice (2026-08-20/21)
+### Historischer WebKit-Vertical-Slice (2026-08-20/21, seit 2026-08-25 entfernt)
+
+Die folgenden Punkte dokumentieren den erfolgreichen Prototyp. Die genannten
+Runtime-, Env- und CSS-Pfade existieren nicht mehr im Produkt und sind keine
+aktuellen Start- oder Testanweisungen.
 
 - `meridian-ui-runtime` stellt tokengetriebene Panel- und Launcher-Dokumente
   als GTK3/WebKitGTK-4.1-Layer-Shell-Clients bereit.

@@ -1,0 +1,9 @@
+[package]
+name = "niwoe-compass-render"
+version.workspace = true
+edition = "2021"
+description = "QuompaCC compass renderer shared between bootsplash and niwoe-login"
+
+[dependencies]
+ab_glyph = { workspace = true }
+tiny-skia = { workspace = true }

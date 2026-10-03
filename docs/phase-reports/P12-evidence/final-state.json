@@ -1,0 +1,47 @@
+{
+  "identity": {
+    "niwoe": {
+      "pid": "216055",
+      "release": "c09985e39b77bea259fb81aaae8ab92f4933bf50a0a8971756bde146457d6f65",
+      "installed": "c09985e39b77bea259fb81aaae8ab92f4933bf50a0a8971756bde146457d6f65",
+      "running": "c09985e39b77bea259fb81aaae8ab92f4933bf50a0a8971756bde146457d6f65"
+    },
+    "niwoe-shell": {
+      "pid": "216068",
+      "release": "d373452ac60fe17e6a8f93fc94634ad510e1da34a574a0718b8a27bc718e5282",
+      "installed": "d373452ac60fe17e6a8f93fc94634ad510e1da34a574a0718b8a27bc718e5282",
+      "running": "d373452ac60fe17e6a8f93fc94634ad510e1da34a574a0718b8a27bc718e5282"
+    }
+  },
+  "outputs": [
+    {
+      "output_name": "drm-0",
+      "x": 0,
+      "y": 0,
+      "width": 1920,
+      "height": 1080,
+      "scale_millis": 1000,
+      "refresh_millihz": 60000,
+      "primary": true
+    },
+    {
+      "output_name": "drm-1",
+      "x": 1920,
+      "y": 0,
+      "width": 3840,
+      "height": 2160,
+      "scale_millis": 1000,
+      "refresh_millihz": 30000,
+      "primary": false
+    }
+  ],
+  "test_windows": 0,
+  "active_workspace": 1,
+  "network_devices": [
+    "enp4s0f1:ethernet:connected",
+    "wlp3s0:wifi:connected",
+    "lo:loopback:connected (externally)",
+    "p2p-dev-wlp3s0:wifi-p2p:disconnected"
+  ],
+  "config_sha256": "13c8e7bc71c3412370f9d788cb5f0d12f56545b541287b4e11bb1e384751dc1d"
+}

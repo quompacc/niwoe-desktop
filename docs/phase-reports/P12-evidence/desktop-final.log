@@ -1,0 +1,11 @@
+PASS tiling, floating, modifier move/resize wayland
+PASS pointer scroll wayland
+PASS tiling, floating, modifier move/resize x11
+PASS pointer scroll x11
+PASS second output input wayland 1.0
+PASS second output input x11 1.0
+PASS second output input wayland 1.5
+PASS second output input x11 1.5
+PASS second output input wayland 2.0
+PASS second output input x11 2.0
+PASS owned clients removed; config/layout bytes restored

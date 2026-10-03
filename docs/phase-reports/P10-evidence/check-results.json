@@ -1,0 +1,48 @@
+{
+  "fmt": {
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "summaries": 0
+  },
+  "check": {
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "summaries": 0
+  },
+  "tests": {
+    "passed": 1209,
+    "failed": 0,
+    "ignored": 1,
+    "summaries": 41,
+    "ignored_tests": [
+      "test dbus::registration::tests::authority_restart_reregisters_and_cancels_pending_auth ... ignored, run with dbus-run-session: isolated mock authority, never system bus"
+    ]
+  },
+  "clippy": {
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "summaries": 0
+  },
+  "guard": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "summaries": 1
+  },
+  "dbus": {
+    "passed": 1,
+    "failed": 0,
+    "ignored": 0,
+    "summaries": 1
+  },
+  "release": {
+    "passed": 0,
+    "failed": 0,
+    "ignored": 0,
+    "summaries": 0
+  },
+  "final_render_fix": "fmt/check/workspace tests/clippy/release all exit 0; same test totals"
+}

@@ -1,0 +1,15 @@
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+PASS backend default and live stream raop_sink.MacBook-Air-von-Eduard.local.192.168.1.133.7000
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+Invalid non-ASCII character: 0xffffffc3
+PASS backend default and live stream alsa_output.pci-0000_00_1f.3.analog-stereo
+PASS original audio default restored

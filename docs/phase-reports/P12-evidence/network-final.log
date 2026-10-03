@@ -1,0 +1,3 @@
+PASS p12-ethernet-before
+PASS p12-wifi-active
+PASS p12-ethernet-restored

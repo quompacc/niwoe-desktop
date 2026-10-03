@@ -1,0 +1,432 @@
+[
+  {
+    "scale": 2.0,
+    "secondary": true,
+    "outputs": [
+      {
+        "output_id": 1,
+        "output_name": "drm-0",
+        "active_workspace": 3,
+        "primary": true,
+        "focused": true,
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080,
+        "scale_millis": 2000,
+        "transform": "Normal",
+        "refresh_millihz": 60000,
+        "modes": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": true,
+            "preferred": true
+          }
+        ]
+      },
+      {
+        "output_id": 2,
+        "output_name": "drm-1",
+        "active_workspace": 1,
+        "primary": false,
+        "focused": false,
+        "x": 1920,
+        "y": 0,
+        "width": 3840,
+        "height": 2160,
+        "scale_millis": 1000,
+        "transform": "Normal",
+        "refresh_millihz": 30000,
+        "modes": [
+          {
+            "width": 3840,
+            "height": 2160,
+            "refresh_millihz": 30000,
+            "current": true,
+            "preferred": false
+          },
+          {
+            "width": 3840,
+            "height": 2160,
+            "refresh_millihz": 29970,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 3440,
+            "height": 1440,
+            "refresh_millihz": 49986,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 2560,
+            "height": 1440,
+            "refresh_millihz": 59950,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 50000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1680,
+            "height": 1050,
+            "refresh_millihz": 59883,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1600,
+            "height": 900,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 1024,
+            "refresh_millihz": 75024,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 1024,
+            "refresh_millihz": 60019,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1440,
+            "height": 900,
+            "refresh_millihz": 59901,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 800,
+            "refresh_millihz": 59909,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1152,
+            "height": 864,
+            "refresh_millihz": 75000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 50000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "refresh_millihz": 75028,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "refresh_millihz": 70069,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "refresh_millihz": 60003,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 832,
+            "height": 624,
+            "refresh_millihz": 74551,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 75000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 72187,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 60316,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 56250,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 576,
+            "refresh_millihz": 50000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 480,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 480,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 75000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 72808,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 66666,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 400,
+            "refresh_millihz": 70081,
+            "current": false,
+            "preferred": false
+          }
+        ]
+      }
+    ],
+    "entries": [
+      {
+        "key": 301,
+        "title": "P09 native",
+        "floating": true,
+        "app": {
+          "kind": "native",
+          "id": "org.niwoe.P09Native"
+        },
+        "geometry": {
+          "x": 0,
+          "y": 48,
+          "width": 1920,
+          "height": 100
+        },
+        "output": {
+          "name": "drm-0",
+          "scale_millis": 2000,
+          "workarea": {
+            "x": 0,
+            "y": 48,
+            "width": 1920,
+            "height": 1032
+          }
+        }
+      },
+      {
+        "key": 302,
+        "title": "P09 x11",
+        "floating": true,
+        "app": {
+          "kind": "xwayland",
+          "id": "P09X11"
+        },
+        "geometry": {
+          "x": 0,
+          "y": 48,
+          "width": 1920,
+          "height": 100
+        },
+        "output": {
+          "name": "drm-0",
+          "scale_millis": 2000,
+          "workarea": {
+            "x": 0,
+            "y": 48,
+            "width": 1920,
+            "height": 1032
+          }
+        }
+      }
+    ]
+  },
+  {
+    "scale": 1.5,
+    "secondary": false,
+    "outputs": [
+      {
+        "output_id": 1,
+        "output_name": "drm-0",
+        "active_workspace": 3,
+        "primary": true,
+        "focused": true,
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080,
+        "scale_millis": 1500,
+        "transform": "Normal",
+        "refresh_millihz": 60000,
+        "modes": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": true,
+            "preferred": true
+          }
+        ]
+      }
+    ],
+    "entries": [
+      {
+        "key": 301,
+        "title": "P09 native",
+        "floating": true,
+        "app": {
+          "kind": "native",
+          "id": "org.niwoe.P09Native"
+        },
+        "geometry": {
+          "x": 0,
+          "y": 48,
+          "width": 1920,
+          "height": 100
+        },
+        "output": {
+          "name": "drm-0",
+          "scale_millis": 1500,
+          "workarea": {
+            "x": 0,
+            "y": 48,
+            "width": 1920,
+            "height": 1032
+          }
+        }
+      },
+      {
+        "key": 302,
+        "title": "P09 x11",
+        "floating": true,
+        "app": {
+          "kind": "xwayland",
+          "id": "P09X11"
+        },
+        "geometry": {
+          "x": 0,
+          "y": 48,
+          "width": 1920,
+          "height": 100
+        },
+        "output": {
+          "name": "drm-0",
+          "scale_millis": 1500,
+          "workarea": {
+            "x": 0,
+            "y": 48,
+            "width": 1920,
+            "height": 1032
+          }
+        }
+      }
+    ]
+  }
+]

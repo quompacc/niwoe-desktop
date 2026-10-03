@@ -5,7 +5,7 @@ on:
     branches: [master]
   pull_request:
 
-# Same three gates as .githooks/pre-push: fmt, clippy (--all-targets), test.
+# P00 Linux gates: fmt, workspace check, clippy (--all-targets), test.
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -40,6 +40,9 @@ jobs:
 
       - name: clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: workspace check
+        run: cargo check --workspace --locked
 
       - name: test
         run: cargo test --workspace

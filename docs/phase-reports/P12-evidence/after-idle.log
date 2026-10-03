@@ -1,0 +1,4 @@
+Warm-up 30 s; no GUI input, hotplug or builds until completion
+PASS idle sample 0 300.00657066400163
+PASS idle sample 1 300.00721696300025
+PASS idle sample 2 300.00568246700277

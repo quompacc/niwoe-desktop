@@ -1,0 +1,15 @@
+PASS explicit UI draft prepared; productive documents unchanged
+Traceback (most recent call last):
+  File "/home/eduard/niwoe-desktop/scripts/test-first-run-faults.py", line 37, in <module>
+    assert 'journal' in state and 'draft' in state, state
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'schema_version': 1, 'revision': 121, 'fresh': True, 'completed': True, 'draft': '{"step":4,"profile":"preserve","rooms_revision":8,"rooms":[{"operation":"configure","id":null,"name":"Arbeit","description":"Ein Kontext für deine Arbeit","assignment":"free","preferences":{"icon":null,"apps":[],"layout":"tiling","restore":"disabled"},"position":9}],"panel_revision":2,"panel":["search","status"],"practiced":[false,false,false]}'}
+CAPTURE p11-real-partial-error
+PASS real second-document rename denied after rooms committed; active journal, no false new completion
+PASS return/retry completes only remaining write, exact panel and no duplicate rooms
+CAPTURE p11-real-write-error
+CAPTURE p11-unsaved-resume
+PASS actual draft write denied; original retained, local choice survives cancel/reopen and saves after repair
+CAPTURE p11-error-broken
+CAPTURE p11-error-future
+PASS corrupt/future state visible in real UI; original error documents retained, recovery after repair

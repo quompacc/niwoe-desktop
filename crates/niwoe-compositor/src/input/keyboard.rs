@@ -1,0 +1,361 @@
+use niwoe_config::{Action, Modifiers, SplitDir};
+use niwoe_ipc::ShellEvent;
+use smithay::{
+    backend::input::{Event, InputBackend, KeyState, KeyboardKeyEvent},
+    desktop::Window,
+    input::keyboard::FilterResult,
+    utils::SERIAL_COUNTER,
+    wayland::seat::WaylandFocus,
+};
+use tracing::debug;
+
+use crate::state::NiwoeState;
+#[path = "navigation.rs"]
+mod navigation;
+
+struct KeyMatch {
+    modifiers: Modifiers,
+    keysym: u32,
+}
+
+fn wm_split_dir(dir: SplitDir) -> niwoe_wm::SplitDir {
+    match dir {
+        SplitDir::Horizontal => niwoe_wm::SplitDir::Horizontal,
+        SplitDir::Vertical => niwoe_wm::SplitDir::Vertical,
+    }
+}
+
+fn focused_window_for_close(state: &NiwoeState) -> Option<Window> {
+    let focus_surface = state
+        .seat
+        .get_keyboard()?
+        .current_focus()
+        .map(|target| target.into_surface())?;
+    (0..state.workspaces.count()).find_map(|idx| {
+        state
+            .workspaces
+            .space_at(idx)
+            .elements()
+            .find(|window| {
+                window
+                    .wl_surface()
+                    .is_some_and(|surface| surface.as_ref() == &focus_surface)
+            })
+            .cloned()
+    })
+}
+
+pub fn handle_keyboard<I: InputBackend>(state: &mut NiwoeState, event: &impl KeyboardKeyEvent<I>) {
+    let serial = SERIAL_COUNTER.next_serial();
+    let time = Event::time_msec(event);
+    let key_state = event.state();
+    let Some(keyboard) = state.seat.get_keyboard() else {
+        debug!("keyboard event ignored: seat has no keyboard");
+        return;
+    };
+    let lock_active = state.lock_manager.is_locked_or_pending();
+    if lock_active {
+        // Repair a stale target (for example after output/client removal)
+        // before forwarding any key, including while acquisition is pending.
+        state.refresh_lock_focus();
+    }
+
+    let match_result = keyboard.input::<KeyMatch, _>(
+        state,
+        event.key_code(),
+        key_state,
+        serial,
+        time,
+        |data, modifiers, handle| {
+            // The lock surface owns all keyboard input while locking. In
+            // particular, compositor shortcuts must never run over it.
+            if lock_active {
+                return FilterResult::Forward;
+            }
+            if key_state != KeyState::Pressed {
+                return FilterResult::Forward;
+            }
+
+            let mut mods = Modifiers::empty();
+            if modifiers.logo {
+                mods |= Modifiers::SUPER;
+            }
+            if modifiers.shift {
+                mods |= Modifiers::SHIFT;
+            }
+            if modifiers.ctrl {
+                mods |= Modifiers::CTRL;
+            }
+            if modifiers.alt {
+                mods |= Modifiers::ALT;
+            }
+
+            if let Some(&sym) = handle.raw_syms().first() {
+                let keysym = sym.raw();
+                let is_global_shortcut = data.keybind_config.find_action(mods, keysym).is_some()
+                    || is_workspace_fallback_shortcut(mods, keysym)
+                    || is_audio_key(keysym);
+                if !is_global_shortcut {
+                    return FilterResult::Forward;
+                }
+
+                return FilterResult::Intercept(KeyMatch {
+                    modifiers: mods,
+                    keysym,
+                });
+            }
+
+            FilterResult::Forward
+        },
+    );
+
+    let Some(km) = match_result else { return };
+
+    // Multimedia volume keys are handled globally and routed to the shell, which
+    // owns the platform audio backend. They carry no keybind action.
+    if let Some(event) = audio_key_event(km.keysym) {
+        state.ipc.broadcast(&event);
+        return;
+    }
+
+    let action = match state.keybind_config.find_action(km.modifiers, km.keysym) {
+        Some(a) => a.clone(),
+        None => {
+            // Keep Super+1..9 workspace switching available as a stable fallback,
+            // even when custom keybind maps omit explicit workspace entries.
+            if km.modifiers == Modifiers::SUPER {
+                if let Some(idx) = workspace_idx_from_digit_keysym(km.keysym)
+                    .and_then(|position| state.workspaces.rooms().slot_at_position(position))
+                {
+                    let focused_output = state.focused_output();
+                    let focused_output_name = focused_output.and_then(|id| {
+                        state
+                            .output_registry
+                            .by_id(id)
+                            .map(|info| info.name.as_str())
+                    });
+                    debug!(
+                        "keybind switch workspace for focused output (fallback): keysym=0x{:x} target_workspace={} focused_output_id={:?} focused_output_name={:?}",
+                        km.keysym,
+                        idx + 1,
+                        focused_output.map(|id| id.0),
+                        focused_output_name
+                    );
+                    state.switch_workspace_for_focused_output(idx);
+                }
+            } else if km.modifiers == (Modifiers::SUPER | Modifiers::SHIFT) {
+                if let Some(idx) = workspace_idx_from_digit_keysym(km.keysym)
+                    .and_then(|position| state.workspaces.rooms().slot_at_position(position))
+                {
+                    let focused_output = state.focused_output();
+                    let focused_output_name = focused_output.and_then(|id| {
+                        state
+                            .output_registry
+                            .by_id(id)
+                            .map(|info| info.name.as_str())
+                    });
+                    debug!(
+                        "keybind move workspace for focused output (fallback): keysym=0x{:x} target_workspace={} focused_output_id={:?} focused_output_name={:?}",
+                        km.keysym,
+                        idx + 1,
+                        focused_output.map(|id| id.0),
+                        focused_output_name
+                    );
+                    state.move_focused_window_to_workspace_consistent(idx);
+                }
+            }
+            return;
+        }
+    };
+
+    match action {
+        Action::SwitchWorkspace(position) => {
+            let Some(idx) = state.workspaces.rooms().slot_at_position(position) else {
+                return;
+            };
+            let focused_output = state.focused_output();
+            let focused_output_name = focused_output.and_then(|id| {
+                state
+                    .output_registry
+                    .by_id(id)
+                    .map(|info| info.name.as_str())
+            });
+            debug!(
+                "keybind switch workspace for focused output: target_workspace={} focused_output_id={:?} focused_output_name={:?}",
+                idx + 1,
+                focused_output.map(|id| id.0),
+                focused_output_name
+            );
+            state.switch_workspace_for_focused_output(idx)
+        }
+        Action::MoveToWorkspace(position) => {
+            let Some(idx) = state.workspaces.rooms().slot_at_position(position) else {
+                return;
+            };
+            let focused_output = state.focused_output();
+            let focused_output_name = focused_output.and_then(|id| {
+                state
+                    .output_registry
+                    .by_id(id)
+                    .map(|info| info.name.as_str())
+            });
+            debug!(
+                "keybind move workspace for focused output: target_workspace={} focused_output_id={:?} focused_output_name={:?}",
+                idx + 1,
+                focused_output.map(|id| id.0),
+                focused_output_name
+            );
+            state.move_focused_window_to_workspace_consistent(idx)
+        }
+        Action::ToggleTiling => state.toggle_tiling(),
+        Action::ToggleFloating => navigation::toggle_floating(state),
+        Action::ToggleFullscreen => navigation::toggle_fullscreen(state),
+        Action::SwapDirection { dx, dy } => navigation::swap_direction(state, dx, dy),
+        Action::LaunchTerminal => {
+            state.ipc.broadcast(&ShellEvent::LaunchTerminal);
+        }
+        Action::LaunchBrowser => {
+            state.ipc.broadcast(&ShellEvent::LaunchBrowser);
+        }
+        Action::LaunchFiles => {
+            state.ipc.broadcast(&ShellEvent::LaunchFiles);
+        }
+        Action::FocusDirection { dx, dy } => navigation::focus_direction(state, dx, dy),
+        Action::CycleWindow(step) => navigation::cycle_window(state, step),
+        Action::CycleWorkspace(step) => {
+            let count = state.workspaces.count() as i32;
+            let current = state
+                .workspaces
+                .rooms()
+                .definitions()
+                .rooms
+                .iter()
+                .position(|room| {
+                    state.workspaces.rooms().slot_for_room(room.id)
+                        == Some(state.current_workspace_index())
+                })
+                .unwrap_or(0);
+            let position = (current as i32 + i32::from(step)).rem_euclid(count);
+            let next = state
+                .workspaces
+                .rooms()
+                .slot_at_position(position as usize)
+                .expect("validated room position");
+            state.switch_workspace_for_focused_output(next);
+        }
+        Action::ForceSplit(dir) => {
+            let active = state.workspaces.active;
+            state.wm_workspaces[active].force_split(wm_split_dir(dir));
+        }
+        Action::ResizeTile { dir, delta } => {
+            if let Some(window) = state.focused_window() {
+                let active = state.workspaces.active;
+                let wm_dir = wm_split_dir(dir);
+                state.wm_workspaces[active].resize_focused(&window, wm_dir, delta);
+                state.tile_workspace(active);
+            }
+        }
+        Action::CloseWindow => {
+            if let Some(window) = focused_window_for_close(state) {
+                if let Some(toplevel) = window.toplevel() {
+                    toplevel.send_close();
+                } else if let Some(x11) = window.x11_surface() {
+                    if let Err(err) = x11.close() {
+                        debug!(
+                            "xwayland close request failed for {}: {}",
+                            x11.window_id(),
+                            err
+                        );
+                    }
+                }
+            }
+        }
+        Action::ToggleLauncher => {
+            state.broadcast_toggle_launcher();
+        }
+        Action::ToggleQuickSettings => {
+            state.ipc.broadcast(&ShellEvent::ToggleQuickSettings);
+        }
+        Action::OpenSystemSettings => {
+            state.ipc.broadcast(&ShellEvent::OpenSystemSettings);
+        }
+        Action::LockSession => {
+            state.spawn_lock_screen();
+        }
+        Action::ReloadConfig => {
+            state.reload_config();
+        }
+        Action::Quit => {
+            state.loop_signal.stop();
+        }
+    }
+}
+
+fn workspace_idx_from_digit_keysym(keysym: u32) -> Option<usize> {
+    match keysym {
+        0x31 => Some(0),
+        0x32 => Some(1),
+        0x33 => Some(2),
+        0x34 => Some(3),
+        0x35 => Some(4),
+        0x36 => Some(5),
+        0x37 => Some(6),
+        0x38 => Some(7),
+        0x39 => Some(8),
+        _ => None,
+    }
+}
+
+fn is_workspace_fallback_shortcut(modifiers: Modifiers, keysym: u32) -> bool {
+    workspace_idx_from_digit_keysym(keysym).is_some()
+        && (modifiers == Modifiers::SUPER || modifiers == (Modifiers::SUPER | Modifiers::SHIFT))
+}
+
+// XF86 multimedia volume keysyms (independent of modifiers).
+const XF86_AUDIO_LOWER_VOLUME: u32 = 0x1008_FF11;
+const XF86_AUDIO_MUTE: u32 = 0x1008_FF12;
+const XF86_AUDIO_RAISE_VOLUME: u32 = 0x1008_FF13;
+
+/// Volume keys are intercepted globally so they never reach the focused app.
+fn is_audio_key(keysym: u32) -> bool {
+    matches!(
+        keysym,
+        XF86_AUDIO_LOWER_VOLUME | XF86_AUDIO_MUTE | XF86_AUDIO_RAISE_VOLUME
+    )
+}
+
+/// Map a volume keysym to the shell event that performs the change. The shell
+/// owns the platform mixer, so the compositor only forwards intent.
+fn audio_key_event(keysym: u32) -> Option<ShellEvent> {
+    match keysym {
+        XF86_AUDIO_RAISE_VOLUME => Some(ShellEvent::AudioVolumeStep { delta: 5 }),
+        XF86_AUDIO_LOWER_VOLUME => Some(ShellEvent::AudioVolumeStep { delta: -5 }),
+        XF86_AUDIO_MUTE => Some(ShellEvent::AudioMuteToggle),
+        _ => None,
+    }
+}
+
+#[cfg(test)]
+mod audio_key_tests {
+    use super::{audio_key_event, is_audio_key};
+    use niwoe_ipc::ShellEvent;
+
+    #[test]
+    fn audio_keys_map_to_events() {
+        assert_eq!(
+            audio_key_event(0x1008_FF13),
+            Some(ShellEvent::AudioVolumeStep { delta: 5 })
+        );
+        assert_eq!(
+            audio_key_event(0x1008_FF11),
+            Some(ShellEvent::AudioVolumeStep { delta: -5 })
+        );
+        assert_eq!(
+            audio_key_event(0x1008_FF12),
+            Some(ShellEvent::AudioMuteToggle)
+        );
+        assert_eq!(audio_key_event(0x41), None);
+        assert!(is_audio_key(0x1008_FF13));
+        assert!(!is_audio_key(0x41));
+    }
+}

@@ -1,0 +1,61 @@
+[Unit]
+Description=NIWOE login (DRM-direct display manager)
+# tty1 is the user-facing login terminal; getty must not be there.
+Conflicts=getty@tty1.service
+After=systemd-user-sessions.service getty@tty1.service systemd-udev-trigger.service local-fs.target
+# Run before the generic graphical login targets so this is the first
+# thing the user sees after the bootsplash hand-off.
+Before=getty.target multi-user.target
+# Crash-loop guard: if the unit fails 3 times within 30s, systemd stops
+# trying. Without this a bad niwoe binary would respawn forever and
+# burn cycles. tty1 ends up blank in that case — recovery via Ctrl+Alt+F2.
+StartLimitIntervalSec=30
+StartLimitBurst=3
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/niwoe-login
+# Default compositor path; auth.rs spawns this as the authenticated user
+# after PAM open_session(). Override at unit level for testing.
+Environment=NIWOE_LOGIN_COMPOSITOR=/usr/local/bin/niwoe
+# Defaults to /dev/dri/card0. Override for systems where the boot/display
+# GPU is exposed under a different DRM node.
+# Environment=NIWOE_LOGIN_DRM_CARD=/dev/dri/card0
+# tracing_subscriber::fmt::init() defaults to filtering everything below
+# ERROR when RUST_LOG is unset. INFO keeps the boot trail visible in the
+# journal without exploding the volume.
+Environment=RUST_LOG=info
+
+# Bind to /dev/tty1 so getty stays away and the program owns the VT.
+# pam_set_item(PAM_TTY, "tty1") in auth.rs is what makes pam_systemd
+# derive seat=seat0 vtnr=1; the TTYPath here keeps the VT real so that
+# derivation matches the actual situation (and so any kernel messages
+# don't fight with our DRM framebuffer).
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+StandardInput=tty
+StandardOutput=journal
+StandardError=journal
+
+# We need root to open the DRM card with master, run pam_authenticate
+# against /etc/shadow, and call setuid/setgid into the user before spawning
+# the compositor.
+User=root
+
+# Graceful shutdown: SIGTERM lets the render loop release master and exit.
+KillSignal=SIGTERM
+TimeoutStopSec=5
+# Respawn on any exit: a clean compositor exit (= user logged out) should
+# bring the login card back; a crash should also retry, gated by the
+# burst limit above. The bootsplash handover only runs at first boot;
+# subsequent restarts just see no bootsplash socket and proceed.
+Restart=always
+RestartSec=1
+
+[Install]
+# Replaces the getty on tty1; pulled in by multi-user.target via the
+# WantedBy alias below.
+WantedBy=multi-user.target
+Alias=display-manager.service

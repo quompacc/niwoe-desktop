@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# PROVIDE: niwoe_quiet
+# REQUIRE: FILESYSTEMS
+# BEFORE:  devmatch NETWORKING
+# KEYWORD: nojail
+#
+# Mute the system console for a silent graphical boot: NIWOE owns the screen,
+# so kernel/console text should never flash up. The kernel un-mutes the console
+# after early boot (so boot_mute alone is not enough), and then devmatch prints
+# "Autoloading module: ..." and dhclient prints "add net/add host ..." — so this
+# must run BEFORE devmatch and NETWORKING to re-mute in time. Recover console
+# output over SSH with:  conscontrol mute off
+#
+# Enable with:  sysrc niwoe_quiet_enable=YES
+
+. /etc/rc.subr
+
+name=niwoe_quiet
+desc="Mute console for a silent boot"
+rcvar=niwoe_quiet_enable
+
+load_rc_config $name
+: ${niwoe_quiet_enable:="NO"}
+
+start_cmd="niwoe_quiet_start"
+stop_cmd="niwoe_quiet_stop"
+
+niwoe_quiet_start()
+{
+	/sbin/conscontrol mute on >/dev/null 2>&1
+	echo "niwoe_quiet: console muted."
+}
+
+niwoe_quiet_stop()
+{
+	/sbin/conscontrol mute off >/dev/null 2>&1
+}
+
+run_rc_command "$1"

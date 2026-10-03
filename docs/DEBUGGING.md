@@ -8,15 +8,15 @@
 ## Standard-Logging
 - Standard: `RUST_LOG=info`
 - Detailliert: `RUST_LOG=debug`
-- DRM Timing-Aggregation (opt-in): `MERIDIAN_DRM_TIMING=1` (1s-Summary auf `info`)
+- DRM Timing-Aggregation (opt-in): `NIWOE_DRM_TIMING=1` (1s-Summary auf `info`)
 - Beide Binaries nutzen `tracing_subscriber::fmt::init()`.
 
 ## Startbefehle
 - Compositor (Root): `cargo run`
-- Nur Shell: `cargo run -p meridian-shell`
+- Nur Shell: `cargo run -p niwoe-shell`
 - Tests: `cargo test --workspace`
-- Render-Isolation (ohne Auto-Shell): `MERIDIAN_DRM_DISABLE_SHELL=1 cargo run`
-  - Alias: `MERIDIAN_NO_SHELL=1`
+- Render-Isolation (ohne Auto-Shell): `NIWOE_DRM_DISABLE_SHELL=1 cargo run`
+  - Alias: `NIWOE_NO_SHELL=1`
 
 ## DRM Master / Session Diagnose
 - Beim DRM-Start werden jetzt Session-/Seat-Parameter geloggt:
@@ -122,8 +122,8 @@ Immer in dieser Reihenfolge prüfen:
 - Live-Eingaben prüfen:
   - `sudo libinput debug-events`
 - Entscheidungsregel:
-  - Keine Keyboard-Events in libinput => kein Meridian-Keybinding-Problem.
-  - Keyboard-Events in libinput, aber keine Meridian-Reaktion => Meridian-Inputpfad prüfen.
+  - Keine Keyboard-Events in libinput => kein NIWOE-Keybinding-Problem.
+  - Keyboard-Events in libinput, aber keine NIWOE-Reaktion => NIWOE-Inputpfad prüfen.
 - Pointer-Spezifik:
   - `POINTER_MOTION_ABSOLUTE` (QEMU tablet) und `POINTER_MOTION` (USB-Maus) getrennt prüfen.
   - Erwarteter Debug-Log bei relativer Mausbewegung:
@@ -142,15 +142,15 @@ Auf der realen OpenBSD-Maschine aus dem Repository-Root ausführen:
 
 Der Harness baut einen kleinen nativen X11-Client und misst nacheinander:
 
-- `native_idle`: Meridian mit Shell im Leerlauf,
-- `compositor_idle`: Meridian ohne Shell im Leerlauf,
+- `native_idle`: NIWOE mit Shell im Leerlauf,
+- `compositor_idle`: NIWOE ohne Shell im Leerlauf,
 - `x11_motion_resize`: kontrolliertes Bewegen und Resizen eines X11-Fensters,
 - `x11_motion_resize_no_shell`: derselbe aktive Workload ohne Shell.
 
-Die Rohdaten landen unter `/tmp/meridian-perf-<UTC-Zeitstempel>`. Die
+Die Rohdaten landen unter `/tmp/niwoe-perf-<UTC-Zeitstempel>`. Die
 `*.phases`-Datei enthält die Zeitgrenzen des Workloads, die zugehörige
 `*.log`-Datei die sekündlichen DRM-Timing- und Dirty-Statistiken. Vor dem Lauf
-darf keine andere Meridian-Instanz aktiv sein.
+darf keine andere NIWOE-Instanz aktiv sein.
 
 Beim Interpretieren `frames` und `timer_fire_ms` gemeinsam betrachten: Ein
 60-Hz-Modus allein belegt noch keine 60 Bilder pro Sekunde. `output_pass_ms`
@@ -190,17 +190,17 @@ Messbefund auf dem OpenBSD-Laptop (Intel HD 620, 1920x1080@60 Hz, 2026-08-19):
 - Erwartung: keine per-frame Render-Logs.
 
 ### Messlauf 1b (Compositor-Isolation ohne Shell)
-- `RUST_LOG=info MERIDIAN_DRM_TIMING=1 MERIDIAN_DRM_DISABLE_SHELL=1 cargo run`
-- Alias: `MERIDIAN_NO_SHELL=1`
+- `RUST_LOG=info NIWOE_DRM_TIMING=1 NIWOE_DRM_DISABLE_SHELL=1 cargo run`
+- Alias: `NIWOE_NO_SHELL=1`
 - Zweck: commit/render-Kosten von Shell-/Layer-Commit-Zyklen isolieren.
 
 ### Messlauf 2 (aggregierte Timing-Metriken, low-noise)
-- `RUST_LOG=info MERIDIAN_DRM_TIMING=1 cargo run`
+- `RUST_LOG=info NIWOE_DRM_TIMING=1 cargo run`
 - Erwartete 1s-Logzeile:
   - `drm timing summary: ticks=... frames=... interval_ms(avg/min/max)=... render_ms(... ) commit_ms(... ) queue_ms(... ) vblank_wait_ms(... ) ...`
 
 ### Messlauf 3 (kurz, detailliert)
-- `RUST_LOG=debug MERIDIAN_DRM_TIMING=1 cargo run`
+- `RUST_LOG=debug NIWOE_DRM_TIMING=1 cargo run`
 - Nur kurz laufen lassen, um Diagnose-Details zu sehen.
 
 ### Auswertung
@@ -227,7 +227,7 @@ Messbefund auf dem OpenBSD-Laptop (Intel HD 620, 1920x1080@60 Hz, 2026-08-19):
   - Maus flüssig, Panel sichtbar, kein akuter Stutter.
 
 ## Shell Commit Diagnose
-- Aktivieren: `MERIDIAN_SHELL_COMMIT_STATS=1`
+- Aktivieren: `NIWOE_SHELL_COMMIT_STATS=1`
 - In den ersten 5s nach Shell-Start wird jeder Commit auf `info` geloggt:
   - `shell commit: surface=panel|launcher reason=...`
 - Zusätzlich 1s-Aggregat:
@@ -241,11 +241,19 @@ Empfohlener Lauf:
 scripts/smoke-drm.sh
 ```
 
-- Default ist Regression/Smoke mit Timeout (`MERIDIAN_SMOKE_TIMEOUT`, Default 20s).
+- Default ist Regression/Smoke mit Timeout (`NIWOE_SMOKE_TIMEOUT`, Default 20s).
 - Für manuelle Launcher-/UX-Tests ohne Timeout:
   - `scripts/smoke-drm.sh run`
-  - oder: `MERIDIAN_SMOKE_MODE=run scripts/smoke-drm.sh`
-- Logpfad steuerbar über `MERIDIAN_SMOKE_LOG` (Default `/tmp/meridian-smoke-drm.log`).
+  - oder: `NIWOE_SMOKE_MODE=run scripts/smoke-drm.sh`
+- OpenBSD-Hardwaretests sind nur aus `target/release` performance-aussagekräftig.
+  Der Release-Compositor startet automatisch die danebenliegende
+  `target/release/niwoe-shell`. `target/debug/niwoe` darf für visuelle
+  Performance-Abnahmen nicht verwendet werden.
+- Für eine schnelle Shell-Aktualisierung in einer bereits laufenden
+  Release-Sitzung: `ksh scripts/restart-openbsd-shell.ksh`. Das Skript baut nur die
+  Shell optimiert und lässt sie durch den Compositor-Watchdog neu starten. Bei
+  einem Debug-Compositor bricht es absichtlich ab.
+- Logpfad steuerbar über `NIWOE_SMOKE_LOG` (Default `/tmp/niwoe-smoke-drm.log`).
 
 ### Guter Zustand
 - Nach Setup im steady-state:
@@ -262,15 +270,15 @@ scripts/smoke-drm.sh
 - Dauerhafte `Creating wl_shm buffer...`-Zeilen ohne sichtbare State-Änderung.
 
 ## Registry / Layer-Shell Debugging
-- Client Bind/Init: `crates/meridian-shell/src/wayland/init.rs`
-- Server Layer Mapping: `crates/meridian-compositor/src/state/handlers/core/layer_shell.rs`
-- Commit/Arrange/Configure: `crates/meridian-compositor/src/state/handlers/core/compositor.rs`
+- Client Bind/Init: `crates/niwoe-shell/src/wayland/init.rs`
+- Server Layer Mapping: `crates/niwoe-compositor/src/state/handlers/core/layer_shell.rs`
+- Commit/Arrange/Configure: `crates/niwoe-compositor/src/state/handlers/core/compositor.rs`
 
 ## Nützliche grep/rg-Befehle
-- `rg -n "Panel|Launcher|layer|configure|draw_panel|draw_launcher" crates/meridian-shell/src`
-- `rg -n "layer_surface|layer_map|arrange|send_configure" crates/meridian-compositor/src`
+- `rg -n "Panel|Launcher|layer|configure|draw_panel|draw_launcher" crates/niwoe-shell/src`
+- `rg -n "layer_surface|layer_map|arrange|send_configure" crates/niwoe-compositor/src`
 - `rg -n "poll_ipc|broadcast_|ShellCommand|ShellEvent" crates`
-- `rg -n "keybind|parse_keybind|parse_action|invalid keybind|invalid action" crates/meridian-config/src crates/meridian-compositor/src`
+- `rg -n "keybind|parse_keybind|parse_action|invalid keybind|invalid action" crates/niwoe-config/src crates/niwoe-compositor/src`
 - `rg -n "drm output add detected|drm output added via hotplug pipeline" logs/*.log`
 - `rg -n "drm output remove detected|drm output removed via hotplug pipeline" logs/*.log`
 - `rg -n "drm connector reconfigure detected|drm output reconfigured via hotplug pipeline" logs/*.log`
@@ -289,30 +297,30 @@ scripts/smoke-drm.sh
 Bei zukünftigen XDG-Portal-Bugs zuerst trennen:
 1. D-Bus/Portal-Lifecycle (Name, Activation, Request/Response)
 2. Policy/Prompt-Entscheidung (allow/deny/cancel)
-3. Meridian-Datenpfad (Screenshot-/Output-Quelle)
+3. NIWOE-Datenpfad (Screenshot-/Output-Quelle)
 4. Sandboxed-App-Kontext (Flatpak/Snap)
 
 Referenzplan: `docs/XDG_PORTALS.md`
 
 ## Portal FileChooser / Screenshot
 Aktueller Zustand:
-- `meridian-portal` stellt `org.freedesktop.impl.portal.desktop.meridian`
+- `niwoe-portal` stellt `org.freedesktop.impl.portal.desktop.niwoe`
   auf `/org/freedesktop/portal/desktop` bereit.
 - Implementiert sind `org.freedesktop.impl.portal.FileChooser`,
   `org.freedesktop.impl.portal.Screenshot` und
   `org.freedesktop.impl.portal.Access`.
 - `OpenFile`, `SaveFile` und `SaveFiles` delegieren an
-  `MERIDIAN_FILE_PICKER` oder `/usr/local/bin/meridian-file-picker`.
-- Screenshot laeuft ueber Portal -> Meridian-IPC -> Compositor-Policy ->
+  `NIWOE_FILE_PICKER` oder `/usr/local/bin/niwoe-file-picker`.
+- Screenshot laeuft ueber Portal -> NIWOE-IPC -> Compositor-Policy ->
   Shell-Consent/Region-Picker -> DRM-PNG-Capture.
 - ScreenCast ist weiterhin offen.
 
 ### Manueller FileChooser-Smoke
 1. Installationsmetadaten installieren (`scripts/install-local.sh --build`) oder
-   Portal manuell starten: `RUST_LOG=debug cargo run -p meridian-portal`.
-2. Sicherstellen, dass `MERIDIAN_FILE_PICKER` gesetzt ist oder
-   `/usr/local/bin/meridian-file-picker` existiert.
-3. Einen echten `xdg-desktop-portal`-Client gegen den Meridian-Backend-Namen
+   Portal manuell starten: `RUST_LOG=debug cargo run -p niwoe-portal`.
+2. Sicherstellen, dass `NIWOE_FILE_PICKER` gesetzt ist oder
+   `/usr/local/bin/niwoe-file-picker` existiert.
+3. Einen echten `xdg-desktop-portal`-Client gegen den NIWOE-Backend-Namen
    testen.
 4. Erwartung:
    - Portal loggt `portal service ready`.
@@ -322,12 +330,12 @@ Aktueller Zustand:
    - Cancel liefert Response-Code `1`, Picker-Fehler `2`.
 
 ### Manueller Screenshot-Portal-Smoke
-1. Meridian-Session mit laufender Shell starten.
+1. NIWOE-Session mit laufender Shell starten.
 2. Portal-Aktivierung pruefen:
-   `busctl --user introspect org.freedesktop.impl.portal.desktop.meridian /org/freedesktop/portal/desktop --no-pager`.
+   `busctl --user introspect org.freedesktop.impl.portal.desktop.niwoe /org/freedesktop/portal/desktop --no-pager`.
 3. Screenshot ueber einen echten xdg-desktop-portal-Client anfordern.
 4. Erwartung:
-   - Nicht-interaktive Requests zeigen ein Meridian-Consent-Modal.
+   - Nicht-interaktive Requests zeigen ein NIWOE-Consent-Modal.
    - Interaktive Requests zeigen den Region-Picker.
    - Allow schreibt eine PNG in `XDG_RUNTIME_DIR` und liefert eine `file://` URI.
    - Deny/Cancel liefert Response-Code `1`.
@@ -335,7 +343,7 @@ Aktueller Zustand:
 ## Manueller E2E-Test: ReloadConfig
 Vorbereitung:
 1. `RUST_LOG=debug cargo run` (Compositor starten).
-2. Sicherstellen, dass `~/.config/meridian/config.toml` existiert und vom laufenden Prozess lesbar ist.
+2. Sicherstellen, dass `~/.config/niwoe/config.toml` existiert und vom laufenden Prozess lesbar ist.
 3. Reload auslösen (über bestehenden Shell-Reload-Trigger).
 
 ### Testfall A: Gültige Config mit Theme-/Cursor-/Wallpaper-Änderung
@@ -386,7 +394,7 @@ Erwartetes Verhalten:
 - Alter visueller Zustand (Theme/Panel) bleibt aktiv.
 
 ### Testfall D: Fehlende Config
-`~/.config/meridian/config.toml` temporär entfernen und Reload auslösen.
+`~/.config/niwoe/config.toml` temporär entfernen und Reload auslösen.
 Erwartete Logs:
 - `config reload requested`
 - Hinweis auf Defaults (fehlende Datei)
@@ -403,7 +411,7 @@ Voraussetzung:
 2. Für Multi-Output-Fälle zwei aktive Outputs (z. B. DRM mit zwei Monitoren).
 
 ### Testfall A: Single-Output Regression
-1. Meridian starten.
+1. NIWOE starten.
 2. `Super+1` bis `Super+9` drücken.
 3. Erwartung: Verhalten wie vor Phase 4b (sichtbarer Workspace-Wechsel ohne Regression).
 4. Erwartete Logs:
@@ -498,7 +506,7 @@ Voraussetzung:
 2. Für Multi-Output-Fälle zwei aktive Outputs.
 
 ### Schritt 1: Single-Output Regression
-1. Meridian mit einem Output starten.
+1. NIWOE mit einem Output starten.
 2. `Super+1..9` testen.
 3. Erwartung: keine Regression gegenüber Legacy-Verhalten.
 
@@ -540,7 +548,7 @@ Voraussetzung:
    - kein unnötiges globales Redraw aller Outputs.
 
 ## Manueller Test: H5a Winit Resize/Reconfigure
-1. Meridian im Winit/nested Backend starten (`cargo run` ohne DRM-Session).
+1. NIWOE im Winit/nested Backend starten (`cargo run` ohne DRM-Session).
 2. Fenstergröße des Winit-Fensters ändern.
 3. Erwartete Logs:
    - `winit output resized`
@@ -552,7 +560,7 @@ Voraussetzung:
    - Kein Crash/Freeze während Resize.
 
 ## Manueller Test: H5b DRM Connector Reconfigure
-1. Meridian im DRM-Backend starten (`RUST_LOG=debug cargo run` in VT/DRM-Session).
+1. NIWOE im DRM-Backend starten (`RUST_LOG=debug cargo run` in VT/DRM-Session).
 2. Falls möglich Monitor-Mode wechseln oder Connector-Event auslösen (z. B. Replug ohne dauerhaften Remove-Support erwarten).
 3. Erwartete Logs:
    - `drm connector scan triggered` (nur bei `trace` sichtbar)
@@ -564,7 +572,7 @@ Voraussetzung:
    - Panel bleibt sichtbar.
 
 ## Manueller Test: H5c DRM Output Remove (minimal)
-1. Meridian im DRM-Backend starten (`RUST_LOG=debug cargo run` in VT/DRM-Session).
+1. NIWOE im DRM-Backend starten (`RUST_LOG=debug cargo run` in VT/DRM-Session).
 2. Einen bereits bekannten Monitor trennen/disconnecten.
 3. Erwartete Logs:
    - `drm output remove detected`
@@ -579,7 +587,7 @@ Voraussetzung:
    - Output-Add wird separat in H5c-add behandelt.
 
 ## Manueller Test: H5c-add DRM Output Add (minimal)
-1. Meridian im DRM-Backend starten (`RUST_LOG=debug cargo run` in VT/DRM-Session).
+1. NIWOE im DRM-Backend starten (`RUST_LOG=debug cargo run` in VT/DRM-Session).
 2. Einen neuen Monitor verbinden/connecten.
 3. Erwartete Logs:
    - `drm output add detected`
@@ -668,7 +676,7 @@ Voraussetzungen:
   - `card1 = virtio-gpu`
 - Connector:
   - `card0-HDMI-A-1 connected`
-- Meridian:
+- NIWOE:
   - `Frame rendered` auf `3440x1440@60Hz`
   - Panel layer surface `3440x36` sichtbar/gemappt
   - Layer map `surfaces=2`

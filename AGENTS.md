@@ -1,36 +1,59 @@
-# Meridian Agent Rules
+# NIWOE Agent Rules
 
 ## Projekt (Kurz)
-Meridian ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess und
-erstklassigem BSD-Ziel. Der aktuelle Shell-Renderer ist nativ; die aktive
-Zielarchitektur migriert Meridian-eigene Alltags-UI schrittweise auf eine kleine
-WebKit-Plattform mit HTML/CSS/Web Components und typisierter Rust-Bridge.
-OpenBSD wird zuerst auf realer Intel-Hardware evaluiert, FreeBSD bleibt die
-ernsthafte Alternative. Aktive Reihenfolge: `MERIDIAN_OS_PLAN.md` + `ROADMAP.md`.
+NIWOE ist ein Rust-Wayland-Compositor mit separatem Shell-Prozess. Produktziel
+ist zuerst ein kohärenter nativer Linux-Desktop auf einer bestehenden Linux-
+Distribution; ein eigenes Linux-basiertes OS folgt erst nach der Desktop-Alpha.
+NIWOE-eigene UI bleibt vollständig nativ in Rust und baut auf
+`niwoe-ui`, `niwoe-tokens` und `niwoe-config` auf. Der archivierte
+WebKit-Prototyp ist nur visuelle Referenz und kein Produktpfad. Die aktive
+Reihenfolge ist ausschließlich `NIWOE_IMPLEMENTATION_PLAN.md`; frühere
+NIWOE-/BSD-Roadmaps sind historische Evidenz und keine offenen Pflichten.
 
 ## Design – VERBINDLICHE Vorgabe (gilt für jede UI-/Render-Änderung)
-Die Datei **`docs/meridian_design_manifest.md` ist die maßgebliche Design-Spezifikation.**
+Die Datei **`docs/niwoe_design_manifest.md` ist die
+maßgebliche Design-Spezifikation.** Sie präzisiert `docs/NIWOE_DESIGN_BRIEF.md`.
 Jede Änderung an Aussehen, Farben, Geometrie oder Effekten MUSS ihr entsprechen.
 Bei Konflikt schlägt das Manifest jede andere Quelle (Audits, Altcode).
 
 Daraus abgeleitete, nicht verhandelbare Invarianten:
-- **Eine** zentrale Design-Quelle: `meridian-tokens` (`Palette`, `Interaction`,
-  `Elevation`, `Radius`) + `meridian-config` (`Decorations`). Jedes UI-Element
+- **Eine** zentrale Design-Quelle: `niwoe-tokens` (`Palette`, `Interaction`,
+  `Elevation`, `Radius`) + `niwoe-config` (`Decorations`). Jedes UI-Element
   zieht Farbe/Alpha/Geometrie/Radius/Effekt **ausschließlich** daraus.
 - **Kein hartverdrahteter Farb-/Alpha-/Radius-/Mix-Wert im Render-Code** außerhalb
   dieser Quelle. Ausnahmen nur für Marken-Assets/Icons und Tests, und nur explizit
   via `// guard:allow: <grund>` bzw. `guard:allow-file` begründet.
-- Genau **2 Themes (hell/dunkel)**, identisch bis auf Farben (Layout, Geometrie,
-  Radien, Glas/Blur/Schatten gleich). Theme-Wechsel = nur Farbtabelle tauschen.
-- **Branding (Kompass/Meridian-Grafik) nur subtil in Login + Bootsplash**
-  (Manifest §11/§12). NICHT in der Alltags-UI/Taskbar/Startbutton
-  (Manifest §3.4 „kein Kompass-Theater", §9 „kein buntes Logo", §14 „Kompass überall").
-- **Guard-Test muss grün bleiben:** `cargo test -p meridian-tokens --test design_guard`
+- Nutzerentscheidung vom 25.09.2026: Die Desktop-Alpha verwendet **ein**
+  verbindliches dunkelgrünes NIWOE-Theme. Das helle Theme ist für die Alpha
+  kein Produkt- oder Abnahmeziel; eine spätere helle Variante braucht eine
+  eigene Produktentscheidung. Vorhandener Light-Code darf als ungenutzter
+  Bestand erhalten bleiben, begründet aber keine zweite aktive UI oder
+  Theme-Auswahl. Alle aktiven Designwerte bleiben zentral in Tokens/Config.
+- **Branding nur als NIWOE-Wortmarke in Welcome, Login und About**; keine
+  NIWOE-Kompassgrafik und keine Markenfläche in der Alltags-UI, Taskbar oder
+  dem Hub-Button.
+- **Guard-Test muss grün bleiben:** `cargo test -p niwoe-tokens --test design_guard`
   schlägt bei neuen Hardcodes fehl. Roten Guard nie ignorieren — entweder
   zentralisieren oder bewusst mit `// guard:allow: <grund>` freigeben.
 - Definition of Done für Zentralität: `docs/GUI_CENTRALIZATION_PLAN.md` §9.
-- Web-UI erzeugt CSS-Tokens ausschließlich aus `meridian-tokens` +
-  `meridian-config`; keine zweite handgepflegte Palette/Geometrie.
+- Nutzerkorrektur vom 24.09.2026: Die letzten vier Mockups unter `assets/`
+  (`17_13_54 (1)` bis `(4)`) sind visuell verbindlich. Die ersten vier
+  (`17_13_13 (1)` bis `(4)`) sind redundante, unverbindliche Kontextbilder.
+  Abweichungen von den letzten vier nur bei konkret dokumentierter technischer
+  Notwendigkeit oder ausdrücklicher Nutzerkorrektur. Nutzerkorrektur vom
+  24.09.2026: Die Panel-Schaltfläche öffnet den vollständigen Hub aus Mockup
+  `17_13_54 (2)`; es gibt keine separate Spotlight-Launcher-Oberfläche. Vom Hub
+  führt der sichtbare Weg zu „Räume verwalten“ und „Raum konfigurieren“ mit der
+  vollständigen Sidebar aus `(3)` und `(4)`. Native Produkt-UI bezieht weiterhin
+  alle Designwerte direkt aus `niwoe-tokens` + `niwoe-config`.
+- Nutzerpräzisierung vom 24.09.2026: Der Hub öffnet sich genau einmal zu Beginn
+  jeder neuen NIWOE-Login-Sitzung als Willkommensansicht. Ein Shell-/Watchdog-
+  Neustart innerhalb derselben Sitzung darf ihn nicht erneut öffnen. Danach ist
+  `Super+Space` der reguläre Hub-Zugang; Tippen im Hub startet die Suche.
+- Nutzerauftrag vom 25.09.2026: Jede neue NIWOE-Login-Sitzung beginnt in der
+  neutralen Loge ohne aktiven Raum. Der Willkommens-Hub ist ihr Einstieg; eine
+  Raumwahl aktiviert den gewählten Kontext. Ein direkter App-Schnellstart aus
+  der Loge aktiviert Raum 1 als Fensterziel. Die Loge ist kein zehnter Raum.
 
 ## Harte Regeln für Codex
 1. Keine Feature-Änderung ohne expliziten Auftrag.
@@ -43,11 +66,10 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
 8. Prefer cached visual assets over per-frame recomputation.
 9. Do not add animations, blur, shadows, or icon decoding without cache/invalidation strategy.
 10. Every visual feature must explain its performance model.
-10a. WebKit/UI-Bridge bleibt unprivilegiert, deny-by-default und ohne ambienten
-    Datei-/Netzwerk-/Prozesszugriff; privilegierte Aktionen bleiben in kleinen
-    Rust-Services/Helpern.
-10b. Keine große neue Desktop-Funktion vor dem Vertical Slice
-    Runtime/Bridge -> Panel -> Launcher -> Quick Settings.
+10a. Die native Shell bleibt unprivilegiert; privilegierte Aktionen bleiben in
+    kleinen Rust-Services/Helpern mit engen typisierten IPC-Grenzen.
+10b. Keine große neue Desktop-Funktion vor der nativen Qualitätsrunde
+    Panel -> Hub -> Quick Settings.
 11. After every Rust code change, run at least `cargo check --workspace`.
 12. If tests were added or changed, run `cargo test --workspace`.
 13. For formatting-sensitive Rust changes, run `cargo fmt`.
@@ -76,6 +98,20 @@ Daraus abgeleitete, nicht verhandelbare Invarianten:
 2. Bei Test-/Logikänderungen zusätzlich `cargo test --workspace`.
 3. Bei formatierungssensitiven Änderungen `cargo fmt`.
 4. Bei Rendering/Input/IPC: betroffene Pfade manuell gegen Call-Flow prüfen.
+
+## Installation auf dem Testrechner
+- Nutzerkorrektur vom 23.09.2026: Zuerst das Panel entsprechend den verbindlichen
+  Mockups einschließlich sichtbarem Glas/Blur/leichter Transparenz fertigstellen
+  und visuell abnehmen. Bis dahin keine Fortsetzung anderer UI-Phasen.
+- Anschließende Nutzerfreigabe: Material von Systemdeck/Lautstärke beibehalten
+  und ausdrücklich auf Panel und Hub übertragen. Dieser Materialabgleich ist
+  Teil des aktuellen Auftrags.
+- Nutzerauftrag vom 23.09.2026: Jeden erfolgreich geprüften Implementierungsstand
+  direkt als Release auf dem vorhandenen Fedora-Testrechner installieren, damit
+  der Nutzer ihn sehen kann. Nicht bei einem nur lokal geprüften Stand aufhören.
+- Installierte Buildidentität prüfen; bei reinen Shell-Änderungen die Shell über
+  den vorhandenen Watchdog erneuern, sofern eine NIWOE-Sitzung läuft. Erforderlichen
+  Neulogin ausdrücklich melden. Bestehende KDE-/GTK-Konfiguration erhalten.
 
 ## Berichtformat
 1. Geänderte Dateien.

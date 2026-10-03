@@ -1,0 +1,12 @@
+{
+  "niwoe": {
+    "pid": "216055",
+    "installed": "c09985e39b77bea259fb81aaae8ab92f4933bf50a0a8971756bde146457d6f65",
+    "running": "c09985e39b77bea259fb81aaae8ab92f4933bf50a0a8971756bde146457d6f65"
+  },
+  "niwoe-shell": {
+    "pid": "216068",
+    "installed": "d373452ac60fe17e6a8f93fc94634ad510e1da34a574a0718b8a27bc718e5282",
+    "running": "d373452ac60fe17e6a8f93fc94634ad510e1da34a574a0718b8a27bc718e5282"
+  }
+}

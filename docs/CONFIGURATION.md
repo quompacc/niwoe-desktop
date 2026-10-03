@@ -1,12 +1,11 @@
 # Configuration
 
-> Architecture note (2026-08-19): `meridian-config` remains the persistent and
-> validated source when Settings moves to WebKit. UI documents emit typed
-> intents through the Rust bridge; they do not edit configuration files or
-> define fallback design tokens themselves.
+> Architecture note (2026-08-25): `niwoe-config` is the persistent and
+> validated source for native Settings. UI code emits typed intents; it does not
+> bypass validation, edit unrelated files or define fallback design tokens.
 
-Meridian lädt die Benutzerkonfiguration aus:
-- `~/.config/meridian/config.toml`
+NIWOE lädt die Benutzerkonfiguration aus:
+- `~/.config/niwoe/config.toml`
 
 Wenn die Datei fehlt oder fehlerhaft ist, werden Defaults genutzt (bzw. bei Runtime-Reload der alte aktive Zustand beibehalten).
 

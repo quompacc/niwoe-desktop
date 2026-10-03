@@ -1,0 +1,586 @@
+//! Chrome tokens: scrollbar, launcher-overlay and mask opacities — named once
+//! so a global look change touches ONE place. Before this, the shell carried a
+//! pile of `LAUNCHER_*_ALPHA` / `DIM_ALPHA` magic constants per file.
+//!
+//! These are plain `u8` opacities applied over the theme's own colours (the
+//! colour always comes from `Palette`; only the *opacity* is named here), so
+//! they stay theme-agnostic and identical between the light and dark themes.
+
+/// Default composited surface opacity, shared by config and native previews.
+// guard:allow: canonical surface opacity definition in niwoe-tokens, not a renderer override.
+pub const SURFACE_ALPHA: u8 = 235;
+
+/// Scrollbar track/thumb opacity (drawn over glass).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Scrollbar {
+    /// Track (the groove) — uses `Palette::text`.
+    pub track_alpha: u8,
+    /// Thumb (the draggable bar) — uses `Palette::accent`.
+    pub thumb_alpha: u8,
+}
+
+impl Scrollbar {
+    pub const DEFAULT: Scrollbar = Scrollbar {
+        track_alpha: 25,
+        thumb_alpha: 180,
+    };
+}
+
+impl Default for Scrollbar {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry shared by the panel surface and popovers anchored beside it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Panel {
+    pub height: u32,
+    /// Edge-attached top bar; shared by shell paint and compositor backdrop.
+    pub edge_radius: i32,
+    pub bottom_gap: u32,
+    pub side_margin: u32,
+    pub top_shadow: u32,
+    /// Height of the quiet interactive rail inside the panel.
+    pub control_height: u32,
+    /// Raster size requested for pinned application icons.
+    pub app_icon_size: i32,
+    /// Compact raster size for system and status-notifier icons.
+    pub status_icon_size: i32,
+    /// Resting control width for launcher and pinned applications.
+    pub control_width: u32,
+    /// Wider status control used by the clock.
+    pub clock_width: u32,
+    pub room_width: u32,
+    pub room_overflow_width: u32,
+    /// Desktop mockup: a short room rail, with remaining rooms in overflow.
+    pub visible_rooms: usize,
+    /// Neutral hover overlay over `Palette::surface_alt`.
+    pub hover_alpha: u8,
+    pub pressed_alpha: u8,
+    /// Focus/running indicator overlay over `Palette::accent`.
+    pub active_alpha: u8,
+    /// Hairline/group separator over `Palette::text`.
+    pub divider_alpha: u8,
+}
+
+impl Panel {
+    pub const DEFAULT: Panel = Panel {
+        height: 48,
+        edge_radius: 0,
+        bottom_gap: 0,
+        side_margin: 0,
+        top_shadow: 0,
+        control_height: 32,
+        app_icon_size: 22,
+        status_icon_size: 22,
+        control_width: 40,
+        clock_width: 164,
+        room_width: 120,
+        room_overflow_width: 32,
+        visible_rooms: 4,
+        hover_alpha: 30,
+        pressed_alpha: 60,
+        active_alpha: 20,
+        divider_alpha: 46,
+    };
+
+    pub const fn surface_height(self) -> u32 {
+        self.top_shadow + self.height + self.bottom_gap
+    }
+
+    /// Logical space reserved at the top edge for normal windows.
+    pub const fn window_reservation(self) -> u32 {
+        self.height + self.bottom_gap
+    }
+}
+
+impl Default for Panel {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry for the calendar popup anchored to the panel's right edge.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Calendar {
+    pub width: i32,
+    pub height: i32,
+    pub columns: i32,
+    pub rows: i32,
+    pub weekday_height: i32,
+    pub weekday_gap: i32,
+    pub cell_gap: i32,
+    pub today_inset: i32,
+}
+
+impl Calendar {
+    pub const DEFAULT: Calendar = Calendar {
+        width: 384,
+        height: 356,
+        columns: 7,
+        rows: 6,
+        weekday_height: 24,
+        weekday_gap: 8,
+        cell_gap: 4,
+        today_inset: 3,
+    };
+}
+
+impl Default for Calendar {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry for the compact 3x3 workspace switcher popup.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct WorkspaceSwitcher {
+    pub footer_height: i32,
+    pub line_height: i32,
+    pub navigation_height: i32,
+    pub width: i32,
+    pub height: i32,
+    pub columns: i32,
+    pub rows: i32,
+    pub tile_gap: i32,
+    pub tile_pad: i32,
+    pub occupied_dot_size: i32,
+}
+
+impl WorkspaceSwitcher {
+    pub const DEFAULT: WorkspaceSwitcher = WorkspaceSwitcher {
+        footer_height: 144,
+        line_height: 18,
+        navigation_height: 32,
+        width: 320,
+        height: 392,
+        columns: 3,
+        rows: 3,
+        tile_gap: 10,
+        tile_pad: 10,
+        occupied_dot_size: 6,
+    };
+}
+
+impl Default for WorkspaceSwitcher {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry for compositor-owned server-side window decorations.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WindowChrome {
+    pub titlebar_height: i32,
+    pub button_width: i32,
+    pub button_icon_size: u32,
+    pub button_icon_stroke: f32,
+    pub button_hover_inset: i32,
+    pub button_hover_radius: f32,
+    pub separator_height: i32,
+    pub resize_handle: i32,
+}
+
+impl WindowChrome {
+    pub const DEFAULT: WindowChrome = WindowChrome {
+        titlebar_height: 0,
+        button_width: 38,
+        button_icon_size: 13,
+        button_icon_stroke: 1.25,
+        button_hover_inset: 3,
+        button_hover_radius: crate::Radius::DEFAULT.sm as f32,
+        separator_height: 1,
+        resize_handle: 8,
+    };
+}
+
+impl Default for WindowChrome {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Launcher surface-overlay opacities (each applied over a `Palette` colour).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Launcher {
+    /// Canonical launcher surface width in logical pixels.
+    pub width: i32,
+    /// Canonical launcher surface height in logical pixels.
+    pub height: i32,
+    /// Gap between the launcher and the panel reservation.
+    pub panel_gap: i32,
+    /// Raster size requested for application icons in logical pixels.
+    pub app_icon_size: i32,
+    pub header_height: i32,
+    pub footer_height: i32,
+    pub sidebar_width: i32,
+    pub outer_pad: i32,
+    pub content_pad: i32,
+    pub search_height: i32,
+    pub sidebar_heading_height: i32,
+    pub favorite_row_height: i32,
+    pub app_heading_height: i32,
+    pub app_card_height: i32,
+    pub grid_gap: i32,
+    pub grid_columns: i32,
+    pub footer_button_size: i32,
+    pub footer_button_gap: i32,
+    /// Outer band behind the grid (0 = fully transparent: the compositor glass shows).
+    pub band_alpha: u8,
+    /// Resting cell background (0 = transparent).
+    pub cell_alpha: u8,
+    /// Hovered cell overlay (over `Palette::surface`).
+    pub hover_alpha: u8,
+    /// Selected cell overlay over the neutral `surface_alt` colour.
+    pub selected_alpha: u8,
+    /// Search-field fill (over `Palette::surface`).
+    pub search_field_alpha: u8,
+    /// Quiet accent hairline while the launcher search owns keyboard focus.
+    pub search_focus_alpha: u8,
+    /// Bento accent strip (over `Palette::accent`).
+    pub bento_accent_alpha: u8,
+    /// Power button when "armed" (over `Palette::error`).
+    pub power_armed_alpha: u8,
+    /// Section divider hairline (over `Palette::accent`).
+    pub divider_alpha: u8,
+}
+
+impl Launcher {
+    /// Search-only launcher; Settings retains its independent larger viewport.
+    pub const SEARCH: Launcher = Launcher {
+        width: 640,
+        height: 480,
+        header_height: 96,
+        footer_height: 40,
+        app_card_height: 56,
+        grid_gap: 4,
+        grid_columns: 1,
+        sidebar_width: 0,
+        content_pad: 16,
+        app_heading_height: 0,
+        ..Self::DEFAULT
+    };
+
+    /// Shared outer geometry for Hub overview and its inline search state.
+    pub const HUB: Launcher = Launcher {
+        width: crate::Hub::DEFAULT.width,
+        height: crate::Hub::DEFAULT.height,
+        header_height: 104,
+        footer_height: 48,
+        app_card_height: 60,
+        grid_gap: 4,
+        grid_columns: 1,
+        sidebar_width: 0,
+        content_pad: 24,
+        app_heading_height: 0,
+        ..Self::DEFAULT
+    };
+
+    pub const DEFAULT: Launcher = Launcher {
+        width: 880,
+        height: 620,
+        panel_gap: 2,
+        app_icon_size: 32,
+        header_height: 76,
+        footer_height: 64,
+        sidebar_width: 224,
+        outer_pad: 16,
+        content_pad: 24,
+        search_height: 44,
+        sidebar_heading_height: 36,
+        favorite_row_height: 48,
+        app_heading_height: 56,
+        app_card_height: 68,
+        grid_gap: 8,
+        grid_columns: 2,
+        footer_button_size: 36,
+        footer_button_gap: 4,
+        band_alpha: 0,
+        cell_alpha: 0,
+        hover_alpha: 42,
+        selected_alpha: 56,
+        search_field_alpha: 24,
+        search_focus_alpha: 52,
+        bento_accent_alpha: 105,
+        power_armed_alpha: 46,
+        divider_alpha: 44,
+    };
+}
+
+impl Default for Launcher {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry for the persistent power controls in the native greeter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Greeter {
+    pub power_button_width: i32,
+    pub power_button_height: i32,
+    pub power_button_gap: i32,
+    pub power_button_edge_pad: i32,
+    pub power_button_label_size: u32,
+    pub power_button_border_width: u32,
+    pub power_button_emphasis_border_width: u32,
+}
+
+impl Greeter {
+    pub const DEFAULT: Greeter = Greeter {
+        power_button_width: 96,
+        power_button_height: 32,
+        power_button_gap: 10,
+        power_button_edge_pad: 24,
+        power_button_label_size: 13,
+        power_button_border_width: 1,
+        power_button_emphasis_border_width: 2,
+    };
+}
+
+impl Default for Greeter {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry and translucent overlays for the Settings view hosted inside the
+/// launcher surface. Settings shares the launcher's outer dimensions while
+/// keeping its own, denser information hierarchy.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Settings {
+    pub header_height: i32,
+    pub heading_height: i32,
+    pub header_pad: i32,
+    pub header_gap: i32,
+    pub back_width: i32,
+    pub search_width: i32,
+    pub search_height: i32,
+    pub sidebar_width: i32,
+    pub sidebar_top_pad: i32,
+    pub sidebar_content_pad: i32,
+    pub sidebar_back_height: i32,
+    pub sidebar_brand_height: i32,
+    pub content_pad: i32,
+    pub group_pad: i32,
+    pub group_gap: i32,
+    pub group_heading_height: i32,
+    pub appearance_group_height: i32,
+    pub option_gap: i32,
+    pub theme_option_height: i32,
+    pub theme_preview_width: i32,
+    pub theme_preview_height: i32,
+    pub display_identity_height: i32,
+    pub display_mode_height: i32,
+    pub display_control_height: i32,
+    pub display_control_gap: i32,
+    pub sidebar_row_height: i32,
+    pub sidebar_section_height: i32,
+    pub sidebar_group_gap: i32,
+    pub sidebar_row_inset: i32,
+    pub selection_inset: i32,
+    pub selection_bar_width: i32,
+    pub divider_size: i32,
+    pub wallpaper_thumbnail_width: u32,
+    pub wallpaper_thumbnail_height: u32,
+    /// Internal settings cards are opaque like the archived reference.
+    pub card_alpha: u8,
+    /// Navigation-band opacity; Settings must not expose launcher blur.
+    pub sidebar_alpha: u8,
+    /// Search-field opacity on the opaque settings surface.
+    pub search_alpha: u8,
+    /// Hairline separator over `Palette::accent`.
+    pub divider_alpha: u8,
+}
+
+impl Settings {
+    pub const DEFAULT: Settings = Settings {
+        header_height: 76,
+        heading_height: 48,
+        header_pad: 24,
+        header_gap: 8,
+        back_width: 40,
+        search_width: 336,
+        search_height: crate::Controls::FORM_HEIGHT,
+        sidebar_width: 224,
+        sidebar_top_pad: 8,
+        sidebar_content_pad: 16,
+        sidebar_back_height: 32,
+        sidebar_brand_height: 48,
+        content_pad: 24,
+        group_pad: 16,
+        group_gap: 12,
+        group_heading_height: 44,
+        appearance_group_height: 164,
+        option_gap: 8,
+        theme_option_height: 76,
+        theme_preview_width: 64,
+        theme_preview_height: 44,
+        display_identity_height: 112,
+        display_mode_height: 64,
+        display_control_height: 64,
+        display_control_gap: 8,
+        sidebar_row_height: crate::Controls::MIN_HEIGHT,
+        sidebar_section_height: 18,
+        sidebar_group_gap: crate::Spacing::DEFAULT.xs,
+        sidebar_row_inset: 8,
+        selection_inset: 6,
+        selection_bar_width: 3,
+        divider_size: 1,
+        wallpaper_thumbnail_width: 96,
+        wallpaper_thumbnail_height: 54,
+        card_alpha: 255,
+        sidebar_alpha: 255,
+        search_alpha: 255,
+        divider_alpha: 44,
+    };
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Geometry for the compact system-controls popover.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct QuickSettings {
+    pub width: i32,
+    pub height: i32,
+    pub panel_gap: i32,
+    pub outer_pad: i32,
+    pub header_height: i32,
+    pub tile_height: i32,
+    pub tile_gap: i32,
+    pub section_gap: i32,
+    pub audio_height: i32,
+    pub status_height: i32,
+    pub footer_height: i32,
+    pub control_radius: i32,
+    pub slider_height: i32,
+    pub slider_thumb_size: i32,
+    pub icon_size: i32,
+}
+
+impl QuickSettings {
+    pub const DEFAULT: QuickSettings = QuickSettings {
+        width: 360,
+        height: 400,
+        panel_gap: 2,
+        outer_pad: 16,
+        header_height: 48,
+        tile_height: 88,
+        tile_gap: 10,
+        section_gap: 12,
+        audio_height: 64,
+        status_height: 48,
+        footer_height: 40,
+        control_radius: crate::Radius::DEFAULT.md,
+        slider_height: crate::Controls::TRACK_HEIGHT,
+        slider_thumb_size: crate::Controls::THUMB_SIZE,
+        icon_size: 20,
+    };
+}
+
+impl Default for QuickSettings {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+/// Dimming mask opacity (e.g. the region picker darkens the screen behind it).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Mask {
+    pub dim_alpha: u8,
+}
+
+impl Mask {
+    pub const DEFAULT: Mask = Mask { dim_alpha: 160 };
+}
+
+impl Default for Mask {
+    fn default() -> Self {
+        Self::DEFAULT
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn defaults_locked() {
+        // Changing these is fine — but it WILL move the look everywhere they
+        // are used, so the change is deliberate and visible in one diff.
+        assert_eq!(Scrollbar::DEFAULT.track_alpha, 25);
+        assert_eq!(Scrollbar::DEFAULT.thumb_alpha, 180);
+        assert_eq!(Launcher::DEFAULT.hover_alpha, 42);
+        assert_eq!(Launcher::DEFAULT.width, 880);
+        assert_eq!(Launcher::DEFAULT.height, 620);
+        assert_eq!(Launcher::DEFAULT.panel_gap, 2);
+        assert_eq!(Launcher::DEFAULT.app_icon_size, 32);
+        assert_eq!(Launcher::DEFAULT.sidebar_width, 224);
+        assert_eq!(Launcher::DEFAULT.grid_columns, 2);
+        assert_eq!(Panel::DEFAULT.surface_height(), 48);
+        assert_eq!(Panel::DEFAULT.window_reservation(), 48);
+        assert_eq!(Panel::DEFAULT.control_height, 32);
+        assert_eq!(Panel::DEFAULT.app_icon_size, 22);
+        assert_eq!(Panel::DEFAULT.status_icon_size, 22);
+        assert_eq!(Calendar::DEFAULT.width, 384);
+        assert_eq!(Calendar::DEFAULT.height, 356);
+        assert_eq!(Calendar::DEFAULT.columns, 7);
+        assert_eq!(Calendar::DEFAULT.rows, 6);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.width, 320);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.height, 392);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.columns, 3);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.rows, 3);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.tile_pad, 10);
+        assert_eq!(WorkspaceSwitcher::DEFAULT.occupied_dot_size, 6);
+        assert_eq!(WindowChrome::DEFAULT.titlebar_height, 0);
+        assert_eq!(WindowChrome::DEFAULT.button_width, 38);
+        assert_eq!(WindowChrome::DEFAULT.button_icon_size, 13);
+        assert_eq!(WindowChrome::DEFAULT.separator_height, 1);
+        assert_eq!(Launcher::DEFAULT.selected_alpha, 56);
+        assert_eq!(Launcher::DEFAULT.search_focus_alpha, 52);
+        assert_eq!(Launcher::DEFAULT.divider_alpha, 44);
+        assert_eq!(Greeter::DEFAULT.power_button_width, 96);
+        assert_eq!(Greeter::DEFAULT.power_button_height, 32);
+        assert_eq!(Greeter::DEFAULT.power_button_gap, 10);
+        assert_eq!(Greeter::DEFAULT.power_button_edge_pad, 24);
+        assert_eq!(
+            Settings::DEFAULT.header_height,
+            Launcher::DEFAULT.header_height
+        );
+        assert_eq!(
+            Settings::DEFAULT.sidebar_width,
+            Launcher::DEFAULT.sidebar_width
+        );
+        assert_eq!(Settings::DEFAULT.sidebar_content_pad, 16);
+        assert_eq!(Settings::DEFAULT.sidebar_back_height, 32);
+        assert_eq!(Settings::DEFAULT.sidebar_brand_height, 48);
+        assert_eq!(Settings::DEFAULT.heading_height, 48);
+        assert_eq!(Settings::DEFAULT.sidebar_row_inset, 8);
+        assert_eq!(Settings::DEFAULT.display_identity_height, 112);
+        assert_eq!(Settings::DEFAULT.display_control_height, 64);
+        assert_eq!(Settings::DEFAULT.card_alpha, 255);
+        assert_eq!(Settings::DEFAULT.sidebar_alpha, 255);
+        assert_eq!(
+            Settings::DEFAULT.divider_alpha,
+            Launcher::DEFAULT.divider_alpha
+        );
+        assert_eq!(Mask::DEFAULT.dim_alpha, 160);
+        assert_eq!(QuickSettings::DEFAULT.width, 360);
+        assert_eq!(QuickSettings::DEFAULT.height, 400);
+        assert_eq!(QuickSettings::DEFAULT.slider_thumb_size, 16);
+    }
+
+    #[test]
+    fn defaults_via_default_trait_match_consts() {
+        assert_eq!(Scrollbar::default(), Scrollbar::DEFAULT);
+        assert_eq!(Calendar::default(), Calendar::DEFAULT);
+        assert_eq!(Launcher::default(), Launcher::DEFAULT);
+        assert_eq!(Greeter::default(), Greeter::DEFAULT);
+        assert_eq!(Settings::default(), Settings::DEFAULT);
+        assert_eq!(Mask::default(), Mask::DEFAULT);
+    }
+}

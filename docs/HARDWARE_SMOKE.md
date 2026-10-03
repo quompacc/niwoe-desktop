@@ -1,15 +1,16 @@
 # Controlled Hardware Smoke
 
-> **Scope note (2026-08-19):** this documents the current Linux/native-shell
-> hardware pass. For the new OpenBSD/Acer decision path use `OPENBSD.md`; do not
-> report this smoke as BSD validation.
+> **Scope note (2026-09-21):** NIWOE targets Linux. Start with
+> [the current baseline](NIWOE_LINUX_BASELINE.md), keeping the existing desktop
+> and display manager available. The boot-login replacement procedure below is
+> historical and optional; it is not a P00 requirement. BSD evidence is historical.
 
 This runbook separates preflight work from checks that can only be proven on
 real DRM/input hardware.
 
 ## Goal
 
-Get from boot/login to a usable Meridian desktop once, with recovery available.
+Get from boot/login to a usable NIWOE desktop once, with recovery available.
 Do not combine the first boot with broad hotplug, suspend, or gaming tests.
 
 ## Preflight before enabling tty1 login
@@ -31,12 +32,12 @@ Do not combine the first boot with broad hotplug, suspend, or gaming tests.
 3. Verify installed files exist:
 
    ```bash
-   command -v meridian meridian-shell meridian-login meridian-lock meridian-portal meridian-polkit-agent
-   test -f /etc/pam.d/meridian-login
-   test -f /etc/pam.d/meridian-login-password
-   test -d /usr/local/share/meridian/themes
-   test -f /usr/local/share/xdg-desktop-portal/portals/meridian.portal
-   test -f /usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service
+   command -v niwoe niwoe-shell niwoe-login niwoe-lock niwoe-portal niwoe-polkit-agent
+   test -f /etc/pam.d/niwoe-login
+   test -f /etc/pam.d/niwoe-login-password
+   test -d /usr/local/share/niwoe/themes
+   test -f /usr/local/share/xdg-desktop-portal/portals/niwoe.portal
+   test -f /usr/local/share/dbus-1/services/org.freedesktop.impl.portal.desktop.niwoe.service
    ```
 
 4. Only then enable boot login:
@@ -55,29 +56,29 @@ After reboot, verify from the machine and over SSH:
 - keyboard and pointer input work
 - `Super+Space` opens the launcher
 - a terminal or simple app launches
-- `Super+L` starts `meridian-lock` and unlock succeeds
-- logout returns to `meridian-login`
+- `Super+L` starts `niwoe-lock` and unlock succeeds
+- logout returns to `niwoe-login`
 
 Collect:
 
 ```bash
 systemctl --failed --no-pager
-systemctl status --no-pager meridian-login.service
-sudo journalctl -b -u meridian-login.service --no-pager
-journalctl --user -b --no-pager | grep -E 'meridian|portal|polkit|autostart' || true
+systemctl status --no-pager niwoe-login.service
+sudo journalctl -b -u niwoe-login.service --no-pager
+journalctl --user -b --no-pager | grep -E 'niwoe|portal|polkit|autostart' || true
 ```
 
 ## Portal smoke
 
-Inside the Meridian session:
+Inside the NIWOE session:
 
 ```bash
-busctl --user --list | grep -E 'xdg|portal|meridian' || true
-busctl --user introspect org.freedesktop.impl.portal.desktop.meridian /org/freedesktop/portal/desktop --no-pager
+busctl --user --list | grep -E 'xdg|portal|niwoe' || true
+busctl --user introspect org.freedesktop.impl.portal.desktop.niwoe /org/freedesktop/portal/desktop --no-pager
 ```
 
 FileChooser requires a real xdg-desktop-portal client. Screenshot requires the
-Meridian consent modal and should produce a file URI when allowed.
+NIWOE consent modal and should produce a file URI when allowed.
 
 ## Hotplug and mode-change follow-up
 

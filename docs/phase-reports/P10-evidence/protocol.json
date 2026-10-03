@@ -1,0 +1,26 @@
+[
+  {
+    "type": "room-mutation-result",
+    "request_id": "p10-invalid-1790502680261769898",
+    "revision": 805,
+    "error": "invalid"
+  },
+  {
+    "type": "room-mutation-result",
+    "request_id": "p10-invalid-1790502680462746692",
+    "revision": 805,
+    "error": "invalid"
+  },
+  {
+    "type": "room-mutation-result",
+    "request_id": "p10-invalid-1790502680663890425",
+    "revision": 805,
+    "error": "invalid"
+  },
+  {
+    "type": "room-mutation-result",
+    "request_id": "p10-invalid-1790502680864896558",
+    "revision": 805,
+    "error": "conflict"
+  }
+]

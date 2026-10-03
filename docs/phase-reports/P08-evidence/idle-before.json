@@ -1,0 +1,50 @@
+[
+  {
+    "run": 0,
+    "seconds": 300.000324191,
+    "processes": {
+      "niwoe": {
+        "cpu_percent": 0.7799991571043109,
+        "rss_before": 99340288,
+        "rss_after": 99340288
+      },
+      "niwoe-shell": {
+        "cpu_percent": 0.13999984871103016,
+        "rss_before": 51163136,
+        "rss_after": 51163136
+      }
+    }
+  },
+  {
+    "run": 1,
+    "seconds": 300.00023502600015,
+    "processes": {
+      "niwoe": {
+        "cpu_percent": 0.7166661052161062,
+        "rss_before": 99340288,
+        "rss_after": 99340288
+      },
+      "niwoe-shell": {
+        "cpu_percent": 0.12666656743354435,
+        "rss_before": 51163136,
+        "rss_after": 51163136
+      }
+    }
+  },
+  {
+    "run": 2,
+    "seconds": 300.00193657599993,
+    "processes": {
+      "niwoe": {
+        "cpu_percent": 0.6299959332166523,
+        "rss_before": 99340288,
+        "rss_after": 101044224
+      },
+      "niwoe-shell": {
+        "cpu_percent": 0.12333253719056156,
+        "rss_before": 51163136,
+        "rss_after": 52932608
+      }
+    }
+  }
+]

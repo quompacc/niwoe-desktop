@@ -1,0 +1,556 @@
+use smithay_client_toolkit::{
+    seat::keyboard::{KeyEvent, KeyboardHandler, Keysym, Modifiers},
+    shell::WaylandSurface,
+};
+use tracing::debug;
+use wayland_client::{
+    protocol::{wl_keyboard, wl_surface},
+    Connection, QueueHandle,
+};
+
+use crate::wayland::{CommitReason, RepaintReason, SurfaceKind};
+
+use super::NiwoeShell;
+
+mod room_navigation;
+mod workspace_navigation;
+
+impl KeyboardHandler for NiwoeShell {
+    fn enter(
+        &mut self,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+        _: &wl_keyboard::WlKeyboard,
+        surface: &wl_surface::WlSurface,
+        _: u32,
+        _: &[u32],
+        _: &[Keysym],
+    ) {
+        self.keyboard_focus = if self.launcher_layer.wl_surface() == surface {
+            SurfaceKind::Launcher
+        } else if self.calendar_layer.wl_surface() == surface {
+            SurfaceKind::Calendar
+        } else if self.workspace_layer.wl_surface() == surface {
+            SurfaceKind::WorkspacePopup
+        } else if self.network_layer.wl_surface() == surface {
+            SurfaceKind::NetworkPopup
+        } else if self.panel.wl_surface() == surface {
+            SurfaceKind::Panel
+        } else if self.desktop_menu_layer.wl_surface() == surface {
+            SurfaceKind::DesktopMenu
+        } else {
+            SurfaceKind::None
+        };
+        if self.launcher_state.open {
+            debug!(
+                "launcher keyboard focus enter: focus={:?} open={} configured={}",
+                self.keyboard_focus, self.launcher_state.open, self.launcher_configured
+            );
+        }
+    }
+
+    fn leave(
+        &mut self,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+        _: &wl_keyboard::WlKeyboard,
+        _: &wl_surface::WlSurface,
+        _: u32,
+    ) {
+        if self.launcher_state.open {
+            debug!(
+                "launcher keyboard focus leave: previous={:?} open={}",
+                self.keyboard_focus, self.launcher_state.open
+            );
+        }
+        self.keyboard_focus = SurfaceKind::None;
+    }
+
+    fn press_key(
+        &mut self,
+        _conn: &Connection,
+        qh: &QueueHandle<Self>,
+        _: &wl_keyboard::WlKeyboard,
+        _: u32,
+        event: KeyEvent,
+    ) {
+        let is_escape = event.keysym == Keysym::Escape;
+
+        // ── Screenshot region picker also grabs the keyboard while mapped:
+        // Enter confirms the pending rectangle (no-op if nothing picked
+        // yet — the user has to drag first), Esc cancels. All other keys
+        // are swallowed so they can't leak underneath the overlay.
+        if self.region_picker_open {
+            let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
+            if is_enter {
+                if let Some(rect) = self.region_picker_pending {
+                    self.respond_region(qh, Some(rect.to_screenshot_region()));
+                }
+            } else if is_escape {
+                self.respond_region(qh, None);
+            }
+            return;
+        }
+
+        // ── Screenshot consent modal: it grabs the keyboard, so answer here
+        // first. Enter = allow, Esc = deny. Any other key is swallowed so it
+        // can't leak to the surface behind the modal.
+        if self.consent_open {
+            let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
+            if is_enter {
+                self.respond_consent(true);
+            } else if is_escape {
+                self.respond_consent(false);
+            }
+            return;
+        }
+
+        // ── Wi-Fi password modal: also grabs the keyboard. Enter connects, Esc
+        // cancels, BackSpace edits, printable keys append. All keys are
+        // swallowed so the password never leaks to the surface behind it.
+        if self.wifi_modal_open {
+            if is_escape {
+                self.close_wifi_password_modal();
+                self.draw_panel(qh, RepaintReason::Keyboard);
+                return;
+            }
+            let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
+            if is_enter {
+                self.submit_wifi_password_modal();
+                self.draw_panel(qh, RepaintReason::Keyboard);
+                return;
+            }
+            if event.keysym == Keysym::BackSpace {
+                self.wifi_password_input.pop();
+                self.draw_wifi_modal(qh, RepaintReason::Keyboard);
+                return;
+            }
+            if let Some(ch) = event.keysym.key_char().filter(|c| !c.is_control()) {
+                self.wifi_password_input.push(ch);
+                self.draw_wifi_modal(qh, RepaintReason::Keyboard);
+            }
+            return;
+        }
+
+        // ── Popup / context-menu dismissals ──────────────────────────────────
+        if is_escape && self.context_menu.is_some() {
+            self.context_menu = None;
+            self.draw_launcher(qh, RepaintReason::Keyboard);
+            return;
+        }
+
+        // ── Desktop context menu: full keyboard navigation ────────────────────
+        if self.desktop_menu_open {
+            let is_down = event.keysym == Keysym::Down;
+            let is_up = event.keysym == Keysym::Up;
+            let is_right = event.keysym == Keysym::Right;
+            let is_left = event.keysym == Keysym::Left;
+            let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
+
+            if is_escape {
+                if self
+                    .desktop_context_menu
+                    .as_ref()
+                    .is_some_and(|m| m.submenu_open)
+                {
+                    // First Esc: close submenu only
+                    if let Some(ref mut menu) = self.desktop_context_menu {
+                        menu.submenu_open = false;
+                        menu.submenu_hover_idx = None;
+                    }
+                    self.resize_desktop_menu_surface(false);
+                    self.draw_desktop_menu(qh, RepaintReason::Keyboard);
+                } else {
+                    // Second Esc (or no submenu): close whole menu
+                    self.desktop_context_menu = None;
+                    self.desktop_menu_open = false;
+                    self.unmap_desktop_menu(CommitReason::Input);
+                }
+                return;
+            }
+
+            let n_main = crate::context_menu::desktop_item_list().len();
+            let n_sub = crate::context_menu::submenu_items().len();
+            let submenu_open = self
+                .desktop_context_menu
+                .as_ref()
+                .is_some_and(|m| m.submenu_open);
+
+            if is_down || is_up {
+                if submenu_open {
+                    if let Some(ref mut menu) = self.desktop_context_menu {
+                        let cur = menu.submenu_hover_idx.unwrap_or(if is_down {
+                            n_sub
+                        } else {
+                            n_sub + 1
+                        });
+                        menu.submenu_hover_idx = Some(if is_down {
+                            if cur + 1 < n_sub {
+                                cur + 1
+                            } else {
+                                0
+                            }
+                        } else {
+                            if cur > 0 {
+                                cur - 1
+                            } else {
+                                n_sub - 1
+                            }
+                        });
+                    }
+                } else {
+                    if let Some(ref mut menu) = self.desktop_context_menu {
+                        let cur =
+                            menu.hover_idx
+                                .unwrap_or(if is_down { n_main } else { n_main + 1 });
+                        let next = if is_down {
+                            if cur + 1 < n_main {
+                                cur + 1
+                            } else {
+                                0
+                            }
+                        } else {
+                            if cur > 0 {
+                                cur - 1
+                            } else {
+                                n_main - 1
+                            }
+                        };
+                        menu.hover_idx = Some(next);
+                        // Auto-open submenu when Settings item is reached
+                        if next == crate::context_menu::SETTINGS_ITEM_IDX {
+                            menu.submenu_open = true;
+                            menu.submenu_hover_idx = Some(0);
+                        } else {
+                            menu.submenu_open = false;
+                            menu.submenu_hover_idx = None;
+                        }
+                    }
+                    let new_submenu = self
+                        .desktop_context_menu
+                        .as_ref()
+                        .is_some_and(|m| m.submenu_open);
+                    if new_submenu != submenu_open {
+                        self.resize_desktop_menu_surface(new_submenu);
+                    }
+                }
+                self.draw_desktop_menu(qh, RepaintReason::Keyboard);
+                return;
+            }
+
+            if is_right && !submenu_open {
+                if self
+                    .desktop_context_menu
+                    .as_ref()
+                    .is_some_and(|m| m.hover_idx == Some(crate::context_menu::SETTINGS_ITEM_IDX))
+                {
+                    if let Some(ref mut menu) = self.desktop_context_menu {
+                        menu.submenu_open = true;
+                        menu.submenu_hover_idx = Some(0);
+                    }
+                    self.resize_desktop_menu_surface(true);
+                    self.draw_desktop_menu(qh, RepaintReason::Keyboard);
+                }
+                return;
+            }
+
+            if is_left && submenu_open {
+                if let Some(ref mut menu) = self.desktop_context_menu {
+                    menu.submenu_open = false;
+                    menu.submenu_hover_idx = None;
+                }
+                self.resize_desktop_menu_surface(false);
+                self.draw_desktop_menu(qh, RepaintReason::Keyboard);
+                return;
+            }
+
+            if is_enter {
+                if submenu_open {
+                    let sub_action = self
+                        .desktop_context_menu
+                        .as_ref()
+                        .and_then(|m| m.submenu_hover_idx)
+                        .and_then(|idx| crate::context_menu::submenu_items().get(idx).map(|i| i.1));
+                    self.desktop_context_menu = None;
+                    self.desktop_menu_open = false;
+                    self.unmap_desktop_menu(CommitReason::Input);
+                    if let Some(sub) = sub_action {
+                        self.handle_settings_sub_action(qh, sub);
+                    }
+                } else {
+                    let action = self
+                        .desktop_context_menu
+                        .as_ref()
+                        .and_then(|m| m.hover_idx)
+                        .and_then(|idx| {
+                            crate::context_menu::desktop_item_list()
+                                .get(idx)
+                                .map(|i| i.1)
+                        });
+                    self.desktop_context_menu = None;
+                    self.desktop_menu_open = false;
+                    self.unmap_desktop_menu(CommitReason::Input);
+                    if let Some(action) = action {
+                        self.handle_desktop_context_menu_action(qh, action);
+                    }
+                }
+                return;
+            }
+
+            // Any other key closes the menu
+            if event.keysym.key_char().is_none() {
+                return;
+            }
+            return;
+        }
+        if self.network_popup_open
+            && self.network_popup_tab == crate::network_popup::NetworkTab::Status
+            && !is_escape
+        {
+            use crate::quick_settings_popup::{self as deck, QuickSettingsHit};
+            match event.keysym {
+                Keysym::Tab | Keysym::Down => deck::focus_next(false),
+                Keysym::ISO_Left_Tab | Keysym::Up => deck::focus_next(true),
+                Keysym::Left | Keysym::Right => {
+                    if matches!(deck::focused_action(), Some(QuickSettingsHit::Volume(_))) {
+                        if let Some(volume) = self
+                            .audio_snapshot
+                            .default_output
+                            .as_ref()
+                            .and_then(|d| d.volume_percent)
+                            .map(|v| self.deck_mutation.requested_volume.unwrap_or(v))
+                        {
+                            let next = if event.keysym == Keysym::Left {
+                                volume.saturating_sub(5)
+                            } else {
+                                volume.saturating_add(5).min(100)
+                            };
+                            self.dispatch_deck_action(qh, QuickSettingsHit::Volume(next));
+                        }
+                    }
+                }
+                Keysym::Return | Keysym::KP_Enter | Keysym::space => {
+                    if let Some(action) = deck::focused_action() {
+                        if !matches!(action, QuickSettingsHit::Volume(_)) {
+                            self.dispatch_deck_action(qh, action);
+                        }
+                    } else {
+                        deck::focus_next(false);
+                    }
+                }
+                _ => {}
+            }
+            self.draw_network_popup(qh, RepaintReason::Keyboard);
+            return;
+        }
+        if self.network_popup_open && is_escape {
+            self.close_network_popup(CommitReason::Input);
+            self.draw_panel(qh, RepaintReason::Keyboard);
+            return;
+        }
+        if self.audio_popup_open && is_escape {
+            self.close_audio_popup(CommitReason::Input);
+            self.draw_panel(qh, RepaintReason::Keyboard);
+            return;
+        }
+        if self.workspace_popup_open && self.workspace_state.rooms.edit.is_some() {
+            self.room_edit_key(qh, event.keysym);
+            return;
+        }
+        if self.workspace_popup_open {
+            self.workspace_navigation_key(qh, event.keysym);
+            return;
+        }
+        if self.calendar_popup_open && is_escape {
+            self.close_calendar_popup(CommitReason::Input);
+            self.draw_panel(qh, RepaintReason::Keyboard);
+            if !self.launcher_state.open {
+                return;
+            }
+        }
+
+        if !self.launcher_state.open {
+            return;
+        }
+
+        // (Wi-Fi password entry is handled by the centered modal above, which
+        // grabs the keyboard; the Settings page no longer captures it inline.)
+
+        // ── Settings view: type-to-search; Escape clears then exits ───────────
+        if self.workspace_state.rooms.wizard.open {
+            self.first_run_key(qh, event.keysym);
+            return;
+        }
+        if self.room_management_open {
+            if self.panel_form_key(qh, event.keysym) {
+                return;
+            }
+            if self.room_configuration_id.is_some() {
+                self.room_configuration_key(qh, event.keysym);
+            } else if is_escape {
+                self.return_to_hub(qh);
+            } else {
+                self.room_management_navigation_key(qh, event.keysym);
+            }
+            return;
+        }
+
+        if self.launcher_settings_open {
+            if self.settings_category == crate::settings_view::SettingsCategory::SystemOverview
+                && self.settings_search.is_empty()
+                && matches!(
+                    event.keysym,
+                    Keysym::Return
+                        | Keysym::KP_Enter
+                        | Keysym::space
+                        | Keysym::Tab
+                        | Keysym::ISO_Left_Tab
+                )
+            {
+                if matches!(
+                    event.keysym,
+                    Keysym::Return | Keysym::KP_Enter | Keysym::space
+                ) {
+                    self.open_first_run(qh);
+                }
+                return;
+            }
+            if is_escape {
+                if !self.settings_search.is_empty() {
+                    self.settings_search.clear();
+                } else {
+                    self.launcher_settings_open = false;
+                    self.ui_preview_widget_state = None;
+                }
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+                return;
+            }
+            if event.keysym == Keysym::BackSpace {
+                self.settings_search.pop();
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+                return;
+            }
+            if let Some(ch) = event.keysym.key_char().filter(|c| !c.is_control()) {
+                self.settings_search.push(ch);
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+            }
+            return;
+        }
+
+        if self.hub_key(qh, event.keysym) {
+            return;
+        }
+
+        // ── Command palette keyboard input ────────────────────────────────────
+        if self.window_picker_key(qh, event.keysym) {
+            return;
+        }
+        let is_backspace = event.keysym == Keysym::BackSpace;
+        let grid_direction = match event.keysym {
+            Keysym::Left => Some(crate::app_view::GridDirection::Left),
+            Keysym::Right => Some(crate::app_view::GridDirection::Right),
+            Keysym::Up => Some(crate::app_view::GridDirection::Up),
+            Keysym::Down => Some(crate::app_view::GridDirection::Down),
+            _ => None,
+        };
+        let is_enter = event.keysym == Keysym::Return || event.keysym == Keysym::KP_Enter;
+
+        if is_escape {
+            if self.hub_search_active {
+                self.search_query.clear();
+                self.hub_search_active = false;
+                self.launcher_selected_idx = None;
+                self.app_view_scroll_y = 0;
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+            } else {
+                self.close_launcher_after_launch(qh, RepaintReason::Keyboard);
+            }
+            return;
+        }
+
+        if is_backspace {
+            self.search_query.pop();
+            self.launcher_selected_idx = None;
+            self.app_view_scroll_y = 0;
+            self.draw_launcher(qh, RepaintReason::Keyboard);
+            return;
+        }
+
+        if !self.hub_search_active && self.hub_navigation_key(qh, event.keysym) {
+            return;
+        }
+
+        if self.hub_search_active {
+            if let Some(direction) = grid_direction {
+                let filtered = crate::app_view::collect_palette_apps(
+                    &self.launcher_state.apps,
+                    &self.search_query,
+                    &self.hidden_execs,
+                    self.launcher_state.category,
+                    &self.pinned_apps,
+                );
+                let n = filtered.len();
+                self.launcher_selected_idx =
+                    crate::app_view::next_grid_selection(self.launcher_selected_idx, n, direction);
+                if let Some(selected_idx) = self.launcher_selected_idx {
+                    self.app_view_scroll_y = crate::app_view::scroll_grid_selection_into_view(
+                        self.app_view_scroll_y,
+                        selected_idx,
+                        n,
+                        self.launcher_content_size().1,
+                    );
+                }
+                self.draw_launcher(qh, RepaintReason::Keyboard);
+                return;
+            }
+        }
+
+        if is_enter && self.hub_search_active {
+            let filtered = crate::app_view::collect_palette_apps(
+                &self.launcher_state.apps,
+                &self.search_query,
+                &self.hidden_execs,
+                self.launcher_state.category,
+                &self.pinned_apps,
+            );
+            let idx = self.launcher_selected_idx.unwrap_or(0);
+            if let Some(app) = filtered.get(idx) {
+                let app = (*app).clone();
+                crate::launcher::LauncherState::launch_desktop_app(app, &mut self.ipc);
+                self.close_launcher_after_launch(qh, RepaintReason::Keyboard);
+            }
+            return;
+        }
+
+        let ch = event.keysym.key_char().filter(|c| !c.is_control());
+        if let Some(c) = ch {
+            self.hub_search_active = true;
+            self.room_keyboard_focus = None;
+            self.search_query.push(c);
+            self.launcher_selected_idx = None;
+            self.app_view_scroll_y = 0;
+            self.draw_launcher(qh, RepaintReason::Keyboard);
+        }
+    }
+
+    fn release_key(
+        &mut self,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+        _: &wl_keyboard::WlKeyboard,
+        _: u32,
+        _: KeyEvent,
+    ) {
+    }
+
+    fn update_modifiers(
+        &mut self,
+        _: &Connection,
+        _: &QueueHandle<Self>,
+        _: &wl_keyboard::WlKeyboard,
+        _serial: u32,
+        _: Modifiers,
+        _layout: u32,
+    ) {
+    }
+}

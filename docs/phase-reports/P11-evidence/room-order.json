@@ -1,0 +1,268 @@
+{
+  "original": [
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 1,
+      "workspace": 1,
+      "name": "Raum 1",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 2,
+      "workspace": 2,
+      "name": "Raum 2",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 3,
+      "workspace": 3,
+      "name": "Raum 3",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 4,
+      "workspace": 4,
+      "name": "Raum 4",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 5,
+      "workspace": 5,
+      "name": "Raum 5",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 6,
+      "workspace": 6,
+      "name": "Raum 6",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 7,
+      "workspace": 7,
+      "name": "Raum 7",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 8,
+      "workspace": 8,
+      "name": "Raum 8",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 9,
+      "workspace": 9,
+      "name": "Raum 9",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 17,
+      "workspace": 10,
+      "name": "Arbeit",
+      "description": "Ein Kontext f\u00fcr deine Arbeit",
+      "assignment": "free"
+    }
+  ],
+  "reordered": [
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 2,
+      "workspace": 2,
+      "name": "Raum 2",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 3,
+      "workspace": 3,
+      "name": "Raum 3",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 4,
+      "workspace": 4,
+      "name": "Raum 4",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 5,
+      "workspace": 5,
+      "name": "Raum 5",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 6,
+      "workspace": 6,
+      "name": "Raum 6",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 7,
+      "workspace": 7,
+      "name": "Raum 7",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 8,
+      "workspace": 8,
+      "name": "Raum 8",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 9,
+      "workspace": 9,
+      "name": "Raum 9",
+      "description": "",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 17,
+      "workspace": 10,
+      "name": "Arbeit",
+      "description": "Ein Kontext f\u00fcr deine Arbeit",
+      "assignment": "free"
+    },
+    {
+      "preferences": {
+        "icon": null,
+        "apps": [],
+        "layout": "tiling",
+        "restore": "disabled"
+      },
+      "id": 1,
+      "workspace": 1,
+      "name": "Raum 1",
+      "description": "",
+      "assignment": "free"
+    }
+  ],
+  "shortcut_workspace": 2,
+  "exercised_workspace": 2
+}

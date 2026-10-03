@@ -1,0 +1,4 @@
+CAPTURE p11-relogin-hub
+CAPTURE p11-watchdog-no-welcome
+CAPTURE p11-watchdog-resume
+PASS real relogin neutral Hub, SIGKILL/watchdog, IPC resubscription, unchanged once marker and explicit draft resume

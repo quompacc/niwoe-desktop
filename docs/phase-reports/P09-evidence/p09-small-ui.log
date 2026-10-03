@@ -1,0 +1,14 @@
+   Compiling niwoe-shell v0.5.1 (/home/eduard/niwoe-desktop/crates/niwoe-shell)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 9.54s
+     Running unittests src/main.rs (target/debug/deps/niwoe_shell-68cdaebfa0e97c09)
+
+running 1 test
+test room_management_view::configuration::tests::configuration_renders_selected_room ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 383 filtered out; finished in 0.92s
+
+     Running tests/centralization_guard.rs (target/debug/deps/centralization_guard-c625186d7c864c7d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s

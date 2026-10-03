@@ -1,0 +1,31 @@
+[package]
+name = "niwoe-compositor"
+version.workspace = true
+edition = "2021"
+
+[dependencies]
+bitflags = { workspace = true }
+cgmath = "0.18"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png"] }
+libc = "0.2"
+niwoe-config = { path = "../niwoe-config" }
+niwoe-ipc = { path = "../niwoe-ipc" }
+niwoe-tokens = { path = "../niwoe-tokens" }
+niwoe-wm = { path = "../niwoe-wm" }
+niwoe-boot-common = { path = "../niwoe-boot-common" }
+tiny-skia = { workspace = true }
+smallvec = "1"
+smithay = { workspace = true }
+tracing = { workspace = true }
+wayland-protocols-wlr = { version = "0.3", features = ["server"] }
+xcursor = { version = "0.3", optional = true }
+
+[target.'cfg(not(target_os = "openbsd"))'.dependencies]
+smithay = { workspace = true, features = ["backend_libinput", "backend_udev"] }
+
+[features]
+default = ["xcursor-themes"]
+xcursor-themes = ["dep:xcursor"]
+
+[build-dependencies]
+image = { version = "0.25", default-features = false, features = ["png"] }

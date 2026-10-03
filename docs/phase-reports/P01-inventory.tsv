@@ -1,0 +1,849 @@
+Kind	Path	Count	Names
+CONTENT	.gitattributes	2	meridian-file-picker, meridian-session
+CONTENT	.githooks/pre-push	1	Meridian
+CONTENT	.github/workflows/release.yml	1	Meridian
+CONTENT	AGENTS.md	11	meridian_design_manifest.md, Meridian-, meridian-config, Meridian-Kompassgrafik, meridian-tokens, meridian-ui
+CONTENT	CHANGELOG.md	26	Meridian, MERIDIAN_SCREENSHOT_DEV, meridian-compass-render, meridian-compositor, meridian-desktop, meridian-ipc, meridian-lock, meridian-login, meridian-polkit, meridian-portal, meridian-shell
+CONTENT	CLAUDE.md	7	meridian_design_manifest.md, meridian-, meridian-config, Meridian-Kompass, meridian-tokens
+CONTENT	Cargo.lock	45	meridian, meridian-app-catalog, meridian-boot-common, meridian-compass-render, meridian-compositor, meridian-config, meridian-freetype, meridian-ipc, meridian-lock, meridian-login, meridian-polkit, meridian-portal, meridian-shell, meridian-tokens, meridian-ui, meridian-wm, meridian-xwayland-drm-bridge
+CONTENT	Cargo.toml	19	meridian, meridian-app-catalog, meridian-boot-common, meridian-compass-render, meridian-compositor, meridian-config, meridian-freetype, meridian-ipc, meridian-lock, meridian-login, meridian-polkit, meridian-portal, meridian-shell, meridian-tokens, meridian-ui, meridian-wm, meridian-xwayland-drm-bridge
+CONTENT	INSTALL.md	51	Meridian, meridian-desktop, meridian-file-picker, meridian-lock, meridian-login, meridian-login-password, meridian-login.service, meridian-polkit-agent, meridian-polkit-agent.desktop, meridian-portal, meridian-portals.conf, meridian-shell, meridian.portal, meridian.service
+PATH	MERIDIAN_OS_PLAN.md
+CONTENT	MERIDIAN_OS_PLAN.md	1	Meridian
+PATH	Meridian - BSD – Übergabe für ChatGPT Desktop.md
+CONTENT	Meridian - BSD – Übergabe für ChatGPT Desktop.md	29	Meridian, Meridian-Architektur, meridian-desktop, Meridian-eigene, Meridian-Komponenten, Meridian-Prozesse, Meridian-Tests, Meridian-UI, Meridian-UI-Architektur, Meridian-WebKit-UI-Runtime
+CONTENT	NIWOE_IMPLEMENTATION_PLAN.md	20	Meridian, meridian_, meridian_design_manifest.md, MERIDIAN_OS_PLAN.md, meridian-, meridian-compositor, meridian-config, meridian-desktop, Meridian-Plan, Meridian-Plan., Meridian-Roadmaps, meridian-tokens, meridian-wm
+CONTENT	NIWOE_Konzeptzusammenfassung.md	2	Meridian-Code, Meridian-Design
+CONTENT	PLAN.md	2	Meridian, Meridian-
+CONTENT	README.md	10	meridian_design_manifest.md, MERIDIAN_OS_PLAN.md, Meridian-, meridian-config, meridian-shell, meridian-tokens, meridian-ui
+CONTENT	ROADMAP.md	3	Meridian, Meridian-, Meridian-Phasen.
+CONTENT	cliff.toml	1	Meridian
+PATH	crates/meridian-app-catalog/Cargo.toml
+CONTENT	crates/meridian-app-catalog/Cargo.toml	1	meridian-app-catalog
+PATH	crates/meridian-app-catalog/src/lib.rs
+CONTENT	crates/meridian-app-catalog/src/lib.rs	7	Meridian, MERIDIAN_DESKTOP_ENV
+PATH	crates/meridian-app-catalog/src/tests.rs
+CONTENT	crates/meridian-app-catalog/src/tests.rs	6	meridian, meridian_specific
+PATH	crates/meridian-boot-common/Cargo.toml
+CONTENT	crates/meridian-boot-common/Cargo.toml	2	meridian-boot-common, meridian-login
+PATH	crates/meridian-boot-common/src/lib.rs
+CONTENT	crates/meridian-boot-common/src/lib.rs	9	meridian, meridian-appearance-test-, meridian-boot-common-cleanup, meridian-boot-common-replaced, meridian-login, meridian-login.sock
+PATH	crates/meridian-compass-render/Cargo.toml
+CONTENT	crates/meridian-compass-render/Cargo.toml	2	meridian-compass-render, meridian-login
+PATH	crates/meridian-compass-render/assets/DejaVuSans-Bold.ttf
+PATH	crates/meridian-compass-render/assets/Italianno-Regular.ttf
+PATH	crates/meridian-compass-render/examples/wallpaper.rs
+CONTENT	crates/meridian-compass-render/examples/wallpaper.rs	3	Meridian, meridian_compass_render, meridian-compass-render
+PATH	crates/meridian-compass-render/src/assets.rs
+CONTENT	crates/meridian-compass-render/src/assets.rs	1	meridian-tokens
+PATH	crates/meridian-compass-render/src/lib.rs
+CONTENT	crates/meridian-compass-render/src/lib.rs	8	Meridian, meridian_compass_render, meridian_lines, meridian-login
+PATH	crates/meridian-compass-render/src/lib/background_and_scale.rs
+CONTENT	crates/meridian-compass-render/src/lib/background_and_scale.rs	2	meridian, meridian_lines
+PATH	crates/meridian-compass-render/src/lib/rose_and_needle.rs
+PATH	crates/meridian-compass-render/src/lib/text.rs
+PATH	crates/meridian-compass-render/src/lib_tests.rs
+PATH	crates/meridian-compositor/Cargo.toml
+CONTENT	crates/meridian-compositor/Cargo.toml	11	meridian-boot-common, meridian-compositor, meridian-config, meridian-ipc, meridian-tokens, meridian-wm
+PATH	crates/meridian-compositor/build.rs
+PATH	crates/meridian-compositor/src/backend/clipped_surface.frag
+CONTENT	crates/meridian-compositor/src/backend/clipped_surface.frag	1	Meridian
+PATH	crates/meridian-compositor/src/backend/clipped_surface.rs
+PATH	crates/meridian-compositor/src/backend/drm/blur.frag
+PATH	crates/meridian-compositor/src/backend/drm/glass.frag
+PATH	crates/meridian-compositor/src/backend/drm/glass.rs
+PATH	crates/meridian-compositor/src/backend/drm/glass_cache.rs
+PATH	crates/meridian-compositor/src/backend/drm/gpu.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/gpu.rs	2	MERIDIAN_DRM_DEVICE
+PATH	crates/meridian-compositor/src/backend/drm/init.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/init.rs	15	MERIDIAN_DIRTY_STATS, MERIDIAN_DRM_FORCE_LEGACY, MERIDIAN_DRM_TIMING, meridian-login, MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/init/build.rs
+PATH	crates/meridian-compositor/src/backend/drm/init/event_sources.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/init/event_sources.rs	4	MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/init/hotplug.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/init/hotplug.rs	8	MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/init/layout.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/init/layout.rs	1	MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/init_diagnostics.rs
+PATH	crates/meridian-compositor/src/backend/drm/init_env.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/init_env.rs	9	MERIDIAN_DRM_DISABLE_MODIFIERS, MERIDIAN_DRM_FORCE_FORMAT, MERIDIAN_DRM_FORCE_LEGACY, MERIDIAN_DRM_FORCE_REFRESH_HZ, MERIDIAN_DRM_FRAME_INTERVAL_MS
+PATH	crates/meridian-compositor/src/backend/drm/login_ipc.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/login_ipc.rs	7	meridian_boot_common, meridian-login
+PATH	crates/meridian-compositor/src/backend/drm/mod.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/mod.rs	7	meridian_config, MeridianRenderElements, MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/mode_selection.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/mode_selection.rs	8	meridian_config, MERIDIAN_DRM_FORCE_MODE, MERIDIAN_DRM_MODE, MERIDIAN_DRM_MODE_INDEX, MERIDIAN_DRM_SAFE_MODE
+PATH	crates/meridian-compositor/src/backend/drm/openbsd_privsep.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/openbsd_privsep.rs	1	Meridian
+PATH	crates/meridian-compositor/src/backend/drm/render.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/render.rs	21	meridian_config, meridian-login, MeridianRenderElements, MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/render/capture.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/render/capture.rs	8	Meridian, meridian_ipc, meridian-screenshot-, meridian-thumb-, MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/render/layers.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/render/layers.rs	19	Meridian, meridian-calendar-popup, meridian-desktop-menu, meridian-launcher, meridian-network-popup, meridian-notification, meridian-quick-settings, meridian-screenshot-consent, meridian-screenshot-region-picker, meridian-thumbnail-popup, meridian-workspace-popup, MeridianRenderElements
+PATH	crates/meridian-compositor/src/backend/drm/render/scene_composition.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/render/scene_composition.rs	22	meridian-calendar-popup, meridian-desktop-menu, meridian-launcher, meridian-network-popup, meridian-notification, meridian-panel, meridian-thumbnail-popup, meridian-workspace-popup, MeridianRenderElements
+PATH	crates/meridian-compositor/src/backend/drm/render/scene_helpers.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/render/scene_helpers.rs	9	meridian_config, MeridianRenderElements
+PATH	crates/meridian-compositor/src/backend/drm/render/stack.rs
+PATH	crates/meridian-compositor/src/backend/drm/sleep_lifecycle.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/sleep_lifecycle.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/backend/drm/stats.rs
+PATH	crates/meridian-compositor/src/backend/drm/wscons.rs
+CONTENT	crates/meridian-compositor/src/backend/drm/wscons.rs	6	MERIDIAN_WSKBD_DEVICE, MERIDIAN_WSMOUSE_DEVICE, MeridianState
+PATH	crates/meridian-compositor/src/backend/mod.rs
+PATH	crates/meridian-compositor/src/backend/winit/layers.rs
+CONTENT	crates/meridian-compositor/src/backend/winit/layers.rs	15	Meridian, meridian-calendar-popup, meridian-desktop-menu, meridian-launcher, meridian-network-popup, meridian-notification, meridian-quick-settings, meridian-screenshot-consent, meridian-screenshot-region-picker, meridian-thumbnail-popup, meridian-workspace-popup
+PATH	crates/meridian-compositor/src/backend/winit/mod.rs
+CONTENT	crates/meridian-compositor/src/backend/winit/mod.rs	8	Meridian, MeridianState
+PATH	crates/meridian-compositor/src/backend/winit/scene.rs
+CONTENT	crates/meridian-compositor/src/backend/winit/scene.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/cursor/embedded.rs
+PATH	crates/meridian-compositor/src/cursor/image.rs
+CONTENT	crates/meridian-compositor/src/cursor/image.rs	2	Meridian, meridian-embedded
+PATH	crates/meridian-compositor/src/cursor/mod.rs
+PATH	crates/meridian-compositor/src/cursor/tests.rs
+CONTENT	crates/meridian-compositor/src/cursor/tests.rs	6	meridian-embedded, meridian-xcursor-test-
+PATH	crates/meridian-compositor/src/cursor/xcursor.rs
+PATH	crates/meridian-compositor/src/decoration/icons.rs
+PATH	crates/meridian-compositor/src/decoration/mod.rs
+CONTENT	crates/meridian-compositor/src/decoration/mod.rs	2	meridian_tokens
+PATH	crates/meridian-compositor/src/decoration/model.rs
+CONTENT	crates/meridian-compositor/src/decoration/model.rs	2	meridian_config
+PATH	crates/meridian-compositor/src/decoration/render/buffers.rs
+CONTENT	crates/meridian-compositor/src/decoration/render/buffers.rs	1	meridian_config
+PATH	crates/meridian-compositor/src/decoration/render/elements.rs
+CONTENT	crates/meridian-compositor/src/decoration/render/elements.rs	2	meridian_config, meridian_tokens
+PATH	crates/meridian-compositor/src/decoration/render/elements/frame.rs
+PATH	crates/meridian-compositor/src/decoration/render/elements/shaders.rs
+PATH	crates/meridian-compositor/src/decoration/render/geometry.rs
+CONTENT	crates/meridian-compositor/src/decoration/render/geometry.rs	2	meridian_config, meridian_tokens
+PATH	crates/meridian-compositor/src/decoration/render/hit.rs
+CONTENT	crates/meridian-compositor/src/decoration/render/hit.rs	1	meridian_config
+PATH	crates/meridian-compositor/src/decoration/render/icon_cache.rs
+CONTENT	crates/meridian-compositor/src/decoration/render/icon_cache.rs	5	meridian_config
+PATH	crates/meridian-compositor/src/decoration/render/mod.rs
+PATH	crates/meridian-compositor/src/grabs/mod.rs
+PATH	crates/meridian-compositor/src/grabs/move_grab.rs
+CONTENT	crates/meridian-compositor/src/grabs/move_grab.rs	31	MeridianState
+PATH	crates/meridian-compositor/src/grabs/move_grab/release.rs
+CONTENT	crates/meridian-compositor/src/grabs/move_grab/release.rs	6	MeridianState
+PATH	crates/meridian-compositor/src/grabs/move_grab/restore.rs
+CONTENT	crates/meridian-compositor/src/grabs/move_grab/restore.rs	6	MeridianState
+PATH	crates/meridian-compositor/src/grabs/move_grab_tests.rs
+PATH	crates/meridian-compositor/src/grabs/resize_grab/grab.rs
+CONTENT	crates/meridian-compositor/src/grabs/resize_grab/grab.rs	32	MeridianState
+PATH	crates/meridian-compositor/src/grabs/resize_grab/mod.rs
+CONTENT	crates/meridian-compositor/src/grabs/resize_grab/mod.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/grabs/resize_grab/pacing.rs
+PATH	crates/meridian-compositor/src/grabs/resize_grab/state.rs
+PATH	crates/meridian-compositor/src/input/keyboard.rs
+CONTENT	crates/meridian-compositor/src/input/keyboard.rs	9	meridian_config, meridian_ipc, meridian_wm, MeridianState
+PATH	crates/meridian-compositor/src/input/mod.rs
+CONTENT	crates/meridian-compositor/src/input/mod.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/input/pointer/button.rs
+CONTENT	crates/meridian-compositor/src/input/pointer/button.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/input/pointer/button/helpers.rs
+CONTENT	crates/meridian-compositor/src/input/pointer/button/helpers.rs	6	MeridianState
+PATH	crates/meridian-compositor/src/input/pointer/button_tests.rs
+PATH	crates/meridian-compositor/src/input/pointer/mod.rs
+CONTENT	crates/meridian-compositor/src/input/pointer/mod.rs	9	MeridianState
+PATH	crates/meridian-compositor/src/input/pointer/mod_tests.rs
+PATH	crates/meridian-compositor/src/lib.rs
+PATH	crates/meridian-compositor/src/protocols/mod.rs
+PATH	crates/meridian-compositor/src/protocols/xdg_shell.rs
+PATH	crates/meridian-compositor/src/protocols/xwayland.rs
+CONTENT	crates/meridian-compositor/src/protocols/xwayland.rs	14	Meridian, meridian_xwayland_drm_bridge.so, MERIDIAN_XWAYLAND_DRM_PRIMARY_FD, MERIDIAN_XWAYLAND_DRM_RENDER_FD, MeridianState
+PATH	crates/meridian-compositor/src/protocols/xwayland/configure.rs
+PATH	crates/meridian-compositor/src/protocols/xwayland/helpers.rs
+CONTENT	crates/meridian-compositor/src/protocols/xwayland/helpers.rs	8	MeridianState
+PATH	crates/meridian-compositor/src/protocols/xwayland/input_selection.rs
+PATH	crates/meridian-compositor/src/protocols/xwayland/state_requests.rs
+PATH	crates/meridian-compositor/src/protocols/xwayland/window_lifecycle.rs
+PATH	crates/meridian-compositor/src/protocols/xwayland_tests.rs
+PATH	crates/meridian-compositor/src/state/client.rs
+PATH	crates/meridian-compositor/src/state/handlers/core/compositor.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/core/compositor.rs	8	meridian_wm, meridian-launcher, meridian-quick-settings, MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/core/grab.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/core/grab.rs	3	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/core/layer_shell.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/core/layer_shell.rs	3	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/core/mod.rs
+PATH	crates/meridian-compositor/src/state/handlers/core/shm.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/core/shm.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/dmabuf.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/dmabuf.rs	3	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/idle.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/idle.rs	3	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/misc.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/misc.rs	18	meridian, MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/mod.rs
+PATH	crates/meridian-compositor/src/state/handlers/output_power.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/output_power.rs	4	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/screencopy.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/screencopy.rs	4	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/session_lock.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/session_lock.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/syncobj.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/syncobj.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/wayland_extra.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/wayland_extra.rs	4	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/xdg/lifecycle.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/xdg/lifecycle.rs	7	meridian_wm, MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/xdg/mod.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/xdg/mod.rs	5	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/xdg/requests/grab.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/xdg/requests/grab.rs	3	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/xdg/requests/mod.rs
+PATH	crates/meridian-compositor/src/state/handlers/xdg/requests/state.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/xdg/requests/state.rs	8	MeridianState
+PATH	crates/meridian-compositor/src/state/handlers/xdg/requests/window.rs
+CONTENT	crates/meridian-compositor/src/state/handlers/xdg/requests/window.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/idle.rs
+PATH	crates/meridian-compositor/src/state/ipc/appearance.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/appearance.rs	3	meridian.png, meridian.svg
+PATH	crates/meridian-compositor/src/state/ipc/broadcast.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/broadcast.rs	3	meridian_ipc, MeridianState
+PATH	crates/meridian-compositor/src/state/ipc/commands.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/commands.rs	11	Meridian, meridian_boot_common, meridian_config, meridian_ipc, MeridianConfig, MeridianState
+PATH	crates/meridian-compositor/src/state/ipc/conversions.rs
+PATH	crates/meridian-compositor/src/state/ipc/launch.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/launch.rs	5	Meridian, meridian-launch-reaper-, meridian-launch-test-
+PATH	crates/meridian-compositor/src/state/ipc/lock_screen.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/lock_screen.rs	15	meridian-lock, meridian-lock-reaper, MeridianState
+PATH	crates/meridian-compositor/src/state/ipc/mod.rs
+PATH	crates/meridian-compositor/src/state/ipc/network.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/network.rs	4	Meridian
+PATH	crates/meridian-compositor/src/state/ipc/screenshot.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/screenshot.rs	2	meridian_ipc
+PATH	crates/meridian-compositor/src/state/ipc/screenshot_policy.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/screenshot_policy.rs	11	meridian_ipc, MERIDIAN_SCREENSHOT_DEV
+PATH	crates/meridian-compositor/src/state/ipc/server.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/server.rs	7	Meridian, meridian_ipc
+PATH	crates/meridian-compositor/src/state/ipc/server_tests.rs
+CONTENT	crates/meridian-compositor/src/state/ipc/server_tests.rs	9	meridian_ipc, meridian-ipc-, meridian-ipc-cleanup-test-, meridian.sock
+PATH	crates/meridian-compositor/src/state/layout/focus.rs
+CONTENT	crates/meridian-compositor/src/state/layout/focus.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/layout/mod.rs
+PATH	crates/meridian-compositor/src/state/layout/surface.rs
+CONTENT	crates/meridian-compositor/src/state/layout/surface.rs	8	meridian-launcher, meridian-panel, meridian-quick-settings, MeridianState
+PATH	crates/meridian-compositor/src/state/layout/tiling.rs
+CONTENT	crates/meridian-compositor/src/state/layout/tiling.rs	3	meridian_wm, MeridianState
+PATH	crates/meridian-compositor/src/state/layout/workspace.rs
+CONTENT	crates/meridian-compositor/src/state/layout/workspace.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/lock.rs
+CONTENT	crates/meridian-compositor/src/state/lock.rs	4	MERIDIAN_FAULT_INJECT_HOLD_LOCK_PENDING, MeridianState
+PATH	crates/meridian-compositor/src/state/mod.rs
+CONTENT	crates/meridian-compositor/src/state/mod.rs	6	meridian_config, meridian_ipc, meridian_tokens, meridian_wm, MeridianState
+PATH	crates/meridian-compositor/src/state/mod_tests.rs
+PATH	crates/meridian-compositor/src/state/output_hotplug_tests.rs
+CONTENT	crates/meridian-compositor/src/state/output_hotplug_tests.rs	5	meridian_config, MeridianState
+PATH	crates/meridian-compositor/src/state/output_hotplug_tests/basic.rs
+PATH	crates/meridian-compositor/src/state/output_hotplug_tests/reload.rs
+PATH	crates/meridian-compositor/src/state/output_hotplug_tests/windows.rs
+PATH	crates/meridian-compositor/src/state/output_layout.rs
+CONTENT	crates/meridian-compositor/src/state/output_layout.rs	1	meridian_config
+PATH	crates/meridian-compositor/src/state/output_layout_tests.rs
+CONTENT	crates/meridian-compositor/src/state/output_layout_tests.rs	2	meridian_config, MeridianState
+PATH	crates/meridian-compositor/src/state/output_layout_tests/config_and_diff.rs
+CONTENT	crates/meridian-compositor/src/state/output_layout_tests/config_and_diff.rs	4	MeridianState
+PATH	crates/meridian-compositor/src/state/output_layout_tests/fixtures.rs
+PATH	crates/meridian-compositor/src/state/output_layout_tests/resolution.rs
+PATH	crates/meridian-compositor/src/state/output_power.rs
+PATH	crates/meridian-compositor/src/state/output_registry.rs
+PATH	crates/meridian-compositor/src/state/output_registry_tests.rs
+PATH	crates/meridian-compositor/src/state/placement.rs
+CONTENT	crates/meridian-compositor/src/state/placement.rs	2	MeridianState
+PATH	crates/meridian-compositor/src/state/session_lock_tests.rs
+PATH	crates/meridian-compositor/src/state/setup.rs
+CONTENT	crates/meridian-compositor/src/state/setup.rs	15	meridian_boot_common, meridian_config, meridian_config.cursor, meridian_config.general.theme.trim, meridian_config.wallpaper_override, meridian_config.wallpaper.is_some, meridian_wm, MeridianConfig, MeridianState
+PATH	crates/meridian-compositor/src/state/setup/dirty_and_construction.rs
+CONTENT	crates/meridian-compositor/src/state/setup/dirty_and_construction.rs	11	meridian_boot_common, meridian_config, meridian_config.keybinds, meridian_config.outputs.clone, MeridianConfig, MeridianState, MeridianState.
+PATH	crates/meridian-compositor/src/state/setup/layout.rs
+CONTENT	crates/meridian-compositor/src/state/setup/layout.rs	3	MeridianState
+PATH	crates/meridian-compositor/src/state/setup/output_lifecycle.rs
+CONTENT	crates/meridian-compositor/src/state/setup/output_lifecycle.rs	1	MeridianState
+PATH	crates/meridian-compositor/src/state/setup_tests.rs
+CONTENT	crates/meridian-compositor/src/state/setup_tests.rs	5	meridian_config, MeridianConfig
+PATH	crates/meridian-compositor/src/state/utils.rs
+PATH	crates/meridian-compositor/src/state/workspace_output_state.rs
+PATH	crates/meridian-compositor/src/wallpaper/compose.rs
+CONTENT	crates/meridian-compositor/src/wallpaper/compose.rs	2	meridian_config
+PATH	crates/meridian-compositor/src/wallpaper/gpu.rs
+PATH	crates/meridian-compositor/src/wallpaper/manager.rs
+CONTENT	crates/meridian-compositor/src/wallpaper/manager.rs	1	meridian_config
+PATH	crates/meridian-compositor/src/wallpaper/mod.rs
+PATH	crates/meridian-compositor/src/workspace.rs
+PATH	crates/meridian-compositor/tests/layer_shell.rs
+CONTENT	crates/meridian-compositor/tests/layer_shell.rs	1	meridian_compositor
+PATH	crates/meridian-config/Cargo.toml
+CONTENT	crates/meridian-config/Cargo.toml	3	meridian-config, meridian-tokens
+PATH	crates/meridian-config/src/config.rs
+CONTENT	crates/meridian-config/src/config.rs	7	Meridian, MeridianConfig, MeridianToml
+PATH	crates/meridian-config/src/config/mutation.rs
+CONTENT	crates/meridian-config/src/config/mutation.rs	1	MeridianConfig
+PATH	crates/meridian-config/src/config/output_toml.rs
+PATH	crates/meridian-config/src/config/wallpapers.rs
+PATH	crates/meridian-config/src/config_tests.rs
+CONTENT	crates/meridian-config/src/config_tests.rs	1	MeridianConfig
+PATH	crates/meridian-config/src/config_tests/output_updates.rs
+CONTENT	crates/meridian-config/src/config_tests/output_updates.rs	15	MeridianConfig
+PATH	crates/meridian-config/src/config_tests/parsing.rs
+CONTENT	crates/meridian-config/src/config_tests/parsing.rs	21	meridian, MeridianConfig
+PATH	crates/meridian-config/src/config_tests/wallpaper_and_idle.rs
+CONTENT	crates/meridian-config/src/config_tests/wallpaper_and_idle.rs	11	meridian, meridian-config-test-, MeridianConfig
+PATH	crates/meridian-config/src/keybind/defaults.rs
+PATH	crates/meridian-config/src/keybind/mod.rs
+PATH	crates/meridian-config/src/keybind/parse.rs
+PATH	crates/meridian-config/src/lib.rs
+CONTENT	crates/meridian-config/src/lib.rs	1	MeridianConfig
+PATH	crates/meridian-config/src/output.rs
+PATH	crates/meridian-config/src/theme/manager.rs
+CONTENT	crates/meridian-config/src/theme/manager.rs	6	meridian, MERIDIAN_THEME_DIR, MERIDIAN_THEME_DIRS, meridian-theme-manager-
+PATH	crates/meridian-config/src/theme/mod.rs
+PATH	crates/meridian-config/src/theme/types/color.rs
+CONTENT	crates/meridian-config/src/theme/types/color.rs	3	meridian_config, meridian_tokens, meridian-tokens
+PATH	crates/meridian-config/src/theme/types/config.rs
+CONTENT	crates/meridian-config/src/theme/types/config.rs	2	meridian_tokens
+PATH	crates/meridian-config/src/theme/types/error.rs
+PATH	crates/meridian-config/src/theme/types/mod.rs
+PATH	crates/meridian-freetype/Cargo.toml
+CONTENT	crates/meridian-freetype/Cargo.toml	3	meridian-freetype, meridian-tokens
+PATH	crates/meridian-freetype/src/lib.rs
+CONTENT	crates/meridian-freetype/src/lib.rs	1	meridian_tokens
+PATH	crates/meridian-ipc/Cargo.toml
+CONTENT	crates/meridian-ipc/Cargo.toml	1	meridian-ipc
+PATH	crates/meridian-ipc/src/appearance.rs
+PATH	crates/meridian-ipc/src/lib.rs
+CONTENT	crates/meridian-ipc/src/lib.rs	2	MERIDIAN_IPC_TOKEN, meridian.sock
+PATH	crates/meridian-ipc/src/lib_tests.rs
+CONTENT	crates/meridian-ipc/src/lib_tests.rs	6	Meridian, meridian.png
+PATH	crates/meridian-ipc/src/settings.rs
+PATH	crates/meridian-lock/Cargo.toml
+CONTENT	crates/meridian-lock/Cargo.toml	10	meridian-config, meridian-lock, meridian-openbsd-auth, meridian-openbsd-auth.rs, meridian-tokens, meridian-ui
+PATH	crates/meridian-lock/src/auth.rs
+CONTENT	crates/meridian-lock/src/auth.rs	3	meridian_lock, meridian-lock, meridian-openbsd-auth
+PATH	crates/meridian-lock/src/auth_protocol.rs
+PATH	crates/meridian-lock/src/bin/meridian-openbsd-auth.rs
+CONTENT	crates/meridian-lock/src/bin/meridian-openbsd-auth.rs	4	meridian_lock, meridian-openbsd-auth
+PATH	crates/meridian-lock/src/lib.rs
+PATH	crates/meridian-lock/src/main.rs
+CONTENT	crates/meridian-lock/src/main.rs	7	meridian_config, MeridianConfig
+PATH	crates/meridian-lock/src/main/render.rs
+CONTENT	crates/meridian-lock/src/main/render.rs	2	Meridian
+PATH	crates/meridian-lock/src/main/render_helpers.rs
+CONTENT	crates/meridian-lock/src/main/render_helpers.rs	6	meridian_tokens, meridian_ui, meridian-lock-shm, meridian-lock.XXXXXXXXXX
+PATH	crates/meridian-lock/src/main/runtime.rs
+CONTENT	crates/meridian-lock/src/main/runtime.rs	2	meridian_lock
+PATH	crates/meridian-lock/src/main_tests.rs
+CONTENT	crates/meridian-lock/src/main_tests.rs	1	meridian_config
+PATH	crates/meridian-lock/src/openbsd_sandbox.rs
+CONTENT	crates/meridian-lock/src/openbsd_sandbox.rs	1	meridian-openbsd-auth
+PATH	crates/meridian-login/Cargo.toml
+CONTENT	crates/meridian-login/Cargo.toml	9	meridian-boot-common, meridian-compass-render, meridian-config, meridian-login, meridian-tokens
+PATH	crates/meridian-login/config/meridian-login.pam
+CONTENT	crates/meridian-login/config/meridian-login.pam	6	meridian-login
+PATH	crates/meridian-login/config/meridian-login.service
+CONTENT	crates/meridian-login/config/meridian-login.service	6	Meridian, MERIDIAN_LOGIN_COMPOSITOR, MERIDIAN_LOGIN_DRM_CARD, meridian-login
+PATH	crates/meridian-login/src/auth.rs
+CONTENT	crates/meridian-login/src/auth.rs	5	meridian-login, meridian-login-password, meridian-login.
+PATH	crates/meridian-login/src/auth/openbsd_backend.rs
+PATH	crates/meridian-login/src/input.rs
+CONTENT	crates/meridian-login/src/input.rs	2	meridian-login, meridian-login.
+PATH	crates/meridian-login/src/input/openbsd.rs
+CONTENT	crates/meridian-login/src/input/openbsd.rs	2	MERIDIAN_WSKBD_DEVICE, MERIDIAN_WSMOUSE_DEVICE
+PATH	crates/meridian-login/src/main.rs
+CONTENT	crates/meridian-login/src/main.rs	12	meridian_boot_common, meridian_compass_render, meridian_config, MERIDIAN_LOGIN_DRM_CARD, meridian_tokens, meridian-login
+PATH	crates/meridian-login/src/main/animation.rs
+PATH	crates/meridian-login/src/main/controls.rs
+PATH	crates/meridian-login/src/main/geometry_and_buttons.rs
+CONTENT	crates/meridian-login/src/main/geometry_and_buttons.rs	1	meridian_config
+PATH	crates/meridian-login/src/main/handover_ipc.rs
+PATH	crates/meridian-login/src/main/power_actions.rs
+PATH	crates/meridian-login/src/main/runtime.rs
+CONTENT	crates/meridian-login/src/main/runtime.rs	2	meridian-login
+PATH	crates/meridian-login/src/main/state.rs
+PATH	crates/meridian-login/src/main/ui.rs
+PATH	crates/meridian-login/src/main_tests.rs
+CONTENT	crates/meridian-login/src/main_tests.rs	6	meridian-login-hidraw-yubikey-name-test-, meridian-login-hidraw-yubikey-test-, meridian-login-no-yubikey-test-, meridian-login-u2f-map-test-, meridian-login-yubikey-name-test-, meridian-login-yubikey-test-
+PATH	crates/meridian-login/src/session.rs
+CONTENT	crates/meridian-login/src/session.rs	12	meridian, MERIDIAN_, MERIDIAN_DRM_TIMING, MERIDIAN_LOGIN_COMPOSITOR, MERIDIAN_SHELL_AUTO_SETTINGS, meridian-login, Meridian-owned, meridian-runtime-
+PATH	crates/meridian-login/src/visual.rs
+PATH	crates/meridian-polkit/Cargo.toml
+CONTENT	crates/meridian-polkit/Cargo.toml	8	meridian-config, meridian-polkit, meridian-polkit-agent, meridian-tokens, meridian-ui
+PATH	crates/meridian-polkit/src/auth.rs
+PATH	crates/meridian-polkit/src/dbus.rs
+CONTENT	crates/meridian-polkit/src/dbus.rs	1	meridian-shell
+PATH	crates/meridian-polkit/src/dbus/registration.rs
+PATH	crates/meridian-polkit/src/main.rs
+CONTENT	crates/meridian-polkit/src/main.rs	17	Meridian, meridian_config, meridian_config.general.theme, meridian_config.general.theme.is_empty, meridian-polkit-agent, meridian-polkit-panic.log, meridian-shell, MeridianConfig, MeridianConfig.general.theme.
+PATH	crates/meridian-polkit/src/openbsd_sandbox.rs
+CONTENT	crates/meridian-polkit/src/openbsd_sandbox.rs	5	meridian, meridian_config, MERIDIAN_THEME_DIR, MERIDIAN_THEME_DIRS
+PATH	crates/meridian-polkit/src/ui.rs
+CONTENT	crates/meridian-polkit/src/ui.rs	7	meridian, meridian_config, meridian_tokens, meridian_ui, meridian-ui
+PATH	crates/meridian-polkit/src/wayland.rs
+CONTENT	crates/meridian-polkit/src/wayland.rs	6	meridian_config, meridian-lock, meridian-polkit, meridian-polkit.XXXXXXXXXX, MeridianConfig
+PATH	crates/meridian-polkit/src/wayland/dispatch.rs
+PATH	crates/meridian-polkit/src/wayland/state.rs
+CONTENT	crates/meridian-polkit/src/wayland/state.rs	2	meridian-polkit, MeridianConfig
+PATH	crates/meridian-portal/Cargo.toml
+CONTENT	crates/meridian-portal/Cargo.toml	5	meridian-config, meridian-ipc, meridian-portal
+PATH	crates/meridian-portal/src/access.rs
+CONTENT	crates/meridian-portal/src/access.rs	2	Meridian
+PATH	crates/meridian-portal/src/file_chooser.rs
+CONTENT	crates/meridian-portal/src/file_chooser.rs	4	Meridian, MERIDIAN_FILE_PICKER, meridian-file-picker
+PATH	crates/meridian-portal/src/lib.rs
+CONTENT	crates/meridian-portal/src/lib.rs	1	meridian
+PATH	crates/meridian-portal/src/main.rs
+CONTENT	crates/meridian-portal/src/main.rs	2	meridian_portal, meridian-portal
+PATH	crates/meridian-portal/src/openbsd_sandbox.rs
+CONTENT	crates/meridian-portal/src/openbsd_sandbox.rs	9	Meridian, meridian_config, meridian_ipc, MERIDIAN_THEME_DIR, MERIDIAN_THEME_DIRS
+PATH	crates/meridian-portal/src/screenshot.rs
+CONTENT	crates/meridian-portal/src/screenshot.rs	3	Meridian, meridian_ipc
+PATH	crates/meridian-portal/src/settings.rs
+CONTENT	crates/meridian-portal/src/settings.rs	8	Meridian, meridian_config, MeridianConfig
+PATH	crates/meridian-shell/Cargo.toml
+CONTENT	crates/meridian-shell/Cargo.toml	14	meridian-app-catalog, meridian-config, meridian-freetype, meridian-ipc, meridian-shell, meridian-tokens, meridian-ui
+PATH	crates/meridian-shell/assets/gtk/gtk3.css.in
+CONTENT	crates/meridian-shell/assets/gtk/gtk3.css.in	6	Meridian, meridian-shell, meridian-tokens
+PATH	crates/meridian-shell/assets/gtk/gtk4.css.in
+CONTENT	crates/meridian-shell/assets/gtk/gtk4.css.in	3	Meridian, meridian-tokens
+PATH	crates/meridian-shell/src/app_view.rs
+CONTENT	crates/meridian-shell/src/app_view.rs	17	meridian_config, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/app_view/header_and_grid.rs
+CONTENT	crates/meridian-shell/src/app_view/header_and_grid.rs	16	meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/app_view/rows_and_helpers.rs
+CONTENT	crates/meridian-shell/src/app_view/rows_and_helpers.rs	18	meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/app_view_tests.rs
+CONTENT	crates/meridian-shell/src/app_view_tests.rs	1	meridian_config
+PATH	crates/meridian-shell/src/audio/mixer.rs
+PATH	crates/meridian-shell/src/audio/mixerctl.rs
+PATH	crates/meridian-shell/src/audio/mod.rs
+CONTENT	crates/meridian-shell/src/audio/mod.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/audio/wpctl.rs
+PATH	crates/meridian-shell/src/audio_popup.rs
+CONTENT	crates/meridian-shell/src/audio_popup.rs	2	meridian_config
+PATH	crates/meridian-shell/src/autostart.rs
+CONTENT	crates/meridian-shell/src/autostart.rs	19	Meridian, MeridianExtra
+PATH	crates/meridian-shell/src/battery.rs
+PATH	crates/meridian-shell/src/bluetooth.rs
+PATH	crates/meridian-shell/src/buffer.rs
+PATH	crates/meridian-shell/src/context_menu.rs
+CONTENT	crates/meridian-shell/src/context_menu.rs	12	meridian_config, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/context_menu/icons.rs
+CONTENT	crates/meridian-shell/src/context_menu/icons.rs	2	meridian_ui
+PATH	crates/meridian-shell/src/context_menu/overlays.rs
+CONTENT	crates/meridian-shell/src/context_menu/overlays.rs	4	meridian_tokens
+PATH	crates/meridian-shell/src/context_menu_tests.rs
+CONTENT	crates/meridian-shell/src/context_menu_tests.rs	2	meridian_config
+PATH	crates/meridian-shell/src/cursor.rs
+CONTENT	crates/meridian-shell/src/cursor.rs	4	meridian_config, meridian-cursor-scan-, MeridianConfig
+PATH	crates/meridian-shell/src/default_apps.rs
+PATH	crates/meridian-shell/src/draw/bitmap.rs
+CONTENT	crates/meridian-shell/src/draw/bitmap.rs	1	meridian_config
+PATH	crates/meridian-shell/src/draw/mod.rs
+PATH	crates/meridian-shell/src/draw/painter.rs
+CONTENT	crates/meridian-shell/src/draw/painter.rs	2	meridian_config, meridian_tokens
+PATH	crates/meridian-shell/src/draw/painter_tests.rs
+CONTENT	crates/meridian-shell/src/draw/painter_tests.rs	1	meridian_config
+PATH	crates/meridian-shell/src/draw/text.rs
+CONTENT	crates/meridian-shell/src/draw/text.rs	5	meridian_config, meridian_freetype, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/font_resolve.rs
+CONTENT	crates/meridian-shell/src/font_resolve.rs	7	meridian_config, meridian_ui
+PATH	crates/meridian-shell/src/icons/cache.rs
+CONTENT	crates/meridian-shell/src/icons/cache.rs	1	meridian-shell-cache-
+PATH	crates/meridian-shell/src/icons/loader.rs
+PATH	crates/meridian-shell/src/icons/loader/decode.rs
+PATH	crates/meridian-shell/src/icons/loader/filesystem.rs
+PATH	crates/meridian-shell/src/icons/loader_tests.rs
+CONTENT	crates/meridian-shell/src/icons/loader_tests.rs	1	meridian-shell-
+PATH	crates/meridian-shell/src/icons/mod.rs
+PATH	crates/meridian-shell/src/icons/rcc.rs
+PATH	crates/meridian-shell/src/icons/rcc_tests.rs
+CONTENT	crates/meridian-shell/src/icons/rcc_tests.rs	1	meridian-rcc-zstd
+PATH	crates/meridian-shell/src/icons/svg.rs
+PATH	crates/meridian-shell/src/icons/theme_index.rs
+PATH	crates/meridian-shell/src/launcher.rs
+CONTENT	crates/meridian-shell/src/launcher.rs	6	Meridian, meridian_app_catalog, meridian_ipc, MeridianShell
+PATH	crates/meridian-shell/src/launcher_tests.rs
+PATH	crates/meridian-shell/src/main.rs
+CONTENT	crates/meridian-shell/src/main.rs	37	meridian, meridian_tokens, meridian-portal., meridian-session.target, meridian-shell, meridian-shell-panic.log, MeridianShell
+PATH	crates/meridian-shell/src/network/freebsd.rs
+PATH	crates/meridian-shell/src/network/mod.rs
+PATH	crates/meridian-shell/src/network/nmcli.rs
+PATH	crates/meridian-shell/src/network/nmcli_tests.rs
+PATH	crates/meridian-shell/src/network_popup.rs
+CONTENT	crates/meridian-shell/src/network_popup.rs	3	meridian_config, meridian-dark
+PATH	crates/meridian-shell/src/notification_popup.rs
+CONTENT	crates/meridian-shell/src/notification_popup.rs	4	meridian_config
+PATH	crates/meridian-shell/src/notifications/dbus.rs
+CONTENT	crates/meridian-shell/src/notifications/dbus.rs	2	Meridian, meridian-shell
+PATH	crates/meridian-shell/src/notifications/mod.rs
+PATH	crates/meridian-shell/src/notifications/state.rs
+PATH	crates/meridian-shell/src/panel.rs
+PATH	crates/meridian-shell/src/panel_view.rs
+CONTENT	crates/meridian-shell/src/panel_view.rs	7	meridian_config, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/panel_view/chips.rs
+PATH	crates/meridian-shell/src/panel_view/layout.rs
+PATH	crates/meridian-shell/src/panel_view/pinned.rs
+CONTENT	crates/meridian-shell/src/panel_view/pinned.rs	1	meridian_tokens
+PATH	crates/meridian-shell/src/panel_view/render.rs
+CONTENT	crates/meridian-shell/src/panel_view/render.rs	1	meridian_config
+PATH	crates/meridian-shell/src/panel_view/windows.rs
+PATH	crates/meridian-shell/src/panel_view_tests.rs
+CONTENT	crates/meridian-shell/src/panel_view_tests.rs	2	meridian_config, meridian_ui
+PATH	crates/meridian-shell/src/popup_card.rs
+CONTENT	crates/meridian-shell/src/popup_card.rs	4	meridian_config, meridian_tokens
+PATH	crates/meridian-shell/src/power_profile.rs
+PATH	crates/meridian-shell/src/printers.rs
+PATH	crates/meridian-shell/src/process.rs
+CONTENT	crates/meridian-shell/src/process.rs	2	meridian-ok
+PATH	crates/meridian-shell/src/quick_settings_popup.rs
+CONTENT	crates/meridian-shell/src/quick_settings_popup.rs	2	meridian_config, meridian_tokens
+PATH	crates/meridian-shell/src/region_picker.rs
+CONTENT	crates/meridian-shell/src/region_picker.rs	6	meridian_config, meridian_ipc, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/screenshot_consent.rs
+CONTENT	crates/meridian-shell/src/screenshot_consent.rs	3	meridian_config, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/settings_refresh.rs
+CONTENT	crates/meridian-shell/src/settings_refresh.rs	2	meridian_config, meridian_tokens
+PATH	crates/meridian-shell/src/settings_view.rs
+CONTENT	crates/meridian-shell/src/settings_view.rs	6	meridian_config, meridian_ipc, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/settings_view/appearance_widgets.rs
+PATH	crates/meridian-shell/src/settings_view/audio_system_widgets.rs
+PATH	crates/meridian-shell/src/settings_view/basic_widgets.rs
+CONTENT	crates/meridian-shell/src/settings_view/basic_widgets.rs	2	MERIDIAN, MeridianShell.settings_search
+PATH	crates/meridian-shell/src/settings_view/content/bluetooth.rs
+PATH	crates/meridian-shell/src/settings_view/content/cursor.rs
+PATH	crates/meridian-shell/src/settings_view/content/default_apps.rs
+PATH	crates/meridian-shell/src/settings_view/content/display.rs
+PATH	crates/meridian-shell/src/settings_view/content/network.rs
+PATH	crates/meridian-shell/src/settings_view/content/pinned_apps.rs
+PATH	crates/meridian-shell/src/settings_view/content/power.rs
+PATH	crates/meridian-shell/src/settings_view/content/printers.rs
+PATH	crates/meridian-shell/src/settings_view/content/sound.rs
+PATH	crates/meridian-shell/src/settings_view/content/system_overview.rs
+CONTENT	crates/meridian-shell/src/settings_view/content/system_overview.rs	1	Meridian-Installation.
+PATH	crates/meridian-shell/src/settings_view/content/theme.rs
+PATH	crates/meridian-shell/src/settings_view/content/updates.rs
+PATH	crates/meridian-shell/src/settings_view/content/users.rs
+CONTENT	crates/meridian-shell/src/settings_view/content/users.rs	1	Meridian-Sitzung.
+PATH	crates/meridian-shell/src/settings_view/content/wallpaper.rs
+PATH	crates/meridian-shell/src/settings_view/content_builders.rs
+CONTENT	crates/meridian-shell/src/settings_view/content_builders.rs	1	meridian_ui
+PATH	crates/meridian-shell/src/settings_view/display_controls.rs
+PATH	crates/meridian-shell/src/settings_view/display_widgets.rs
+PATH	crates/meridian-shell/src/settings_view/draw.rs
+CONTENT	crates/meridian-shell/src/settings_view/draw.rs	3	meridian_ui
+PATH	crates/meridian-shell/src/settings_view/group_widgets.rs
+CONTENT	crates/meridian-shell/src/settings_view/group_widgets.rs	2	meridian_tokens
+PATH	crates/meridian-shell/src/settings_view/ids.rs
+PATH	crates/meridian-shell/src/settings_view/network_device_widgets.rs
+PATH	crates/meridian-shell/src/soft_shadow.rs
+PATH	crates/meridian-shell/src/status_notifier.rs
+PATH	crates/meridian-shell/src/status_notifier/activation_and_menu.rs
+PATH	crates/meridian-shell/src/status_notifier_popup.rs
+CONTENT	crates/meridian-shell/src/status_notifier_popup.rs	4	meridian_config
+PATH	crates/meridian-shell/src/status_notifier_tests.rs
+PATH	crates/meridian-shell/src/sysinfo.rs
+CONTENT	crates/meridian-shell/src/sysinfo.rs	2	meridian
+PATH	crates/meridian-shell/src/system_power.rs
+CONTENT	crates/meridian-shell/src/system_power.rs	7	Meridian, meridian_ipc, meridian-system-power
+PATH	crates/meridian-shell/src/theme_export.rs
+CONTENT	crates/meridian-shell/src/theme_export.rs	45	Meridian, meridian_config, meridian_generated, meridian_theme_and_dark_flag, Meridian-generated, meridian-theme-export-test-, meridian-tokens, meridian-toolkit-isolation-, MeridianDark, MeridianLight
+PATH	crates/meridian-shell/src/thumbnail_popup.rs
+CONTENT	crates/meridian-shell/src/thumbnail_popup.rs	6	meridian_config
+PATH	crates/meridian-shell/src/ui/mod.rs
+PATH	crates/meridian-shell/src/ui/primitives.rs
+CONTENT	crates/meridian-shell/src/ui/primitives.rs	1	meridian_config
+PATH	crates/meridian-shell/src/ui/tokens.rs
+CONTENT	crates/meridian-shell/src/ui/tokens.rs	3	meridian_config, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/updates.rs
+PATH	crates/meridian-shell/src/users.rs
+PATH	crates/meridian-shell/src/wayland/calendar.rs
+PATH	crates/meridian-shell/src/wayland/handlers/compositor.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/compositor.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/keyboard.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/keyboard.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/layer.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/layer.rs	3	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/mod.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/mod.rs	10	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/output.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/output.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/pointer.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/pointer.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/pointer/launcher.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/pointer/launcher.rs	8	meridian_ui
+PATH	crates/meridian-shell/src/wayland/handlers/pointer/overlays_and_desktop.rs
+PATH	crates/meridian-shell/src/wayland/handlers/pointer/panel_and_popups.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/pointer/panel_and_popups.rs	6	meridian_ipc, meridian_ui
+PATH	crates/meridian-shell/src/wayland/handlers/pointer_state.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/pointer_state.rs	4	meridian_ui, MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/pointer_translate.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/pointer_translate.rs	23	meridian_ui
+PATH	crates/meridian-shell/src/wayland/handlers/seat.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/seat.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/shm.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/shm.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/widget_dispatch.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/widget_dispatch.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/widget_dispatch/dispatch.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/widget_dispatch/dispatch.rs	24	Meridian, meridian_config, meridian_ipc, MeridianConfig, MeridianShell
+PATH	crates/meridian-shell/src/wayland/handlers/widget_dispatch/settings_and_context.rs
+CONTENT	crates/meridian-shell/src/wayland/handlers/widget_dispatch/settings_and_context.rs	18	meridian_config, meridian_ipc, MeridianConfig, MeridianShell
+PATH	crates/meridian-shell/src/wayland/init.rs
+CONTENT	crates/meridian-shell/src/wayland/init.rs	42	meridian_config, meridian_config.general.idle_timeout_secs, meridian_config.general.theme, meridian_config.general.theme.trim, meridian_config.panel.pinned.is_empty, meridian_config.wallpaper.as_ref, MERIDIAN_SHELL_COMMIT_STATS, MERIDIAN_SHELL_RENDER_STATS, MERIDIAN_SHELL_REPAINT_STATS, meridian-calendar-popup, meridian-desktop, meridian-desktop-menu, meridian-launcher, meridian-network-popup, meridian-notification, meridian-panel, meridian-screenshot-consent, meridian-screenshot-region-picker, meridian-thumbnail-popup, meridian-wifi-password, meridian-workspace-popup, MeridianConfig, MeridianShell
+PATH	crates/meridian-shell/src/wayland/init/assets.rs
+CONTENT	crates/meridian-shell/src/wayland/init/assets.rs	3	meridian_config, meridian_tokens
+PATH	crates/meridian-shell/src/wayland/init/commit.rs
+CONTENT	crates/meridian-shell/src/wayland/init/commit.rs	2	MeridianShell
+PATH	crates/meridian-shell/src/wayland/init/flags.rs
+CONTENT	crates/meridian-shell/src/wayland/init/flags.rs	1	MERIDIAN_TEST_FLAG_THAT_MUST_NOT_EXIST
+PATH	crates/meridian-shell/src/wayland/ipc.rs
+CONTENT	crates/meridian-shell/src/wayland/ipc.rs	14	meridian, meridian_ipc
+PATH	crates/meridian-shell/src/wayland/mod.rs
+CONTENT	crates/meridian-shell/src/wayland/mod.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/wayland/render.rs
+CONTENT	crates/meridian-shell/src/wayland/render.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/wayland/render/calendar_workspace.rs
+CONTENT	crates/meridian-shell/src/wayland/render/calendar_workspace.rs	7	meridian_config, meridian_tokens, MeridianShell
+PATH	crates/meridian-shell/src/wayland/render/core.rs
+CONTENT	crates/meridian-shell/src/wayland/render/core.rs	4	meridian_tokens, meridian_ui, MeridianShell
+PATH	crates/meridian-shell/src/wayland/render/desktop_overlays.rs
+CONTENT	crates/meridian-shell/src/wayland/render/desktop_overlays.rs	4	meridian_config, MeridianShell
+PATH	crates/meridian-shell/src/wayland/render/launcher.rs
+CONTENT	crates/meridian-shell/src/wayland/render/launcher.rs	7	meridian_config, meridian_tokens, meridian_ui, MeridianShell
+PATH	crates/meridian-shell/src/wayland/render/network_audio.rs
+CONTENT	crates/meridian-shell/src/wayland/render/network_audio.rs	7	meridian_config, MeridianShell
+PATH	crates/meridian-shell/src/wayland/render/notifications.rs
+CONTENT	crates/meridian-shell/src/wayland/render/notifications.rs	8	meridian_config, meridian-panel-click-zones.json, MeridianShell
+PATH	crates/meridian-shell/src/wayland/screencopy.rs
+CONTENT	crates/meridian-shell/src/wayland/screencopy.rs	14	meridian_ipc, meridian-screenshot, meridian-screenshot.XXXXXXXXXX, MeridianShell
+PATH	crates/meridian-shell/src/wayland/shell.rs
+CONTENT	crates/meridian-shell/src/wayland/shell.rs	9	meridian_config, meridian_ipc, meridian_ui, MeridianShell
+PATH	crates/meridian-shell/src/wayland/state.rs
+CONTENT	crates/meridian-shell/src/wayland/state.rs	10	meridian, MERIDIAN_ARGS, meridian_config, meridian_ipc, meridian-file-picker, MeridianConfig, MeridianShell
+PATH	crates/meridian-shell/src/wayland/state/audio_and_network_popups.rs
+CONTENT	crates/meridian-shell/src/wayland/state/audio_and_network_popups.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/wayland/state/ipc_events.rs
+CONTENT	crates/meridian-shell/src/wayland/state/ipc_events.rs	22	meridian_config, meridian_ipc, MeridianConfig, MeridianShell
+PATH	crates/meridian-shell/src/wayland/state/panel_actions.rs
+CONTENT	crates/meridian-shell/src/wayland/state/panel_actions.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/wayland/state/popups.rs
+CONTENT	crates/meridian-shell/src/wayland/state/popups.rs	1	MeridianShell
+PATH	crates/meridian-shell/src/wayland/state/shell_actions.rs
+CONTENT	crates/meridian-shell/src/wayland/state/shell_actions.rs	13	meridian_config, meridian_ipc, MeridianConfig, MeridianShell
+PATH	crates/meridian-shell/src/wayland/state/timers.rs
+CONTENT	crates/meridian-shell/src/wayland/state/timers.rs	7	meridian_ipc, meridian-, MeridianShell
+PATH	crates/meridian-shell/src/wayland/state_tests.rs
+CONTENT	crates/meridian-shell/src/wayland/state_tests.rs	3	meridian_config, meridian_ipc, MeridianConfig
+PATH	crates/meridian-shell/src/wayland/state_tests/output_events.rs
+PATH	crates/meridian-shell/src/wayland/state_tests/workspaces.rs
+CONTENT	crates/meridian-shell/src/wayland/state_tests/workspaces.rs	11	meridian, meridian_config, MeridianConfig
+PATH	crates/meridian-shell/src/wayland/time.rs
+PATH	crates/meridian-shell/src/wayland/types.rs
+PATH	crates/meridian-shell/src/widget_action.rs
+CONTENT	crates/meridian-shell/src/widget_action.rs	5	meridian_config
+PATH	crates/meridian-shell/src/widget_traversal.rs
+CONTENT	crates/meridian-shell/src/widget_traversal.rs	2	meridian_ui
+PATH	crates/meridian-shell/src/wifi_password_modal.rs
+CONTENT	crates/meridian-shell/src/wifi_password_modal.rs	3	meridian_config, meridian_tokens, meridian_ui
+PATH	crates/meridian-shell/src/workspaces.rs
+CONTENT	crates/meridian-shell/src/workspaces.rs	4	meridian_config, meridian_tokens
+PATH	crates/meridian-shell/tests/centralization_guard.rs
+CONTENT	crates/meridian-shell/tests/centralization_guard.rs	2	meridian_tokens, meridian-ui
+PATH	crates/meridian-tokens/Cargo.toml
+CONTENT	crates/meridian-tokens/Cargo.toml	1	meridian-tokens
+PATH	crates/meridian-tokens/assets/fonts/AdwaitaSans-Regular.ttf
+PATH	crates/meridian-tokens/assets/fonts/LICENSE
+PATH	crates/meridian-tokens/src/chrome.rs
+PATH	crates/meridian-tokens/src/color.rs
+CONTENT	crates/meridian-tokens/src/color.rs	7	Meridian, meridian_config, meridian-config, meridian-ui
+PATH	crates/meridian-tokens/src/elevation.rs
+CONTENT	crates/meridian-tokens/src/elevation.rs	1	meridian_config
+PATH	crates/meridian-tokens/src/font.rs
+CONTENT	crates/meridian-tokens/src/font.rs	2	Meridian, meridian-compass-render
+PATH	crates/meridian-tokens/src/interaction.rs
+PATH	crates/meridian-tokens/src/lib.rs
+CONTENT	crates/meridian-tokens/src/lib.rs	3	Meridian, meridian-config, meridian-ui
+PATH	crates/meridian-tokens/src/radius.rs
+CONTENT	crates/meridian-tokens/src/radius.rs	1	meridian-ui
+PATH	crates/meridian-tokens/src/typography.rs
+PATH	crates/meridian-tokens/tests/design_guard.rs
+CONTENT	crates/meridian-tokens/tests/design_guard.rs	2	meridian-config, meridian-tokens
+PATH	crates/meridian-tokens/tests/source_size_guard.rs
+CONTENT	crates/meridian-tokens/tests/source_size_guard.rs	1	meridian-tokens
+PATH	crates/meridian-ui/Cargo.toml
+CONTENT	crates/meridian-ui/Cargo.toml	5	meridian-freetype, meridian-tokens, meridian-ui
+PATH	crates/meridian-ui/assets/fonts/LICENSE
+PATH	crates/meridian-ui/src/effect/border.rs
+PATH	crates/meridian-ui/src/effect/dominant_color.rs
+PATH	crates/meridian-ui/src/effect/fill.rs
+PATH	crates/meridian-ui/src/effect/metro_surface.rs
+PATH	crates/meridian-ui/src/effect/mod.rs
+PATH	crates/meridian-ui/src/effect/radius.rs
+PATH	crates/meridian-ui/src/effect/text.rs
+CONTENT	crates/meridian-ui/src/effect/text.rs	3	Meridian, meridian_freetype, meridian_tokens
+PATH	crates/meridian-ui/src/event/hit_test.rs
+PATH	crates/meridian-ui/src/event/mod.rs
+PATH	crates/meridian-ui/src/lib.rs
+CONTENT	crates/meridian-ui/src/lib.rs	1	Meridian
+PATH	crates/meridian-ui/src/paint/layout.rs
+PATH	crates/meridian-ui/src/paint/mod.rs
+PATH	crates/meridian-ui/src/paint/render.rs
+PATH	crates/meridian-ui/src/style/color.rs
+CONTENT	crates/meridian-ui/src/style/color.rs	2	meridian_tokens, meridian-tokens
+PATH	crates/meridian-ui/src/style/mod.rs
+PATH	crates/meridian-ui/src/style/radius.rs
+CONTENT	crates/meridian-ui/src/style/radius.rs	2	meridian_tokens, meridian-tokens
+PATH	crates/meridian-ui/src/style/spacing.rs
+PATH	crates/meridian-ui/src/widget/base.rs
+PATH	crates/meridian-ui/src/widget/button.rs
+CONTENT	crates/meridian-ui/src/widget/button.rs	1	meridian_tokens
+PATH	crates/meridian-ui/src/widget/mod.rs
+CONTENT	crates/meridian-ui/src/widget/mod.rs	1	Meridian
+PATH	crates/meridian-ui/src/widget/tile.rs
+CONTENT	crates/meridian-ui/src/widget/tile.rs	1	meridian_tokens
+PATH	crates/meridian-wm/Cargo.toml
+CONTENT	crates/meridian-wm/Cargo.toml	1	meridian-wm
+PATH	crates/meridian-wm/src/floating.rs
+PATH	crates/meridian-wm/src/lib.rs
+PATH	crates/meridian-wm/src/tiling/layout.rs
+PATH	crates/meridian-wm/src/tiling/mod.rs
+PATH	crates/meridian-wm/src/tiling/tree.rs
+PATH	crates/meridian-wm/src/tiling/types.rs
+PATH	crates/meridian-wm/src/window.rs
+PATH	crates/meridian-wm/src/workspace.rs
+PATH	crates/meridian-xwayland-drm-bridge/Cargo.toml
+CONTENT	crates/meridian-xwayland-drm-bridge/Cargo.toml	1	meridian-xwayland-drm-bridge
+PATH	crates/meridian-xwayland-drm-bridge/src/lib.rs
+CONTENT	crates/meridian-xwayland-drm-bridge/src/lib.rs	3	Meridian, MERIDIAN_XWAYLAND_DRM_PRIMARY_FD, MERIDIAN_XWAYLAND_DRM_RENDER_FD
+CONTENT	docs/APP_STACK.md	12	Meridian, Meridian-owned
+CONTENT	docs/ARCHITECTURE.md	24	Meridian, meridian_design_manifest.md, meridian-, meridian-compositor, meridian-config, meridian-ipc, meridian-lock, meridian-login, meridian-polkit, meridian-portal, meridian-shell, meridian-tokens, meridian-ui, meridian-wm
+CONTENT	docs/AUDIT_2026-05-25.md	18	Meridian, meridian-config, Meridian-Decorations, meridian-file-picker, meridian-shell
+CONTENT	docs/AUDIT_2026-06-20.md	42	Meridian, meridian_config, meridian_tokens, meridian-compass-render, meridian-compositor, meridian-config, meridian-lock, meridian-login, meridian-polkit, meridian-shell, meridian-tokens
+CONTENT	docs/AUDIT_2026-08-19.md	26	Meridian, Meridian-Änderung, meridian-compositor, Meridian-Keys, meridian-lock, meridian-portal, meridian-shell, meridian-tokens, MeridianConfig, MeridianRenderElements
+CONTENT	docs/CODE_INDEX.md	491	Meridian, meridian_design_manifest.md, meridian_environment_keys, meridian_lines, meridian_theme_and_dark_flag, meridian-boot-common, meridian-compass-render, meridian-compositor, meridian-config, meridian-freetype, meridian-ipc, meridian-lock, meridian-login, meridian-polkit, meridian-portal, meridian-session.target, meridian-shell, meridian-tokens, meridian-ui, meridian-wm, MeridianConfig, MeridianShell, MeridianState, MeridianToml
+CONTENT	docs/CONFIGURATION.md	3	Meridian, meridian-config
+CONTENT	docs/DEBUGGING.md	52	Meridian, MERIDIAN_DRM_DISABLE_SHELL, MERIDIAN_DRM_TIMING, MERIDIAN_FILE_PICKER, MERIDIAN_NO_SHELL, MERIDIAN_SHELL_COMMIT_STATS, MERIDIAN_SMOKE_LOG, MERIDIAN_SMOKE_MODE, MERIDIAN_SMOKE_TIMEOUT, Meridian-Backend-Namen, meridian-compositor, meridian-config, Meridian-Consent-Modal., Meridian-Datenpfad, meridian-file-picker, Meridian-Inputpfad, Meridian-Instanz, Meridian-IPC, Meridian-Keybinding-Problem., meridian-perf-, meridian-portal, Meridian-Reaktion, Meridian-Session, meridian-shell, meridian-smoke-drm.log
+CONTENT	docs/DESKTOP_SETTINGS_CONTRACT.md	5	Meridian, meridian-config, Meridian-Einstellungen., meridian-portal
+CONTENT	docs/FRAME_STRATEGY.md	16	Meridian, meridian_design_manifest.md, Meridian-eigene, Meridian-Frame, Meridian-konform, Meridian-Leiste, Meridian-SSD-Leiste, Meridian-SSD-Rahmen., Meridian-Titelleiste, meridian-tokens, Meridian-UI-Kit, Meridians
+CONTENT	docs/FREEBSD.md	24	Meridian, meridian_enable, meridian_login, meridian_login_enable, meridian_quiet, meridian_user, meridian-bootlogo.png, meridian-login, meridian-login-password, meridian-login.log, meridian-login.sock, meridian.log
+CONTENT	docs/GUI_CENTRALIZATION_PLAN.md	8	Meridian, meridian_design_manifest.md, meridian-config, Meridian-owned, meridian-tokens, meridian-ui
+CONTENT	docs/HARDWARE_SMOKE.md	21	Meridian, meridian-lock, meridian-login, meridian-login-password, meridian-login.service, meridian-polkit-agent, meridian-portal, meridian-shell, meridian.portal, meridian.service
+PATH	docs/MERIDIAN_LOGIN.md
+CONTENT	docs/MERIDIAN_LOGIN.md	31	Meridian, MERIDIAN_, MERIDIAN_DRM_TIMING, MERIDIAN_LOGIN_COMPOSITOR, MERIDIAN_LOGIN_DRM_CARD, meridian-boot-common, meridian-compass-render, meridian-login, meridian-login-password, meridian-login.service, meridian-login.sock, meridian-shell
+CONTENT	docs/MULTI_MONITOR.md	15	meridian-compositor, MeridianState.output_registry, MeridianState.outputs
+CONTENT	docs/NATIVE_UI_PLAN.md	1	Meridian-
+CONTENT	docs/NIWOE_DESIGN_BRIEF.md	4	Meridian-, meridian-config, Meridian-Schriftzüge, meridian-tokens
+CONTENT	docs/NIWOE_DEVELOPMENT_DISTRO.md	1	Meridian-Plan
+CONTENT	docs/NIWOE_LINUX_BASELINE.md	18	meridian, Meridian-Namen, meridian-portal, meridian-session, meridian-session.target, meridian-shell, meridian-tokens, Meridian., meridian.desktop
+CONTENT	docs/NVIDIA_PASSTHROUGH.md	39	Meridian, MERIDIAN_DIRTY_STATS, MERIDIAN_DRM_DISABLE_SHELL, MERIDIAN_DRM_FORCE_MODE, MERIDIAN_DRM_FORCE_REFRESH_HZ, MERIDIAN_DRM_FRAME_INTERVAL_MS, MERIDIAN_DRM_MODE, MERIDIAN_DRM_MODE_INDEX, MERIDIAN_DRM_TIMING, MERIDIAN_NO_SHELL, MERIDIAN_SHELL_RENDER_STATS, MERIDIAN_SMOKE_LOG, MERIDIAN_SMOKE_MODE, MERIDIAN_SMOKE_TIMEOUT, Meridian-Dispatch, Meridian-Inputpfad, Meridian-Keybinding-Problem., meridian-smoke-drm.log, Meridian-Test., Meridian-Testablauf, Meridian-VM
+CONTENT	docs/OPENBSD.md	60	Meridian, meridian_design_manifest.md, MERIDIAN_WEB_UI_PANEL, meridian-boot-common, meridian-compass-render, meridian-compositor, meridian-config, meridian-freetype, meridian-ipc, meridian-lock, meridian-login, meridian-openbsd-auth, meridian-polkit, meridian-portal, meridian-runtime-, meridian-shell, meridian-tokens, meridian-ui, meridian-ui-runtime, meridian-wm, Meridian.
+CONTENT	docs/OPENBSD_BOOT_2026-08-27.md	7	meridian_bootsplash, meridian_login, meridian-login.sock
+CONTENT	docs/OPENBSD_QUIET_BOOT.md	3	Meridian, meridian-login
+CONTENT	docs/OPENBSD_SANDBOX_PLAN.md	53	meridian, MERIDIAN_FAULT_INJECT_HOLD_LOCK_PENDING, MERIDIAN_THEME_DIR, meridian-lock, meridian-login, meridian-openbsd-auth, meridian-polkit, meridian-polkit-agent, meridian-polkit-agent.desktop, meridian-portal, meridian-shell, meridian-ui-runtime, meridian.sock
+CONTENT	docs/OPENBSD_SETTINGS_AUDIT_2026-08-27.md	7	Meridian, meridian-build, meridian-tokens
+CONTENT	docs/OPENBSD_SUSPEND_INPUT_2026-08-26.md	21	Meridian, Meridian-Experimente, Meridian-Fehler., Meridian-Lauf., Meridian-Pfad, Meridian-Produktcode, Meridian-Prozess, Meridian-Prozesse, Meridian-Prozessen, Meridian-Qualitätsrunde., Meridian-Sitzung, meridian-test, Meridians
+CONTENT	docs/PROJECT_STATUS.md	63	Meridian, MERIDIAN_, meridian_design_manifest.md, MERIDIAN_FILE_PICKER, MERIDIAN_THEME_DIR, MERIDIAN_WEB_UI_PANEL, meridian-boot-common, meridian-compass-render, meridian-compositor, Meridian-Config, Meridian-eigene, meridian-file-picker, Meridian-Frame., meridian-freetype, Meridian-Grafiksession, meridian-ipc, meridian-lock, meridian-login, meridian-login-password, meridian-login.sock, meridian-portal, Meridian-Prozessen, Meridian-Roadmaps, meridian-runtime-, Meridian-Session, meridian-session.target, meridian-shell, Meridian-SSD-Pfad., Meridian-Stand, Meridian-Theme, meridian-tokens, meridian-ui, meridian-ui-runtime, meridian-wm
+CONTENT	docs/README.md	4	meridian_design_manifest.md, MERIDIAN_LOGIN.md, MERIDIAN_OS_PLAN.md
+CONTENT	docs/REFACTORING_PLAN.md	12	Meridian, meridian-login, meridian-shell, meridian-tokens, meridian-ui, MeridianShell
+CONTENT	docs/SSD_FRAME_PLAN.md	32	Meridian, meridian-arch, meridian-bin-backup, meridian-build, meridian-compositor, meridian-config, meridian-desktop, meridian-shell, meridian-tokens
+CONTENT	docs/TESTING.md	47	Meridian, MERIDIAN_DRM_TIMING, MERIDIAN_FILE_PICKER, MERIDIAN_SCREENSHOT_DEV, meridian-compositor, meridian-config, meridian-ipc, meridian-login, meridian-panel-click-zones.json, meridian-portal, meridian-shell, meridian-tokens, MeridianFakeTray
+CONTENT	docs/WORKSPACES.md	2	Meridian
+CONTENT	docs/XDG_PORTALS.md	18	meridian, MERIDIAN_FILE_PICKER, MERIDIAN_SCREENSHOT_DEV, Meridian-, Meridian-Backends, Meridian-Config, meridian-file-picker, Meridian-IPC-, meridian-openbsd-portals.conf, Meridian-Policy, meridian-portal, meridian-portals.conf, Meridian-Prozess, meridian.sock
+CONTENT	docs/design-reference/webkit-prototype/README.md	5	Meridian, meridian-config, meridian-tokens
+CONTENT	docs/design-reference/webkit-prototype/assets/diagnostic.css	247	meridian-color-accent, meridian-color-border, meridian-color-launcher-divider, meridian-color-launcher-hover, meridian-color-launcher-search, meridian-color-launcher-search-focus, meridian-color-launcher-selected, meridian-color-on-accent, meridian-color-preview-dark-background, meridian-color-preview-dark-surface, meridian-color-preview-dark-surface-alt, meridian-color-preview-light-background, meridian-color-preview-light-surface, meridian-color-preview-light-surface-alt, meridian-color-surface, meridian-color-surface-alt, meridian-color-text, meridian-color-text-dim, meridian-decoration-border-width, meridian-elevation-launcher-extent, meridian-font-ui, meridian-launcher-app-icon-size, meridian-layout-gap, meridian-radius-lg, meridian-radius-md, meridian-radius-sm, meridian-radius-xl, meridian-surface-launcher-radius, meridian-type-body-size, meridian-type-caption-size, meridian-type-display-size, meridian-type-medium-weight, meridian-type-regular-weight, meridian-type-strong-weight, meridian-type-title-size
+CONTENT	docs/design-reference/webkit-prototype/assets/diagnostic.html	14	Meridian, MERIDIAN_APP_CATALOG, MERIDIAN_COMPONENT_CSS, MERIDIAN_ICON_SPRITE, MERIDIAN_LAUNCHER_SCRIPT, MERIDIAN_OS, MERIDIAN_THEME, MERIDIAN_TOKENS, meridian-icon, Meridian-Installation., meridian-theme
+CONTENT	docs/design-reference/webkit-prototype/assets/generated-tokens-reference.css	203	meridian-color-accent, meridian-color-accent-alt, meridian-color-background, meridian-color-border, meridian-color-error, meridian-color-launcher-divider, meridian-color-launcher-hover, meridian-color-launcher-search, meridian-color-launcher-search-focus, meridian-color-launcher-selected, meridian-color-launcher-shadow, meridian-color-on-accent, meridian-color-panel-active, meridian-color-panel-divider, meridian-color-panel-hover, meridian-color-panel-shadow, meridian-color-preview-dark-background, meridian-color-preview-dark-surface, meridian-color-preview-dark-surface-alt, meridian-color-preview-light-background, meridian-color-preview-light-surface, meridian-color-preview-light-surface-alt, meridian-color-success, meridian-color-surface, meridian-color-surface-alt, meridian-color-text, meridian-color-text-dim, meridian-color-warning, meridian-config, meridian-decoration-border-width, meridian-decoration-corner-radius, meridian-decoration-window-corner-radius, meridian-elevation-launcher-alpha, meridian-elevation-launcher-blur, meridian-elevation-launcher-extent, meridian-elevation-launcher-offset-y, meridian-elevation-panel-alpha, meridian-elevation-panel-blur, meridian-elevation-panel-extent, meridian-elevation-panel-offset-y, meridian-elevation-popup-alpha, meridian-elevation-popup-blur, meridian-elevation-popup-extent, meridian-elevation-popup-offset-y, meridian-font-ui, meridian-glass-alpha, meridian-glass-blur-enabled, meridian-glass-blur-radius, meridian-glass-button-alpha, meridian-glass-divider-alpha, meridian-glass-enabled, meridian-glass-frame-alpha, meridian-glass-specular, meridian-interaction-accent-hover-alpha, meridian-interaction-accent-idle-alpha, meridian-interaction-armed-mix, meridian-interaction-hover-mix, meridian-interaction-neutral-hover, meridian-interaction-neutral-pressed, meridian-interaction-pressed-mix, meridian-interaction-selected-mix, meridian-launcher-app-icon-size, meridian-launcher-band-alpha, meridian-launcher-bento-accent-alpha, meridian-launcher-cell-alpha, meridian-launcher-divider-alpha, meridian-launcher-height, meridian-launcher-hover-alpha, meridian-launcher-power-armed-alpha, meridian-launcher-search-field-alpha, meridian-launcher-selected-alpha, meridian-launcher-width, meridian-layout-gap, meridian-mask-dim-alpha, meridian-panel-active-alpha, meridian-panel-app-icon-size, meridian-panel-bottom-gap, meridian-panel-clock-width, meridian-panel-control-height, meridian-panel-control-width, meridian-panel-divider-alpha, meridian-panel-height, meridian-panel-hover-alpha, meridian-panel-side-margin, meridian-panel-top-shadow, meridian-quick-settings-height, meridian-quick-settings-panel-gap, meridian-quick-settings-width, meridian-radius-lg, meridian-radius-md, meridian-radius-none, meridian-radius-sm, meridian-radius-xl, meridian-schema-version, meridian-scrollbar-thumb-alpha, meridian-scrollbar-track-alpha, meridian-selection-active-mix, meridian-selection-expanded-mix, meridian-selection-focused-mix, meridian-selection-hover-mix, meridian-selection-selected-mix, meridian-shadow-alpha, meridian-shadow-enabled, meridian-shadow-offset-y, meridian-shadow-radius, meridian-shadow-radius-top, meridian-surface-control-blur, meridian-surface-control-fill-alpha, meridian-surface-control-frame-alpha, meridian-surface-control-radius, meridian-surface-control-tint, meridian-surface-launcher-blur, meridian-surface-launcher-fill-alpha, meridian-surface-launcher-frame-alpha, meridian-surface-launcher-radius, meridian-surface-launcher-tint, meridian-surface-modal-blur, meridian-surface-modal-fill-alpha, meridian-surface-modal-frame-alpha, meridian-surface-modal-radius, meridian-surface-modal-tint, meridian-surface-panel-blur, meridian-surface-panel-fill-alpha, meridian-surface-panel-frame-alpha, meridian-surface-panel-radius, meridian-surface-panel-tint, meridian-surface-popup-blur, meridian-surface-popup-fill-alpha, meridian-surface-popup-frame-alpha, meridian-surface-popup-radius, meridian-surface-popup-tint, meridian-theme, meridian-theme-scope, meridian-type-body-size, meridian-type-caption-size, meridian-type-display-size, meridian-type-medium-weight, meridian-type-regular-weight, meridian-type-strong-weight, meridian-type-title-size
+CONTENT	docs/design-reference/webkit-prototype/assets/launcher.js	4	meridian, meridianLauncher, meridianTheme
+CONTENT	docs/design-reference/webkit-prototype/assets/panel.css	65	meridian-color-accent, meridian-color-border, meridian-color-panel-active, meridian-color-panel-divider, meridian-color-panel-hover, meridian-color-panel-shadow, meridian-color-surface, meridian-color-text, meridian-color-text-dim, meridian-decoration-border-width, meridian-elevation-panel-blur, meridian-elevation-panel-offset-y, meridian-font-ui, meridian-layout-gap, meridian-panel-app-icon-size, meridian-panel-bottom-gap, meridian-panel-clock-width, meridian-panel-control-height, meridian-panel-control-width, meridian-panel-height, meridian-panel-side-margin, meridian-panel-top-shadow, meridian-radius-md, meridian-radius-sm, meridian-radius-xl, meridian-surface-panel-radius, meridian-type-body-size, meridian-type-caption-size, meridian-type-medium-weight, meridian-type-regular-weight
+CONTENT	docs/design-reference/webkit-prototype/assets/panel.html	12	Meridian, MERIDIAN_ICON_SPRITE, MERIDIAN_PANEL_APPS, MERIDIAN_PANEL_CSS, MERIDIAN_PANEL_SCRIPT, MERIDIAN_THEME, MERIDIAN_TOKENS, meridian-icon, meridian-theme, meridian-theme-scope
+CONTENT	docs/design-reference/webkit-prototype/assets/panel.js	1	meridian
+CONTENT	docs/design-reference/webkit-prototype/assets/quick_settings.css	86	meridian-color-accent, meridian-color-border, meridian-color-error, meridian-color-on-accent, meridian-color-surface, meridian-color-surface-alt, meridian-color-text, meridian-color-text-dim, meridian-decoration-border-width, meridian-font-ui, meridian-interaction-neutral-hover, meridian-layout-gap, meridian-radius-lg, meridian-radius-md, meridian-surface-popup-radius, meridian-type-body-size, meridian-type-caption-size, meridian-type-strong-weight, meridian-type-title-size
+CONTENT	docs/design-reference/webkit-prototype/assets/quick_settings.html	7	Meridian, MERIDIAN_ICON_SPRITE, MERIDIAN_QUICK_SETTINGS_CSS, MERIDIAN_QUICK_SETTINGS_SCRIPT, MERIDIAN_THEME, MERIDIAN_TOKENS, meridian-theme
+CONTENT	docs/design-reference/webkit-prototype/assets/quick_settings.js	2	meridian, meridianQuickSettings
+PATH	docs/meridian_design_manifest.md
+CONTENT	docs/meridian_design_manifest.md	4	meridian_design_manifest.md, meridian-config, Meridian-Kompass, meridian-tokens
+CONTENT	docs/phase-reports/P00.md	38	meridian, meridian_design_manifest.md, MERIDIAN_OS_PLAN.md, meridian_wallpaper_light_test.png, meridian-arch, meridian-compass-render, meridian-compositor, meridian-lock, meridian-login, meridian-login.service, meridian-polkit, meridian-polkit-agent, meridian-portal, meridian-session, meridian-shell, meridian-ui, meridian.desktop
+CONTENT	docs/phase-reports/P00_REVIEW.md	1	meridian
+CONTENT	docs/technical-design-guidelines.md	2	Meridian, Meridian-Owned
+PATH	packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service
+CONTENT	packaging/dbus-1/services/org.freedesktop.impl.portal.desktop.meridian.service	3	meridian, meridian-portal, meridian-portal.service
+PATH	packaging/meridian-session
+CONTENT	packaging/meridian-session	8	Meridian, meridian-session.target
+PATH	packaging/openbsd/rc.d/meridian_bootsplash
+CONTENT	packaging/openbsd/rc.d/meridian_bootsplash	6	Meridian, meridian-bootsplash, meridian-login, meridian-login.
+PATH	packaging/openbsd/rc.d/meridian_login
+CONTENT	packaging/openbsd/rc.d/meridian_login	8	meridian, meridian-login, meridian-login.sock
+PATH	packaging/pam/freebsd/meridian-login
+CONTENT	packaging/pam/freebsd/meridian-login	2	meridian-login
+PATH	packaging/pam/freebsd/meridian-login-password
+CONTENT	packaging/pam/freebsd/meridian-login-password	2	meridian-login, meridian-login-password
+PATH	packaging/pam/meridian-login-password
+CONTENT	packaging/pam/meridian-login-password	3	meridian-login, meridian-login-password, meridian-login.
+PATH	packaging/rc.d/meridian
+CONTENT	packaging/rc.d/meridian	50	meridian, meridian_bin, meridian_bootsplash_socket, meridian_enable, meridian_prefix, meridian_start, meridian_status, meridian_stop, meridian_user, meridian-login.service, meridian-shell, meridian.log
+PATH	packaging/rc.d/meridian-login
+CONTENT	packaging/rc.d/meridian-login	26	meridian, meridian_enable, meridian_login, meridian_login_enable, meridian_login_prefix, meridian_login_start, meridian_login_stop, meridian-login, meridian-login-password, meridian-login., meridian-login.log, meridian-login.service., meridian-login.sock
+PATH	packaging/rc.d/meridian_quiet
+CONTENT	packaging/rc.d/meridian_quiet	11	Meridian, meridian_quiet, meridian_quiet_enable, meridian_quiet_start, meridian_quiet_stop
+PATH	packaging/systemd-user/meridian-portal.service
+CONTENT	packaging/systemd-user/meridian-portal.service	4	Meridian, meridian-portal, meridian-session.target
+PATH	packaging/systemd-user/meridian-session.target
+CONTENT	packaging/systemd-user/meridian-session.target	4	Meridian, meridian-portal, meridian-portal.service, meridian-session.target
+PATH	packaging/wayland-sessions/meridian.desktop
+CONTENT	packaging/wayland-sessions/meridian.desktop	3	Meridian, meridian-session
+PATH	packaging/xdg-autostart/meridian-polkit-agent.desktop
+CONTENT	packaging/xdg-autostart/meridian-polkit-agent.desktop	4	Meridian, meridian-polkit-agent
+PATH	packaging/xdg-desktop-portal/meridian-openbsd-portals.conf
+CONTENT	packaging/xdg-desktop-portal/meridian-openbsd-portals.conf	3	meridian
+PATH	packaging/xdg-desktop-portal/meridian-portals.conf
+CONTENT	packaging/xdg-desktop-portal/meridian-portals.conf	4	meridian
+PATH	packaging/xdg-desktop-portal/portals/meridian-openbsd.portal
+CONTENT	packaging/xdg-desktop-portal/portals/meridian-openbsd.portal	2	meridian
+PATH	packaging/xdg-desktop-portal/portals/meridian.portal
+CONTENT	packaging/xdg-desktop-portal/portals/meridian.portal	2	meridian
+PATH	scripts/gen-meridian-theme.py
+CONTENT	scripts/gen-meridian-theme.py	5	Meridian, meridian_tokens, meridian-compass-render, meridian-config
+CONTENT	scripts/gen_code_index.sh	1	meridian
+CONTENT	scripts/install-deps-freebsd.sh	7	Meridian
+CONTENT	scripts/install-deps.sh	1	Meridian
+CONTENT	scripts/install-freebsd.sh	44	Meridian, meridian_enable, meridian_login, meridian_login_enable, meridian_quiet, meridian_quiet_enable, meridian_user, meridian-backup, meridian-bootlogo.png, meridian-loader.conf., meridian-lock, meridian-login, meridian-login-password, meridian-polkit-agent, meridian-portal, meridian-shell, Meridian.
+CONTENT	scripts/install-local.sh	48	Meridian, meridian_xwayland_drm_bridge.so, meridian-file-picker, meridian-lock, meridian-login, meridian-login-password, meridian-login.pam, meridian-login.service, meridian-polkit-agent, meridian-polkit-agent.desktop, meridian-portal, meridian-portal.service, meridian-portals.conf, meridian-session, meridian-session.target, meridian-shell, meridian.desktop, meridian.portal, meridian.service
+CONTENT	scripts/install-openbsd-boot.ksh	23	Meridian, meridian_bootsplash, meridian_login, meridian-backup., meridian-bootsplash, meridian-lock, meridian-login, meridian-polkit-agent, meridian-portal, meridian-shell
+CONTENT	scripts/install-openbsd-lock	4	meridian-lock, meridian-openbsd-auth
+CONTENT	scripts/install-openbsd-polkit	8	meridian, meridian-polkit-agent, meridian-polkit-agent.desktop, meridian-polkit-autostart.XXXXXXXXXX
+CONTENT	scripts/install-openbsd-portal	13	meridian, meridian-openbsd-portals.conf, meridian-openbsd.portal, meridian-portal, meridian-portal-service.XXXXXXXXXX, meridian-portals.conf, meridian.portal, meridian.service
+CONTENT	scripts/measure-openbsd-drm.ksh	13	meridian, MERIDIAN_DIRTY_STATS, MERIDIAN_DRM_DISABLE_SHELL, MERIDIAN_DRM_TIMING, MERIDIAN_PERF_RESULT_DIR, MERIDIAN_SHELL_RENDER_STATS, meridian-perf-, meridian-runtime-, meridian-shell
+PATH	scripts/meridian-file-picker
+CONTENT	scripts/meridian-file-picker	1	meridian-portal
+CONTENT	scripts/restart-openbsd-shell.ksh	6	meridian, meridian-shell
+CONTENT	scripts/smoke-drm.sh	23	meridian, MERIDIAN_DIRTY_STATS, MERIDIAN_DRM_TIMING, MERIDIAN_SHELL_RENDER_STATS, MERIDIAN_SMOKE_LOG, MERIDIAN_SMOKE_MODE, MERIDIAN_SMOKE_TIMEOUT, meridian-runtime-, meridian-shell, meridian-smoke-drm.log
+CONTENT	scripts/smoke-nested.sh	3	meridian, meridian-shell
+CONTENT	scripts/test-login-uinput.py	27	meridian, meridian-login, meridian-login-smoke-keyboard, meridian-login-smoke-pointer, meridian-login.service, meridian-panel-click-zones.json, meridian-shell, meridian.sock
+CONTENT	scripts/test-session-launcher.sh	18	meridian, meridian-session, meridian-session.target, meridian.desktop
+CONTENT	scripts/x11-motion-bench.c	1	Meridian
+CONTENT	src/main.rs	24	Meridian, meridian_compositor, MERIDIAN_DRM_DISABLE_SHELL, MERIDIAN_IPC_TOKEN, MERIDIAN_NO_SHELL, meridian-shell, MeridianState
+CONTENT	themes/dark/theme.toml	3	Meridian, meridian_tokens, meridian-config
+CONTENT	themes/light/theme.toml	3	Meridian, meridian_tokens, meridian-config
+CONTENT	third_party/smithay/Cargo.toml	1	Meridian
+CONTENT	third_party/smithay/OPENBSD_PORT.md	7	Meridian, meridian-compositor, meridian-wm
+DIRECTORY	crates/meridian-app-catalog		meridian-app-catalog
+DIRECTORY	crates/meridian-boot-common		meridian-boot-common
+DIRECTORY	crates/meridian-compass-render		meridian-compass-render
+DIRECTORY	crates/meridian-compositor		meridian-compositor
+DIRECTORY	crates/meridian-config		meridian-config
+DIRECTORY	crates/meridian-freetype		meridian-freetype
+DIRECTORY	crates/meridian-ipc		meridian-ipc
+DIRECTORY	crates/meridian-lock		meridian-lock
+DIRECTORY	crates/meridian-login		meridian-login
+DIRECTORY	crates/meridian-polkit		meridian-polkit
+DIRECTORY	crates/meridian-portal		meridian-portal
+DIRECTORY	crates/meridian-shell		meridian-shell
+DIRECTORY	crates/meridian-tokens		meridian-tokens
+DIRECTORY	crates/meridian-ui		meridian-ui
+DIRECTORY	crates/meridian-wm		meridian-wm
+DIRECTORY	crates/meridian-xwayland-drm-bridge		meridian-xwayland-drm-bridge
+REMOTE	github	1	git@github.com:quompacc/meridian-desktop.git -> git@github.com:quompacc/niwoe-desktop.git
+REMOTE	origin	1	ssh://git@codeberg.org/QuompaCC/meridian-desktop.git (unchanged external mirror)

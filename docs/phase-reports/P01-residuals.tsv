@@ -1,0 +1,43 @@
+Path	Occurrences	Reason
+CHANGELOG.md	26	Historical released versions and original URLs
+crates/niwoe-config/src/environment.rs	3	Legacy override reader and priority fixtures
+crates/niwoe-config/src/migration_tests.rs	15	Explicit legacy XDG input and migration fixtures; never live IPC
+crates/niwoe-config/src/migration.rs	2	Explicit legacy XDG input and migration fixtures; never live IPC
+crates/niwoe-login/src/session.rs	1	Forward legacy user overrides to shared read-only compatibility resolver
+docs/AUDIT_2026-05-25.md	18	Explicit historical/superseded plan, audit or dated platform evidence
+docs/AUDIT_2026-06-20.md	42	Explicit historical/superseded plan, audit or dated platform evidence
+docs/AUDIT_2026-08-19.md	26	Explicit historical/superseded plan, audit or dated platform evidence
+docs/design-reference/webkit-prototype/assets/diagnostic.css	247	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/diagnostic.html	14	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/generated-tokens-reference.css	203	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/launcher.js	4	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/panel.css	65	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/panel.html	12	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/panel.js	1	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/quick_settings.css	86	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/quick_settings.html	7	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/assets/quick_settings.js	2	Explicitly archived non-product WebKit visual reference
+docs/design-reference/webkit-prototype/README.md	5	Explicitly archived non-product WebKit visual reference
+docs/NATIVE_UI_PLAN.md	1	Explicit historical/superseded plan, audit or dated platform evidence
+docs/NIWOE_MIGRATION.md	4	Migration source names and unchanged external Codeberg remote
+docs/OPENBSD_BOOT_2026-08-27.md	7	Explicit historical/superseded plan, audit or dated platform evidence
+docs/OPENBSD_SETTINGS_AUDIT_2026-08-27.md	7	Explicit historical/superseded plan, audit or dated platform evidence
+docs/OPENBSD_SUSPEND_INPUT_2026-08-26.md	21	Explicit historical/superseded plan, audit or dated platform evidence
+docs/phase-reports/P00_REVIEW.md	1	Immutable historical P00 command and test evidence
+docs/phase-reports/P00.md	38	Immutable historical P00 command and test evidence
+docs/phase-reports/P01-changes.tsv	471	Per-file migration evidence with original paths
+docs/phase-reports/P01-inventory.tsv	2330	Phase inventory/evidence and unchanged external Codeberg remote
+docs/phase-reports/P01-residuals.tsv	1	This per-path exception ledger repeats historical path names
+docs/phase-reports/P01.md	3	Phase inventory/evidence and unchanged external Codeberg remote
+docs/PROJECT_STATUS.md	63	Explicit historical/superseded plan, audit or dated platform evidence
+docs/SSD_FRAME_PLAN.md	32	Explicit historical/superseded plan, audit or dated platform evidence
+Meridian - BSD – Übergabe für ChatGPT Desktop.md	29	Explicit historical/superseded plan, audit or dated platform evidence
+NIWOE_IMPLEMENTATION_PLAN.md	19	Historical baseline table and explicit P01 old-to-new migration requirements
+NIWOE_Konzeptzusammenfassung.md	2	Original user concept; historical naming provenance
+PLAN.md	2	Explicit historical/superseded plan, audit or dated platform evidence
+ROADMAP.md	3	Explicit historical/superseded plan, audit or dated platform evidence
+scripts/measure-openbsd-drm.ksh	1	Legacy performance output directory override; NIWOE value wins
+scripts/migrate-legacy-install.sh	30	Detect and retire old installed names; staged migration fixtures
+scripts/smoke-drm.sh	3	Legacy smoke overrides; present NIWOE values win; no old executable is launched
+scripts/smoke-filechooser.py	1	Refuse manual portal smoke when a legacy lock process is still running
+scripts/test-install-migration.sh	8	Detect and retire old installed names; staged migration fixtures

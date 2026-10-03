@@ -26,7 +26,7 @@ Nur Spezifikation, keine Implementierung.
 - Ein `focused_output` steuert input-getriebene Aktionen.
 - Gute Ergonomie bei schrittweiser Migration aus dem aktuellen globalen Modell.
 
-## Zielentscheidung für Meridian
+## Zielentscheidung für NIWOE
 Empfohlen: **Option C (Hybrid)**.
 
 Begründung:
@@ -256,7 +256,7 @@ Begründung:
 - Option B: neue output-aware Events einführen (z. B. `OutputWorkspaceChanged`, `OutputWorkspaceSnapshot`).
 - Option C: Übergang mit beidem (legacy + neue Events parallel).
 
-### 3) Empfehlung für Meridian
+### 3) Empfehlung für NIWOE
 Empfohlen: **Option C**.
 - Grund:
   - Rückwärtskompatibel zu bestehender Shell/Panel-Verarbeitung.

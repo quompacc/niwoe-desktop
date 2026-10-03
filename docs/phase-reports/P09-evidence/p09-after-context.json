@@ -1,0 +1,429 @@
+{
+  "room-snapshot": {
+    "type": "room-snapshot",
+    "snapshot": {
+      "revision": 759,
+      "rooms": [
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 2,
+          "workspace": 2,
+          "name": "Raum 2",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 1,
+          "workspace": 1,
+          "name": "Entwicklung",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 3,
+          "workspace": 3,
+          "name": "Raum 3",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 4,
+          "workspace": 4,
+          "name": "Raum 4",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 5,
+          "workspace": 5,
+          "name": "Raum 5",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 6,
+          "workspace": 6,
+          "name": "Raum 6",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 7,
+          "workspace": 7,
+          "name": "Raum 7",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 8,
+          "workspace": 8,
+          "name": "Raum 8",
+          "description": "",
+          "assignment": "free"
+        },
+        {
+          "preferences": {
+            "icon": null,
+            "apps": [],
+            "layout": "tiling",
+            "restore": "disabled"
+          },
+          "id": 9,
+          "workspace": 9,
+          "name": "Raum 9",
+          "description": "",
+          "assignment": "free"
+        }
+      ]
+    }
+  },
+  "window-snapshot": {
+    "type": "window-snapshot",
+    "active_workspace": 1,
+    "windows": []
+  },
+  "output-workspace-snapshot": {
+    "type": "output-workspace-snapshot",
+    "focused_output_id": 1,
+    "outputs": [
+      {
+        "output_id": 1,
+        "output_name": "drm-0",
+        "active_workspace": 1,
+        "primary": true,
+        "focused": true,
+        "x": 0,
+        "y": 0,
+        "width": 1920,
+        "height": 1080,
+        "scale_millis": 1000,
+        "transform": "Normal",
+        "refresh_millihz": 60000,
+        "modes": [
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": true,
+            "preferred": true
+          }
+        ]
+      },
+      {
+        "output_id": 3,
+        "output_name": "drm-1",
+        "active_workspace": 3,
+        "primary": false,
+        "focused": false,
+        "x": 1920,
+        "y": 0,
+        "width": 3840,
+        "height": 2160,
+        "scale_millis": 1000,
+        "transform": "Normal",
+        "refresh_millihz": 30000,
+        "modes": [
+          {
+            "width": 3840,
+            "height": 2160,
+            "refresh_millihz": 30000,
+            "current": true,
+            "preferred": false
+          },
+          {
+            "width": 3840,
+            "height": 2160,
+            "refresh_millihz": 29970,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 3440,
+            "height": 1440,
+            "refresh_millihz": 49986,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 2560,
+            "height": 1440,
+            "refresh_millihz": 59950,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1920,
+            "height": 1080,
+            "refresh_millihz": 50000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1680,
+            "height": 1050,
+            "refresh_millihz": 59883,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1600,
+            "height": 900,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 1024,
+            "refresh_millihz": 75024,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 1024,
+            "refresh_millihz": 60019,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1440,
+            "height": 900,
+            "refresh_millihz": 59901,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 800,
+            "refresh_millihz": 59909,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1152,
+            "height": 864,
+            "refresh_millihz": 75000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1280,
+            "height": 720,
+            "refresh_millihz": 50000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "refresh_millihz": 75028,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "refresh_millihz": 70069,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 1024,
+            "height": 768,
+            "refresh_millihz": 60003,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 832,
+            "height": 624,
+            "refresh_millihz": 74551,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 75000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 72187,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 60316,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 800,
+            "height": 600,
+            "refresh_millihz": 56250,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 576,
+            "refresh_millihz": 50000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 480,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 480,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 75000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 72808,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 66666,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 60000,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 640,
+            "height": 480,
+            "refresh_millihz": 59940,
+            "current": false,
+            "preferred": false
+          },
+          {
+            "width": 720,
+            "height": 400,
+            "refresh_millihz": 70081,
+            "current": false,
+            "preferred": false
+          }
+        ]
+      }
+    ]
+  }
+}

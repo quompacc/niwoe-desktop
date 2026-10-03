@@ -1,0 +1,4 @@
+[2m2026-09-27T17:47:04.327117Z[0m [32m INFO[0m [2mniwoe_compositor::state::handlers::core::compositor[0m[2m:[0m Sending layer surface configure: output=drm-0
+[2m2026-09-27T17:47:09.190899Z[0m [32m INFO[0m [2mniwoe_compositor::state::handlers::core::compositor[0m[2m:[0m Sending layer surface configure: output=drm-0
+[2m2026-09-27T17:47:09.705176Z[0m [32m INFO[0m [2mniwoe_compositor::state::handlers::core::compositor[0m[2m:[0m Sending layer surface configure: output=drm-0
+[2m2026-09-27T17:47:10.786328Z[0m [32m INFO[0m [2mniwoe_compositor::state::handlers::core::compositor[0m[2m:[0m Sending layer surface configure: output=drm-0

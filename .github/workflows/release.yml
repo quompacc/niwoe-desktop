@@ -29,5 +29,5 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          name: Meridian ${{ github.ref_name }}
+          name: NIWOE ${{ github.ref_name }}
           body_path: RELEASE_NOTES.md

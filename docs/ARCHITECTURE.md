@@ -1,11 +1,12 @@
-# Meridian Architecture
+# NIWOE Architecture
 
-> Updated 2026-08-19. Sections explicitly distinguish the current native-shell
-> implementation from the target WebKit UI platform.
+> Updated 2026-09-21. Product UI is native Rust; Linux is the product target.
+> Existing `niwoe-*` identifiers remain until the P01 naming migration.
+> The retired WebKit prototype is retained only as a visual reference.
 
 ## Stable system boundary
 
-Meridian is a Wayland compositor and desktop, not a themed layer over another
+NIWOE is a Wayland compositor and desktop, not a themed layer over another
 desktop. Rust remains responsible for protocol correctness, hardware access,
 policy, IPC and privileged integration on Linux and BSD.
 
@@ -17,7 +18,7 @@ target architecture.
 The current executable path is:
 
 ```text
-boot/login → meridian compositor → native meridian-shell
+boot/login → niwoe compositor → native niwoe-shell
                                   ├─ panel / launcher / popups / settings
                                   └─ IPC to compositor and system services
 ```
@@ -25,58 +26,50 @@ boot/login → meridian compositor → native meridian-shell
 Important workspace responsibilities:
 
 - `src/main.rs`: backend selection, XWayland, IPC timer and shell watchdog
-- `meridian-compositor`: Wayland server, DRM/Winit backends, input, rendering,
+- `niwoe-compositor`: Wayland server, DRM/Winit backends, input, rendering,
   output/workspace policy and compositor IPC
-- `meridian-shell`: native Rust layer-shell client and current desktop UI
-- `meridian-config`: TOML configuration, themes, outputs and keybindings
-- `meridian-tokens`: authoritative design values and guard tests
-- `meridian-ipc`: shell/compositor contracts
-- `meridian-wm`: workspace, tiling and floating logic
-- `meridian-login`, `meridian-lock`: authentication/session surfaces
-- `meridian-portal`: portal policy and D-Bus integration
-- `meridian-polkit`: authorization agent
-- `meridian-ui`: reusable native UI primitives
+- `niwoe-shell`: native Rust layer-shell client and current desktop UI
+- `niwoe-config`: TOML configuration, themes, outputs and keybindings
+- `niwoe-tokens`: authoritative design values and guard tests
+- `niwoe-ipc`: shell/compositor contracts
+- `niwoe-wm`: workspace, tiling and floating logic
+- `niwoe-login`, `niwoe-lock`: authentication/session surfaces
+- `niwoe-portal`: portal policy and D-Bus integration
+- `niwoe-polkit`: authorization agent
+- `niwoe-ui`: reusable native UI primitives
 
 The exact source inventory is generated in `CODE_INDEX.md`.
 
-## Target UI architecture
+## Product UI architecture
 
 ```text
-Meridian compositor
+NIWOE compositor
 ├─ Wayland / XWayland
 ├─ DRM/KMS, input and output management
 ├─ window/workspace policy and effects
 └─ typed IPC and supervision
           │
           ▼
-Meridian UI runtime (unprivileged)
-├─ WebKit lifecycle and Wayland surface integration
-├─ capability-scoped Rust bridge
-├─ packaged/offline assets
-└─ crash containment and diagnostics
-          │
-          ▼
-Meridian UI framework
-├─ CSS generated from meridian-tokens/config
-├─ Web Components and shared icons
-└─ minimal TypeScript state adapters
+native niwoe-shell (unprivileged)
+├─ Wayland surface lifecycle and input
+├─ niwoe-ui primitives and shared icons
+├─ direct niwoe-tokens/config consumption
+└─ typed IPC to compositor and small system helpers
           ├─ panel
           ├─ launcher
           ├─ Quick Settings
-          └─ later Meridian system tools
+          └─ later NIWOE system tools
 ```
 
-The new runtime is an additional unprivileged client, not a compositor plugin
-and not a privileged web view. Detailed requirements are in `UI_PLATFORM.md`.
+The shell is a separate unprivileged Wayland client, not a compositor plugin.
+Detailed sequencing and acceptance gates are in `../NIWOE_IMPLEMENTATION_PLAN.md`.
 
-## Migration boundary
+## UI boundary
 
-The native shell remains the fallback and behavioral reference until the full
-panel/launcher/Quick Settings vertical slice is proven. Migration may extend IPC
-additively but must not silently break existing native-shell decoding.
-
-Login and bootsplash stay native during the first slice. Authentication UI is a
-separate security decision; the WebKit direction does not automatically move it.
+Panel, launcher and Quick Settings share native primitives and the central Rust
+tokens. IPC may grow additively but must not silently break existing decoding.
+Login, lock and bootsplash also remain native and keep their narrower security
+boundaries.
 
 ## Compositor / shell / IPC contract
 
@@ -98,16 +91,15 @@ Visual stacking is correctness and remains:
 5. overlay surfaces/launcher/popups
 6. cursor
 
-Moving a surface from native drawing to WebKit does not authorize reordering.
+Changing native surface composition does not authorize reordering.
 
 ## Backends and platforms
 
 - DRM/KMS is the authoritative real-session path.
 - Winit/nested execution supports development and regression tests.
-- Linux is the currently exercised implementation platform.
-- FreeBSD has an existing logind-free installer/session path.
-- OpenBSD is the next hardware/portability evaluation; support is not yet
-  claimed.
+- Linux is the active development and product platform.
+- Existing FreeBSD/OpenBSD adapters remain technical references, not active
+  evaluation targets or mandatory release gates.
 
 OS integrations live behind explicit platform adapters. OpenBSD `pledge` and
 `unveil` and FreeBSD Capsicum/jails/MAC are not treated as interchangeable APIs.
@@ -124,39 +116,37 @@ GTK, Qt, browsers, Electron and wxWidgets remain external. See `APP_STACK.md`.
 ## Design-source flow
 
 ```text
-meridian-tokens + meridian-config
-              ├─ native render consumers
-              └─ generated CSS variables → shared Web Components
+niwoe-tokens + niwoe-config
+              └─ native niwoe-ui and render consumers
 ```
 
-There is no hand-maintained parallel CSS palette. The design guard must cover
-web assets before production migration.
+There is no parallel product CSS palette or planned WebKit migration.
+Archived web assets are historical visual references only.
 
 ## Security boundaries
 
-- WebKit runs without root, DRM/input handles or ambient command execution.
+- The native shell runs without root or raw DRM/input handles.
 - Privileged operations remain in small Rust services/helpers.
-- Every bridge call is typed, validated and capability-checked.
-- Packaged local content is the default; remote navigation is denied.
-- A compromised document must not imply compositor or root compromise.
+- IPC calls are typed, validated and subject to existing authentication/policy.
+- A shell failure must not bypass compositor-owned session locking.
 
 ## Performance-sensitive paths
 
 - compositor DRM/Winit render and damage paths
 - decorations, wallpaper and captures
-- UI surface commits and WebKit paints
+- native UI surface commits
 - icon/font decode and launcher population
 - bridge event fan-out and state serialization
 
 Static UI must be event-driven. Reusable assets are cached with explicit
-theme/scale/content invalidation. The Acer/OpenBSD evaluation provides the
-low-end measurement baseline.
+theme/scale/content invalidation. The documented Linux host provides the
+measurement baseline; old BSD results do not substitute for it.
 
 ## Related documents
 
-- `../MERIDIAN_OS_PLAN.md` — strategy and OS decision
-- `../ROADMAP.md` — execution phases
-- `UI_PLATFORM.md` — runtime/bridge target
-- `PROJECT_STATUS.md` — implemented behavior
+- `../NIWOE_IMPLEMENTATION_PLAN.md` — strategy and execution phases
+- `NIWOE_LINUX_BASELINE.md` — setup and validation
+- `phase-reports/README.md` — verified implementation status
+- `PROJECT_STATUS.md` — historical implementation snapshot
 - `OPENBSD.md` / `FREEBSD.md` — platform evidence
-- `meridian_design_manifest.md` — binding visual specification
+- `niwoe_design_manifest.md` — binding visual specification

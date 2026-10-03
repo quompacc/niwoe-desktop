@@ -1,24 +1,20 @@
 # Technical Design Guidelines
 
-These guidelines define implementation discipline for Meridian patches.
+These guidelines define implementation discipline for NIWOE patches.
 
-The active product direction is the BSD-capable Rust compositor plus an
-unprivileged WebKit UI platform for Meridian-owned surfaces. Target architecture
-and current implementation must always be labelled separately.
+The active product direction is a Linux Rust compositor plus a separate,
+unprivileged native Rust shell. Existing BSD adapters remain technical reference;
+the old BSD evaluation roadmap is superseded by `../NIWOE_IMPLEMENTATION_PLAN.md`.
 
-## Native / Web Boundary
+## Native Shell Boundary
 - Keep DRM/KMS, input, Wayland policy, window management, IPC authority and
-  privileged helpers in Rust.
-- Use WebKit only for Meridian-owned presentation surfaces and system tools.
-- Do not move authentication or privileged policy into JavaScript as a side
-  effect of UI migration.
-- Do not build a general Tauri replacement; expose the smallest required API.
+  privileged helpers in the compositor or narrow Rust services.
+- Keep the native shell unprivileged and expose only the smallest required IPC.
+- Do not move authentication or privileged policy into general shell UI code.
 
-## Bridge Security
-- Bridge operations are typed, versioned, capability-scoped and deny-by-default.
-- Packaged local content is the default; remote navigation has no privileged
-  bridge access.
-- No ambient filesystem, network or subprocess access.
+## IPC Security
+- IPC operations are typed, versioned, capability-scoped and deny-by-default.
+- The shell gets no ambient privileged filesystem, device or subprocess access.
 - Validate identity, bounds and state at every process boundary.
 
 ## Platform Discipline
@@ -47,11 +43,10 @@ and current implementation must always be labelled separately.
 - Favor minimal settings surfaces.
 - New settings must have clear product value and low long-term maintenance cost.
 
-## Meridian-Owned Shell Components
+## NIWOE-Owned Shell Components
 - Keep panel, launcher, and compositor-owned UI behavior coherent and predictable.
 - Avoid unbounded extension points that fragment UX.
-- Until the vertical slice is proven, keep the native shell as behavioral
-  reference and fallback.
+- Build shared native primitives before expanding the shell's feature surface.
 
 ## Toolkit-Neutral Defaults
 - Default behavior must remain toolkit-neutral.
@@ -71,8 +66,8 @@ and current implementation must always be labelled separately.
   - `cargo clippy --workspace --all-targets -- -D warnings`
   - `cargo test --workspace`
   - `git diff --check`
-- Web UI changes additionally require generated-token snapshots, bridge schema
-  tests, component interaction/accessibility tests and an idle/performance check.
+- Native UI changes additionally require component interaction/accessibility
+  checks and an idle/performance check on the affected path.
 
 ## Visual Validation
 - For rendering or input-adjacent changes, validate affected visual and interaction paths directly.
@@ -91,6 +86,6 @@ Apply this priority order:
 
 ## Product Filter
 A technical change is acceptable only if it:
-1. aligns with Meridian product direction
+1. aligns with NIWOE product direction
 2. avoids policy drift and app-specific coupling
 3. remains maintainable under small-patch discipline

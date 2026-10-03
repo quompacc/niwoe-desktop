@@ -12,36 +12,36 @@ Keine vollständige Implementierung, keine Render-/Workspace-Verhaltensänderung
 
 ### 1) Output-Registrierung
 - Winit:
-  - `crates/meridian-compositor/src/backend/winit/mod.rs`
+  - `crates/niwoe-compositor/src/backend/winit/mod.rs`
   - erzeugt genau einen Output (`"winit"`), setzt Mode (`refresh: 60_000`), mapped auf aktive Workspace bei `(0,0)`, pusht in `state.outputs`.
 - DRM:
-  - `crates/meridian-compositor/src/backend/drm/init.rs`
+  - `crates/niwoe-compositor/src/backend/drm/init.rs`
   - enumeriert verbundene Connectoren, erzeugt pro Connector `Output` (`drm-{idx}`), setzt Mode/Refresh/Transform, mapped Outputs horizontal versetzt (`x_offset`), pusht in `state.outputs`.
   - zusätzlich pro Output `DrmOutput` in `DrmBackend.outputs`.
 
 ### 2) Output-Geometrie / State
 - Global im State:
-  - `crates/meridian-compositor/src/state/mod.rs`
-  - `MeridianState.outputs: Vec<Output>`
-  - `MeridianState.output_registry: OutputRegistry` (read-only Sicht auf Output-Metadaten)
+  - `crates/niwoe-compositor/src/state/mod.rs`
+  - `NiwoeState.outputs: Vec<Output>`
+  - `NiwoeState.output_registry: OutputRegistry` (read-only Sicht auf Output-Metadaten)
 - Wayland-Output-Protokollmodul:
-  - `crates/meridian-compositor/src/protocols/output.rs` ist derzeit nur Placeholder.
+  - `crates/niwoe-compositor/src/protocols/output.rs` ist derzeit nur Placeholder.
 - Workspace-Mapping:
-  - `crates/meridian-compositor/src/workspace.rs`
+  - `crates/niwoe-compositor/src/workspace.rs`
   - `Space::map_output(...)` wird verwendet; beim Workspace-Switch werden Outputs vom alten in den neuen Workspace remapped (`remap_outputs`).
 
 ### 3) Rendering pro Output
 - DRM:
-  - `crates/meridian-compositor/src/backend/drm/render.rs`
+  - `crates/niwoe-compositor/src/backend/drm/render.rs`
   - iteriert über `drm.outputs` und rendert pro Output.
   - Layer-Daten werden pro Output geholt (`collect_layer_data(&out.output)`).
   - Cursor wird nur für den Output gerendert, dessen Geometrie den Pointer enthält.
 - Winit:
-  - `crates/meridian-compositor/src/backend/winit/mod.rs`
+  - `crates/niwoe-compositor/src/backend/winit/mod.rs`
   - ein Output, ein Damage-Tracker, ein Redraw-Loop.
 
 ### 4) Layer-Shell Output-Zuordnung
-- `crates/meridian-compositor/src/state/handlers/core/layer_shell.rs`
+- `crates/niwoe-compositor/src/state/handlers/core/layer_shell.rs`
 - Neue Layer-Surfaces:
   - nutzen angeforderten Output (`wl_output`) falls vorhanden,
   - sonst Registry-Policy `primary -> first`.
@@ -50,10 +50,10 @@ Keine vollständige Implementierung, keine Render-/Workspace-Verhaltensänderung
 
 ### 5) Cursor-Koordinaten
 - Pointer-Motion:
-  - `crates/meridian-compositor/src/input/pointer/mod.rs`
+  - `crates/niwoe-compositor/src/input/pointer/mod.rs`
   - Absolute Motion nutzt jetzt `OutputRegistry`-Desktop-Bounds + `output_at_point(...)` mit `primary()/first()`-Fallback.
 - Cursor-Render:
-  - `crates/meridian-compositor/src/backend/drm/render.rs`
+  - `crates/niwoe-compositor/src/backend/drm/render.rs`
   - Pointer-Location wird gegen jeweilige `output_geometry` geprüft; Cursor nur auf passendem Output.
 
 ### 6) Workspace-Mapping zu Outputs
@@ -181,11 +181,11 @@ Keine vollständige Implementierung, keine Render-/Workspace-Verhaltensänderung
 
 ### Backend-Hookpunkte für H5
 - DRM:
-  - `crates/meridian-compositor/src/backend/drm/init.rs`
+  - `crates/niwoe-compositor/src/backend/drm/init.rs`
   - bestehender Device-Notifier ist vorhanden (`insert_source(drm_notifier, ...)`), aktuell auf `DrmEvent::VBlank` beschränkt.
   - H5-Hook: Connector-Änderungen dort erkennen und auf `handle_output_*` routen (rescan/reconfigure/remove/add).
 - Winit:
-  - `crates/meridian-compositor/src/backend/winit/mod.rs`
+  - `crates/niwoe-compositor/src/backend/winit/mod.rs`
   - `WinitEvent::Resized` ist vorhanden und aktualisiert bereits Output-Metadaten.
   - H5a-Hook: Resize/Reconfigure gezielt über `handle_output_reconfigured(...)` führen (statt generischem Update), mit stabilem OutputId-Pfad.
 
@@ -217,7 +217,7 @@ Keine vollständige Implementierung, keine Render-/Workspace-Verhaltensänderung
 - Atomic modeset edge cases bei Reconfigure/Remove.
 
 ## First-Output Audit (nach OutputRegistry-Migration)
-- Scope: `crates/meridian-compositor/src` (Codepfade, keine reine Doku-Treffer).
+- Scope: `crates/niwoe-compositor/src` (Codepfade, keine reine Doku-Treffer).
 - Suchmuster: `outputs.first()`, `.first()` im Output-Kontext, `first output`, `primary`, `fallback`.
 
 Klassifikation:

@@ -1,0 +1,9 @@
+PASS original /dev/uinput ACL restored exactly
+PASS no temporary autologin/debug session/RTC alarm/recovery unit; displaymanager original hash unchanged
+PASS 50/51 original personal files byte-identical; only KDE-created kwinrc tiling defaults differ; user WLAN retained
+PASS removed 10 owned private editor profiles
+PASS removed 16 P12-owned installation staging payloads; logs preserved
+PASS no owned hardware clients; removed PID helpers, temporary caches, source manifest and binary backups
+PASS raw test evidence and private original-configuration backups retained; no test profile remains active
+PASS remaining remote temporary helper scripts removed after access restoration
+PASS local temporary SSH keys, synthetic inspection images and helper caches removed

@@ -4,7 +4,7 @@
 > Broad new portal/UI work is deferred behind the WebKit vertical slice unless
 > required for its security boundary or basic daily-driver validation.
 
-Stand: 2026-06-05, auditiert gegen `crates/meridian-portal`.
+Stand: 2026-08-24, auditiert gegen `crates/niwoe-portal` und OpenBSD-Hardware.
 
 ## Ziel
 
@@ -13,17 +13,18 @@ Prompts nicht in den Compositor-Render-/Input-Hotpath wandern.
 
 ## Aktueller Stand
 
-- Binary: `meridian-portal`.
-- D-Bus Name: `org.freedesktop.impl.portal.desktop.meridian`.
+- Binary: `niwoe-portal`.
+- D-Bus Name: `org.freedesktop.impl.portal.desktop.niwoe`.
 - Object Path: `/org/freedesktop/portal/desktop`.
-- Implementiert sind die Impl-Portale `FileChooser`, `Screenshot` und `Access`.
+- Implementiert sind die Impl-Portale `FileChooser`, `Screenshot`, `Access`
+  und `Settings`.
 - `PickColor` antwortet kontrolliert mit Response-Code `2`.
-- `ScreenCast`, Settings/Appearance und OpenURI sind offen.
+- `ScreenCast` und OpenURI sind offen.
 - Installationsmetadaten liegen unter `packaging/`:
   - D-Bus service file
   - systemd user unit
   - `.portal` descriptor
-  - `meridian-portals.conf`
+  - `niwoe-portals.conf`
 
 ## FileChooser
 
@@ -36,8 +37,8 @@ Implementierte Methoden:
 
 Der Backend-Prozess delegiert an einen externen Picker:
 
-- `MERIDIAN_FILE_PICKER`, falls gesetzt
-- sonst `/usr/local/bin/meridian-file-picker`
+- `NIWOE_FILE_PICKER`, falls gesetzt
+- sonst `/usr/local/bin/niwoe-file-picker`
 
 Weitergereichte Umgebung:
 
@@ -54,6 +55,14 @@ Rueckgaben:
 - Cancel: Response-Code `1`.
 - Picker-Fehler: Response-Code `2`.
 
+Auf OpenBSD wird diese Schnittstelle bewusst nicht vom NIWOE-Prozess
+exportiert. `packaging/xdg-desktop-portal/niwoe-openbsd-portals.conf` routet
+FileChooser exklusiv an das separat paketierte `xdg-desktop-portal-gtk`.
+Andernfalls wuerde dessen beliebiger Dateizugriff die enge `unveil(2)`-Sicht
+des lang laufenden NIWOE-Backends auf das gesamte Home-Verzeichnis
+aufweiten. Der echte Frontend-Aufruf und sichtbare Cancel-Pfad sind auf der
+Referenzhardware verifiziert.
+
 ## Screenshot
 
 Implementierte Methoden:
@@ -64,52 +73,59 @@ Implementierte Methoden:
 
 Datenpfad:
 
-1. `meridian-portal` nimmt den D-Bus-Request entgegen.
-2. Der Portal-Prozess sendet `ScreenshotBridgeRequest` ueber den Meridian-IPC-
+1. `niwoe-portal` nimmt den D-Bus-Request entgegen.
+2. Der Portal-Prozess sendet `ScreenshotBridgeRequest` ueber den NIWOE-IPC-
    Socket an den Compositor.
 3. Die Compositor-Policy entscheidet:
    - `PortalDbus` + `interactive=false`: Shell-Consent-Modal.
    - `PortalDbus` + `interactive=true`: Shell-Region-Picker.
    - unbekannte oder untrusted Origins: deny-by-default.
-   - `Internal` ist nur mit `MERIDIAN_SCREENSHOT_DEV=1` erlaubt.
+   - `Internal` ist nur mit `NIWOE_SCREENSHOT_DEV=1` erlaubt.
 4. Nach Consent/Region-Pick rendert der DRM-Pfad den Output, schreibt eine PNG
    in `XDG_RUNTIME_DIR` und antwortet mit einem File-URI.
 
 Offene Validierung:
 
-- echter `xdg-desktop-portal`-Client in einer installierten Meridian-Session
-- Cancel-/Deny-/Allow-Pfade mit sichtbarem Shell-Modal
 - Region-Picker auf echter DRM-Hardware und Multi-Output
 - Winit-/Nicht-DRM-Verhalten fuer Portal-Screenshot, falls benoetigt
+
+Der installierte OpenBSD-Frontendpfad ist fuer Consent verifiziert: sichtbares
+Ablehnen liefert Code `1` ohne Ergebnis, sichtbares Erlauben Code `0` mit einer
+gueltigen lokalen 1920x1080-PNG. Die Testdatei wurde danach entfernt.
 
 ## Access
 
 `org.freedesktop.impl.portal.Access` ist vorhanden und antwortet auto-allow,
-weil Meridian die eigentliche Screenshot-Entscheidung im eigenen Shell-/Compositor-
-Consent-Pfad trifft. Das verhindert, dass xdg-desktop-portal die Meridian-
+weil NIWOE die eigentliche Screenshot-Entscheidung im eigenen Shell-/Compositor-
+Consent-Pfad trifft. Das verhindert, dass xdg-desktop-portal die NIWOE-
 Screenshot-Implementierung schon beim Backend-Scan verwirft.
 
 ## Architekturgrenzen
 
 - Portal-Prozess ist die D-Bus- und App-Policy-Grenze.
 - Compositor bleibt Frame-/State-Quelle, nicht D-Bus-Frontend.
-- Screenshot-Capture braucht explizite Meridian-Policy; es gibt keinen globalen
+- Screenshot-Capture braucht explizite NIWOE-Policy; es gibt keinen globalen
   Allow-Default.
 - FileChooser darf extern delegieren; ScreenCast braucht eine eigene PipeWire-
   Session- und Permission-Architektur.
+- Auf OpenBSD ist der GTK-FileChooser eine ausdrueckliche separate
+  Sicherheitsgrenze; `niwoe-portal` besitzt dort weder `proc`/`exec` noch
+  allgemeinen Zugriff auf Nutzerdateien.
+- Das OpenBSD-Backend startet nur mit einem bereits vorhandenen echten
+  `$XDG_RUNTIME_DIR/niwoe.sock`; fehlender Socket oder eine normale Datei an
+  dessen Stelle fuehren kontrolliert zu Exit-Status `1`.
 
 ## Offene Slices
 
-1. FileChooser haerten:
-   - echte `xdg-desktop-portal`-Clients testen
+1. FileChooser weiter haerten:
    - Filter/Current-folder/Modal-Optionen auswerten
-   - Cancel-/Fehlerpfade dokumentieren
+   - Erfolgs- und Backend-Ausfallpfad zusaetzlich zum verifizierten Cancel testen
 2. Screenshot produktionshaerten:
-   - installierten Portal-Pfad gegen xdg-desktop-portal testen
-   - Consent-/Region-Picker auf echter Hardware validieren
+   - interaktiven Region-Picker auf echter Hardware validieren
    - Multi-Output-Auswahl und Output-Aufloesung spezifizieren
 3. Settings/Appearance read-only:
-   - Theme/Accent/Color-Scheme aus Meridian-Config ableiten
+   - Color-Scheme ist aus NIWOE-Config abgeleitet und live signalisiert
+   - weitere standardisierte Appearance-Werte nur bei realem Clientbedarf
 4. ScreenCast:
    - PipeWire
    - Session-Lifecycle, Revoke/Stop
